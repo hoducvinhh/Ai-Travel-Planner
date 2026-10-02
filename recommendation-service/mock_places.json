@@ -1,0 +1,4002 @@
+[
+  {
+    "name": "Hồ Xuân Hương",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "bbaf9043-fbe7-4ffd-945f-e81761561a23",
+    "description": "A beautiful Hồ Xuân Hương in Lam Dong",
+    "price_estimate": 0,
+    "popularity_score": 129.68822569928733,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.9404,
+    "longitude": 108.438
+  },
+  {
+    "name": "Thác Datanla",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "1cdc4a0c-121b-4777-8f10-eb3d0f83c44f",
+    "description": "A beautiful Thác Datanla in Lam Dong",
+    "price_estimate": 50000,
+    "popularity_score": 149.60234745316743,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.9094,
+    "longitude": 108.4583
+  },
+  {
+    "name": "Đồi Chè Cầu Đất",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "48b61e1c-06d7-44f0-a233-ea5ee0c1e67a",
+    "description": "A beautiful Đồi Chè Cầu Đất in Lam Dong",
+    "price_estimate": 30000,
+    "popularity_score": 48.526093939020434,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.9738,
+    "longitude": 108.4194
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "af4933a3-3ce0-49aa-acda-06b12ded764c",
+    "description": "A beautiful Thiền Viện Trúc Lâm in Lam Dong",
+    "price_estimate": 0,
+    "popularity_score": 24.986559353443962,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.9683,
+    "longitude": 108.4511
+  },
+  {
+    "name": "Ga Đà Lạt",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "80553005-f8c8-429b-889f-a3ee50b52d96",
+    "description": "A beautiful Ga Đà Lạt in Lam Dong",
+    "price_estimate": 0,
+    "popularity_score": 178.97501570244486,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.9404,
+    "longitude": 108.4419
+  },
+  {
+    "name": "Crazy House",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "d8d01dd3-6fc3-4c14-9619-5d0c14963a65",
+    "description": "A beautiful Crazy House in Lam Dong",
+    "price_estimate": 50000,
+    "popularity_score": 120.14603992756274,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.9475,
+    "longitude": 108.4222
+  },
+  {
+    "name": "Valley of Love",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "b772e199-dc1e-4e2f-a2e0-a9417b5d84e4",
+    "description": "A beautiful Valley of Love in Lam Dong",
+    "price_estimate": 40000,
+    "popularity_score": 10.810457790423717,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.9658,
+    "longitude": 108.4142
+  },
+  {
+    "name": "Cà phê Mê Linh",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "447646ba-e5c0-4198-b72e-1e0f9fcdf41b",
+    "description": "A beautiful Cà phê Mê Linh in Lam Dong",
+    "price_estimate": 50000,
+    "popularity_score": 50.36887421119422,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.9404,
+    "longitude": 108.4419
+  },
+  {
+    "name": "Hồ Hoàn Kiếm",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "9dbb74c8-8018-450a-921b-2e575a3dbac2",
+    "description": "A beautiful Hồ Hoàn Kiếm in Hanoi",
+    "price_estimate": 0,
+    "popularity_score": 10.174514088353407,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 21.0285,
+    "longitude": 105.8542
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "5a90e6ff-b72b-4a68-aa3a-e2168f47dd9c",
+    "description": "A beautiful Văn Miếu Quốc Tử Giám in Hanoi",
+    "price_estimate": 30000,
+    "popularity_score": 144.62382451986866,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.0277,
+    "longitude": 105.8355
+  },
+  {
+    "name": "Chợ Đồng Xuân",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "114fdd15-1699-4ac4-827f-7c0241786de9",
+    "description": "A beautiful Chợ Đồng Xuân in Hanoi",
+    "price_estimate": 0,
+    "popularity_score": 111.26358871762726,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.0367,
+    "longitude": 105.8481
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "be15ed7b-dfc0-49c8-81a8-8e254a73abd7",
+    "description": "A beautiful Bảo Tàng Hồ Chí Minh in Hanoi",
+    "price_estimate": 25000,
+    "popularity_score": 92.59576402535146,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.0364,
+    "longitude": 105.8345
+  },
+  {
+    "name": "Phố Cổ Hà Nội",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "d60aabdc-1de7-49bb-b65d-854cd12e41f8",
+    "description": "A beautiful Phố Cổ Hà Nội in Hanoi",
+    "price_estimate": 0,
+    "popularity_score": 162.8389390521762,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.0333,
+    "longitude": 105.85
+  },
+  {
+    "name": "Dinh Độc Lập",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "baf2769a-575e-4cf5-a2ff-72b5e83ed92f",
+    "description": "A beautiful Dinh Độc Lập in Ho Chi Minh",
+    "price_estimate": 40000,
+    "popularity_score": 152.96743659030463,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.7769,
+    "longitude": 106.6955
+  },
+  {
+    "name": "Chợ Bến Thành",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "f50134c9-f8f7-4058-8d6e-051c9d43a65b",
+    "description": "A beautiful Chợ Bến Thành in Ho Chi Minh",
+    "price_estimate": 0,
+    "popularity_score": 141.13718202270422,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.772,
+    "longitude": 106.6981
+  },
+  {
+    "name": "Nhà Thờ Đức Bà",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "fcc072bd-dbc2-40f7-ab6c-b29e79d8af08",
+    "description": "A beautiful Nhà Thờ Đức Bà in Ho Chi Minh",
+    "price_estimate": 0,
+    "popularity_score": 59.18491162597016,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.7797,
+    "longitude": 106.699
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "93f72a49-a712-413f-ad32-2d5b1718f225",
+    "description": "A beautiful Bảo Tàng Chứng Tích Chiến Tranh in Ho Chi Minh",
+    "price_estimate": 40000,
+    "popularity_score": 191.65654908032232,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.7794,
+    "longitude": 106.6918
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "68a9ea16-89b8-4cab-8d89-4e195d619a2c",
+    "description": "A beautiful Phố Đi Bộ Nguyễn Huệ in Ho Chi Minh",
+    "price_estimate": 0,
+    "popularity_score": 24.931003921370497,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.7741,
+    "longitude": 106.7021
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 18",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "9ef80f47-03ac-43ea-93e7-0ea8166d1040",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 1763,
+    "popularity_score": 170.26140143775467,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.921204173444401,
+    "longitude": 108.35979008858462
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 19",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "d24569e6-cbfe-49bd-a248-d946462c8190",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 7571,
+    "popularity_score": 29.341101756375824,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.687760039615691,
+    "longitude": 106.65673565628141
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 20",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "19718e1e-609d-42d6-906f-0f3f1780212a",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 33918,
+    "popularity_score": 42.49627510004868,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 20.945564876731133,
+    "longitude": 105.78007965513031
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 21",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "0111dd41-f988-4ada-941e-8365245b3054",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 22614,
+    "popularity_score": 171.78695559795364,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.003725245007832,
+    "longitude": 105.82618206047368
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 22",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "ec272fd6-e2d8-4ca5-ba4e-6b3cd4a8e023",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 20329,
+    "popularity_score": 77.18528858779212,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.07043503487554,
+    "longitude": 105.87486406269171
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 23",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "2591ad26-6f62-43fb-90aa-7a341cf822e3",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 39960,
+    "popularity_score": 128.82076619842675,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 12.019625359590071,
+    "longitude": 108.35208049875239
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 24",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "a0b73fdb-7bdc-4567-86a5-c4e4c16e2446",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": -1155,
+    "popularity_score": 197.95705337413608,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.070932391686664,
+    "longitude": 105.79392303479405
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 25",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "bc7a356f-5f4e-4b40-b83f-9784e45b42e1",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": -8168,
+    "popularity_score": 49.66437403300035,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.097709160154242,
+    "longitude": 105.82833295740447
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 26",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "5c84fb77-143c-443b-b91c-994f90b84493",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 26913,
+    "popularity_score": 183.0615442161813,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 12.049073525294535,
+    "longitude": 108.38233557615969
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 27",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "16397497-9abf-4ea0-88df-651271c2a7a9",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": 2964,
+    "popularity_score": 177.51321500790698,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.77147037051748,
+    "longitude": 106.6519760332996
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 28",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "7b15d1ee-3cd1-47b8-811e-fdb9b05b6b9e",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 58394,
+    "popularity_score": 110.10057148512163,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.95731719804471,
+    "longitude": 108.5214645767205
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 29",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "ef5d87d0-2e9c-4aee-b6c7-4a3dd5f76156",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 1861,
+    "popularity_score": 47.76754803567025,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.035205258735292,
+    "longitude": 105.76818188243476
+  },
+  {
+    "name": "Thác Datanla - Branch 30",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "a4ff4fc3-015d-459d-b4bc-8553897a2a76",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 43592,
+    "popularity_score": 34.80405727291091,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.967815872872592,
+    "longitude": 108.44273199335993
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 31",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "4d2d324a-9c8f-4c2b-a414-72e6434b0361",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 32608,
+    "popularity_score": 79.41576086877467,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.979622869019828,
+    "longitude": 108.51361567552271
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 32",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "6bc19740-69c1-42b8-bd7c-d86fedf8ce63",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": -6247,
+    "popularity_score": 137.93352196018208,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.990575559918323,
+    "longitude": 108.49171974653149
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 33",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "6b2be7bb-a1c8-4766-a38e-423ebeb719ed",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": -6345,
+    "popularity_score": 62.232525086248096,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.027444741265843,
+    "longitude": 105.93886318550422
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 34",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "faa6ef9e-bd5e-48f4-acf6-f33c14a9710f",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 6403,
+    "popularity_score": 153.58262881515262,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 21.111025567868964,
+    "longitude": 105.92830371396735
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 35",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "882474dc-51a5-4b96-a2dc-6efda338ee87",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 36635,
+    "popularity_score": 123.7491912304436,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.002482770518228,
+    "longitude": 105.76780980715063
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh - Branch 36",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "5c135873-f998-473d-84a5-ebd1c8d91bbb",
+    "description": "A wonderful place similar to Bảo Tàng Chứng Tích Chiến Tranh",
+    "price_estimate": 30018,
+    "popularity_score": 121.79419396974465,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.683295348477166,
+    "longitude": 106.77761972325293
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 37",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "c2b88a94-c544-45d2-93c6-bf987ee2be7c",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 27846,
+    "popularity_score": 16.295407466366573,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.1170898890596,
+    "longitude": 105.75263069041357
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 38",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "4543a547-0a22-4f09-9594-2df2d2660705",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -7733,
+    "popularity_score": 195.70697626708017,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.832866885861398,
+    "longitude": 106.62467829289994
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 39",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "5da00cc2-87ac-49b5-8459-d73d4ea22041",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": 8015,
+    "popularity_score": 37.19975699995489,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.854186608217052,
+    "longitude": 106.68362758804018
+  },
+  {
+    "name": "Valley of Love - Branch 40",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "ca876f28-5bdc-44c2-ba42-49f5be3d65c1",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 47671,
+    "popularity_score": 152.27671334398207,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.906030212677939,
+    "longitude": 108.37654325826017
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 41",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "52988840-9d26-456d-b59e-3d085fdb3769",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 29355,
+    "popularity_score": 180.42474650537437,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.960600839173654,
+    "longitude": 105.77943946740632
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 42",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "11b1259e-dfb1-4e17-ba61-440873306735",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": -9311,
+    "popularity_score": 119.7202000991605,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.05438802288207,
+    "longitude": 105.74953816779703
+  },
+  {
+    "name": "Thác Datanla - Branch 43",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "48788432-d60b-443b-8973-315dc07a6c1e",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 47501,
+    "popularity_score": 18.14306398150996,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.981327080050749,
+    "longitude": 108.37247146997773
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 44",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "3ac6d504-9200-4f88-8a13-f347e9c380f1",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 49125,
+    "popularity_score": 135.45066676777472,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.94824678627895,
+    "longitude": 108.4865705131762
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 45",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "a63eddd6-d99c-4578-985f-956932b0721d",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -2038,
+    "popularity_score": 158.0007877366969,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.717781982872376,
+    "longitude": 106.61838616284577
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 46",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "46c83812-8d3a-45cc-be4a-edcf34a0dd31",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 41609,
+    "popularity_score": 87.59783148888455,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.84966734967392,
+    "longitude": 106.60633423744643
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 47",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "6c841beb-9300-4c81-9b5d-ea72544d77fc",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": -8014,
+    "popularity_score": 83.51115000994241,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 12.02841850217234,
+    "longitude": 108.37295380644896
+  },
+  {
+    "name": "Valley of Love - Branch 48",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "41ff0ef9-8392-40cd-928f-ba7cdc55aeb2",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 36232,
+    "popularity_score": 109.57572201251716,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.950176327966881,
+    "longitude": 108.36990902893338
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 49",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "def7411a-74a2-4524-9c2c-0874a41903db",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 42470,
+    "popularity_score": 91.4104952854241,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.85998174564032,
+    "longitude": 108.47232897879971
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 50",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "c8b325e0-c278-403e-87a6-771ba892063b",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -9517,
+    "popularity_score": 193.95427017052648,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.707362222120784,
+    "longitude": 106.69922822509014
+  },
+  {
+    "name": "Valley of Love - Branch 51",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "b3968c7d-515f-45ee-a24e-652ffd3fa200",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 43141,
+    "popularity_score": 180.97635877455699,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.941594623795384,
+    "longitude": 108.51126176875594
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 52",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "e20627dc-6ed3-43d6-8a7a-0f1f21581b86",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 4909,
+    "popularity_score": 60.62359964464945,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 21.119963528171937,
+    "longitude": 105.95328453789855
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 53",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "b771c461-11b3-4881-a089-809330b9f73d",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 5947,
+    "popularity_score": 35.185380928442505,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.717640179682835,
+    "longitude": 106.61379665840145
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 54",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "4eab0534-522a-48d8-8e89-1e6100bd3cb6",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -8003,
+    "popularity_score": 150.8552342739175,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.68412846745279,
+    "longitude": 106.69745770342179
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh - Branch 55",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "d6460ae4-9d49-40a2-a48e-afcf5c469631",
+    "description": "A wonderful place similar to Bảo Tàng Chứng Tích Chiến Tranh",
+    "price_estimate": 35158,
+    "popularity_score": 16.09151804709348,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.695422293048118,
+    "longitude": 106.62896499219615
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 56",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "4b91373e-59dc-47af-a395-47daa099077b",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 27707,
+    "popularity_score": 83.7362325070641,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.923043069557725,
+    "longitude": 108.43830383070669
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 57",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "e230cf3b-e7bc-4afe-b5b0-cb7c144d6f3b",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 33737,
+    "popularity_score": 133.1877670721419,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.978356543106392,
+    "longitude": 108.50634125154728
+  },
+  {
+    "name": "Valley of Love - Branch 58",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "840ffeed-cd30-4ad6-b96a-b6a07cbd17c9",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 40295,
+    "popularity_score": 51.543760760089974,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.89197565642549,
+    "longitude": 108.44330015776752
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 59",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "b3969f1c-f8c3-4f8d-89e8-69fef6ce084d",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 360,
+    "popularity_score": 186.15857468257528,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.67386309137685,
+    "longitude": 106.72233185109862
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 60",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "bb12cd09-a6f0-4135-a5f6-8330cfa157f3",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": -7600,
+    "popularity_score": 109.83870879981733,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.92134008295008,
+    "longitude": 108.53775187559874
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 61",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "9d080332-0777-4a3e-b9a8-bcab934c4658",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 28004,
+    "popularity_score": 77.05778230408237,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.961436914601542,
+    "longitude": 108.42804359245231
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 62",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "04a5597b-a9b6-4fa0-8734-579adcd23b26",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 37332,
+    "popularity_score": 6.5255058946708004,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 20.987575750439994,
+    "longitude": 105.86817774299321
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 63",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "39d83176-acfe-41a2-b6fb-522c74979b42",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -1334,
+    "popularity_score": 27.50859073172493,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.9888833367962,
+    "longitude": 108.372989581955
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 64",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "900d5491-b899-4805-91d4-eb90228f64a4",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 39819,
+    "popularity_score": 46.0727826873539,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.96841946246549,
+    "longitude": 105.86234759177701
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 65",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "0598d775-ce10-47db-965d-1258d0623226",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 6561,
+    "popularity_score": 100.26371116912843,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 20.94695969354255,
+    "longitude": 105.83891515451275
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 66",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "153b1cdc-14c5-43f3-b3a8-383224ed44b2",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": -8556,
+    "popularity_score": 5.6914093721175485,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 21.055922675460277,
+    "longitude": 105.80659105248688
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 67",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "eb9ed6cd-c82e-4811-b036-1547b4cdd1c6",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 8077,
+    "popularity_score": 142.6051521181982,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.673933939921668,
+    "longitude": 106.61314877201475
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 68",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "e4bdf53c-cb14-4ebc-938d-ba7284ff827f",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": 7877,
+    "popularity_score": 12.025486921861969,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.956901913297958,
+    "longitude": 108.3715187571135
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 69",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "ef34dcab-975b-47f3-959d-8f32c872c827",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -8630,
+    "popularity_score": 65.11037823637606,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 12.020184927305296,
+    "longitude": 108.38391530766795
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 70",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "2e6888cc-0de5-4974-ac4f-ca50b9b117e7",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 43368,
+    "popularity_score": 73.96733374985058,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 12.017226940290202,
+    "longitude": 108.42317547796642
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 71",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "40245c30-4341-474e-8fd2-8064703ca762",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -2243,
+    "popularity_score": 173.598110762893,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 12.016683240932664,
+    "longitude": 108.34685727237964
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 72",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "8792440e-35c0-4fc1-babc-ba1a20b2bf7a",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": 3491,
+    "popularity_score": 161.4358520927421,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.09884986331488,
+    "longitude": 105.80146114191889
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 73",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "e33425ac-2a46-48bb-8601-351b426d33bf",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 2535,
+    "popularity_score": 175.0725226666875,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.912786743509132,
+    "longitude": 108.51441732111938
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 74",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "14bfc73b-6fc9-41f4-9000-29650bf6d502",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 1457,
+    "popularity_score": 64.51221913102711,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.716584709441163,
+    "longitude": 106.73010663654972
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 75",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "d5e4368d-3032-42c6-b345-7edd6d088e58",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 756,
+    "popularity_score": 59.32759689948576,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.12667782080967,
+    "longitude": 105.80582499854437
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh - Branch 76",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "e4df2c6a-81a1-4b14-b45a-400a15078b94",
+    "description": "A wonderful place similar to Bảo Tàng Chứng Tích Chiến Tranh",
+    "price_estimate": 43096,
+    "popularity_score": 137.50603308025143,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.745629973642883,
+    "longitude": 106.59732010702393
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 77",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "2b9e7f5f-7392-4842-9580-28e3f2234f8d",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": -4149,
+    "popularity_score": 118.21499807904803,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 20.936151439470652,
+    "longitude": 105.87351425099756
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 78",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "46c5defb-9b90-4300-8d39-084b90eb4fb0",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 25278,
+    "popularity_score": 90.09680735476856,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 20.959529156805868,
+    "longitude": 105.91440094658225
+  },
+  {
+    "name": "Valley of Love - Branch 79",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "139e4cd9-d818-4dab-9cf6-2b6c0313aeee",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 38346,
+    "popularity_score": 13.655374074080063,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.866138255643726,
+    "longitude": 108.4993150330998
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 80",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "f355ca22-0571-4146-8339-e00fb9306b4f",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -3544,
+    "popularity_score": 76.02318699734651,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.863874897194263,
+    "longitude": 106.78625417124361
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 81",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "b873e1c3-0667-441e-b91c-600b6b8fe73d",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": -5917,
+    "popularity_score": 145.3520812877203,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.038124500807054,
+    "longitude": 105.88147858082115
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 82",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "f52a5548-8f90-4ec6-8ac2-1a9395afdd43",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": 3185,
+    "popularity_score": 140.95564076790782,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 20.962157559811832,
+    "longitude": 105.83218926675458
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 83",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "cebed497-6016-45b9-9ad7-94b678a148be",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": -4298,
+    "popularity_score": 125.02540861051921,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.014515033751632,
+    "longitude": 105.9167450338608
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 84",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "a02e7991-23b3-47eb-b31b-ebfe89339a08",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 29401,
+    "popularity_score": 45.98562355211517,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.049032314095953,
+    "longitude": 105.79994984594731
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 85",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "3ff52ddb-9113-43a8-a400-344eeff3d49e",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 4488,
+    "popularity_score": 136.74731047206947,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.766637237181865,
+    "longitude": 106.77833616516564
+  },
+  {
+    "name": "Crazy House - Branch 86",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "b821559a-06b2-47ab-bad1-923c81e684d2",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 42778,
+    "popularity_score": 60.33834897364035,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.97408817115316,
+    "longitude": 108.38923765108197
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 87",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "83a7c144-2feb-406d-9f04-cd52bb97f31e",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 50171,
+    "popularity_score": 48.80492986947121,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.869870792449156,
+    "longitude": 108.35114274361855
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 88",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "4ee866f9-c776-4da6-a127-16fd8ab5be1e",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -7614,
+    "popularity_score": 93.80615283411738,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.794834179881864,
+    "longitude": 106.74266918309979
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 89",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "b7cf2795-98e5-4df1-ac5c-e579e39f8cba",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 6199,
+    "popularity_score": 82.93230826092484,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.064511602222357,
+    "longitude": 105.7511089636276
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 90",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "daf9d793-4c22-40f7-8060-a0b3a2a296cd",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 3931,
+    "popularity_score": 47.67402167840229,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.971891550088747,
+    "longitude": 108.36114367702812
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 91",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "0e5e35ac-9e3a-4112-972d-388c6d580167",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 43976,
+    "popularity_score": 94.01005596668365,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.97391554651727,
+    "longitude": 108.53947849061329
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 92",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "a62eb83b-28b6-47a6-bbac-18b5d6254aef",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": 4502,
+    "popularity_score": 124.46720293854375,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.115104059268205,
+    "longitude": 105.83344815137173
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 93",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "f1d78b0c-a107-4568-9275-8c6dbc14846d",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 4611,
+    "popularity_score": 179.9555801304861,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.846398981956654,
+    "longitude": 106.69211395144939
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 94",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "cbfaa1d5-cd38-46d4-a14d-8cef0b9cf581",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 49086,
+    "popularity_score": 154.33366843794727,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.937319403414053,
+    "longitude": 108.38974917276293
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 95",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "feaa0e8c-2ed7-4302-baa8-fe36a487b29e",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -7462,
+    "popularity_score": 144.141248209156,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.726343021416437,
+    "longitude": 106.66204191368375
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 96",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "593c8971-cf0c-4dfc-b665-829c1ff4d9fc",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -7360,
+    "popularity_score": 31.982941995650364,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.750707058486269,
+    "longitude": 106.63266105331543
+  },
+  {
+    "name": "Valley of Love - Branch 97",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "c9cba68f-c0cd-47c0-a1d7-3f6481749d0a",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 32104,
+    "popularity_score": 85.89923970015253,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.974322228100784,
+    "longitude": 108.39735484682062
+  },
+  {
+    "name": "Valley of Love - Branch 98",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "d206e010-60b6-4a83-b147-0149c1bf7dde",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 43767,
+    "popularity_score": 80.94797847005354,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 12.05501240671802,
+    "longitude": 108.31810639134754
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 99",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "a9a1c0fe-bdbd-44d0-b0e3-ce5e1145e2ad",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 5629,
+    "popularity_score": 6.149736298878649,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.993022530474477,
+    "longitude": 105.82799732961274
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 100",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "e56a76fd-f05a-400e-8f17-f4f13f3a43ee",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 47636,
+    "popularity_score": 150.7655554507199,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.836873634188253,
+    "longitude": 106.77506226947983
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 101",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "be5055d1-6ac9-48ca-bca1-2e39b290c08c",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -2810,
+    "popularity_score": 58.22238579383503,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.685504963989343,
+    "longitude": 106.66622590873968
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 102",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "7848fa4c-1a1f-4a17-9e8c-301dd3224894",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": -4592,
+    "popularity_score": 168.89860429719891,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.129444395503786,
+    "longitude": 105.85682472590649
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 103",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "d839e3eb-23ee-408e-b32d-6eabdffddae3",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 9395,
+    "popularity_score": 115.05643668983095,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 20.9500894924324,
+    "longitude": 105.83572255393221
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 104",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "3fd6a0a7-de80-47b4-8b68-c728b081141e",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -4046,
+    "popularity_score": 14.805503530282373,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.737470533388347,
+    "longitude": 106.6890398650033
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 105",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "729dd806-8b65-4513-92a0-535d529c7e71",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": 2423,
+    "popularity_score": 59.260040049567166,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.987154306356476,
+    "longitude": 105.76448124655234
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 106",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "2c6d8fb1-eb7f-4574-aaac-31ef29c06e15",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": 7675,
+    "popularity_score": 15.156693607434818,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.88524443314395,
+    "longitude": 108.35172367409055
+  },
+  {
+    "name": "Thác Datanla - Branch 107",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "0d435fca-9883-4005-aee6-e6b38d7b6310",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 41016,
+    "popularity_score": 190.17428787961782,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.97724576925692,
+    "longitude": 108.48256713131723
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 108",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "0ef633e7-17fe-4ef6-8444-a575e731d6ef",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 44136,
+    "popularity_score": 97.34440688449497,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.953193916386004,
+    "longitude": 108.3854929081813
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 109",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "d422d522-f391-4fe2-96ef-303db2d00c0f",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 2087,
+    "popularity_score": 37.718882956721444,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 21.121246948820243,
+    "longitude": 105.8978714457192
+  },
+  {
+    "name": "Crazy House - Branch 110",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "b2f4d01b-b362-440f-a2a9-c32126d54676",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 50192,
+    "popularity_score": 26.079256183233284,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 12.033277433681423,
+    "longitude": 108.43735934568248
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 111",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "0d7ebeb1-ba64-46a5-8730-3622abeddf21",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 2997,
+    "popularity_score": 188.58676671555537,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 20.948499295568613,
+    "longitude": 105.8881228831866
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 112",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "c99b6290-af94-41ee-a6b7-b5ef7956e8c6",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 43339,
+    "popularity_score": 140.95263548667558,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 12.01045864781776,
+    "longitude": 108.46198232296338
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 113",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "07c9c0e6-619f-4ac8-a142-2f82ca2f5dae",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 8544,
+    "popularity_score": 157.61389254039884,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.9748490490621,
+    "longitude": 108.48340426813746
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 114",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "93410a2d-40a0-480b-a5b3-83f262bda7ff",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 36579,
+    "popularity_score": 131.270934541077,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 12.043715125399917,
+    "longitude": 108.483866183618
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 115",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "af2040c4-c6fd-47df-b5a1-3660371f0dc4",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 4205,
+    "popularity_score": 192.35357560684284,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 12.046615002961019,
+    "longitude": 108.44304786952034
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 116",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "2d97052d-0417-457b-be7f-78b8bf4e5afe",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": 4270,
+    "popularity_score": 39.34670741178157,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 12.033494746247616,
+    "longitude": 108.39591647927749
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 117",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "d42305e6-e69f-47be-b4e9-31b598988153",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 5843,
+    "popularity_score": 95.65038546872903,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.792594923812741,
+    "longitude": 106.66656091659623
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 118",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "ba4114a4-e2db-4ee2-a467-1e6e3beb620d",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 42839,
+    "popularity_score": 59.39100859253168,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.889172687838192,
+    "longitude": 108.43484169332065
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 119",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "0afded0a-d3cf-4090-ac81-c4a0217654f8",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 1023,
+    "popularity_score": 10.596499565167468,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.969667971431537,
+    "longitude": 105.79242397003594
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 120",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "dbd6b205-7896-48ae-b83a-b8cde83bcfe3",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 1152,
+    "popularity_score": 59.53340516732926,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 21.068736750066442,
+    "longitude": 105.80945371515125
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 121",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "40464152-2d23-47d7-be35-121c037bbd1c",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": 6928,
+    "popularity_score": 189.87220266652108,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.888671210074536,
+    "longitude": 108.4192856249341
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 122",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "a5877cae-46dd-47ad-8c5b-40e26d0fcfb0",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -2126,
+    "popularity_score": 139.668821192072,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.816468481294546,
+    "longitude": 106.69173490991732
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 123",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "46cbd131-a362-4d71-bcd7-5c394b7974ea",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": -6951,
+    "popularity_score": 62.37593835749698,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.97875743105904,
+    "longitude": 108.39924120602602
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 124",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "7eec137a-c3a1-4228-b6b5-8b78fb53fffe",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 30507,
+    "popularity_score": 112.92722622699867,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.021500762541045,
+    "longitude": 105.88368708734272
+  },
+  {
+    "name": "Chợ Đồng Xuân - Branch 125",
+    "province": "Hanoi",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Local"
+    ],
+    "price": 0,
+    "lat": 21.0367,
+    "lon": 105.8481,
+    "id": "4127ac05-0308-4684-9ce8-b8e6d7fc8685",
+    "description": "A wonderful place similar to Chợ Đồng Xuân",
+    "price_estimate": 1528,
+    "popularity_score": 142.05671372622496,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 20.998024598269765,
+    "longitude": 105.7942076082597
+  },
+  {
+    "name": "Valley of Love - Branch 126",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "5587a453-32e3-444d-968e-5aad74485a70",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 40339,
+    "popularity_score": 28.313174544735304,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 12.055975512078687,
+    "longitude": 108.4522327108281
+  },
+  {
+    "name": "Valley of Love - Branch 127",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "653824d3-8a71-4d38-aafd-187471b5a0e0",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 37090,
+    "popularity_score": 149.02790743424538,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 12.01071700021861,
+    "longitude": 108.5095214045766
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh - Branch 128",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "47446435-fe93-45ad-9ffc-a93183d9de8b",
+    "description": "A wonderful place similar to Bảo Tàng Chứng Tích Chiến Tranh",
+    "price_estimate": 49555,
+    "popularity_score": 60.18474713861623,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.845925672665414,
+    "longitude": 106.65104929265303
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 129",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "6738a084-8ca4-4628-ab71-2f936c937273",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 20879,
+    "popularity_score": 63.94217981218494,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.043227017853532,
+    "longitude": 105.78936226535666
+  },
+  {
+    "name": "Thác Datanla - Branch 130",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "3bcb5b1c-6478-487e-a323-75635cb7d390",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 58132,
+    "popularity_score": 61.96664568779162,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.936973931021186,
+    "longitude": 108.50885843515825
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 131",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "fe03ce25-030f-45e6-8fa5-c389a916d11a",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": -9599,
+    "popularity_score": 116.9425228271348,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.964042841721279,
+    "longitude": 108.41924118651205
+  },
+  {
+    "name": "Thác Datanla - Branch 132",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "5bf3e1d0-9763-43e9-ad3a-1c33bc213205",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 48273,
+    "popularity_score": 188.50740136978013,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.832217428144984,
+    "longitude": 108.37136868702278
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 133",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "695ed422-801c-424e-bf13-230f8329c9c7",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -7573,
+    "popularity_score": 117.51912551180952,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.690421814858507,
+    "longitude": 106.62883951689473
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 134",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "4cc16a8d-47ee-4187-866f-c99f0c0b1ce8",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 22791,
+    "popularity_score": 198.81403392849293,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.039314606923526,
+    "longitude": 105.81873480428206
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 135",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "39bceb1a-5f57-4062-a37f-ed378c681ea2",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 57123,
+    "popularity_score": 79.17371509857712,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.899870626503478,
+    "longitude": 108.45960502774423
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 136",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "9aa1ec8c-d4d5-450f-be38-934f60742bc1",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 40006,
+    "popularity_score": 115.88274677172548,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.798826182449025,
+    "longitude": 106.7435178610969
+  },
+  {
+    "name": "Valley of Love - Branch 137",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "f69b9df3-b49e-4264-9a2d-171ff8c9b870",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 36914,
+    "popularity_score": 56.605994431551444,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.897211418676175,
+    "longitude": 108.34896270966529
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 138",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "6284276a-1007-4572-a014-06c50ca45e8f",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 25129,
+    "popularity_score": 5.521765907562718,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 12.011674227156954,
+    "longitude": 108.41338249580153
+  },
+  {
+    "name": "Thác Datanla - Branch 139",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "2233367e-dcc0-46a3-a01a-f781a300ba02",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 47585,
+    "popularity_score": 61.180453470769415,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.949997511618744,
+    "longitude": 108.4491062652814
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 140",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "3b710518-74bc-4b92-8464-9556a1a2be9a",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 48668,
+    "popularity_score": 158.6264651961126,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.958357917841052,
+    "longitude": 108.5026811360563
+  },
+  {
+    "name": "Valley of Love - Branch 141",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Garden",
+      "Romantic"
+    ],
+    "price": 40000,
+    "lat": 11.9658,
+    "lon": 108.4142,
+    "id": "69e963bf-8f17-4b1b-8601-1e7caffe0da6",
+    "description": "A wonderful place similar to Valley of Love",
+    "price_estimate": 43930,
+    "popularity_score": 27.38137897990392,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.995326944680496,
+    "longitude": 108.49588228904251
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 142",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "31bbb6fb-abbf-43db-96e0-12ef8865f921",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -7661,
+    "popularity_score": 16.629417705200176,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.95940880746388,
+    "longitude": 108.506748060264
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 143",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "df5d964f-d8db-4397-b589-fdb3036f2a0f",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 34390,
+    "popularity_score": 29.248963344068105,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 20.988518238108952,
+    "longitude": 105.81600170383255
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 144",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "29e94637-e26f-49a4-9118-e1f86db9290f",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 6399,
+    "popularity_score": 110.29640470661273,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 20.94458837037986,
+    "longitude": 105.76217215683673
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 145",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "e40c6f22-a8b6-4d73-9ad1-c8901c8611f9",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 40561,
+    "popularity_score": 122.72415998445257,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.695165377326196,
+    "longitude": 106.78788222043856
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 146",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "c5fd9185-a725-4fe8-b0c0-2230e6455c4d",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": -1169,
+    "popularity_score": 117.36816199753562,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.934500164650327,
+    "longitude": 108.46830189788675
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 147",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "355cbfdc-bef3-4d9f-a4bb-7e103d505fe1",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": -4053,
+    "popularity_score": 199.40436761184986,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 21.055456943890817,
+    "longitude": 105.85254516043821
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 148",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "258e1346-43c9-4669-b53f-ea518981c1d9",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 35401,
+    "popularity_score": 72.85240597745684,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.938011651191315,
+    "longitude": 108.3403199769165
+  },
+  {
+    "name": "Crazy House - Branch 149",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "25eb3fba-28ec-4590-8ea0-629786f29e7c",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 50807,
+    "popularity_score": 85.27079250861976,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.905143559072291,
+    "longitude": 108.51123870791264
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 150",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "ce13d5a0-88e6-43d0-8ba7-43a5e296132e",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -8798,
+    "popularity_score": 93.69105217733724,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.724579770188441,
+    "longitude": 106.6252843202862
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 151",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "8479c23f-a938-44ce-960d-d006a4e5c5d4",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 6862,
+    "popularity_score": 165.86080463739668,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 21.064832077296625,
+    "longitude": 105.85851871887144
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 152",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "463a6434-c515-4987-890f-d3560acf3e32",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 31776,
+    "popularity_score": 41.57859557193279,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.801426774520342,
+    "longitude": 106.69519862047643
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 153",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "2c58df68-2611-4d73-bc5c-fcbad8f5009c",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -8309,
+    "popularity_score": 44.6938564783034,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.69820264579009,
+    "longitude": 106.65570582899767
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 154",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "4610368c-6657-48c6-ac71-6bf47a8acb18",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -6022,
+    "popularity_score": 10.629541276124328,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.801474333416394,
+    "longitude": 106.64685949246552
+  },
+  {
+    "name": "Crazy House - Branch 155",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "9987c113-6642-4121-89cf-f46c6aa1d766",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 50182,
+    "popularity_score": 112.41360636552065,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.92909813745798,
+    "longitude": 108.36714013189116
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 156",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "1bb1191c-2c98-40ad-a5aa-b34db2901196",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 5120,
+    "popularity_score": 189.67684476007443,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 12.03472863475378,
+    "longitude": 108.45077510094144
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 157",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "880cd895-b3e3-46ad-aa4f-fbbac58923eb",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 36674,
+    "popularity_score": 142.55526783554149,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.09464478911534,
+    "longitude": 105.93154892652068
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 158",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "a087b97a-8272-4921-8bcd-ec5c887f4479",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 54967,
+    "popularity_score": 112.49668999169158,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.878522074189586,
+    "longitude": 108.46177551973499
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 159",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "717a57ab-ec52-4859-816c-1433ba0319eb",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -7713,
+    "popularity_score": 58.86824355029799,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.90837504862286,
+    "longitude": 108.49944348115287
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 160",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "9f1e245e-e03f-4820-8fa8-fc8fa4be4a84",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": -9916,
+    "popularity_score": 60.153601740151196,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 21.095995184521286,
+    "longitude": 105.87018467677669
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 161",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "170ce263-cbce-4bba-9de6-a022abab4924",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -5131,
+    "popularity_score": 92.07674164342292,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.7487247883386,
+    "longitude": 106.70938348341416
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 162",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "a947ec50-7d3c-4252-ae5a-796fb72a66da",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 2360,
+    "popularity_score": 93.7922002889677,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.848020336646814,
+    "longitude": 106.79825492626652
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 163",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "53fd9af0-8466-410c-81ae-3d852033ef5c",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 58736,
+    "popularity_score": 79.67931554127243,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.84912945981946,
+    "longitude": 108.49084103031305
+  },
+  {
+    "name": "Phố Cổ Hà Nội - Branch 164",
+    "province": "Hanoi",
+    "categories": [
+      "Shopping",
+      "Food",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 21.0333,
+    "lon": 105.85,
+    "id": "49170e47-04b5-41ad-9a1c-aad1bc83244c",
+    "description": "A wonderful place similar to Phố Cổ Hà Nội",
+    "price_estimate": 2651,
+    "popularity_score": 197.74073037817567,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.12946362773196,
+    "longitude": 105.84906572992328
+  },
+  {
+    "name": "Thác Datanla - Branch 165",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "3faea4e0-1953-4802-afbb-48a87ac78ce3",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 44136,
+    "popularity_score": 102.94677427592835,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.875798940786272,
+    "longitude": 108.37837292043297
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 166",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "8424aaf8-01f8-4fe1-8165-3896124bc955",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -6733,
+    "popularity_score": 107.56046192747448,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.675069519583053,
+    "longitude": 106.62693108319338
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 167",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "01195248-9d4a-4d01-971e-f8348a82fbcc",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -7549,
+    "popularity_score": 96.55066719202273,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.908112246810287,
+    "longitude": 108.48044091971738
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 168",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "b30ae273-7484-4715-9a80-9b9fe222df1b",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 30766,
+    "popularity_score": 171.20656063034914,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 11.949801879504532,
+    "longitude": 108.38273223078667
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 169",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "7bb8404d-8a07-45a0-b2e9-dc0f834b63ee",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": 7728,
+    "popularity_score": 12.000324468348882,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 10.726654048620404,
+    "longitude": 106.73587991488118
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 170",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "ba22d908-9237-4ff8-8f99-6b594e51301f",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 27454,
+    "popularity_score": 150.61944151389577,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.123367545644108,
+    "longitude": 105.88757393859885
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 171",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "6c81914b-926e-4b24-865f-ac04318e91e3",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 4538,
+    "popularity_score": 37.44113341219891,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 12.048984812410097,
+    "longitude": 108.36029819373545
+  },
+  {
+    "name": "Thác Datanla - Branch 172",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "3e5d741c-d83e-4d56-9f33-2e9562089341",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 49613,
+    "popularity_score": 74.90035174857088,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.83851395913988,
+    "longitude": 108.46453326362975
+  },
+  {
+    "name": "Crazy House - Branch 173",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "fc7a8346-770c-47d4-b8aa-1865a1ace3db",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 45570,
+    "popularity_score": 39.13852423726639,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 12.021667919728971,
+    "longitude": 108.44614207370749
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 174",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "637ccf25-cd14-4d3e-af0f-af76eb7d3304",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 56307,
+    "popularity_score": 183.00165812459318,
+    "indoor_outdoor": "both",
+    "activity_level": "low",
+    "latitude": 11.88683768885903,
+    "longitude": 108.46948092620072
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 175",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "ae14c5e3-8a2f-4145-b62a-76b516071420",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -1634,
+    "popularity_score": 135.03393986696375,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.852241884719778,
+    "longitude": 106.73362217713981
+  },
+  {
+    "name": "Crazy House - Branch 176",
+    "province": "Lam Dong",
+    "categories": [
+      "Architecture",
+      "Art",
+      "Unique"
+    ],
+    "price": 50000,
+    "lat": 11.9475,
+    "lon": 108.4222,
+    "id": "91b6cbbf-4262-4964-81c3-53e45af2c7c0",
+    "description": "A wonderful place similar to Crazy House",
+    "price_estimate": 42420,
+    "popularity_score": 91.13730780274382,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 12.045030339043693,
+    "longitude": 108.38203084982476
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 177",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "c08333f4-02c4-4bd1-bae3-c607b0c2f2eb",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 38195,
+    "popularity_score": 94.08298347021837,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.716743399821778,
+    "longitude": 106.67243864979346
+  },
+  {
+    "name": "Nhà Thờ Đức Bà - Branch 178",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Religious",
+      "Architecture",
+      "Historical"
+    ],
+    "price": 0,
+    "lat": 10.7797,
+    "lon": 106.699,
+    "id": "1e694059-2bf2-48df-a892-337dc9f81bf8",
+    "description": "A wonderful place similar to Nhà Thờ Đức Bà",
+    "price_estimate": -6506,
+    "popularity_score": 51.25511187587705,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.75149183151545,
+    "longitude": 106.65817447804315
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 179",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "fd663071-b472-497d-826a-e6b75ed6e8a8",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 20718,
+    "popularity_score": 195.69917449248823,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 21.006861148182274,
+    "longitude": 105.7371195931523
+  },
+  {
+    "name": "Thác Datanla - Branch 180",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "a00be8f1-199c-46a9-bd60-d904e17d8349",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 59870,
+    "popularity_score": 150.30857005612415,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.964548195920676,
+    "longitude": 108.40432367819407
+  },
+  {
+    "name": "Bảo Tàng Hồ Chí Minh - Branch 181",
+    "province": "Hanoi",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Culture"
+    ],
+    "price": 25000,
+    "lat": 21.0364,
+    "lon": 105.8345,
+    "id": "4fa0ce6e-3cfb-4c60-b734-a5fbde669e1c",
+    "description": "A wonderful place similar to Bảo Tàng Hồ Chí Minh",
+    "price_estimate": 22176,
+    "popularity_score": 129.14048621114893,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 20.986525360008724,
+    "longitude": 105.88561546474834
+  },
+  {
+    "name": "Ga Đà Lạt - Branch 182",
+    "province": "Lam Dong",
+    "categories": [
+      "Historical",
+      "Architecture",
+      "Photo Spot"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "2fad842b-cce6-40a1-9938-5f7e593eaf0f",
+    "description": "A wonderful place similar to Ga Đà Lạt",
+    "price_estimate": -6817,
+    "popularity_score": 181.16372229422873,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.848284514792164,
+    "longitude": 108.49962209680203
+  },
+  {
+    "name": "Thác Datanla - Branch 183",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "4a557f92-1bd3-42e3-ab82-c0d6371714a1",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 58991,
+    "popularity_score": 76.1479404405516,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.827426675149244,
+    "longitude": 108.41732209032583
+  },
+  {
+    "name": "Dinh Độc Lập - Branch 184",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Historical",
+      "Museum",
+      "Architecture"
+    ],
+    "price": 40000,
+    "lat": 10.7769,
+    "lon": 106.6955,
+    "id": "01ecaae6-e01b-4531-8e3d-9f01f96ef8b0",
+    "description": "A wonderful place similar to Dinh Độc Lập",
+    "price_estimate": 35755,
+    "popularity_score": 44.154984956764864,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.852192119341328,
+    "longitude": 106.66867150612302
+  },
+  {
+    "name": "Bảo Tàng Chứng Tích Chiến Tranh - Branch 185",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Museum",
+      "Historical",
+      "Education"
+    ],
+    "price": 40000,
+    "lat": 10.7794,
+    "lon": 106.6918,
+    "id": "93171521-e70c-4f26-b63a-854f897c9783",
+    "description": "A wonderful place similar to Bảo Tàng Chứng Tích Chiến Tranh",
+    "price_estimate": 38930,
+    "popularity_score": 166.9421608156425,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.862209790707663,
+    "longitude": 106.78063756321944
+  },
+  {
+    "name": "Văn Miếu Quốc Tử Giám - Branch 186",
+    "province": "Hanoi",
+    "categories": [
+      "Historical",
+      "Temple",
+      "Education"
+    ],
+    "price": 30000,
+    "lat": 21.0277,
+    "lon": 105.8355,
+    "id": "4f4b1507-751c-4abe-bb35-47f03c0e7d87",
+    "description": "A wonderful place similar to Văn Miếu Quốc Tử Giám",
+    "price_estimate": 31099,
+    "popularity_score": 161.82534502787956,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 21.120278658573774,
+    "longitude": 105.76365140300118
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 187",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "eab358e5-de3c-4eab-86f1-bd0ddfdb250f",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 53022,
+    "popularity_score": 193.6176007235063,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.913555009881113,
+    "longitude": 108.50003639371779
+  },
+  {
+    "name": "Hồ Xuân Hương - Branch 188",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Lake",
+      "Scenic"
+    ],
+    "price": 0,
+    "lat": 11.9404,
+    "lon": 108.438,
+    "id": "dc4dea9c-b03c-4584-a663-a797367fa406",
+    "description": "A wonderful place similar to Hồ Xuân Hương",
+    "price_estimate": -1335,
+    "popularity_score": 109.63160011246653,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.914117131723208,
+    "longitude": 108.48780232070736
+  },
+  {
+    "name": "Hồ Hoàn Kiếm - Branch 189",
+    "province": "Hanoi",
+    "categories": [
+      "Lake",
+      "Historical",
+      "Cultural"
+    ],
+    "price": 0,
+    "lat": 21.0285,
+    "lon": 105.8542,
+    "id": "d98f87a0-9104-4175-8ac7-fbb8afffd3a1",
+    "description": "A wonderful place similar to Hồ Hoàn Kiếm",
+    "price_estimate": 9154,
+    "popularity_score": 79.29997235813269,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "high",
+    "latitude": 21.11655837835591,
+    "longitude": 105.77586922043986
+  },
+  {
+    "name": "Cà phê Mê Linh - Branch 190",
+    "province": "Lam Dong",
+    "categories": [
+      "Cafe",
+      "View",
+      "Coffee"
+    ],
+    "price": 50000,
+    "lat": 11.9404,
+    "lon": 108.4419,
+    "id": "75ff0cb5-9c34-44bd-b491-c29f437c9955",
+    "description": "A wonderful place similar to Cà phê Mê Linh",
+    "price_estimate": 55449,
+    "popularity_score": 9.879806681064053,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 11.906001256363476,
+    "longitude": 108.46391643917168
+  },
+  {
+    "name": "Đồi Chè Cầu Đất - Branch 191",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Tea Plantation",
+      "Photography"
+    ],
+    "price": 30000,
+    "lat": 11.9738,
+    "lon": 108.4194,
+    "id": "5e82254b-76eb-4624-a504-378480802008",
+    "description": "A wonderful place similar to Đồi Chè Cầu Đất",
+    "price_estimate": 35213,
+    "popularity_score": 182.33058949343896,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 12.00364788925692,
+    "longitude": 108.34273518734541
+  },
+  {
+    "name": "Thác Datanla - Branch 192",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "d4f67b3b-fd4a-4c3e-b2be-cf93948142dc",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 41219,
+    "popularity_score": 64.35109394942103,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "medium",
+    "latitude": 11.832624096145022,
+    "longitude": 108.40526000648626
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 193",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "547ff517-223b-4009-a9d6-45a00c387e57",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": -5555,
+    "popularity_score": 80.78593707427778,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.808197243770035,
+    "longitude": 106.75072802430464
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 194",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "654ae1c3-138b-49a0-bd3a-960213dd2445",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 3733,
+    "popularity_score": 119.53136738197846,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.705004580481967,
+    "longitude": 106.68507690548736
+  },
+  {
+    "name": "Thiền Viện Trúc Lâm - Branch 195",
+    "province": "Lam Dong",
+    "categories": [
+      "Religious",
+      "Temple",
+      "Culture"
+    ],
+    "price": 0,
+    "lat": 11.9683,
+    "lon": 108.4511,
+    "id": "c73e4273-0e0f-4a8e-ac58-45fd5bffbcf1",
+    "description": "A wonderful place similar to Thiền Viện Trúc Lâm",
+    "price_estimate": 6034,
+    "popularity_score": 125.05218173997548,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 11.874843257371008,
+    "longitude": 108.42520599174688
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 196",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "6917dfbd-3d99-46f5-83c5-640b9a44f831",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": 4571,
+    "popularity_score": 190.35825812102826,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.691870924921226,
+    "longitude": 106.73523605309626
+  },
+  {
+    "name": "Phố Đi Bộ Nguyễn Huệ - Branch 197",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Entertainment",
+      "Walking",
+      "Urban"
+    ],
+    "price": 0,
+    "lat": 10.7741,
+    "lon": 106.7021,
+    "id": "098de86a-939c-4be8-9a50-cd24cc851482",
+    "description": "A wonderful place similar to Phố Đi Bộ Nguyễn Huệ",
+    "price_estimate": 1753,
+    "popularity_score": 16.807267387488707,
+    "indoor_outdoor": "both",
+    "activity_level": "medium",
+    "latitude": 10.712061712432217,
+    "longitude": 106.62653194381745
+  },
+  {
+    "name": "Chợ Bến Thành - Branch 198",
+    "province": "Ho Chi Minh",
+    "categories": [
+      "Market",
+      "Shopping",
+      "Food"
+    ],
+    "price": 0,
+    "lat": 10.772,
+    "lon": 106.6981,
+    "id": "b1c09620-191b-49eb-80c5-3d7eed1e5721",
+    "description": "A wonderful place similar to Chợ Bến Thành",
+    "price_estimate": -6997,
+    "popularity_score": 134.23990392208572,
+    "indoor_outdoor": "both",
+    "activity_level": "high",
+    "latitude": 10.799898583705941,
+    "longitude": 106.792318662413
+  },
+  {
+    "name": "Thác Datanla - Branch 199",
+    "province": "Lam Dong",
+    "categories": [
+      "Nature",
+      "Waterfall",
+      "Adventure"
+    ],
+    "price": 50000,
+    "lat": 11.9094,
+    "lon": 108.4583,
+    "id": "887da106-22dc-4079-9379-c3f0d7a7b932",
+    "description": "A wonderful place similar to Thác Datanla",
+    "price_estimate": 50928,
+    "popularity_score": 52.49593494698461,
+    "indoor_outdoor": "outdoor",
+    "activity_level": "low",
+    "latitude": 11.966795619995263,
+    "longitude": 108.39934111502856
+  }
+]

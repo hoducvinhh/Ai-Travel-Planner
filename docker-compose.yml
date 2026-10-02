@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: travel_planner_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: travel_rag
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d travel_rag"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  recommendation-service:
+    build:
+      context: ./recommendation-service
+      dockerfile: Dockerfile
+    container_name: travel_planner_recommendation
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/travel_rag
+      HOST: 0.0.0.0
+      PORT: 8000
+      LAMBDA_DECAY: 0.05
+      TOP_K: 50
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./recommendation-service/models:/app/models
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: travel_planner_backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/travel_rag
+      RECOMMENDATION_SERVICE_URL: http://recommendation-service:8000
+      PORT: 3000
+    env_file:
+      - ./backend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - recommendation-service
+    volumes:
+      - ./backend/src:/app/src
+
+volumes:
+  pgdata:

@@ -1,0 +1,325 @@
+{
+  "info": {
+    "name": "AI Travel Planner API",
+    "description": "Complete API collection for AI Travel Planner",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "Create Trip & Generate Itinerary",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"destination\": \"Lam Dong\",\n  \"startDate\": \"2026-11-01T00:00:00.000Z\",\n  \"endDate\": \"2026-11-04T00:00:00.000Z\",\n  \"budgetPerPerson\": 5000000,\n  \"groupSize\": 2,\n  \"preferences\": [\"Nature\", \"Adventure\", \"Photography\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/trips",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips"]
+            }
+          }
+        },
+        {
+          "name": "Get Trip by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/trips/{{tripId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "{{tripId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Trips",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/trips?userId={{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips"],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{userId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Trip Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CONFIRMED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/trips/{{tripId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "{{tripId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "Delete Trip",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/trips/{{tripId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["trips", "{{tripId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Interactions",
+      "item": [
+        {
+          "name": "Track Interaction - View",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"placeId\": \"{{placeId}}\",\n  \"eventType\": \"VIEW_DETAIL\",\n  \"sessionId\": \"{{sessionId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/interactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions"]
+            }
+          }
+        },
+        {
+          "name": "Track Interaction - Like",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"placeId\": \"{{placeId}}\",\n  \"eventType\": \"LIKE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/interactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions"]
+            }
+          }
+        },
+        {
+          "name": "Track Interaction - Save",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"placeId\": \"{{placeId}}\",\n  \"eventType\": \"SAVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/interactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions"]
+            }
+          }
+        },
+        {
+          "name": "Track Interaction - Rate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"placeId\": \"{{placeId}}\",\n  \"eventType\": \"RATE\",\n  \"ratingValue\": 4.5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/interactions",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions"]
+            }
+          }
+        },
+        {
+          "name": "Get User Interactions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/interactions/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions", "user", "{{userId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get User Saved Places",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/interactions/user/{{userId}}/saved",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions", "user", "{{userId}}", "saved"]
+            }
+          }
+        },
+        {
+          "name": "Get User Liked Places",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/interactions/user/{{userId}}/liked",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions", "user", "{{userId}}", "liked"]
+            }
+          }
+        },
+        {
+          "name": "Get Place Ratings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/interactions/place/{{placeId}}/ratings",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions", "place", "{{placeId}}", "ratings"]
+            }
+          }
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/interactions/user/{{userId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["interactions", "user", "{{userId}}", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Get Recommendations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"destination\": \"Lam Dong\",\n  \"budgetPerPerson\": 5000000,\n  \"days\": 3,\n  \"groupSize\": 2,\n  \"monthOfYear\": 11,\n  \"explicitPreferences\": [\"Nature\", \"Adventure\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/recommendations",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations"]
+            }
+          }
+        },
+        {
+          "name": "Train Model",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/train",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations", "train"]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/recommendations/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["recommendations", "health"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "placeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tripId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

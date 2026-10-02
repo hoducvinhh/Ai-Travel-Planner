@@ -1,0 +1,136 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+model TourismChunk {
+  id        String                      @id
+  chunkType String                      @map("chunk_type") @db.VarChar(20)
+  content   String                      @db.Text
+  embedding Unsupported("vector(1024)")
+  metadata  Json                        @db.JsonB
+  createdAt DateTime                    @default(now()) @map("created_at")
+
+  @@index([chunkType], map: "idx_tourism_chunks_type")
+  @@map("tourism_chunks")
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  name            String?
+  password        String
+  preferredStyles String[] @map("preferred_styles")
+  budgetLevel     String?  @map("budget_level")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  interactions UserInteractionEvent[]
+  preferences  UserPlacePreference[]
+  trips        Trip[]
+
+  @@map("users")
+}
+
+model Place {
+  id              String   @id @default(uuid())
+  name            String
+  description     String   @db.Text
+  categories      String[]
+  latitude        Float
+  longitude       Float
+  province        String?
+  district        String?
+  priceEstimate   Int      @default(0) @map("price_estimate")
+  popularityScore Float    @default(0) @map("popularity_score")
+  indoorOutdoor   String?  @map("indoor_outdoor")
+  activityLevel   String?  @map("activity_level")
+  imageUrl        String?  @map("image_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  interactions UserInteractionEvent[]
+  preferences  UserPlacePreference[]
+  tripPlaces   TripPlace[]
+
+  @@index([province])
+  @@index([categories])
+  @@map("places")
+}
+
+model UserInteractionEvent {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  placeId     String   @map("place_id")
+  sessionId   String?  @map("session_id")
+  eventType   String   @map("event_type")
+  ratingValue Float?   @map("rating_value")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([userId, placeId])
+  @@index([createdAt])
+  @@index([eventType])
+  @@map("user_interaction_events")
+}
+
+model UserPlacePreference {
+  userId          String   @map("user_id")
+  placeId         String   @map("place_id")
+  aggregatedScore Float    @map("aggregated_score")
+  lastInteraction DateTime @map("last_interaction")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@id([userId, placeId])
+  @@index([aggregatedScore])
+  @@map("user_place_preferences")
+}
+
+model Trip {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  destination     String
+  startDate       DateTime @map("start_date")
+  endDate         DateTime @map("end_date")
+  budgetPerPerson Int      @map("budget_per_person")
+  groupSize       Int      @map("group_size")
+  status          String   @default("DRAFT")
+  itinerary       Json?    @db.JsonB
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user   User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  places TripPlace[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("trips")
+}
+
+model TripPlace {
+  id         String   @id @default(uuid())
+  tripId     String   @map("trip_id")
+  placeId    String   @map("place_id")
+  dayNumber  Int      @map("day_number")
+  orderInDay Int      @map("order_in_day")
+  notes      String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  trip  Trip  @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([tripId])
+  @@index([placeId])
+  @@map("trip_places")
+}
