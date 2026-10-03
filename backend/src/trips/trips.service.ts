@@ -149,48 +149,49 @@ export class TripsService {
     groupSize: number,
     preferences: string[],
   ): Promise<TripItinerary> {
-    const prompt = `You are a travel itinerary planner. Create a detailed ${days}-day itinerary using the following places.
+    const prompt = `Bạn là một chuyên gia lên lịch trình du lịch người Việt Nam. Hãy tạo một lịch trình chi tiết ${days} ngày bằng cách sử dụng các địa điểm sau.
 
-**Budget**: ${budgetPerPerson.toLocaleString()} VND per person
-**Group Size**: ${groupSize} people
-**Preferences**: ${preferences.join(', ') || 'None specified'}
+**Ngân sách**: ${budgetPerPerson.toLocaleString()} VND mỗi người
+**Số người**: ${groupSize} người
+**Sở thích**: ${preferences.join(', ') || 'Không chỉ định'}
 
-**Available Places** (sorted by recommendation score):
-${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(', ')} (${p.priceEstimate.toLocaleString()} VND) at (${p.latitude}, ${p.longitude})`).join('\n')}
+**Danh sách địa điểm khả dụng** (đã sắp xếp theo độ phù hợp):
+${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(', ')} (${p.priceEstimate.toLocaleString()} VND) tại tọa độ (${p.latitude}, ${p.longitude})`).join('\n')}
 
-**Instructions**:
-1. Select 10-15 places from the list above
-2. Distribute them across ${days} days (3-5 places per day)
-3. Group places that are geographically close together in the same day
-4. Consider travel time between locations
-5. Balance activity types (mix of nature, culture, food, etc.)
-6. Stay within budget constraints
-7. Provide estimated time for each place
+**Yêu cầu bắt buộc**:
+1. Chọn 10-15 địa điểm từ danh sách trên
+2. Phân bổ hợp lý trong ${days} ngày (3-5 địa điểm/ngày)
+3. Các địa điểm trong cùng 1 ngày phải gần nhau về mặt địa lý
+4. Cân nhắc thời gian di chuyển giữa các địa điểm
+5. Cân bằng các hoạt động (thiên nhiên, văn hóa, ẩm thực...)
+6. Đảm bảo tổng chi phí không vượt quá ngân sách
+7. Ước tính thời gian tham quan cho mỗi địa điểm
+8. TẤT CẢ NỘI DUNG BAO GỒM TIÊU ĐỀ, MÔ TẢ, LỜI KHUYÊN PHẢI ĐƯỢC VIẾT BẰNG TIẾNG VIỆT 100%.
 
-**Output Format** (JSON only, no explanation):
+**Định dạng đầu ra** (Chỉ trả về JSON, không kèm giải thích):
 \`\`\`json
 {
   "days": [
     {
       "dayNumber": 1,
-      "date": "Day 1",
+      "date": "Ngày 1",
       "places": [
         {
           "placeId": "uuid-from-list",
-          "name": "Place Name",
-          "description": "Why visit this place",
-          "categories": ["Category1", "Category2"],
-          "estimatedTime": "2 hours",
+          "name": "Tên địa điểm",
+          "description": "Lý do nên tham quan địa điểm này",
+          "categories": ["Danh mục 1", "Danh mục 2"],
+          "estimatedTime": "2 giờ",
           "orderInDay": 1,
           "latitude": 0.0,
           "longitude": 0.0,
           "priceEstimate": 0
         }
       ],
-      "notes": "Day overview and tips"
+      "notes": "Lưu ý và tổng quan cho ngày này"
     }
   ],
-  "summary": "Overall trip summary",
+  "summary": "Tóm tắt tổng quan về toàn bộ chuyến đi",
   "totalEstimatedCost": 0
 }
 \`\`\``;

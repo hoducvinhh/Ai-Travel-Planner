@@ -9,6 +9,8 @@ import { ChatModule } from './chat/chat.module';
 import { RecommendationModule } from './recommendation/recommendation.module';
 import { TripsModule } from './trips/trips.module';
 import { InteractionsModule } from './interactions/interactions.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { InteractionsModule } from './interactions/interactions.module';
     RecommendationModule,
     TripsModule,
     InteractionsModule,
+    AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}

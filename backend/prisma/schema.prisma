@@ -21,11 +21,17 @@ model TourismChunk {
   @@map("tourism_chunks")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id              String   @id @default(uuid())
   email           String   @unique
   name            String?
   password        String
+  role            Role     @default(USER)
   preferredStyles String[] @map("preferred_styles")
   budgetLevel     String?  @map("budget_level")
   createdAt       DateTime @default(now()) @map("created_at")
