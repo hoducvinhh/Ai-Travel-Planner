@@ -38,4 +38,13 @@ export class AuthService {
     const { password, ...result } = user;
     return this.login(result);
   }
+
+  async getProfile(userId: string) {
+    const user = await this.usersService.findById(userId);
+    if (!user) {
+      throw new UnauthorizedException('Người dùng không tồn tại');
+    }
+    const { password, ...result } = user;
+    return result;
+  }
 }

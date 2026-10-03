@@ -10,6 +10,6 @@ COPY . .
 
 RUN npx prisma generate
 
-EXPOSE 3000
+EXPOSE 3002
 
 CMD ["npm", "run", "start:dev"]

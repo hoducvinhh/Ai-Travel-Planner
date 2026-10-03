@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MapPin, Calendar, Users, DollarSign, ArrowRight, Plus, Loader2 } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { api } from '@/lib/api';
 
 interface Trip {
   id: string;
@@ -15,21 +17,15 @@ interface Trip {
   createdAt: string;
 }
 
-export default function TripsPage() {
+function TripsContent() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTrips = async () => {
       try {
-        // TODO: Replace with actual user ID from auth
-        const userId = '58edf5af-3cb0-4c4a-aa48-ff515df49f80';
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/trips?userId=${userId}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          setTrips(data);
-        }
+        const data = await api.get<Trip[]>('/trips');
+        setTrips(data || []);
       } catch (error) {
         console.error('Error fetching trips:', error);
       } finally {
@@ -143,3 +139,12 @@ export default function TripsPage() {
     </div>
   );
 }
+
+export default function TripsPage() {
+  return (
+    <ProtectedRoute>
+      <TripsContent />
+    </ProtectedRoute>
+  );
+}
+

@@ -16,6 +16,9 @@ import {
   MapIcon,
 } from 'lucide-react';
 
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { api } from '@/lib/api';
+
 // Dynamically import Leaflet map (client-side only)
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
@@ -63,7 +66,7 @@ interface Trip {
   createdAt: string;
 }
 
-export default function TripDetailPage() {
+function TripDetailContent() {
   const params = useParams();
   const router = useRouter();
   const tripId = params.id as string;
@@ -76,22 +79,18 @@ export default function TripDetailPage() {
   useEffect(() => {
     const fetchTrip = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/trips/${tripId}`);
-
-        if (!response.ok) {
-          throw new Error('Trip not found');
-        }
-
-        const data = await response.json();
+        const data = await api.get<Trip>(`/trips/${tripId}`);
         setTrip(data);
       } catch (err: any) {
-        setError(err.message);
+        setError(err.message || 'Trip not found');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTrip();
+    if (tripId) {
+      fetchTrip();
+    }
   }, [tripId]);
 
   if (loading) {
@@ -313,3 +312,12 @@ export default function TripDetailPage() {
     </div>
   );
 }
+
+export default function TripDetailPage() {
+  return (
+    <ProtectedRoute>
+      <TripDetailContent />
+    </ProtectedRoute>
+  );
+}
+

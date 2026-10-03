@@ -14,6 +14,8 @@ import {
   Loader2,
   CheckCircle2,
 } from 'lucide-react';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { api } from '@/lib/api';
 
 type FormData = {
   destination: string;
@@ -43,7 +45,7 @@ const PREFERENCES = [
   { id: 'historical', label: 'Lịch sử', icon: '🏯' },
 ];
 
-export default function NewTripPage() {
+function NewTripContent() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,31 +75,19 @@ export default function NewTripPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/trips`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: '58edf5af-3cb0-4c4a-aa48-ff515df49f80', // TODO: Replace with real user ID from auth
-          destination: formData.destination,
-          startDate: new Date(formData.startDate).toISOString(),
-          endDate: new Date(formData.endDate).toISOString(),
-          budgetPerPerson: formData.budgetPerPerson,
-          groupSize: formData.groupSize,
-          preferences: formData.preferences,
-        }),
+      const trip = await api.post('/trips', {
+        destination: formData.destination,
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        budgetPerPerson: formData.budgetPerPerson,
+        groupSize: formData.groupSize,
+        preferences: formData.preferences,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create trip');
-      }
-
-      const trip = await response.json();
       router.push(`/trips/${trip.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating trip:', error);
-      alert('Không thể tạo lịch trình. Vui lòng thử lại!');
+      alert(error.message || 'Không thể tạo lịch trình. Vui lòng thử lại!');
     } finally {
       setIsLoading(false);
     }
@@ -118,8 +108,8 @@ export default function NewTripPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white">
-      {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-50">
+      {/* Step Header */}
+      <div className="border-b border-slate-800/80 bg-slate-950/30">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -148,7 +138,7 @@ export default function NewTripPage() {
             />
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         {/* Step 1: Destination & Dates */}
@@ -366,3 +356,12 @@ export default function NewTripPage() {
     </div>
   );
 }
+
+export default function NewTripPage() {
+  return (
+    <ProtectedRoute>
+      <NewTripContent />
+    </ProtectedRoute>
+  );
+}
+

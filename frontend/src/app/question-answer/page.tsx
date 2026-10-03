@@ -245,8 +245,8 @@ export default function QuestionAnswerPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-slate-100 font-sans selection:bg-emerald-500 selection:text-white">
-      {/* 1. Header Bar */}
-      <header className="sticky top-0 z-30 backdrop-blur-md bg-slate-950/80 border-b border-emerald-900/40 px-4 lg:px-8 py-3.5 transition-all">
+      {/* 1. Sub-Header Bar */}
+      <div className="relative z-10 backdrop-blur-md bg-slate-950/80 border-b border-emerald-900/40 px-4 lg:px-8 py-3.5 transition-all">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 ring-1 ring-emerald-400/30">
@@ -296,7 +296,7 @@ export default function QuestionAnswerPage() {
             )}
           </div>
         </div>
-      </header>
+      </div>
 
       {/* 2. Main Chat Area */}
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-between">

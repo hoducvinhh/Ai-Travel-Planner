@@ -6,31 +6,6 @@ import { MapPin, MessageSquare, Sparkles, Calendar, Map, TrendingUp, Users, Cloc
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg">
-              <MapPin className="w-7 h-7 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent">
-                AI Travel Planner
-              </h1>
-              <p className="text-xs text-slate-400">Trợ lý du lịch thông minh</p>
-            </div>
-          </div>
-
-          <Link
-            href="/trips"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-emerald-500/50 transition text-sm font-medium"
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Xem Lịch Trình</span>
-          </Link>
-        </div>
-      </header>
-
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-16">
