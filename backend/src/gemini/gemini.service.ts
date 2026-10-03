@@ -10,7 +10,7 @@ export class GeminiService {
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-    this.modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-2.0-flash');
+    this.modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-3.8-flash');
 
     if (apiKey && apiKey.trim().length > 0) {
       this.ai = new GoogleGenAI({ apiKey });

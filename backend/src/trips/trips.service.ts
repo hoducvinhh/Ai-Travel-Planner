@@ -223,9 +223,14 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
             const p = places[currentPlaceIndex];
             dayPlaces.push({
               placeId: p.id,
+              name: p.name,
+              description: 'Khám phá ' + p.name + ' - ' + p.categories.join(', '),
+              categories: p.categories,
+              estimatedTime: '2 hours',
               orderInDay: i + 1,
-              timeSpentHours: 2,
-              description: 'Khám phá ' + p.name + ' - ' + p.categories.join(', ')
+              latitude: Number(p.latitude) || 0,
+              longitude: Number(p.longitude) || 0,
+              priceEstimate: Number(p.priceEstimate) || 0
             });
             totalCost += Number(p.priceEstimate) || 0;
             currentPlaceIndex++;
@@ -234,6 +239,7 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
         if (dayPlaces.length > 0) {
           mockDays.push({
             dayNumber: day,
+            date: 'Ngày ' + day,
             places: dayPlaces,
             notes: 'Ngày ' + day + ' trải nghiệm các địa điểm gợi ý'
           });
