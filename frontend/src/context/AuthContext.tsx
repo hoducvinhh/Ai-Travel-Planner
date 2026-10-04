@@ -9,15 +9,9 @@ import {
   setStoredUser,
   ApiError,
 } from '@/lib/api';
+import { User } from '@/types';
 
-export interface User {
-  id: string;
-  email: string;
-  name?: string;
-  role: 'USER' | 'ADMIN';
-  preferredStyles?: string[];
-  budgetLevel?: string;
-}
+export type { User };
 
 interface AuthContextType {
   user: User | null;

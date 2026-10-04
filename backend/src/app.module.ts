@@ -11,6 +11,9 @@ import { TripsModule } from './trips/trips.module';
 import { InteractionsModule } from './interactions/interactions.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { PlacesModule } from './places/places.module';
+import { CommentsModule } from './comments/comments.module';
+import { CommunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { UsersModule } from './users/users.module';
     InteractionsModule,
     AuthModule,
     UsersModule,
+    PlacesModule,
+    CommentsModule,
+    CommunityModule,
   ],
 })
 export class AppModule {}

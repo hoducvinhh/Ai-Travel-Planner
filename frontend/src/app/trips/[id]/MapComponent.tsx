@@ -11,17 +11,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-interface Place {
-  placeId: string;
-  name: string;
-  latitude: number;
-  longitude: number;
-  orderInDay: number;
-}
-
-interface MapComponentProps {
-  places: Place[];
-}
+import { ItineraryPlace as Place, MapComponentProps } from '@/types';
 
 export default function MapComponent({ places }: MapComponentProps) {
   const mapRef = useRef<L.Map | null>(null);

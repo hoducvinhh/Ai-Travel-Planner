@@ -57,6 +57,154 @@ export class InteractionsService {
     return interaction;
   }
 
+  async toggleLike(userId: string, placeId: string) {
+    const existingLike = await this.prisma.userInteractionEvent.findFirst({
+      where: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.LIKE,
+      },
+    });
+
+    let isLiked = false;
+    if (existingLike) {
+      // Remove like
+      await this.prisma.userInteractionEvent.delete({
+        where: { id: existingLike.id },
+      });
+      isLiked = false;
+    } else {
+      // Add like
+      await this.prisma.userInteractionEvent.create({
+        data: {
+          userId,
+          placeId,
+          eventType: InteractionEventType.LIKE,
+        },
+      });
+      isLiked = true;
+    }
+
+    // Update popularity
+    this.updatePlacePopularity(placeId).catch(() => {});
+
+    // Count current likes
+    const likesCount = await this.prisma.userInteractionEvent.count({
+      where: {
+        placeId,
+        eventType: InteractionEventType.LIKE,
+      },
+    });
+
+    return { isLiked, likesCount };
+  }
+
+  async toggleSave(userId: string, placeId: string) {
+    // Check latest save/remove_save status
+    const latestSave = await this.prisma.userInteractionEvent.findFirst({
+      where: {
+        userId,
+        placeId,
+        eventType: { in: [InteractionEventType.SAVE, InteractionEventType.REMOVE_SAVE] },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const isCurrentlySaved = latestSave?.eventType === InteractionEventType.SAVE;
+    let isSaved = false;
+
+    if (isCurrentlySaved) {
+      await this.prisma.userInteractionEvent.create({
+        data: {
+          userId,
+          placeId,
+          eventType: InteractionEventType.REMOVE_SAVE,
+        },
+      });
+      isSaved = false;
+    } else {
+      await this.prisma.userInteractionEvent.create({
+        data: {
+          userId,
+          placeId,
+          eventType: InteractionEventType.SAVE,
+        },
+      });
+      isSaved = true;
+    }
+
+    this.updatePlacePopularity(placeId).catch(() => {});
+
+    return { isSaved };
+  }
+
+  async ratePlace(userId: string, placeId: string, ratingValue: number) {
+    if (!ratingValue || ratingValue < 1 || ratingValue > 5) {
+      throw new Error('Đánh giá phải từ 1 đến 5 sao');
+    }
+
+    // Upsert or create new rate event
+    await this.prisma.userInteractionEvent.create({
+      data: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.RATE,
+        ratingValue,
+      },
+    });
+
+    this.updatePlacePopularity(placeId).catch(() => {});
+
+    // Recalculate stats
+    const placeRatings = await this.getPlaceRatings(placeId);
+
+    return {
+      success: true,
+      userRating: ratingValue,
+      ratingAvg: placeRatings.averageRating,
+      ratingCount: placeRatings.totalRatings,
+    };
+  }
+
+  async getUserSummary(userId: string) {
+    const [savedPlaces, likedPlaces, allUserRatings, tripsCount] = await Promise.all([
+      this.getUserSavedPlaces(userId),
+      this.getUserLikedPlaces(userId),
+      this.prisma.userInteractionEvent.findMany({
+        where: { userId, eventType: InteractionEventType.RATE },
+        orderBy: { createdAt: 'desc' },
+        include: { place: true },
+      }),
+      this.prisma.trip.count({
+        where: { userId },
+      }),
+    ]);
+
+    // Unique rated places
+    const ratedPlacesMap = new Map();
+    for (const r of allUserRatings) {
+      if (!ratedPlacesMap.has(r.placeId)) {
+        ratedPlacesMap.set(r.placeId, {
+          place: r.place,
+          rating: r.ratingValue,
+          ratedAt: r.createdAt,
+        });
+      }
+    }
+
+    return {
+      savedPlaces,
+      likedPlaces,
+      ratedPlaces: Array.from(ratedPlacesMap.values()),
+      stats: {
+        tripsCount,
+        likedCount: likedPlaces.length,
+        savedCount: savedPlaces.length,
+        ratedCount: ratedPlacesMap.size,
+      },
+    };
+  }
+
   async getUserInteractions(userId: string, placeId?: string) {
     const where: any = { userId };
     if (placeId) {
@@ -94,7 +242,6 @@ export class InteractionsService {
   }
 
   async getUserSavedPlaces(userId: string) {
-    // Get all SAVE events minus REMOVE_SAVE events
     const saves = await this.prisma.userInteractionEvent.findMany({
       where: {
         userId,
@@ -117,21 +264,17 @@ export class InteractionsService {
       },
     });
 
-    // Filter out places that were removed after being saved
     const savedPlaceIds = saves
       .filter((save) => {
         const removal = removals.find(
-          (r) =>
-            r.placeId === save.placeId && r.createdAt > save.createdAt,
+          (r) => r.placeId === save.placeId && r.createdAt > save.createdAt,
         );
         return !removal;
       })
       .map((s) => s.placeId);
 
-    // Get unique place IDs
     const uniquePlaceIds = [...new Set(savedPlaceIds)];
 
-    // Fetch place details
     return this.prisma.place.findMany({
       where: {
         id: {
@@ -155,7 +298,16 @@ export class InteractionsService {
       },
     });
 
-    return interactions.map((i) => i.place);
+    // Deduplicate by place id
+    const seen = new Set<string>();
+    const places = [];
+    for (const i of interactions) {
+      if (!seen.has(i.placeId)) {
+        seen.add(i.placeId);
+        places.push(i.place);
+      }
+    }
+    return places;
   }
 
   async getPlaceRatings(placeId: string) {
@@ -193,7 +345,6 @@ export class InteractionsService {
   }
 
   private async updatePlacePopularity(placeId: string) {
-    // Calculate popularity score based on interactions
     const interactions = await this.prisma.userInteractionEvent.groupBy({
       by: ['eventType'],
       where: {
@@ -204,7 +355,6 @@ export class InteractionsService {
       },
     });
 
-    // Weight different interaction types
     const weights = {
       [InteractionEventType.VIEW_DETAIL]: 1,
       [InteractionEventType.LIKE]: 3,
@@ -220,10 +370,9 @@ export class InteractionsService {
       popularityScore += interaction._count.id * weight;
     }
 
-    // Update place popularity
     await this.prisma.place.update({
       where: { id: placeId },
-      data: { popularityScore },
+      data: { popularityScore: Math.max(0, popularityScore) },
     });
 
     this.logger.log(`Updated popularity score for place ${placeId}: ${popularityScore}`);

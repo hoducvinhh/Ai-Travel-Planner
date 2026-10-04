@@ -37,9 +37,13 @@ model User {
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  interactions UserInteractionEvent[]
-  preferences  UserPlacePreference[]
-  trips        Trip[]
+  interactions      UserInteractionEvent[]
+  preferences       UserPlacePreference[]
+  trips             Trip[]
+  comments          Comment[]
+  communityPosts    CommunityPost[]
+  communityComments CommunityComment[]
+  postLikes         PostLike[]
 
   @@map("users")
 }
@@ -64,6 +68,7 @@ model Place {
   interactions UserInteractionEvent[]
   preferences  UserPlacePreference[]
   tripPlaces   TripPlace[]
+  comments     Comment[]
 
   @@index([province])
   @@index([categories])
@@ -139,4 +144,67 @@ model TripPlace {
   @@index([tripId])
   @@index([placeId])
   @@map("trip_places")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  placeId   String   @map("place_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  place Place @relation(fields: [placeId], references: [id], onDelete: Cascade)
+
+  @@index([placeId])
+  @@index([userId])
+  @@map("comments")
+}
+
+model CommunityPost {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  title      String
+  content    String   @db.Text
+  images     String[] @default([])
+  tags       String[] @default([])
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments CommunityComment[]
+  likes    PostLike[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("community_posts")
+}
+
+model CommunityComment {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("community_comments")
+}
+
+model PostLike {
+  id        String   @id @default(uuid())
+  postId    String   @map("post_id")
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("post_likes")
 }

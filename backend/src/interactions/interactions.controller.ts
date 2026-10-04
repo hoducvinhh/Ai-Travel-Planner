@@ -8,7 +8,11 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { InteractionsService, TrackInteractionDto } from './interactions.service';
+import {
+  InteractionsService,
+  TrackInteractionDto,
+  InteractionEventType,
+} from './interactions.service';
 
 @Controller('interactions')
 export class InteractionsController {
@@ -18,6 +22,43 @@ export class InteractionsController {
   @HttpCode(HttpStatus.CREATED)
   async trackInteraction(@Body() dto: TrackInteractionDto) {
     return this.interactionsService.trackInteraction(dto);
+  }
+
+  @Post('toggle-like')
+  async toggleLike(@Body() body: { userId: string; placeId: string }) {
+    return this.interactionsService.toggleLike(body.userId, body.placeId);
+  }
+
+  @Post('toggle-save')
+  async toggleSave(@Body() body: { userId: string; placeId: string }) {
+    return this.interactionsService.toggleSave(body.userId, body.placeId);
+  }
+
+  @Post('rate')
+  async ratePlace(
+    @Body() body: { userId: string; placeId: string; ratingValue: number },
+  ) {
+    return this.interactionsService.ratePlace(
+      body.userId,
+      body.placeId,
+      body.ratingValue,
+    );
+  }
+
+  @Post('track')
+  async trackEvent(
+    @Body() body: { userId: string; placeId: string; eventType: InteractionEventType },
+  ) {
+    return this.interactionsService.trackInteraction({
+      userId: body.userId,
+      placeId: body.placeId,
+      eventType: body.eventType,
+    });
+  }
+
+  @Get('user/:userId/summary')
+  async getUserSummary(@Param('userId') userId: string) {
+    return this.interactionsService.getUserSummary(userId);
   }
 
   @Get('user/:userId')

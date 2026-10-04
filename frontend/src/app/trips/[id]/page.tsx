@@ -29,42 +29,7 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
   ),
 });
 
-interface Place {
-  placeId: string;
-  name: string;
-  description: string;
-  categories: string[];
-  estimatedTime: string;
-  orderInDay: number;
-  latitude: number;
-  longitude: number;
-  priceEstimate: number;
-}
-
-interface DayPlan {
-  dayNumber: number;
-  date: string;
-  places: Place[];
-  notes?: string;
-}
-
-interface TripItinerary {
-  days: DayPlan[];
-  summary: string;
-  totalEstimatedCost: number;
-}
-
-interface Trip {
-  id: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  budgetPerPerson: number;
-  groupSize: number;
-  status: string;
-  itinerary: TripItinerary;
-  createdAt: string;
-}
+import { ItineraryPlace as Place, DayPlan, TripItinerary, Trip } from '@/types';
 
 function TripDetailContent() {
   const params = useParams();

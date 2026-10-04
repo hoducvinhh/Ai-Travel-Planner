@@ -5,17 +5,7 @@ import Link from 'next/link';
 import { MapPin, Calendar, Users, DollarSign, ArrowRight, Plus, Loader2 } from 'lucide-react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api';
-
-interface Trip {
-  id: string;
-  destination: string;
-  startDate: string;
-  endDate: string;
-  budgetPerPerson: number;
-  groupSize: number;
-  status: string;
-  createdAt: string;
-}
+import { Trip } from '@/types';
 
 function TripsContent() {
   const [trips, setTrips] = useState<Trip[]>([]);
