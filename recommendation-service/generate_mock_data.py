@@ -243,20 +243,30 @@ def expand_places_with_llm_style(base_places: List[Dict], target_count: int = 20
         place_with_id["longitude"] = place["lon"]
         places.append(place_with_id)
 
-    # Generate variations to reach target count
+    # If mock_places.json already exists with curated places, load from it to keep real places
+    import os
+    if os.path.exists('mock_places.json'):
+        with open('mock_places.json', 'r', encoding='utf-8') as f:
+            existing = json.load(f)
+            if len(existing) >= target_count and not any("Branch" in p.get("name", "") for p in existing):
+                return existing[:target_count]
+
+    # Otherwise generate variations with non-negative prices and meaningful names
+    counter = 1
     while len(places) < target_count:
         base = random.choice(base_places)
         variation = base.copy()
         variation["id"] = str(uuid.uuid4())
-        variation["name"] = f"{base['name']} - Branch {len(places)}"
-        variation["description"] = f"A wonderful place similar to {base['name']}"
-        variation["price_estimate"] = base["price"] + random.randint(-10000, 10000)
+        variation["name"] = f"{base['name']} Khu {counter}"
+        variation["description"] = f"Khu du lịch trải nghiệm tại {base['name']}, {base['province']}"
+        variation["price_estimate"] = max(0, base["price"] + random.randint(-10000, 10000))
         variation["popularity_score"] = random.uniform(5, 200)
         variation["indoor_outdoor"] = "outdoor" if any(c in base["categories"] for c in ["Nature", "Lake", "Mountain"]) else "both"
         variation["activity_level"] = random.choice(["low", "medium", "high"])
-        variation["latitude"] = base["lat"] + random.uniform(-0.1, 0.1)
-        variation["longitude"] = base["lon"] + random.uniform(-0.1, 0.1)
+        variation["latitude"] = base["lat"] + random.uniform(-0.02, 0.02)
+        variation["longitude"] = base["lon"] + random.uniform(-0.02, 0.02)
         places.append(variation)
+        counter += 1
 
     return places
 

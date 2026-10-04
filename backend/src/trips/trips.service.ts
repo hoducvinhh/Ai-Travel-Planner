@@ -52,10 +52,11 @@ export class TripsService {
     this.logger.log(`Creating trip for user ${dto.userId} to ${dto.destination}`);
 
     // Calculate days
-    const days = Math.ceil(
+    const diffDays = Math.ceil(
       (new Date(dto.endDate).getTime() - new Date(dto.startDate).getTime()) /
         (1000 * 60 * 60 * 24),
     );
+    const days = Math.max(1, diffDays);
 
     // Create trip record
     const trip = await this.prisma.trip.create({
@@ -118,11 +119,12 @@ export class TripsService {
       throw new Error('No recommendations available for this destination');
     }
 
-    // Step 2: Fetch place details
+    // Step 2: Fetch place details (take enough unique candidates based on trip duration)
+    const neededCandidates = Math.max(30, days * 5);
     const places = await this.prisma.place.findMany({
       where: {
         id: {
-          in: recommendations.placeIds.slice(0, 30), // Take top 30 for LLM
+          in: recommendations.placeIds.slice(0, neededCandidates),
         },
       },
     });
@@ -149,6 +151,9 @@ export class TripsService {
     groupSize: number,
     preferences: string[],
   ): Promise<TripItinerary> {
+    const minPlaces = Math.min(places.length, days * 2);
+    const maxPlaces = Math.min(places.length, days * 4);
+
     const prompt = `Bạn là một chuyên gia lên lịch trình du lịch người Việt Nam. Hãy tạo một lịch trình chi tiết ${days} ngày bằng cách sử dụng các địa điểm sau.
 
 **Ngân sách**: ${budgetPerPerson.toLocaleString()} VND mỗi người
@@ -159,14 +164,15 @@ export class TripsService {
 ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(', ')} (${p.priceEstimate.toLocaleString()} VND) tại tọa độ (${p.latitude}, ${p.longitude})`).join('\n')}
 
 **Yêu cầu bắt buộc**:
-1. Chọn 10-15 địa điểm từ danh sách trên
-2. Phân bổ hợp lý trong ${days} ngày (3-5 địa điểm/ngày)
-3. Các địa điểm trong cùng 1 ngày phải gần nhau về mặt địa lý
-4. Cân nhắc thời gian di chuyển giữa các địa điểm
-5. Cân bằng các hoạt động (thiên nhiên, văn hóa, ẩm thực...)
-6. Đảm bảo tổng chi phí không vượt quá ngân sách
-7. Ước tính thời gian tham quan cho mỗi địa điểm
-8. TẤT CẢ NỘI DUNG BAO GỒM TIÊU ĐỀ, MÔ TẢ, LỜI KHUYÊN PHẢI ĐƯỢC VIẾT BẰNG TIẾNG VIỆT 100%.
+1. Chọn khoảng ${minPlaces}-${maxPlaces} địa điểm từ danh sách trên sao cho phù hợp với số ngày.
+2. TUYỆT ĐỐI KHÔNG ĐƯỢC LẶP LẠI ĐỊA ĐIỂM: Mỗi địa điểm chỉ được xuất hiện DUY NHẤT 1 LẦN trong toàn bộ chuyến đi ${days} ngày. Không được lặp lại bất kỳ địa điểm nào giữa các ngày hoặc trong cùng 1 ngày.
+3. Phân bổ hợp lý trong ${days} ngày (khoảng 2-4 địa điểm mỗi ngày).
+4. Các địa điểm trong cùng 1 ngày phải gần nhau về mặt địa lý để tiện di chuyển.
+5. Cân nhắc thời gian di chuyển giữa các địa điểm.
+6. Cân bằng các hoạt động (thiên nhiên, văn hóa, ẩm thực...).
+7. Đảm bảo tổng chi phí không vượt quá ngân sách.
+8. Ước tính thời gian tham quan cho mỗi địa điểm.
+9. TẤT CẢ NỘI DUNG BAO GỒM TIÊU ĐỀ, MÔ TẢ, LỜI KHUYÊN PHẢI ĐƯỢC VIẾT BẰNG TIẾNG VIỆT 100%.
 
 **Định dạng đầu ra** (Chỉ trả về JSON, không kèm giải thích):
 \`\`\`json
@@ -200,12 +206,39 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
       const response = await this.gemini.generateText(prompt);
 
       // Extract JSON from response
-      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
+      const jsonMatch =
+        response.match(/```(?:json)?\s*([\s\S]*?)\s*```/) ||
+        response.match(/(\{[\s\S]*\})/);
       if (!jsonMatch) {
         throw new Error('Failed to parse LLM response');
       }
 
       const itinerary = JSON.parse(jsonMatch[1]) as TripItinerary;
+
+      // Hậu xử lý: Đảm bảo 100% không có địa điểm nào bị lặp lại giữa các ngày
+      const seenPlaceIds = new Set<string>();
+      let calculatedTotalCost = 0;
+
+      for (const day of itinerary.days) {
+        day.places = (day.places || []).filter((p) => {
+          if (!p.placeId || seenPlaceIds.has(p.placeId)) {
+            return false;
+          }
+          seenPlaceIds.add(p.placeId);
+          calculatedTotalCost += Number(p.priceEstimate) || 0;
+          return true;
+        });
+
+        // Đánh lại số thứ tự trong ngày
+        day.places.forEach((p, idx) => {
+          p.orderInDay = idx + 1;
+        });
+      }
+
+      if (calculatedTotalCost > 0) {
+        itinerary.totalEstimatedCost = calculatedTotalCost;
+      }
+
       return itinerary;
     } catch (error: any) {
       this.logger.warn(`LLM itinerary generation failed: ${error?.message || 'Unknown error'}. Using FALLBACK itinerary!`);
@@ -214,21 +247,27 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
       let currentPlaceIndex = 0;
       let totalCost = 0;
       
-      // Calculate how many days based on dates, or default to 3 places per day
-      const daysCount = Math.max(1, Math.ceil(places.length / 3));
+      // Sử dụng chính xác số ngày người dùng đã chọn
+      const daysCount = Math.max(1, days);
+      const placesPerDay = 3;
+      const usedFallbackIds = new Set<string>();
       
       for (let day = 1; day <= daysCount; day++) {
         const dayPlaces = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < placesPerDay; i++) {
+          while (currentPlaceIndex < places.length && usedFallbackIds.has(places[currentPlaceIndex].id)) {
+            currentPlaceIndex++;
+          }
           if (currentPlaceIndex < places.length) {
             const p = places[currentPlaceIndex];
+            usedFallbackIds.add(p.id);
             dayPlaces.push({
               placeId: p.id,
               name: p.name,
-              description: 'Khám phá ' + p.name + ' - ' + p.categories.join(', '),
-              categories: p.categories,
-              estimatedTime: '2 hours',
-              orderInDay: i + 1,
+              description: 'Khám phá ' + p.name + ' - ' + (p.categories || []).join(', '),
+              categories: p.categories || [],
+              estimatedTime: '2 giờ',
+              orderInDay: dayPlaces.length + 1,
               latitude: Number(p.latitude) || 0,
               longitude: Number(p.longitude) || 0,
               priceEstimate: Number(p.priceEstimate) || 0
@@ -249,7 +288,7 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
 
       return {
         days: mockDays,
-        summary: 'Lịch trình dự phòng tự động (AI tạm thời bận). Dựa trên gợi ý Recommendation Model.',
+        summary: `Lịch trình ${daysCount} ngày dự phòng tự động (AI tạm thời bận). Dựa trên gợi ý Recommendation Model.`,
         totalEstimatedCost: totalCost
       };
     }
