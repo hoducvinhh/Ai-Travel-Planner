@@ -140,14 +140,15 @@ class RecommendationModel:
         self.reverse_place_mapping = {v: k for k, v in self.place_id_mapping.items()}
 
     def predict(self, user_id: str, candidate_place_ids: List[str],
-                user_features: np.ndarray = None) -> List[Tuple[str, float]]:
-        """Predict scores for candidate places"""
+                user_features: np.ndarray = None,
+                candidate_popularity: Dict[str, float] = None) -> List[Tuple[str, float]]:
+        """Predict scores for candidate places with cold-start fallback"""
         if self.model is None:
-            raise ValueError("Model not trained yet")
+            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
 
         # Handle cold start (new user)
         if user_id not in self.user_id_mapping:
-            return self._cold_start_recommend(candidate_place_ids, user_features)
+            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
 
         user_idx = self.user_id_mapping[user_id]
 
@@ -158,31 +159,67 @@ class RecommendationModel:
         ]
 
         if not valid_candidates:
-            return []
+            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
 
         place_indices = [self.place_id_mapping[pid] for pid in valid_candidates]
 
         # Predict scores
-        scores = self.model.predict(
+        raw_scores = self.model.predict(
             user_ids=user_idx,
             item_ids=np.array(place_indices)
         )
 
-        # Sort by score
-        results = list(zip(valid_candidates, scores))
-        results.sort(key=lambda x: x[1], reverse=True)
+        # Normalize raw model scores to [0.2, 0.9]
+        min_s = float(np.min(raw_scores))
+        max_s = float(np.max(raw_scores))
+        score_range = max_s - min_s
 
+        results = []
+        for pid, raw in zip(valid_candidates, raw_scores):
+            if score_range > 0:
+                norm_score = 0.2 + 0.7 * float((raw - min_s) / score_range)
+            else:
+                norm_score = 0.5
+            results.append((pid, norm_score))
+
+        # Include any candidate places not seen during model training
+        unseen_candidates = [pid for pid in candidate_place_ids if pid not in self.place_id_mapping]
+        if unseen_candidates:
+            unseen_results = self._cold_start_recommend(
+                unseen_candidates, user_features, candidate_popularity
+            )
+            results.extend(unseen_results)
+
+        # Sort by score descending
+        results.sort(key=lambda x: x[1], reverse=True)
         return results
 
     def _cold_start_recommend(self, candidate_place_ids: List[str],
-                             user_features: np.ndarray) -> List[Tuple[str, float]]:
-        """Content-based recommendation for cold start"""
-        # Fall back to popularity-based ranking
-        # In production, you'd use content similarity here
+                             user_features: np.ndarray = None,
+                             candidate_popularity: Dict[str, float] = None) -> List[Tuple[str, float]]:
+        """Content-based & popularity-ranked recommendation for cold start"""
+        if not candidate_place_ids:
+            return []
+
+        if not candidate_popularity:
+            return [(place_id, 0.5) for place_id in candidate_place_ids]
+
+        pop_values = [candidate_popularity.get(pid, 0.0) for pid in candidate_place_ids]
+        max_pop = max(pop_values) if pop_values else 1.0
+        min_pop = min(pop_values) if pop_values else 0.0
+        range_pop = max_pop - min_pop
+
         scores = []
         for place_id in candidate_place_ids:
-            # Simple popularity score as fallback
-            scores.append((place_id, 0.5))
+            pop = candidate_popularity.get(place_id, 0.0)
+            if range_pop > 0:
+                normalized_score = 0.2 + 0.7 * float((pop - min_pop) / range_pop)
+            else:
+                normalized_score = 0.5
+            scores.append((place_id, normalized_score))
+
+        # Sort by popularity score descending
+        scores.sort(key=lambda x: x[1], reverse=True)
         return scores
 
     def save_model(self):

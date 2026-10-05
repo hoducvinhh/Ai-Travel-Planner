@@ -138,7 +138,15 @@ export default function PlaceDirectionsModal({
   // Transport mode & Routing stats
   const [transportMode, setTransportMode] = useState<TransportMode>('motorbike');
   const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(null);
-  const [travelDurationMinutes, setTravelDurationMinutes] = useState<number | null>(null);
+  const [modeDurations, setModeDurations] = useState<{
+    motorbike: number | null;
+    driving: number | null;
+    walking: number | null;
+  }>({
+    motorbike: null,
+    driving: null,
+    walking: null,
+  });
   const [isRouting, setIsRouting] = useState(false);
 
   // Weather state
@@ -377,8 +385,7 @@ export default function PlaceDirectionsModal({
       setIsRouting(true);
 
       try {
-        const osrmProfile = transportMode === 'walking' ? 'walking' : 'driving';
-        const url = `https://router.project-osrm.org/route/v1/${osrmProfile}/${userCoords.lng},${userCoords.lat};${place.longitude},${place.latitude}?overview=full&geometries=geojson`;
+        const url = `https://router.project-osrm.org/route/v1/driving/${userCoords.lng},${userCoords.lat};${place.longitude},${place.latitude}?overview=full&geometries=geojson`;
 
         const res = await fetch(url);
         if (res.ok) {
@@ -389,20 +396,26 @@ export default function PlaceDirectionsModal({
             const distanceKm = Math.round((distanceMeters / 1000) * 10) / 10;
             setRouteDistanceKm(distanceKm);
 
-            // Calculate duration based on transport mode
-            let durationMins = 0;
-            if (transportMode === 'driving') {
-              durationMins = Math.round(primaryRoute.duration / 60);
-            } else if (transportMode === 'motorbike') {
-              // Motorbikes in Vietnam average ~32 km/h
-              const hours = distanceKm / 32;
-              durationMins = Math.max(2, Math.round(hours * 60));
-            } else if (transportMode === 'walking') {
-              // Walking speed ~4.8 km/h
-              const hours = distanceKm / 4.8;
-              durationMins = Math.max(3, Math.round(hours * 60));
+            // 1. Ô tô (Driving): calculated by OSRM route duration
+            const drivingMins = Math.max(1, Math.round(primaryRoute.duration / 60));
+
+            // 2. Xe máy (Motorbike): Vietnam traffic conditions
+            // City (< 10km): ~28 km/h; suburban (10-50km): ~35 km/h; interprovincial (> 50km): ~40 km/h (no expressways)
+            const bikeSpeed = distanceKm < 10 ? 28 : distanceKm < 50 ? 35 : 40;
+            let motorbikeMins = Math.max(1, Math.round((distanceKm / bikeSpeed) * 60));
+            // In urban city traffic, motorbike can be slightly faster or equal to car
+            if (distanceKm < 15 && motorbikeMins > drivingMins) {
+              motorbikeMins = Math.max(1, Math.round(drivingMins * 0.9));
             }
-            setTravelDurationMinutes(durationMins);
+
+            // 3. Đi bộ (Walking): average walking speed ~4.8 km/h
+            const walkingMins = Math.max(2, Math.round((distanceKm / 4.8) * 60));
+
+            setModeDurations({
+              motorbike: motorbikeMins,
+              driving: drivingMins,
+              walking: walkingMins,
+            });
 
             // Draw route line on map
             if (routeLayerRef.current) {
@@ -414,7 +427,12 @@ export default function PlaceDirectionsModal({
             );
 
             const routeLine = L.polyline(coordinates, {
-              color: transportMode === 'walking' ? '#38bdf8' : transportMode === 'motorbike' ? '#10b981' : '#a855f7',
+              color:
+                transportMode === 'walking'
+                  ? '#38bdf8'
+                  : transportMode === 'motorbike'
+                  ? '#10b981'
+                  : '#a855f7',
               weight: 5,
               opacity: 0.9,
               dashArray: transportMode === 'walking' ? '8, 8' : undefined,
@@ -432,13 +450,51 @@ export default function PlaceDirectionsModal({
         }
       } catch (err) {
         console.error('Lỗi khi tính toán tuyến đường OSRM:', err);
+        // Fallback: Haversine distance
+        const R = 6371;
+        const dLat = ((place.latitude - userCoords.lat) * Math.PI) / 180;
+        const dLon = ((place.longitude - userCoords.lng) * Math.PI) / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos((userCoords.lat * Math.PI) / 180) *
+            Math.cos((place.latitude * Math.PI) / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const estRoadKm = Math.round(R * c * 1.25 * 10) / 10;
+        setRouteDistanceKm(estRoadKm);
+
+        const drivingMins = Math.max(1, Math.round((estRoadKm / (estRoadKm < 15 ? 30 : 60)) * 60));
+        const bikeSpeed = estRoadKm < 10 ? 28 : estRoadKm < 50 ? 35 : 40;
+        const motorbikeMins = Math.max(1, Math.round((estRoadKm / bikeSpeed) * 60));
+        const walkingMins = Math.max(2, Math.round((estRoadKm / 4.8) * 60));
+
+        setModeDurations({
+          motorbike: motorbikeMins,
+          driving: drivingMins,
+          walking: walkingMins,
+        });
       } finally {
         setIsRouting(false);
       }
     }
 
     calculateRoute();
-  }, [userCoords, transportMode, place]);
+  }, [userCoords, place.latitude, place.longitude, place.name]);
+
+  // Update route polyline style instantly when transportMode changes
+  useEffect(() => {
+    if (!routeLayerRef.current) return;
+    routeLayerRef.current.setStyle({
+      color:
+        transportMode === 'walking'
+          ? '#38bdf8'
+          : transportMode === 'motorbike'
+          ? '#10b981'
+          : '#a855f7',
+      dashArray: transportMode === 'walking' ? '8, 8' : undefined,
+    });
+  }, [transportMode]);
 
   // Format Duration string
   const formatDuration = (mins: number | null) => {
@@ -446,6 +502,11 @@ export default function PlaceDirectionsModal({
     if (mins < 60) return `${mins} phút`;
     const h = Math.floor(mins / 60);
     const m = mins % 60;
+    if (h >= 48) {
+      const days = Math.floor(h / 24);
+      const remH = h % 24;
+      return remH > 0 ? `${days} ngày ${remH} giờ` : `${days} ngày`;
+    }
     return m > 0 ? `${h} giờ ${m} phút` : `${h} giờ`;
   };
 
@@ -538,7 +599,7 @@ export default function PlaceDirectionsModal({
                   <span>Xe máy</span>
                 </div>
                 <span className="text-[12px] font-bold font-mono text-emerald-300">
-                  {formatDuration(travelDurationMinutes)}
+                  {formatDuration(modeDurations.motorbike)}
                 </span>
               </button>
 
@@ -557,7 +618,7 @@ export default function PlaceDirectionsModal({
                   <span>Ô tô</span>
                 </div>
                 <span className="text-[12px] font-bold font-mono text-purple-300">
-                  {formatDuration(travelDurationMinutes)}
+                  {formatDuration(modeDurations.driving)}
                 </span>
               </button>
 
@@ -576,7 +637,7 @@ export default function PlaceDirectionsModal({
                   <span>Đi bộ</span>
                 </div>
                 <span className="text-[12px] font-bold font-mono text-sky-300">
-                  {formatDuration(travelDurationMinutes)}
+                  {formatDuration(modeDurations.walking)}
                 </span>
               </button>
             </div>
@@ -711,7 +772,9 @@ export default function PlaceDirectionsModal({
           {/* External Google Maps Button */}
           <div className="absolute bottom-4 right-4 z-[400]">
             <a
-              href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${place.latitude},${place.longitude}`}
+              href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${place.latitude},${place.longitude}&travelmode=${
+                transportMode === 'walking' ? 'walking' : transportMode === 'motorbike' ? 'two-wheeler' : 'driving'
+              }`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-950/90 hover:bg-slate-900 border border-slate-700 text-white text-xs font-semibold shadow-xl transition"
