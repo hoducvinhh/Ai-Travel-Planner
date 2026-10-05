@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { PrismaService } from '../prisma/prisma.service';
 
 export interface RecommendationRequest {
   userId: string;
@@ -26,6 +27,7 @@ export class RecommendationService {
   constructor(
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
+    private readonly prisma: PrismaService,
   ) {
     this.recommendationServiceUrl = this.configService.get<string>(
       'RECOMMENDATION_SERVICE_URL',
@@ -55,7 +57,9 @@ export class RecommendationService {
         this.httpService.post<{
           place_ids: string[];
           scores: number[];
-        }>(`${this.recommendationServiceUrl}/recommend`, payload),
+        }>(`${this.recommendationServiceUrl}/recommend`, payload, {
+          timeout: 5000,
+        }),
       );
 
       return {
@@ -63,11 +67,101 @@ export class RecommendationService {
         scores: (response as any).data.scores,
       };
     } catch (error: any) {
-      this.logger.error(
-        `Failed to fetch recommendations: ${error?.message || 'Unknown error'}`,
-        error?.stack,
+      this.logger.warn(
+        `Recommendation service unavailable (${error?.message || 'Unknown error'}). Falling back to database popularity ranking.`,
       );
-      throw error;
+      return this.fallbackRecommendations(request);
+    }
+  }
+
+  private async fallbackRecommendations(
+    request: RecommendationRequest,
+  ): Promise<RecommendationResponse> {
+    try {
+      const takeLimit = Math.max(30, (request.days || 3) * 10);
+
+      // Search places by destination province (case-insensitive)
+      let places = await this.prisma.place.findMany({
+        where: {
+          province: {
+            contains: request.destination,
+            mode: 'insensitive',
+          },
+        },
+        orderBy: {
+          popularityScore: 'desc',
+        },
+        take: takeLimit,
+      });
+
+      // If empty, broaden search across province, district, name
+      if (places.length === 0) {
+        places = await this.prisma.place.findMany({
+          where: {
+            OR: [
+              { province: { contains: request.destination, mode: 'insensitive' } },
+              { district: { contains: request.destination, mode: 'insensitive' } },
+              { name: { contains: request.destination, mode: 'insensitive' } },
+            ],
+          },
+          orderBy: {
+            popularityScore: 'desc',
+          },
+          take: takeLimit,
+        });
+      }
+
+      // If still empty, take top places overall
+      if (places.length === 0) {
+        places = await this.prisma.place.findMany({
+          orderBy: {
+            popularityScore: 'desc',
+          },
+          take: takeLimit,
+        });
+      }
+
+      // If explicit preferences provided, prioritize places with matching categories
+      if (request.explicitPreferences && request.explicitPreferences.length > 0 && places.length > 0) {
+        const prefLower = request.explicitPreferences.map((p) => p.toLowerCase().trim());
+        places.sort((a, b) => {
+          const aMatches = a.categories.filter((c) =>
+            prefLower.some((p) => c.toLowerCase().includes(p) || p.includes(c.toLowerCase())),
+          ).length;
+          const bMatches = b.categories.filter((c) =>
+            prefLower.some((p) => c.toLowerCase().includes(p) || p.includes(c.toLowerCase())),
+          ).length;
+
+          if (aMatches !== bMatches) {
+            return bMatches - aMatches;
+          }
+          return b.popularityScore - a.popularityScore;
+        });
+      }
+
+      const placeIds = places.map((p) => p.id);
+      const maxPop = places.length > 0 ? Math.max(...places.map((p) => p.popularityScore)) : 1;
+      const scores = places.map((p) =>
+        maxPop > 0 ? Number((0.3 + 0.6 * (p.popularityScore / maxPop)).toFixed(3)) : 0.5,
+      );
+
+      this.logger.log(
+        `Fallback generated ${placeIds.length} recommendations from database for destination: ${request.destination}`,
+      );
+
+      return {
+        placeIds,
+        scores,
+      };
+    } catch (dbError: any) {
+      this.logger.error(
+        `Database fallback also failed: ${dbError?.message}`,
+        dbError?.stack,
+      );
+      return {
+        placeIds: [],
+        scores: [],
+      };
     }
   }
 

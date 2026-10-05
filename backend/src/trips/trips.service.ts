@@ -101,33 +101,119 @@ export class TripsService {
   ): Promise<TripItinerary> {
     this.logger.log(`Generating itinerary for trip ${tripId}`);
 
-    // Step 1: Get ML recommendations (Top 50)
     const startDate = new Date(dto.startDate);
     const monthOfYear = startDate.getMonth() + 1;
+    const neededCandidates = Math.max(30, days * 5);
 
-    const recommendations = await this.recommendation.getRecommendations({
-      userId: dto.userId,
-      destination: dto.destination,
-      budgetPerPerson: dto.budgetPerPerson,
-      days,
-      groupSize: dto.groupSize,
-      monthOfYear,
-      explicitPreferences: dto.preferences || [],
-    });
-
-    if (recommendations.placeIds.length === 0) {
-      throw new Error('No recommendations available for this destination');
+    // Step 1: Get recommendations (with automatic fallback to database popularity)
+    let placeIds: string[] = [];
+    try {
+      const recommendations = await this.recommendation.getRecommendations({
+        userId: dto.userId,
+        destination: dto.destination,
+        budgetPerPerson: dto.budgetPerPerson,
+        days,
+        groupSize: dto.groupSize,
+        monthOfYear,
+        explicitPreferences: dto.preferences || [],
+      });
+      placeIds = recommendations?.placeIds || [];
+    } catch (recError: any) {
+      this.logger.warn(
+        `Recommendation service call failed (${recError?.message}). Using direct database fallback.`,
+      );
     }
 
-    // Step 2: Fetch place details (take enough unique candidates based on trip duration)
-    const neededCandidates = Math.max(30, days * 5);
-    const places = await this.prisma.place.findMany({
-      where: {
-        id: {
-          in: recommendations.placeIds.slice(0, neededCandidates),
+    // Step 2: Fetch place details from database
+    let places: any[] = [];
+    if (placeIds.length > 0) {
+      const fetchedPlaces = await this.prisma.place.findMany({
+        where: {
+          id: {
+            in: placeIds.slice(0, neededCandidates),
+          },
         },
-      },
-    });
+      });
+
+      // Preserve the ranked order from recommendations
+      const placeMap = new Map(fetchedPlaces.map((p) => [p.id, p]));
+      places = placeIds
+        .slice(0, neededCandidates)
+        .map((id) => placeMap.get(id))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p));
+    }
+
+    // Fallback: If recommendation returned insufficient places, query database directly
+    const minRequiredPlaces = Math.min(10, days * 2);
+    if (places.length < minRequiredPlaces) {
+      this.logger.warn(
+        `Insufficient candidate places (${places.length}). Querying popular places from database for destination: ${dto.destination}`,
+      );
+
+      let fallbackPlaces = await this.prisma.place.findMany({
+        where: {
+          province: {
+            contains: dto.destination,
+            mode: 'insensitive',
+          },
+        },
+        orderBy: {
+          popularityScore: 'desc',
+        },
+        take: neededCandidates,
+      });
+
+      if (fallbackPlaces.length === 0) {
+        fallbackPlaces = await this.prisma.place.findMany({
+          where: {
+            OR: [
+              { province: { contains: dto.destination, mode: 'insensitive' } },
+              { district: { contains: dto.destination, mode: 'insensitive' } },
+              { name: { contains: dto.destination, mode: 'insensitive' } },
+            ],
+          },
+          orderBy: {
+            popularityScore: 'desc',
+          },
+          take: neededCandidates,
+        });
+      }
+
+      if (fallbackPlaces.length === 0) {
+        fallbackPlaces = await this.prisma.place.findMany({
+          orderBy: {
+            popularityScore: 'desc',
+          },
+          take: neededCandidates,
+        });
+      }
+
+      // Prioritize places matching preferences if provided
+      if (dto.preferences && dto.preferences.length > 0 && fallbackPlaces.length > 0) {
+        const prefLower = dto.preferences.map((p) => p.toLowerCase().trim());
+        fallbackPlaces.sort((a, b) => {
+          const aMatches = a.categories.filter((c) =>
+            prefLower.some((p) => c.toLowerCase().includes(p) || p.includes(c.toLowerCase())),
+          ).length;
+          const bMatches = b.categories.filter((c) =>
+            prefLower.some((p) => c.toLowerCase().includes(p) || p.includes(c.toLowerCase())),
+          ).length;
+
+          if (aMatches !== bMatches) {
+            return bMatches - aMatches;
+          }
+          return b.popularityScore - a.popularityScore;
+        });
+      }
+
+      places = fallbackPlaces;
+    }
+
+    if (places.length === 0) {
+      throw new NotFoundException(
+        `Không tìm thấy địa điểm du lịch nào phù hợp cho điểm đến "${dto.destination}".`,
+      );
+    }
 
     // Step 3: Use LLM (Gemini) to create day-by-day itinerary
     const itinerary = await this.createItineraryWithLLM(
