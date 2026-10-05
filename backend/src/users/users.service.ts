@@ -162,4 +162,147 @@ export class UsersService {
 
     return user;
   }
+
+  async findAll(query: { page?: number; limit?: number; search?: string; role?: string }) {
+    const page = Math.max(1, Number(query.page) || 1);
+    const limit = Math.min(100, Math.max(1, Number(query.limit) || 10));
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+    if (query.role && (query.role === 'ADMIN' || query.role === 'USER')) {
+      where.role = query.role;
+    }
+
+    if (query.search && query.search.trim()) {
+      const s = query.search.trim();
+      where.OR = [
+        { name: { contains: s, mode: 'insensitive' } },
+        { email: { contains: s, mode: 'insensitive' } },
+      ];
+    }
+
+    const [total, users] = await Promise.all([
+      this.prisma.user.count({ where }),
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          preferredStyles: true,
+          budgetLevel: true,
+          createdAt: true,
+          updatedAt: true,
+          _count: {
+            select: {
+              trips: true,
+              communityPosts: true,
+              comments: true,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return {
+      items: users,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async adminCreateUser(dto: AdminCreateUserDto) {
+    const existing = await this.findByEmail(dto.email);
+    if (existing) {
+      throw new ConflictException('Email đã tồn tại trong hệ thống');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(dto.password, salt);
+
+    return this.prisma.user.create({
+      data: {
+        email: dto.email.trim(),
+        name: dto.name?.trim() || null,
+        password: hashedPassword,
+        role: dto.role || Role.USER,
+        preferredStyles: dto.preferredStyles || [],
+        budgetLevel: dto.budgetLevel || null,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        preferredStyles: true,
+        budgetLevel: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async adminUpdateUser(id: string, dto: AdminUpdateUserDto) {
+    const existing = await this.findById(id);
+    if (!existing) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    const updateData: any = {};
+    if (dto.name !== undefined) updateData.name = dto.name;
+    if (dto.role !== undefined) updateData.role = dto.role;
+    if (dto.preferredStyles !== undefined) updateData.preferredStyles = dto.preferredStyles;
+    if (dto.budgetLevel !== undefined) updateData.budgetLevel = dto.budgetLevel;
+
+    if (dto.email && dto.email !== existing.email) {
+      const emailExists = await this.findByEmail(dto.email);
+      if (emailExists) {
+        throw new ConflictException('Email này đã được sử dụng bởi tài khoản khác');
+      }
+      updateData.email = dto.email.trim();
+    }
+
+    if (dto.password && dto.password.trim()) {
+      const salt = await bcrypt.genSalt();
+      updateData.password = await bcrypt.hash(dto.password.trim(), salt);
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        preferredStyles: true,
+        budgetLevel: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async adminDeleteUser(id: string, currentAdminId: string) {
+    if (id === currentAdminId) {
+      throw new BadRequestException('Bạn không thể tự xóa tài khoản admin đang đăng nhập');
+    }
+
+    const existing = await this.findById(id);
+    if (!existing) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    return this.prisma.user.delete({
+      where: { id },
+    });
+  }
 }
