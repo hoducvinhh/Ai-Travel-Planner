@@ -646,34 +646,76 @@ export default function PlacesSocialFeedPage() {
                       </div>
 
                       {/* Star Rating Interactive Bar */}
-                      <div className="flex items-center justify-between py-2.5 px-3 rounded-xl bg-slate-950/60 border border-slate-800/80 mb-2">
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs font-bold text-amber-300 mr-1.5">
-                            {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : 'Chưa có'}
-                          </span>
-                          {[1, 2, 3, 4, 5].map((star) => {
-                            const isFilled = (place.userRating || place.ratingAvg) >= star;
-                            return (
-                              <button
-                                key={star}
-                                onClick={() => handleRate(place.id, star)}
-                                title={`Đánh giá ${star} sao`}
-                                className="p-0.5 hover:scale-125 transition-transform"
-                              >
-                                <Star
-                                  className={`w-3.5 h-3.5 ${
-                                    isFilled
-                                      ? 'text-amber-400 fill-amber-400'
-                                      : 'text-slate-600 hover:text-amber-300'
-                                  }`}
-                                />
-                              </button>
-                            );
-                          })}
+                      <div className="py-2.5 px-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 mb-2 transition-colors">
+                        <div className="flex items-center justify-between gap-2">
+                          {/* Average Rating Display */}
+                          <div className="flex items-center gap-1.5">
+                            <Star className="w-4 h-4 text-amber-400 fill-amber-400 flex-shrink-0" />
+                            <span className="text-xs font-bold text-amber-300">
+                              {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : 'Chưa có'}
+                            </span>
+                            <span className="text-[11px] text-slate-500">
+                              ({place.ratingCount} đánh giá)
+                            </span>
+                          </div>
+
+                          {/* 5-Star Interactive Rating Picker */}
+                          <div
+                            className="flex items-center gap-0.5"
+                            onMouseLeave={() =>
+                              setHoverRating((prev) => {
+                                const copy = { ...prev };
+                                delete copy[place.id];
+                                return copy;
+                              })
+                            }
+                          >
+                            {[1, 2, 3, 4, 5].map((star) => {
+                              const isHovered = hoverRating[place.id] !== undefined;
+                              const activeStar = isHovered
+                                ? hoverRating[place.id] >= star
+                                : (place.userRating || 0) >= star;
+
+                              return (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onMouseEnter={() =>
+                                    setHoverRating((prev) => ({ ...prev, [place.id]: star }))
+                                  }
+                                  onClick={() => handleRate(place.id, star)}
+                                  title={`Đánh giá ${star} sao`}
+                                  className="p-0.5 hover:scale-125 transition-transform"
+                                >
+                                  <Star
+                                    className={`w-3.5 h-3.5 transition-colors ${
+                                      activeStar
+                                        ? 'text-amber-400 fill-amber-400'
+                                        : 'text-slate-700 hover:text-amber-300'
+                                    }`}
+                                  />
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <span className="text-[10px] text-slate-500">
-                          ({place.ratingCount} đánh giá)
-                        </span>
+
+                        {/* Personal User Rating Indicator & Unrate Button */}
+                        {place.userRating && (
+                          <div className="mt-1.5 pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
+                            <span className="text-emerald-400 font-medium flex items-center gap-1">
+                              <Check className="w-3 h-3 text-emerald-400" /> Bạn đã đánh giá {place.userRating} sao
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleUnrate(place.id)}
+                              className="text-slate-500 hover:text-rose-400 transition text-[10px] underline underline-offset-2"
+                              title="Hủy đánh giá này"
+                            >
+                              Hủy đánh giá
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
