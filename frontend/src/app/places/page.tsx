@@ -920,6 +920,16 @@ export default function PlacesSocialFeedPage() {
           onClose={() => setDirectionsPlace(null)}
         />
       )}
+
+      {/* Share to Profile Modal */}
+      {sharingPlace && (
+        <SharePlaceModal
+          place={sharingPlace}
+          userId={user?.id}
+          onClose={() => setSharingPlace(null)}
+          showToast={showToast}
+        />
+      )}
     </div>
   );
 }
