@@ -17,6 +17,7 @@ import {
   Compass,
   Users,
   User as UserIcon,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -43,6 +44,9 @@ export default function Navbar() {
     { href: '/community', label: 'Cộng Đồng', icon: Users },
     { href: '/trips', label: 'Lịch Trình', icon: Calendar },
     { href: '/question-answer', label: 'Hỏi Đáp AI', icon: MessageSquare },
+    ...(user?.role === 'ADMIN'
+      ? [{ href: '/admin', label: 'Quản trị', icon: ShieldCheck, isAdmin: true }]
+      : []),
   ];
 
   return (
