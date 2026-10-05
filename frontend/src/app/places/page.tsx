@@ -1,7 +1,6 @@
-'use client';
-
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import {
@@ -26,6 +25,11 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { Place, CommentItem } from '@/types';
+
+const PlaceDirectionsModal = dynamic(
+  () => import('@/components/PlaceDirectionsModal'),
+  { ssr: false }
+);
 
 const PROVINCES = [
   { key: 'ALL', label: 'Tất cả điểm đến', icon: '🌟' },
@@ -70,6 +74,9 @@ export default function PlacesSocialFeedPage() {
 
   // UI Toasts
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Directions & Weather Modal state
+  const [directionsPlace, setDirectionsPlace] = useState<Place | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -691,16 +698,16 @@ export default function PlacesSocialFeedPage() {
 
                       {/* Right: Map & Share */}
                       <div className="flex items-center gap-1">
-                        {/* Map Directions */}
-                        <a
-                          href={`https://www.google.com/maps?q=${place.latitude},${place.longitude}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-2 rounded-xl text-slate-400 hover:text-teal-400 hover:bg-slate-800 transition"
-                          title="Mở chỉ đường trên Google Maps"
+                        {/* Map Directions & Weather */}
+                        <button
+                          type="button"
+                          onClick={() => setDirectionsPlace(place)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-teal-500/10 border border-transparent hover:border-teal-500/30 transition text-xs font-semibold"
+                          title="Xem chỉ đường & Thời tiết thực tế"
                         >
-                          <Navigation className="w-3.5 h-3.5" />
-                        </a>
+                          <Navigation className="w-3.5 h-3.5 text-teal-400" />
+                          <span className="hidden sm:inline">Chỉ đường</span>
+                        </button>
 
                         {/* Share Button */}
                         <button
@@ -821,6 +828,14 @@ export default function PlacesSocialFeedPage() {
           </div>
         )}
       </section>
+
+      {/* Directions & Weather Modal */}
+      {directionsPlace && (
+        <PlaceDirectionsModal
+          place={directionsPlace}
+          onClose={() => setDirectionsPlace(null)}
+        />
+      )}
     </div>
   );
 }
