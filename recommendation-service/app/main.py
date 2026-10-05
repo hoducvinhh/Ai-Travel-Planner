@@ -39,6 +39,58 @@ async def health_check():
         "model_status": model_status
     }
 
+PREFERENCE_KEYWORDS = {
+    'nature': {'nature', 'thiên nhiên', 'lake', 'mountain', 'waterfall', 'park', 'forest', 'đồi', 'thác', 'hồ', 'vườn', 'scenic'},
+    'beach': {'beach', 'biển', 'island', 'đảo', 'sea', 'coastal', 'bãi biển'},
+    'culture': {'culture', 'văn hóa', 'temple', 'pagoda', 'chùa', 'đền', 'museum', 'bảo tàng', 'heritage', 'monument', 'di tích'},
+    'food': {'food', 'ẩm thực', 'restaurant', 'quán', 'ăn uống', 'cuisine', 'street food', 'cafe', 'coffee', 'cà phê', 'culinary'},
+    'adventure': {'adventure', 'phiêu lưu', 'hiking', 'trekking', 'climbing', 'leo núi', 'sport', 'cave', 'hang động'},
+    'photography': {'photography', 'chụp ảnh', 'check-in', 'scenic', 'viewpoint', 'instagram', 'view'},
+    'shopping': {'shopping', 'mua sắm', 'market', 'chợ', 'mall', 'souvenir'},
+    'relax': {'relax', 'thư giãn', 'resort', 'spa', 'lake', 'park', 'peaceful', 'nghỉ dưỡng'},
+    'nightlife': {'nightlife', 'bar', 'pub', 'club', 'night market', 'chợ đêm'},
+    'historical': {'historical', 'lịch sử', 'history', 'di tích', 'monument', 'museum', 'palace', 'dinh', 'citadel'},
+}
+
+def _normalize_categories(categories_val) -> List[str]:
+    """Normalize place categories from database formats"""
+    if not categories_val:
+        return []
+    if isinstance(categories_val, list):
+        return [str(c).strip().lower() for c in categories_val if str(c).strip()]
+    if isinstance(categories_val, str):
+        cleaned = categories_val.strip('{}[]"')
+        return [c.strip().lower() for c in cleaned.split(',') if c.strip()]
+    return []
+
+def _calculate_preference_match(place_categories: List[str], preferences: List[str]) -> int:
+    """Calculate how many explicit user preferences match the place categories"""
+    if not preferences or not place_categories:
+        return 0
+
+    match_count = 0
+    norm_cats = set(place_categories)
+
+    for pref in preferences:
+        pref_clean = pref.lower().strip()
+        matched = False
+        for cat in norm_cats:
+            if pref_clean in cat or cat in pref_clean:
+                matched = True
+                break
+
+        if not matched and pref_clean in PREFERENCE_KEYWORDS:
+            keywords = PREFERENCE_KEYWORDS[pref_clean]
+            for cat in norm_cats:
+                if any(kw in cat for kw in keywords):
+                    matched = True
+                    break
+
+        if matched:
+            match_count += 1
+
+    return match_count
+
 @app.post("/recommend", response_model=RecommendationResponse)
 async def recommend_places(
     request: RecommendationRequest,
@@ -48,22 +100,20 @@ async def recommend_places(
     Generate place recommendations for a user's trip
 
     The recommendation flow:
-    1. Filter places by destination (done by NestJS before calling this)
-    2. Rank using ML model (LightFM hybrid filtering)
-    3. Return top K place_ids with scores
+    1. Filter places by destination
+    2. Rank using ML model (LightFM) or popularity cold-start fallback
+    3. Boost scores using explicit user preferences
+    4. Filter by budget constraint (with soft penalty)
+    5. Apply diversity penalty to avoid category clustering
+    6. Return top K place_ids with scores
     """
     try:
-        if recommendation_model.model is None:
-            raise HTTPException(
-                status_code=503,
-                detail="Recommendation model not loaded. Please train the model first."
-            )
-
-        # Get candidate places from request or query database
-        # In production, NestJS will pass filtered candidate_place_ids
-        # For now, we'll query from database
         from sqlalchemy import text
 
+        if recommendation_model.model is None:
+            logger.warning("Recommendation model not pre-trained yet. Using cold-start popularity ranking.")
+
+        # Query candidate places for destination
         query = text("""
             SELECT id, name, categories, price_estimate, popularity_score,
                    latitude, longitude
@@ -75,39 +125,83 @@ async def recommend_places(
         result = db.execute(query, {"destination": request.destination})
         candidates = result.fetchall()
 
+        # If exact province match is empty, try case-insensitive partial match
         if not candidates:
+            query_broad = text("""
+                SELECT id, name, categories, price_estimate, popularity_score,
+                       latitude, longitude
+                FROM places
+                WHERE province ILIKE :dest_pattern
+                LIMIT 300
+            """)
+            result = db.execute(query_broad, {"dest_pattern": f"%{request.destination}%"})
+            candidates = result.fetchall()
+
+        if not candidates:
+            logger.warning(f"No candidate places found in database for destination: {request.destination}")
             return RecommendationResponse(place_ids=[], scores=[])
 
         candidate_place_ids = [row[0] for row in candidates]
+        candidate_popularity = {row[0]: float(row[4] or 0.0) for row in candidates}
 
-        # Get predictions from model
+        # Step 2: Get predictions from model (handles warm users & cold start with popularity)
         predictions = recommendation_model.predict(
             user_id=request.user_id,
-            candidate_place_ids=candidate_place_ids
+            candidate_place_ids=candidate_place_ids,
+            candidate_popularity=candidate_popularity
         )
 
-        # Apply business rules (budget filtering)
+        # Step 3: Boost scores using explicit preferences
+        if request.explicit_preferences:
+            boosted_predictions = []
+            for place_id, score in predictions:
+                place = next((c for c in candidates if c[0] == place_id), None)
+                if place:
+                    cats = _normalize_categories(place[2])
+                    match_count = _calculate_preference_match(cats, request.explicit_preferences)
+                    boosted_score = score * (1.0 + 0.25 * match_count)
+                    boosted_predictions.append((place_id, boosted_score))
+                else:
+                    boosted_predictions.append((place_id, score))
+            predictions = boosted_predictions
+            predictions.sort(key=lambda x: x[1], reverse=True)
+
+        # Step 4: Apply business rules (realistic budget filtering)
         filtered_predictions = []
-        daily_budget = request.budget_per_person / request.days
+        daily_budget = request.budget_per_person / max(1, request.days)
 
         for place_id, score in predictions:
-            # Get place details
             place = next((c for c in candidates if c[0] == place_id), None)
-            if place and place[3] <= daily_budget * 0.3:  # price_estimate <= 30% daily budget
-                filtered_predictions.append((place_id, score))
+            if not place:
+                continue
+            price = place[3] or 0
 
-        # Apply diversity penalty (avoid too many same categories)
+            # Single attraction within 80% daily budget: keep at full score
+            if daily_budget <= 0 or price <= daily_budget * 0.8:
+                filtered_predictions.append((place_id, score))
+            # Slightly high price (80% - 120% daily budget): apply soft penalty
+            elif price <= daily_budget * 1.2:
+                filtered_predictions.append((place_id, score * 0.8))
+
+        # Safety fallback: if budget filter was overly restrictive, fallback to all predictions
+        if len(filtered_predictions) < 10 and len(predictions) > 0:
+            logger.warning(
+                f"Budget filter left only {len(filtered_predictions)} places for daily budget {daily_budget:,.0f} VND. Falling back to all predictions."
+            )
+            filtered_predictions = list(predictions)
+
+        # Step 5: Apply diversity penalty (avoid category clustering)
         diverse_predictions = _apply_diversity_penalty(
             filtered_predictions, candidates
         )
 
-        # Get top K
+        # Step 6: Get top K
         top_k = diverse_predictions[:settings.top_k]
 
         place_ids = [p[0] for p in top_k]
         scores = [float(p[1]) for p in top_k]
 
-        logger.info(f"Generated {len(place_ids)} recommendations for user {request.user_id}")
+        logger.info(f"Generated {len(place_ids)} recommendations for user {request.user_id} in {request.destination}")
 
         return RecommendationResponse(
             place_ids=place_ids,
@@ -128,19 +222,19 @@ def _apply_diversity_penalty(predictions: List[tuple], candidates: List) -> List
         if not place:
             continue
 
-        categories = place[2]  # categories column
+        norm_cats = _normalize_categories(place[2])
 
         # Calculate penalty based on category saturation
         penalty = 0.0
-        for cat in categories:
+        for cat in norm_cats:
             count = category_counts.get(cat, 0)
             penalty += count * 0.1  # 10% penalty per duplicate
 
-        adjusted_score = score * (1 - min(penalty, 0.5))  # Max 50% penalty
+        adjusted_score = score * (1.0 - min(penalty, 0.5))  # Max 50% penalty
         diverse_results.append((place_id, adjusted_score))
 
         # Update category counts
-        for cat in categories:
+        for cat in norm_cats:
             category_counts[cat] = category_counts.get(cat, 0) + 1
 
     # Re-sort by adjusted scores
