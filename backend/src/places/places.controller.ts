@@ -26,6 +26,11 @@ export class PlacesController {
     return this.placesService.findAll(query);
   }
 
+  @Get('provinces')
+  async getProvinces() {
+    return this.placesService.getProvinces();
+  }
+
   @Get(':id')
   async getPlace(@Param('id') id: string, @Query('userId') userId?: string) {
     return this.placesService.findOne(id, userId);

@@ -40,10 +40,11 @@ export class PlacesService {
     const where: any = {};
 
     if (query.province && query.province !== 'ALL' && query.province !== 'all') {
-      where.province = {
-        equals: query.province,
-        mode: 'insensitive',
-      };
+      const p = query.province.trim();
+      where.OR = [
+        { province: { equals: p, mode: 'insensitive' } },
+        { province: { contains: p, mode: 'insensitive' } },
+      ];
     }
 
     if (query.category && query.category !== 'ALL' && query.category !== 'all') {
@@ -322,5 +323,19 @@ export class PlacesService {
     return this.prisma.place.delete({
       where: { id },
     });
+  }
+
+  async getProvinces() {
+    const raw = await this.prisma.place.groupBy({
+      by: ['province'],
+      _count: { id: true },
+      where: { province: { not: null } },
+      orderBy: { _count: { id: 'desc' } },
+    });
+
+    return raw.map((r) => ({
+      key: r.province,
+      count: r._count.id,
+    }));
   }
 }
