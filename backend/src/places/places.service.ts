@@ -11,6 +11,23 @@ export interface PlacesQueryDto {
   userId?: string;
 }
 
+export interface CreatePlaceDto {
+  name: string;
+  description: string;
+  categories: string[];
+  latitude: number;
+  longitude: number;
+  province?: string;
+  district?: string;
+  priceEstimate?: number;
+  popularityScore?: number;
+  indoorOutdoor?: string;
+  activityLevel?: string;
+  imageUrl?: string;
+}
+
+export type UpdatePlaceDto = Partial<CreatePlaceDto>;
+
 @Injectable()
 export class PlacesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -250,5 +267,60 @@ export class PlacesService {
       userRating,
       nearbyPlaces,
     };
+  }
+
+  async create(dto: CreatePlaceDto) {
+    return this.prisma.place.create({
+      data: {
+        name: dto.name,
+        description: dto.description,
+        categories: dto.categories || [],
+        latitude: Number(dto.latitude),
+        longitude: Number(dto.longitude),
+        province: dto.province || null,
+        district: dto.district || null,
+        priceEstimate: Number(dto.priceEstimate) || 0,
+        popularityScore: Number(dto.popularityScore) || 0,
+        indoorOutdoor: dto.indoorOutdoor || null,
+        activityLevel: dto.activityLevel || null,
+        imageUrl: dto.imageUrl || null,
+      },
+    });
+  }
+
+  async update(id: string, dto: UpdatePlaceDto) {
+    const existing = await this.prisma.place.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Địa điểm với ID ${id} không tồn tại`);
+    }
+
+    return this.prisma.place.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.categories !== undefined && { categories: dto.categories }),
+        ...(dto.latitude !== undefined && { latitude: Number(dto.latitude) }),
+        ...(dto.longitude !== undefined && { longitude: Number(dto.longitude) }),
+        ...(dto.province !== undefined && { province: dto.province }),
+        ...(dto.district !== undefined && { district: dto.district }),
+        ...(dto.priceEstimate !== undefined && { priceEstimate: Number(dto.priceEstimate) }),
+        ...(dto.popularityScore !== undefined && { popularityScore: Number(dto.popularityScore) }),
+        ...(dto.indoorOutdoor !== undefined && { indoorOutdoor: dto.indoorOutdoor }),
+        ...(dto.activityLevel !== undefined && { activityLevel: dto.activityLevel }),
+        ...(dto.imageUrl !== undefined && { imageUrl: dto.imageUrl }),
+      },
+    });
+  }
+
+  async delete(id: string) {
+    const existing = await this.prisma.place.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Địa điểm với ID ${id} không tồn tại`);
+    }
+
+    return this.prisma.place.delete({
+      where: { id },
+    });
   }
 }
