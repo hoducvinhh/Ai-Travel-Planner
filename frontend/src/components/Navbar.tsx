@@ -76,12 +76,21 @@ export default function Navbar() {
                 href={link.href}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                   isActive
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
+                    ? link.isAdmin
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/50 shadow-sm shadow-purple-500/20'
+                      : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
+                    : link.isAdmin
+                    ? 'text-purple-400 hover:text-purple-300 bg-purple-500/10 border border-purple-500/20 hover:bg-purple-500/20'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{link.label}</span>
+                {link.isAdmin && (
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500 text-white font-bold uppercase tracking-wider">
+                    Admin
+                  </span>
+                )}
               </Link>
             );
           })}
