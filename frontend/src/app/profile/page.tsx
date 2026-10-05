@@ -24,6 +24,7 @@ import {
   ExternalLink,
   Shield,
   Compass,
+  Share2,
 } from 'lucide-react';
 import { Place, Trip, UserProfileData } from '@/types';
 
@@ -50,7 +51,7 @@ export default function ProfilePage() {
   const { user: authUser, isAuthenticated, isLoading: authLoading, refreshProfile } = useAuth();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<'wishlist' | 'liked' | 'trips' | 'preferences'>('wishlist');
+  const [activeTab, setActiveTab] = useState<'wishlist' | 'liked' | 'rated' | 'shared' | 'trips' | 'preferences'>('wishlist');
   const [profileData, setProfileData] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,6 +65,122 @@ export default function ProfilePage() {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Remove from Wishlist
+  const handleRemoveSaved = async (placeId: string) => {
+    if (!authUser) return;
+
+    // Optimistic UI update
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        savedPlaces: prev.savedPlaces.filter((p) => p.id !== placeId),
+        stats: {
+          ...prev.stats,
+          savedCount: Math.max(0, (prev.stats?.savedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/toggle-save', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa địa điểm khỏi Wishlist 🔖');
+    } catch (err) {
+      showToast('Có lỗi xảy ra khi xóa');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove from Liked Places
+  const handleRemoveLiked = async (placeId: string) => {
+    if (!authUser) return;
+
+    // Optimistic UI update
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        likedPlaces: prev.likedPlaces.filter((p) => p.id !== placeId),
+        stats: {
+          ...prev.stats,
+          likedCount: Math.max(0, (prev.stats?.likedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/toggle-like', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã bỏ thích địa điểm ❤️');
+    } catch (err) {
+      showToast('Có lỗi xảy ra khi bỏ thích');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove Rating
+  const handleRemoveRating = async (placeId: string) => {
+    if (!authUser) return;
+
+    // Optimistic UI update
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ratedPlaces: (prev.ratedPlaces || []).filter((r) => r.place.id !== placeId),
+        stats: {
+          ...prev.stats,
+          ratedCount: Math.max(0, (prev.stats?.ratedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/unrate', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa đánh giá sao ⭐');
+    } catch (err) {
+      showToast('Có lỗi xảy ra khi xóa đánh giá');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove Shared Place
+  const handleRemoveShared = async (placeId: string) => {
+    if (!authUser) return;
+
+    // Optimistic UI update
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        sharedPlaces: (prev.sharedPlaces || []).filter((s) => s.place.id !== placeId),
+        stats: {
+          ...prev.stats,
+          sharedCount: Math.max(0, (prev.stats?.sharedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/unshare', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa bài chia sẻ khỏi trang cá nhân 🚀');
+    } catch (err) {
+      showToast('Có lỗi xảy ra khi xóa bài chia sẻ');
+      loadProfile(authUser.id);
+    }
   };
 
   const loadProfile = async (userId: string) => {
