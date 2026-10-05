@@ -38,11 +38,15 @@ const SharePlaceModal = dynamic(
   { ssr: false }
 );
 
+import { VIETNAM_PROVINCES, getProvinceMeta } from '@/lib/provinces';
+
 const PROVINCES = [
   { key: 'ALL', label: 'Tất cả điểm đến', icon: '🌟' },
-  { key: 'Hanoi', label: 'Hà Nội', icon: '🏛️' },
-  { key: 'Ho Chi Minh', label: 'TP. Hồ Chí Minh', icon: '🏙️' },
-  { key: 'Lam Dong', label: 'Đà Lạt (Lâm Đồng)', icon: '🌲' },
+  ...VIETNAM_PROVINCES.map((p) => ({
+    key: p.key,
+    label: p.label,
+    icon: p.icon,
+  })),
 ];
 
 const CATEGORIES = [
@@ -358,16 +362,8 @@ export default function PlacesSocialFeedPage() {
   };
 
   const getProvinceBadge = (province?: string) => {
-    if (province?.toLowerCase().includes('hanoi') || province?.includes('Hà Nội')) {
-      return { text: 'Hà Nội', bg: 'bg-blue-500/15 text-blue-400 border-blue-500/30' };
-    }
-    if (
-      province?.toLowerCase().includes('ho chi minh') ||
-      province?.includes('Hồ Chí Minh')
-    ) {
-      return { text: 'TP. Hồ Chí Minh', bg: 'bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30' };
-    }
-    return { text: 'Đà Lạt (Lâm Đồng)', bg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
+    const meta = getProvinceMeta(province);
+    return { text: meta.label, bg: meta.bg, icon: meta.icon };
   };
 
   return (
@@ -388,7 +384,7 @@ export default function PlacesSocialFeedPage() {
         <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <Compass className="w-3.5 h-3.5" />
-            Social Travel Feed • Khám Phá 200 Điểm Đến Thật
+            Social Travel Feed • Khám Phá 280+ Điểm Đến Thật
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
             Khám Phá & Chia Sẻ Điểm Đến{' '}
@@ -405,7 +401,7 @@ export default function PlacesSocialFeedPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-300">
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>200 Địa điểm tuyển chọn</span>
+              <span>280+ Địa điểm tuyển chọn</span>
             </div>
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-teal-400" />
@@ -413,7 +409,7 @@ export default function PlacesSocialFeedPage() {
             </div>
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span>Hà Nội • TP.HCM • Đà Lạt</span>
+              <span>11 Tỉnh thành du lịch trọng điểm</span>
             </div>
           </div>
         </div>
@@ -586,7 +582,7 @@ export default function PlacesSocialFeedPage() {
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
                           <div className="text-center z-20 px-4">
                             <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg">
-                              {provBadge.text === 'Hà Nội' ? '🏛️' : provBadge.text.includes('Hồ Chí Minh') ? '🏙️' : '🌲'}
+                              {provBadge.icon || '🏞️'}
                             </div>
                             <span className="text-xs font-medium text-slate-300 line-clamp-1">
                               {place.district || provBadge.text}

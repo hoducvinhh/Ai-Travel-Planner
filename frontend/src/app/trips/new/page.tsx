@@ -26,11 +26,12 @@ type FormData = {
   preferences: string[];
 };
 
-const DESTINATIONS = [
-  { id: 'Hanoi', label: 'Hà Nội' },
-  { id: 'Ho Chi Minh', label: 'Hồ Chí Minh' },
-  { id: 'Lam Dong', label: 'Đà Lạt' },
-];
+import { VIETNAM_PROVINCES } from '@/lib/provinces';
+
+const DESTINATIONS = VIETNAM_PROVINCES.map((p) => ({
+  id: p.key,
+  label: `${p.icon} ${p.label}`,
+}));
 
 const PREFERENCES = [
   { id: 'nature', label: 'Thiên nhiên', icon: '🏞️' },
