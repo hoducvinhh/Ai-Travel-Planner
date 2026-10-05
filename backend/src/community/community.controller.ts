@@ -2,12 +2,21 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Body,
   Param,
   Query,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
   BadRequestException,
 } from '@nestjs/common';
 import { CommunityService, CreatePostDto } from './community.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('community')
 export class CommunityController {
@@ -64,5 +73,33 @@ export class CommunityController {
   @Get('travel-buddies')
   async getTravelBuddies(@Query('userId') userId?: string) {
     return this.communityService.getTravelBuddies(userId);
+  }
+
+  // --- ADMIN ENDPOINTS ---
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Patch('posts/:id')
+  async updatePost(
+    @Param('id') id: string,
+    @Body() body: Partial<CreatePostDto>,
+  ) {
+    return this.communityService.updatePost(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete('posts/:id')
+  @HttpCode(HttpStatus.OK)
+  async deletePost(@Param('id') id: string) {
+    return this.communityService.deletePost(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete('comments/:id')
+  @HttpCode(HttpStatus.OK)
+  async deleteComment(@Param('id') id: string) {
+    return this.communityService.deleteComment(id);
   }
 }
