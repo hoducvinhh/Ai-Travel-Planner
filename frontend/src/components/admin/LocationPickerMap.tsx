@@ -2,7 +2,9 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
-import { Search, MapPin, Loader2, Navigation, Compass, Check } from 'lucide-react';
+import { Search, MapPin, Loader2, Navigation, Compass, X, Database, Globe } from 'lucide-react';
+import { api } from '@/lib/api';
+import { Place } from '@/types';
 
 // Fix icon url issue with Leaflet in Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -24,20 +26,15 @@ interface LocationPickerProps {
   }) => void;
 }
 
-interface SearchResult {
-  place_id: number;
-  display_name: string;
-  lat: string;
-  lon: string;
-  address?: {
-    city?: string;
-    state?: string;
-    county?: string;
-    suburb?: string;
-    quarter?: string;
-    city_district?: string;
-    town?: string;
-  };
+export interface LocationPickerResult {
+  id: string;
+  name: string;
+  subtitle: string;
+  lat: number;
+  lng: number;
+  province?: string;
+  district?: string;
+  source: 'osm' | 'db';
 }
 
 const CITY_PRESETS = [
@@ -62,9 +59,10 @@ export default function LocationPickerMap({
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<LocationPickerResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Safe initial coordinates (Vietnam center or provided)
   const currentLat = Number.isFinite(latitude) && latitude !== 0 ? latitude : 16.0544;
@@ -76,8 +74,8 @@ export default function LocationPickerMap({
       className: 'custom-admin-marker',
       html: `
         <div style="position: relative; display: flex; align-items: center; justify-content: center; width: 38px; height: 38px;">
-          <div style="position: absolute; width: 38px; height: 38px; border-radius: 50%; background: rgba(16, 185, 129, 0.3); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-          <div style="width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; width: 38px; height: 38px; border-radius: 50%; background: rgba(16, 185, 129, 0.35); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+          <div style="width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
             <div style="width: 8px; height: 8px; border-radius: 50%; background: white;"></div>
           </div>
         </div>
@@ -118,14 +116,12 @@ export default function LocationPickerMap({
 
     let layer: L.TileLayer;
     if (style === 'osm') {
-      // 100% OpenStreetMap official data - NO WATERMARK, NO API KEY
       layer = L.tileLayer(
         'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
         {
           subdomains: ['a', 'b', 'c'],
           maxZoom: 20,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          attribution: '&copy; OpenStreetMap contributors',
         }
       );
     } else if (style === 'satellite') {
@@ -135,7 +131,7 @@ export default function LocationPickerMap({
         attribution: '&copy; Google Satellite',
       });
     } else {
-      // Google Maps Streets - Clean, Fast, High Resolution in Vietnam
+      // Google Maps Streets
       layer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         subdomains: ['0', '1', '2', '3'],
         maxZoom: 20,
@@ -158,10 +154,8 @@ export default function LocationPickerMap({
         zoomControl: true,
       });
 
-      // Apply initial tile layer
       applyTileLayer(mapStyle, map);
 
-      // Create draggable marker
       const marker = L.marker([currentLat, currentLng], {
         icon: createCustomIcon(),
         draggable: true,
@@ -170,17 +164,15 @@ export default function LocationPickerMap({
       marker.bindPopup(`
         <div style="font-family: inherit; font-size: 13px; font-weight: 600; color: #0f172a; padding: 2px;">
           📍 Tọa độ đã chọn<br/>
-          <span style="font-weight: 400; color: #64748b; font-size: 11px;">Kéo thả để điều chỉnh vị trí</span>
+          <span style="font-weight: 400; color: #64748b; font-size: 11px;">Kéo thả để điều chỉnh vị trí chính xác</span>
         </div>
       `);
 
-      // On drag marker
       marker.on('dragend', () => {
         const pos = marker.getLatLng();
         updatePosition(pos.lat, pos.lng);
       });
 
-      // On map click: move marker
       map.on('click', (e: L.LeafletMouseEvent) => {
         updatePosition(e.latlng.lat, e.latlng.lng);
       });
@@ -188,7 +180,6 @@ export default function LocationPickerMap({
       mapRef.current = map;
       markerRef.current = marker;
 
-      // Invalidate size after modal render to fix blank/white tiles
       const timer1 = setTimeout(() => map.invalidateSize(), 150);
       const timer2 = setTimeout(() => map.invalidateSize(), 400);
       const timer3 = setTimeout(() => map.invalidateSize(), 800);
@@ -209,84 +200,169 @@ export default function LocationPickerMap({
     }
   };
 
-  // Sync external coordinates change to map & marker
+  // Sync external coordinates change to map & marker (smooth pan)
   useEffect(() => {
     if (mapRef.current && markerRef.current) {
       if (Number.isFinite(latitude) && Number.isFinite(longitude) && latitude !== 0 && longitude !== 0) {
         const currentMarkerPos = markerRef.current.getLatLng();
-        if (
-          Math.abs(currentMarkerPos.lat - latitude) > 0.0001 ||
-          Math.abs(currentMarkerPos.lng - longitude) > 0.0001
-        ) {
+        const dist = Math.hypot(currentMarkerPos.lat - latitude, currentMarkerPos.lng - longitude);
+        if (dist > 0.0001) {
           markerRef.current.setLatLng([latitude, longitude]);
-          mapRef.current.setView([latitude, longitude], mapRef.current.getZoom());
+          const mapCenter = mapRef.current.getCenter();
+          const centerDist = Math.hypot(mapCenter.lat - latitude, mapCenter.lng - longitude);
+          if (centerDist > 0.002) {
+            mapRef.current.panTo([latitude, longitude]);
+          }
         }
       }
     }
   }, [latitude, longitude]);
 
-  // OpenStreetMap Nominatim Live Search
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
+  // Multi-source Search: Photon (OSM) + Nominatim fallback + Local DB
+  const executeSearch = async (queryText: string, autoSelectFirst = false) => {
+    const q = queryText.trim();
+    if (!q) return;
 
     setIsSearching(true);
     setShowResults(true);
 
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-        searchQuery.trim()
-      )}&countrycodes=vn&addressdetails=1&limit=6`;
+      const results: LocationPickerResult[] = [];
 
-      const response = await fetch(url, {
-        headers: {
-          'Accept-Language': 'vi,en;q=0.9',
-        },
-      });
+      // 1. Primary: Photon OSM API (Fast, reliable in VN, no CORS/DNS blocks)
+      try {
+        const photonUrl = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6`;
+        const response = await fetch(photonUrl);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.features && Array.isArray(data.features)) {
+            for (const f of data.features) {
+              const props = f.properties || {};
+              const coords = f.geometry?.coordinates; // [lng, lat]
+              if (coords && coords.length >= 2) {
+                const lng = coords[0];
+                const lat = coords[1];
+                const name = props.name || props.street || q;
+                const province = props.city || props.state || '';
+                const district = props.district || props.suburb || props.county || '';
+                const addressParts = [
+                  props.housenumber,
+                  props.street,
+                  district,
+                  province,
+                  props.country,
+                ].filter(Boolean);
 
-      if (response.ok) {
-        const data: SearchResult[] = await response.json();
-        setSearchResults(data);
+                results.push({
+                  id: `osm-${props.osm_id || Math.random()}`,
+                  name,
+                  subtitle: addressParts.join(', ') || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
+                  lat,
+                  lng,
+                  province,
+                  district,
+                  source: 'osm',
+                });
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Photon geocoding error:', err);
+      }
+
+      // 2. Secondary: Fallback to Nominatim if Photon returned nothing
+      if (results.length === 0) {
+        try {
+          const nomUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+            q
+          )}&countrycodes=vn&addressdetails=1&limit=5`;
+          const response = await fetch(nomUrl, {
+            headers: { 'Accept-Language': 'vi,en;q=0.9' },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            for (const item of data) {
+              results.push({
+                id: `nom-${item.place_id}`,
+                name: item.display_name.split(',')[0],
+                subtitle: item.display_name,
+                lat: parseFloat(item.lat),
+                lng: parseFloat(item.lon),
+                province: item.address?.state || item.address?.city || '',
+                district: item.address?.suburb || item.address?.quarter || item.address?.county || '',
+                source: 'osm',
+              });
+            }
+          }
+        } catch (err) {
+          // ignore network/DNS failures
+        }
+      }
+
+      // 3. Search local database places
+      try {
+        const dbRes = await api.get<{ items: Place[] }>(`/places?search=${encodeURIComponent(q)}&limit=3`);
+        if (dbRes?.items?.length) {
+          for (const p of dbRes.items) {
+            results.unshift({
+              id: `db-${p.id}`,
+              name: p.name,
+              subtitle: `${p.district ? p.district + ', ' : ''}${p.province || 'Việt Nam'} (Trong CSDL)`,
+              lat: p.latitude,
+              lng: p.longitude,
+              province: p.province || '',
+              district: p.district || '',
+              source: 'db',
+            });
+          }
+        }
+      } catch (err) {
+        // non-fatal
+      }
+
+      setSearchResults(results);
+
+      // If user hit Enter or clicked "Tìm" and we got results, jump immediately to the top result!
+      if (autoSelectFirst && results.length > 0) {
+        handleSelectResult(results[0]);
       }
     } catch (err) {
-      console.error('Error searching OpenStreetMap Nominatim:', err);
+      console.error('Error searching location:', err);
     } finally {
       setIsSearching(false);
     }
   };
 
   // Select a search result
-  const handleSelectResult = (result: SearchResult) => {
-    const lat = parseFloat(result.lat);
-    const lng = parseFloat(result.lon);
+  const handleSelectResult = (result: LocationPickerResult) => {
+    const lat = result.lat;
+    const lng = result.lng;
 
     if (mapRef.current) {
       mapRef.current.flyTo([lat, lng], 16, { duration: 1.2 });
     }
 
-    // Extract province and district from Nominatim address
-    const province =
-      result.address?.state ||
-      result.address?.city ||
-      '';
-    const district =
-      result.address?.suburb ||
-      result.address?.quarter ||
-      result.address?.city_district ||
-      result.address?.county ||
-      result.address?.town ||
-      '';
-
-    const shortName = result.display_name.split(',')[0];
+    if (markerRef.current) {
+      markerRef.current.setLatLng([lat, lng]);
+      markerRef.current
+        .bindPopup(`
+          <div style="font-family: inherit; font-size: 13px; font-weight: 600; color: #0f172a; padding: 2px;">
+            📍 ${result.name}<br/>
+            <span style="font-weight: 400; color: #64748b; font-size: 11px;">${result.subtitle}</span>
+          </div>
+        `)
+        .openPopup();
+    }
 
     updatePosition(lat, lng, {
-      province,
-      district,
-      suggestedName: shortName,
+      province: result.province,
+      district: result.district,
+      suggestedName: result.name,
     });
 
     setShowResults(false);
-    setSearchQuery(result.display_name.split(',')[0]);
+    setSearchQuery(result.name);
   };
 
   // Jump to City Preset
@@ -294,71 +370,145 @@ export default function LocationPickerMap({
     if (mapRef.current) {
       mapRef.current.flyTo([city.lat, city.lng], 13, { duration: 1 });
     }
+    if (markerRef.current) {
+      markerRef.current.setLatLng([city.lat, city.lng]);
+      markerRef.current
+        .bindPopup(`
+          <div style="font-family: inherit; font-size: 13px; font-weight: 600; color: #0f172a; padding: 2px;">
+            📍 ${city.name}<br/>
+            <span style="font-weight: 400; color: #64748b; font-size: 11px;">Kéo thả để điều chỉnh vị trí chính xác</span>
+          </div>
+        `)
+        .openPopup();
+    }
     updatePosition(city.lat, city.lng, { province: city.name });
+  };
+
+  // Live typing with debounce
+  const handleInputChange = (text: string) => {
+    setSearchQuery(text);
+    if (!text.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setShowResults(true);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = setTimeout(() => {
+      executeSearch(text, false);
+    }, 400);
   };
 
   return (
     <div className="space-y-3">
-      {/* Search Bar - Live OpenStreetMap Nominatim */}
+      {/* Search Bar - NO FORM TAG (Prevents outer modal form submission!) */}
       <div className="relative">
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="flex gap-2">
           <div className="relative flex-1">
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                if (!showResults) setShowResults(true);
-              }}
+              onChange={(e) => handleInputChange(e.target.value)}
               onFocus={() => {
                 if (searchResults.length > 0) setShowResults(true);
               }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  executeSearch(searchQuery, true);
+                }
+              }}
               placeholder="🔍 Tìm địa điểm OSM (VD: Cà phê Giảng, Chợ Bến Thành, Bà Nà Hills...)"
-              className="w-full pl-9 pr-4 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition shadow-inner"
+              className="w-full pl-9 pr-9 py-2 text-xs bg-slate-900 border border-slate-700/80 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition shadow-inner"
             />
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  setShowResults(false);
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
           <button
-            type="submit"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              executeSearch(searchQuery, true);
+            }}
             disabled={isSearching}
-            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 disabled:opacity-50 transition"
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 disabled:opacity-50 transition cursor-pointer"
           >
             {isSearching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
             <span>Tìm</span>
           </button>
-        </form>
+        </div>
 
         {/* Live Search Suggestions Dropdown */}
         {showResults && searchResults.length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1.5 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[1000] overflow-hidden max-h-60 overflow-y-auto">
-            <div className="p-2 border-b border-slate-800 text-[11px] font-semibold text-emerald-400 flex items-center justify-between">
-              <span>Kết quả OpenStreetMap ({searchResults.length})</span>
+          <div className="absolute top-full left-0 right-0 mt-1.5 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[1000] overflow-hidden max-h-64 overflow-y-auto">
+            <div className="p-2 border-b border-slate-800 text-[11px] font-semibold text-emerald-400 flex items-center justify-between bg-slate-950/60">
+              <span className="flex items-center gap-1">
+                <Compass className="w-3.5 h-3.5" />
+                Gợi ý địa điểm ({searchResults.length}) - Bấm để nhảy map
+              </span>
               <button
                 type="button"
-                onClick={() => setShowResults(false)}
-                className="text-slate-400 hover:text-white"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setShowResults(false);
+                }}
+                className="text-slate-400 hover:text-white text-[11px]"
               >
                 ✕ Đóng
               </button>
             </div>
             {searchResults.map((item) => (
               <button
-                key={item.place_id}
+                key={item.id}
                 type="button"
-                onClick={() => handleSelectResult(item)}
-                className="w-full text-left px-3 py-2.5 hover:bg-slate-800/80 border-b border-slate-800/50 last:border-b-0 flex items-start gap-2.5 transition"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleSelectResult(item);
+                }}
+                className="w-full text-left px-3 py-2.5 hover:bg-slate-800/80 border-b border-slate-800/50 last:border-b-0 flex items-start gap-2.5 transition group cursor-pointer"
               >
-                <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                {item.source === 'db' ? (
+                  <Database className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <Globe className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                )}
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-semibold text-white truncate">
-                    {item.display_name.split(',')[0]}
+                  <div className="text-xs font-semibold text-white group-hover:text-emerald-300 transition-colors truncate">
+                    {item.name}
                   </div>
                   <div className="text-[10px] text-slate-400 line-clamp-1">
-                    {item.display_name}
+                    {item.subtitle}
                   </div>
-                  <div className="text-[9px] text-teal-400/80 font-mono mt-0.5">
-                    Lat: {parseFloat(item.lat).toFixed(4)}, Lng: {parseFloat(item.lon).toFixed(4)}
+                  <div className="text-[9px] text-teal-400/80 font-mono mt-0.5 flex items-center gap-2">
+                    <span>Lat: {item.lat.toFixed(4)}, Lng: {item.lng.toFixed(4)}</span>
+                    {item.province && (
+                      <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">
+                        {item.province}
+                      </span>
+                    )}
                   </div>
                 </div>
               </button>
@@ -377,8 +527,12 @@ export default function LocationPickerMap({
           <button
             key={city.name}
             type="button"
-            onClick={() => handleJumpCity(city)}
-            className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800 text-slate-300 hover:text-emerald-300 text-[11px] font-medium transition flex-shrink-0"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleJumpCity(city);
+            }}
+            className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-slate-800 text-slate-300 hover:text-emerald-300 text-[11px] font-medium transition flex-shrink-0 cursor-pointer"
           >
             {city.name}
           </button>
