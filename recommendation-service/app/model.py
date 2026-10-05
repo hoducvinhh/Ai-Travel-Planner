@@ -1,9 +1,15 @@
+from __future__ import annotations
 import numpy as np
 import pickle
 import os
-from lightfm import LightFM
-from lightfm.data import Dataset
-from typing import List, Dict, Tuple
+try:
+    from lightfm import LightFM  # type: ignore
+    from lightfm.data import Dataset  # type: ignore
+except ImportError:
+    LightFM = None
+    Dataset = None
+
+from typing import List, Dict, Tuple, Optional, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
 from app.feature_engineering import FeatureEngineering
@@ -22,8 +28,12 @@ class RecommendationModel:
         self.model_path = model_path or "models/lightfm_model.pkl"
 
     def prepare_dataset(self, users: List[Dict], places: List[Dict],
-                       interactions: List[Dict]) -> Dataset:
+                       interactions: List[Dict]) -> Any:
         """Prepare LightFM dataset with features"""
+        if Dataset is None:
+            raise RuntimeError(
+                "LightFM is not installed. Please run the service inside Docker (python:3.11) or install LightFM dependencies."
+            )
 
         # Extract unique categories
         self.all_categories = list(set(
@@ -116,6 +126,11 @@ class RecommendationModel:
     def train(self, interactions_matrix, weights, user_features_matrix,
               item_features_matrix, epochs: int = 30):
         """Train LightFM model"""
+        if LightFM is None:
+            raise RuntimeError(
+                "LightFM is not installed. Please run the service inside Docker (python:3.11) or install LightFM dependencies."
+            )
+
         self.model = LightFM(
             loss='warp',
             no_components=64,
