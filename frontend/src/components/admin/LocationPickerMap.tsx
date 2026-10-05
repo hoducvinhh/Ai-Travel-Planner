@@ -106,6 +106,47 @@ export default function LocationPickerMap({
     [onChange]
   );
 
+  // Map Layer type
+  const [mapStyle, setMapStyle] = useState<'google' | 'osm' | 'satellite'>('google');
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+
+  // Function to switch tile layer
+  const applyTileLayer = useCallback((style: 'osm' | 'google' | 'satellite', map: L.Map) => {
+    if (tileLayerRef.current) {
+      map.removeLayer(tileLayerRef.current);
+    }
+
+    let layer: L.TileLayer;
+    if (style === 'osm') {
+      // 100% OpenStreetMap official data - NO WATERMARK, NO API KEY
+      layer = L.tileLayer(
+        'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+        {
+          subdomains: ['a', 'b', 'c'],
+          maxZoom: 20,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }
+      );
+    } else if (style === 'satellite') {
+      layer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        maxZoom: 20,
+        attribution: '&copy; Google Satellite',
+      });
+    } else {
+      // Google Maps Streets - Clean, Fast, High Resolution in Vietnam
+      layer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        maxZoom: 20,
+        attribution: '&copy; Google Maps',
+      });
+    }
+
+    layer.addTo(map);
+    tileLayerRef.current = layer;
+  }, []);
+
   // Initialize Leaflet Map
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -117,11 +158,8 @@ export default function LocationPickerMap({
         zoomControl: true,
       });
 
-      // OpenStreetMap Tile Layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
-      }).addTo(map);
+      // Apply initial tile layer
+      applyTileLayer(mapStyle, map);
 
       // Create draggable marker
       const marker = L.marker([currentLat, currentLng], {
@@ -149,16 +187,27 @@ export default function LocationPickerMap({
 
       mapRef.current = map;
       markerRef.current = marker;
-    }
 
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-        markerRef.current = null;
-      }
-    };
-  }, []);
+      // Invalidate size after modal render to fix blank/white tiles
+      const timer1 = setTimeout(() => map.invalidateSize(), 150);
+      const timer2 = setTimeout(() => map.invalidateSize(), 400);
+      const timer3 = setTimeout(() => map.invalidateSize(), 800);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [applyTileLayer, createCustomIcon, currentLat, currentLng, mapStyle, updatePosition]);
+
+  // When mapStyle changes
+  const handleSwitchMapStyle = (newStyle: 'osm' | 'google' | 'satellite') => {
+    setMapStyle(newStyle);
+    if (mapRef.current) {
+      applyTileLayer(newStyle, mapRef.current);
+    }
+  };
 
   // Sync external coordinates change to map & marker
   useEffect(() => {
@@ -344,10 +393,47 @@ export default function LocationPickerMap({
           style={{ minHeight: '320px' }}
         />
 
-        {/* Floating Instruction & Coordinates Badge */}
-        <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 text-[11px] text-slate-300 flex items-center gap-2 shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Click hoặc kéo thả ghim trên bản đồ để chọn tọa độ</span>
+        {/* Floating Instruction */}
+        <div className="absolute top-3 left-3 z-[400] bg-slate-950/85 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 text-[11px] text-slate-300 flex items-center gap-2 shadow-lg max-w-[50%] truncate">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
+          <span className="truncate">Click hoặc kéo thả ghim</span>
+        </div>
+
+        {/* Layer Style Switcher Buttons */}
+        <div className="absolute top-3 right-3 z-[400] flex items-center gap-1 bg-slate-950/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg text-[10px] font-semibold">
+          <button
+            type="button"
+            onClick={() => handleSwitchMapStyle('osm')}
+            className={`px-2 py-1 rounded-lg transition ${
+              mapStyle === 'osm'
+                ? 'bg-emerald-500 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🗺️ OSM
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSwitchMapStyle('google')}
+            className={`px-2 py-1 rounded-lg transition ${
+              mapStyle === 'google'
+                ? 'bg-emerald-500 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            📍 Google
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSwitchMapStyle('satellite')}
+            className={`px-2 py-1 rounded-lg transition ${
+              mapStyle === 'satellite'
+                ? 'bg-emerald-500 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            🛰️ Vệ tinh
+          </button>
         </div>
 
         <div className="absolute bottom-3 right-3 z-[400] bg-slate-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-emerald-500/30 font-mono text-[11px] text-emerald-300 shadow-lg flex items-center gap-2">

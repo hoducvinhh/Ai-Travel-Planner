@@ -37,4 +37,5 @@ export interface Trip {
 
 export interface MapComponentProps {
   places: ItineraryPlace[];
+  onSelectPlace?: (place: ItineraryPlace) => void;
 }

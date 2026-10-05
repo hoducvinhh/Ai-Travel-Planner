@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 
 import { ItineraryPlace as Place, MapComponentProps } from '@/types';
 
-export default function MapComponent({ places }: MapComponentProps) {
+export default function MapComponent({ places, onSelectPlace }: MapComponentProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
 
@@ -27,12 +27,17 @@ export default function MapComponent({ places }: MapComponentProps) {
         13
       );
 
-      // Add OpenStreetMap tiles
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19,
+      // Clean, fast, watermark-free map tiles
+      L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['0', '1', '2', '3'],
+        maxZoom: 20,
+        attribution: '&copy; Google Maps',
       }).addTo(mapRef.current);
+
+      // Invalidate size to guarantee sharp rendering
+      setTimeout(() => {
+        if (mapRef.current) mapRef.current.invalidateSize();
+      }, 200);
     }
 
     const map = mapRef.current;
@@ -71,16 +76,43 @@ export default function MapComponent({ places }: MapComponentProps) {
         icon: numberIcon,
       }).addTo(map);
 
-      marker.bindPopup(`
-        <div style="min-width: 200px;">
-          <div style="font-weight: bold; margin-bottom: 4px; font-size: 14px;">
+      const popupHtml = `
+        <div style="min-width: 200px; font-family: inherit;">
+          <div style="font-weight: bold; margin-bottom: 4px; font-size: 14px; color: #0f172a;">
             ${index + 1}. ${place.name}
           </div>
-          <div style="font-size: 12px; color: #64748b;">
+          <div style="font-size: 12px; color: #64748b; margin-bottom: 10px;">
             ${place.latitude.toFixed(4)}, ${place.longitude.toFixed(4)}
           </div>
+          <button id="btn-map-dir-${place.placeId}" style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 7px 12px;
+            background: #10b981;
+            color: #ffffff;
+            border-radius: 8px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+          ">
+            🧭 Chỉ đường & Thời tiết
+          </button>
         </div>
-      `);
+      `;
+
+      marker.bindPopup(popupHtml);
+
+      marker.on('popupopen', () => {
+        const btn = document.getElementById(`btn-map-dir-${place.placeId}`);
+        if (btn && onSelectPlace) {
+          btn.onclick = () => onSelectPlace(place);
+        }
+      });
 
       markers.push(marker);
     });

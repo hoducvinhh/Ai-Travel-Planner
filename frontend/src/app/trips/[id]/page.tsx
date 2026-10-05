@@ -18,6 +18,7 @@ import {
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api';
+import PlaceWeatherPill from '@/components/PlaceWeatherPill';
 
 // Dynamically import Leaflet map (client-side only)
 const MapComponent = dynamic(() => import('./MapComponent'), {
@@ -28,6 +29,12 @@ const MapComponent = dynamic(() => import('./MapComponent'), {
     </div>
   ),
 });
+
+// Dynamically import Directions & Weather Modal (client-side only)
+const PlaceDirectionsModal = dynamic(
+  () => import('@/components/PlaceDirectionsModal'),
+  { ssr: false }
+);
 
 import { ItineraryPlace as Place, DayPlan, TripItinerary, Trip } from '@/types';
 
@@ -40,6 +47,7 @@ function TripDetailContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
+  const [directionsPlace, setDirectionsPlace] = useState<Place | null>(null);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -186,11 +194,19 @@ function TripDetailContent() {
           <div className="lg:col-span-2 space-y-6">
             {/* Map */}
             <div className="rounded-2xl overflow-hidden border border-slate-800">
-              <div className="bg-slate-900/50 px-4 py-3 border-b border-slate-800 flex items-center gap-2">
-                <MapIcon className="w-5 h-5 text-emerald-400" />
-                <span className="font-semibold">Bản đồ địa điểm</span>
+              <div className="bg-slate-900/50 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapIcon className="w-5 h-5 text-emerald-400" />
+                  <span className="font-semibold">Bản đồ địa điểm</span>
+                </div>
+                <span className="text-xs text-slate-400">
+                  Bấm ghim trên bản đồ để xem chỉ đường
+                </span>
               </div>
-              <MapComponent places={currentDay?.places || []} />
+              <MapComponent
+                places={currentDay?.places || []}
+                onSelectPlace={(p) => setDirectionsPlace(p)}
+              />
             </div>
 
             {/* Day Details */}
@@ -213,15 +229,24 @@ function TripDetailContent() {
                       className="relative p-5 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-emerald-500/50 transition group"
                     >
                       {/* Order Badge */}
-                      <div className="absolute -left-3 top-5 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm border-4 border-slate-950">
+                      <div className="absolute -left-3 top-5 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm border-4 border-slate-950 shadow-md">
                         {index + 1}
                       </div>
 
                       <div className="ml-6">
-                        <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start justify-between mb-3 gap-3">
                           <div>
-                            <h4 className="text-lg font-bold mb-1">{place.name}</h4>
-                            <div className="flex flex-wrap gap-2 mb-2">
+                            <h4
+                              onClick={() => setDirectionsPlace(place)}
+                              className="text-lg font-bold mb-1 hover:text-emerald-400 cursor-pointer transition flex items-center gap-2 group/title"
+                              title="Bấm để xem chỉ đường và thời tiết"
+                            >
+                              <span>{place.name}</span>
+                              <span className="text-xs text-emerald-400/80 font-normal opacity-0 group-hover/title:opacity-100 transition flex items-center gap-1">
+                                <Navigation className="w-3 h-3" /> Chỉ đường
+                              </span>
+                            </h4>
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
                               {place.categories.map((cat) => (
                                 <span
                                   key={cat}
@@ -230,10 +255,13 @@ function TripDetailContent() {
                                   {cat}
                                 </span>
                               ))}
+
+                              {/* Thời tiết thực tế tại địa điểm này */}
+                              <PlaceWeatherPill latitude={place.latitude} longitude={place.longitude} />
                             </div>
                           </div>
 
-                          <div className="text-right">
+                          <div className="text-right flex-shrink-0">
                             <div className="text-sm text-slate-400 mb-1">Chi phí</div>
                             <div className="font-bold text-emerald-400">
                               {place.priceEstimate.toLocaleString()} VNĐ
@@ -241,29 +269,29 @@ function TripDetailContent() {
                           </div>
                         </div>
 
-                        <p className="text-slate-300 mb-3">{place.description}</p>
+                        <p className="text-slate-300 mb-3 text-sm leading-relaxed">{place.description}</p>
 
                         <div className="flex items-center gap-4 text-sm text-slate-400">
                           <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
+                            <Clock className="w-4 h-4 text-slate-500" />
                             <span>{place.estimatedTime}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Navigation className="w-4 h-4" />
+                            <Navigation className="w-4 h-4 text-slate-500" />
                             <span>
                               {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
                             </span>
                           </div>
                           
-                          <a
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded-lg transition-colors border border-emerald-500/30"
+                          <button
+                            type="button"
+                            onClick={() => setDirectionsPlace(place)}
+                            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded-lg transition-colors border border-emerald-500/30 font-medium text-xs cursor-pointer shadow-sm"
+                            title="Chỉ đường từ vị trí của bạn đến địa điểm này"
                           >
                             <Navigation className="w-4 h-4" />
                             <span>Chỉ đường</span>
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -274,6 +302,14 @@ function TripDetailContent() {
           </div>
         </div>
       </main>
+
+      {/* Directions & Weather Modal */}
+      {directionsPlace && (
+        <PlaceDirectionsModal
+          place={directionsPlace}
+          onClose={() => setDirectionsPlace(null)}
+        />
+      )}
     </div>
   );
 }

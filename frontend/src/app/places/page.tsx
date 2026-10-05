@@ -583,7 +583,11 @@ export default function PlacesSocialFeedPage() {
                     {/* Content Section */}
                     <div className="p-5">
                       {/* Name */}
-                      <h3 className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-emerald-300 transition-colors">
+                      <h3
+                        onClick={() => setDirectionsPlace(place)}
+                        className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-emerald-300 transition-colors cursor-pointer"
+                        title="Bấm để xem chỉ đường & thời tiết"
+                      >
                         {place.name}
                       </h3>
 
@@ -703,12 +707,16 @@ export default function PlacesSocialFeedPage() {
                         {/* Map Directions & Weather */}
                         <button
                           type="button"
-                          onClick={() => setDirectionsPlace(place)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-slate-400 hover:text-teal-300 hover:bg-teal-500/10 border border-transparent hover:border-teal-500/30 transition text-xs font-semibold"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setDirectionsPlace(place);
+                          }}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-teal-300 hover:text-white transition text-xs font-semibold shadow-sm shadow-teal-500/10 cursor-pointer"
                           title="Xem chỉ đường & Thời tiết thực tế"
                         >
                           <Navigation className="w-3.5 h-3.5 text-teal-400" />
-                          <span className="hidden sm:inline">Chỉ đường</span>
+                          <span>Chỉ đường</span>
                         </button>
 
                         {/* Share Button */}
