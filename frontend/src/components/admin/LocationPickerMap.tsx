@@ -39,13 +39,16 @@ export interface LocationPickerResult {
 
 const CITY_PRESETS = [
   { name: 'Hà Nội', lat: 21.0285, lng: 105.8542 },
-  { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022 },
   { name: 'TP. Hồ Chí Minh', lat: 10.7769, lng: 106.7009 },
+  { name: 'Đà Nẵng', lat: 16.0544, lng: 108.2022 },
   { name: 'Đà Lạt', lat: 11.9404, lng: 108.4583 },
+  { name: 'Hội An', lat: 15.8801, lng: 108.3380 },
+  { name: 'Huế', lat: 16.4637, lng: 107.5909 },
   { name: 'Nha Trang', lat: 12.2388, lng: 109.1967 },
   { name: 'Phú Quốc', lat: 10.2289, lng: 103.9572 },
-  { name: 'Huế', lat: 16.4637, lng: 107.5909 },
+  { name: 'Hạ Long', lat: 20.9505, lng: 107.0734 },
   { name: 'Sa Pa', lat: 22.3364, lng: 103.8438 },
+  { name: 'Ninh Bình', lat: 20.2506, lng: 105.9745 },
 ];
 
 export default function LocationPickerMap({

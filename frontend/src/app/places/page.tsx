@@ -384,7 +384,7 @@ export default function PlacesSocialFeedPage() {
         <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
             <Compass className="w-3.5 h-3.5" />
-            Social Travel Feed • Khám Phá 280+ Điểm Đến Thật
+            Social Travel Feed • Khám Phá 520+ Điểm Đến Thật
           </div>
           <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
             Khám Phá & Chia Sẻ Điểm Đến{' '}
@@ -401,7 +401,7 @@ export default function PlacesSocialFeedPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-300">
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
               <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>280+ Địa điểm tuyển chọn</span>
+              <span>520+ Địa điểm tuyển chọn</span>
             </div>
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-teal-400" />
