@@ -15,6 +15,7 @@
     "start:prod": "node dist/main",
     "ingest": "tsx src/ingestion/ingest.ts",
     "seed:admin": "tsx prisma/seed.ts",
+    "enrich:images": "tsx prisma/enrich-place-images.ts",
     "lint": "oxlint --type-aware src/ test/",
     "test": "vitest run",
     "test:watch": "vitest",
