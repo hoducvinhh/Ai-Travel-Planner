@@ -28,6 +28,47 @@ export interface CreatePlaceDto {
 
 export type UpdatePlaceDto = Partial<CreatePlaceDto>;
 
+const PROVINCE_ALIASES: Record<string, string[]> = {
+  'da nang': ['Da Nang', 'Đà Nẵng'],
+  'đà nẵng': ['Da Nang', 'Đà Nẵng'],
+  'hanoi': ['Hanoi', 'Hà Nội', 'Ha Noi'],
+  'ha noi': ['Hanoi', 'Hà Nội', 'Ha Noi'],
+  'hà nội': ['Hanoi', 'Hà Nội', 'Ha Noi'],
+  'ho chi minh': ['Ho Chi Minh', 'TP. Hồ Chí Minh', 'TP.HCM', 'Hồ Chí Minh', 'TP Hồ Chí Minh'],
+  'tp. hồ chí minh': ['Ho Chi Minh', 'TP. Hồ Chí Minh', 'TP.HCM', 'Hồ Chí Minh', 'TP Hồ Chí Minh'],
+  'tp.hcm': ['Ho Chi Minh', 'TP. Hồ Chí Minh', 'TP.HCM', 'Hồ Chí Minh', 'TP Hồ Chí Minh'],
+  'hồ chí minh': ['Ho Chi Minh', 'TP. Hồ Chí Minh', 'TP.HCM', 'Hồ Chí Minh', 'TP Hồ Chí Minh'],
+  'lam dong': ['Lam Dong', 'Lâm Đồng', 'Đà Lạt', 'Da Lat'],
+  'lâm đồng': ['Lam Dong', 'Lâm Đồng', 'Đà Lạt', 'Da Lat'],
+  'đà lạt': ['Lam Dong', 'Lâm Đồng', 'Đà Lạt', 'Da Lat'],
+  'da lat': ['Lam Dong', 'Lâm Đồng', 'Đà Lạt', 'Da Lat'],
+  'quang nam': ['Quang Nam', 'Quảng Nam', 'Hội An', 'Hoi An'],
+  'quảng nam': ['Quang Nam', 'Quảng Nam', 'Hội An', 'Hoi An'],
+  'hội an': ['Quang Nam', 'Quảng Nam', 'Hội An', 'Hoi An'],
+  'hoi an': ['Quang Nam', 'Quảng Nam', 'Hội An', 'Hoi An'],
+  'thua thien hue': ['Thua Thien Hue', 'Thừa Thiên Huế', 'Huế', 'Hue'],
+  'thừa thiên huế': ['Thua Thien Hue', 'Thừa Thiên Huế', 'Huế', 'Hue'],
+  'huế': ['Thua Thien Hue', 'Thừa Thiên Huế', 'Huế', 'Hue'],
+  'hue': ['Thua Thien Hue', 'Thừa Thiên Huế', 'Huế', 'Hue'],
+  'khanh hoa': ['Khanh Hoa', 'Khánh Hòa', 'Nha Trang'],
+  'khánh hòa': ['Khanh Hoa', 'Khánh Hòa', 'Nha Trang'],
+  'nha trang': ['Khanh Hoa', 'Khánh Hòa', 'Nha Trang'],
+  'kien giang': ['Kien Giang', 'Kiên Giang', 'Phú Quốc', 'Phu Quoc'],
+  'kiên giang': ['Kien Giang', 'Kiên Giang', 'Phú Quốc', 'Phu Quoc'],
+  'phú quốc': ['Kien Giang', 'Kiên Giang', 'Phú Quốc', 'Phu Quoc'],
+  'phu quoc': ['Kien Giang', 'Kiên Giang', 'Phú Quốc', 'Phu Quoc'],
+  'quang ninh': ['Quang Ninh', 'Quảng Ninh', 'Hạ Long', 'Ha Long'],
+  'quảng ninh': ['Quang Ninh', 'Quảng Ninh', 'Hạ Long', 'Ha Long'],
+  'hạ long': ['Quang Ninh', 'Quảng Ninh', 'Hạ Long', 'Ha Long'],
+  'ha long': ['Quang Ninh', 'Quảng Ninh', 'Hạ Long', 'Ha Long'],
+  'lao cai': ['Lao Cai', 'Lào Cai', 'Sa Pa', 'Sapa'],
+  'lào cai': ['Lao Cai', 'Lào Cai', 'Sa Pa', 'Sapa'],
+  'sa pa': ['Lao Cai', 'Lào Cai', 'Sa Pa', 'Sapa'],
+  'sapa': ['Lao Cai', 'Lào Cai', 'Sa Pa', 'Sapa'],
+  'ninh binh': ['Ninh Binh', 'Ninh Bình'],
+  'ninh bình': ['Ninh Binh', 'Ninh Bình'],
+};
+
 @Injectable()
 export class PlacesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -37,30 +78,40 @@ export class PlacesService {
     const limit = Math.min(100, Math.max(1, Number(query.limit) || 12));
     const skip = (page - 1) * limit;
 
-    const where: any = {};
+    const andConditions: any[] = [];
 
     if (query.province && query.province !== 'ALL' && query.province !== 'all') {
       const p = query.province.trim();
-      where.OR = [
-        { province: { equals: p, mode: 'insensitive' } },
-        { province: { contains: p, mode: 'insensitive' } },
-      ];
+      const pLower = p.toLowerCase();
+      const variants = PROVINCE_ALIASES[pLower] || [p];
+      andConditions.push({
+        OR: variants.flatMap((v) => [
+          { province: { equals: v, mode: 'insensitive' } },
+          { province: { contains: v, mode: 'insensitive' } },
+        ]),
+      });
     }
 
     if (query.category && query.category !== 'ALL' && query.category !== 'all') {
-      where.categories = {
-        has: query.category,
-      };
+      andConditions.push({
+        categories: {
+          has: query.category,
+        },
+      });
     }
 
     if (query.search && query.search.trim()) {
       const s = query.search.trim();
-      where.OR = [
-        { name: { contains: s, mode: 'insensitive' } },
-        { description: { contains: s, mode: 'insensitive' } },
-        { district: { contains: s, mode: 'insensitive' } },
-      ];
+      andConditions.push({
+        OR: [
+          { name: { contains: s, mode: 'insensitive' } },
+          { description: { contains: s, mode: 'insensitive' } },
+          { district: { contains: s, mode: 'insensitive' } },
+        ],
+      });
     }
+
+    const where: any = andConditions.length > 0 ? { AND: andConditions } : {};
 
     let orderBy: any = { popularityScore: 'desc' };
     if (query.sortBy === 'price_asc') {
