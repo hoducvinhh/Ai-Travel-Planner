@@ -320,4 +320,60 @@ export class CommunityService {
 
     return buddies;
   }
+
+  async updatePost(id: string, dto: Partial<CreatePostDto>) {
+    const post = await this.prisma.communityPost.findUnique({
+      where: { id },
+    });
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+
+    return this.prisma.communityPost.update({
+      where: { id },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title.trim() }),
+        ...(dto.content !== undefined && { content: dto.content.trim() }),
+        ...(dto.tags !== undefined && { tags: dto.tags }),
+        ...(dto.images !== undefined && { images: dto.images }),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            preferredStyles: true,
+            budgetLevel: true,
+          },
+        },
+      },
+    });
+  }
+
+  async deletePost(id: string) {
+    const post = await this.prisma.communityPost.findUnique({
+      where: { id },
+    });
+    if (!post) {
+      throw new NotFoundException('Bài viết không tồn tại');
+    }
+
+    return this.prisma.communityPost.delete({
+      where: { id },
+    });
+  }
+
+  async deleteComment(id: string) {
+    const comment = await this.prisma.communityComment.findUnique({
+      where: { id },
+    });
+    if (!comment) {
+      throw new NotFoundException('Bình luận không tồn tại');
+    }
+
+    return this.prisma.communityComment.delete({
+      where: { id },
+    });
+  }
 }
