@@ -45,6 +45,36 @@ export class InteractionsController {
     );
   }
 
+  @Post('unrate')
+  async unratePlace(
+    @Body() body: { userId: string; placeId: string },
+  ) {
+    return this.interactionsService.unratePlace(body.userId, body.placeId);
+  }
+
+  @Post('share')
+  async sharePlace(
+    @Body() body: { userId: string; placeId: string; note?: string },
+  ) {
+    return this.interactionsService.sharePlace(
+      body.userId,
+      body.placeId,
+      body.note,
+    );
+  }
+
+  @Post('unshare')
+  async unsharePlace(
+    @Body() body: { userId: string; placeId: string },
+  ) {
+    return this.interactionsService.unsharePlace(body.userId, body.placeId);
+  }
+
+  @Get('user/:userId/shared')
+  async getUserSharedPlaces(@Param('userId') userId: string) {
+    return this.interactionsService.getUserSharedPlaces(userId);
+  }
+
   @Post('track')
   async trackEvent(
     @Body() body: { userId: string; placeId: string; eventType: InteractionEventType },

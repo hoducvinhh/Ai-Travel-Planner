@@ -143,7 +143,16 @@ export class InteractionsService {
       throw new Error('Đánh giá phải từ 1 đến 5 sao');
     }
 
-    // Upsert or create new rate event
+    // Remove any previous rating of this user for this place so each user has 1 active rating
+    await this.prisma.userInteractionEvent.deleteMany({
+      where: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.RATE,
+      },
+    });
+
+    // Create new rate event
     await this.prisma.userInteractionEvent.create({
       data: {
         userId,
@@ -166,8 +175,98 @@ export class InteractionsService {
     };
   }
 
+  async unratePlace(userId: string, placeId: string) {
+    await this.prisma.userInteractionEvent.deleteMany({
+      where: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.RATE,
+      },
+    });
+
+    this.updatePlacePopularity(placeId).catch(() => {});
+    const placeRatings = await this.getPlaceRatings(placeId);
+
+    return {
+      success: true,
+      userRating: null,
+      ratingAvg: placeRatings.averageRating,
+      ratingCount: placeRatings.totalRatings,
+    };
+  }
+
+  async sharePlace(userId: string, placeId: string, note?: string) {
+    // Record share event
+    const interaction = await this.prisma.userInteractionEvent.create({
+      data: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.SHARE,
+        sessionId: note || null, // Store user's personal thought/caption in sessionId
+      },
+      include: {
+        place: true,
+      },
+    });
+
+    this.updatePlacePopularity(placeId).catch(() => {});
+
+    return {
+      success: true,
+      share: {
+        id: interaction.id,
+        place: interaction.place,
+        note: interaction.sessionId || undefined,
+        sharedAt: interaction.createdAt,
+      },
+    };
+  }
+
+  async unsharePlace(userId: string, placeId: string) {
+    await this.prisma.userInteractionEvent.deleteMany({
+      where: {
+        userId,
+        placeId,
+        eventType: InteractionEventType.SHARE,
+      },
+    });
+
+    return { success: true };
+  }
+
+  async getUserSharedPlaces(userId: string) {
+    const shareEvents = await this.prisma.userInteractionEvent.findMany({
+      where: {
+        userId,
+        eventType: InteractionEventType.SHARE,
+      },
+      include: {
+        place: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const seen = new Set<string>();
+    const sharedPlaces = [];
+    for (const s of shareEvents) {
+      if (!seen.has(s.placeId) && s.place) {
+        seen.add(s.placeId);
+        sharedPlaces.push({
+          id: s.id,
+          place: s.place,
+          note: s.sessionId || undefined,
+          sharedAt: s.createdAt,
+        });
+      }
+    }
+
+    return sharedPlaces;
+  }
+
   async getUserSummary(userId: string) {
-    const [savedPlaces, likedPlaces, allUserRatings, tripsCount] = await Promise.all([
+    const [savedPlaces, likedPlaces, allUserRatings, tripsCount, sharedPlaces] = await Promise.all([
       this.getUserSavedPlaces(userId),
       this.getUserLikedPlaces(userId),
       this.prisma.userInteractionEvent.findMany({
@@ -178,6 +277,7 @@ export class InteractionsService {
       this.prisma.trip.count({
         where: { userId },
       }),
+      this.getUserSharedPlaces(userId),
     ]);
 
     // Unique rated places
@@ -196,11 +296,13 @@ export class InteractionsService {
       savedPlaces,
       likedPlaces,
       ratedPlaces: Array.from(ratedPlacesMap.values()),
+      sharedPlaces,
       stats: {
         tripsCount,
         likedCount: likedPlaces.length,
         savedCount: savedPlaces.length,
         ratedCount: ratedPlacesMap.size,
+        sharedCount: sharedPlaces.length,
       },
     };
   }

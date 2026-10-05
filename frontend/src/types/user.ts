@@ -11,6 +11,19 @@ export interface User {
   createdAt?: string;
 }
 
+export interface UserRatedPlaceItem {
+  place: Place;
+  rating: number;
+  ratedAt: string;
+}
+
+export interface UserSharedPlaceItem {
+  id: string;
+  place: Place;
+  note?: string;
+  sharedAt: string;
+}
+
 export interface UserProfileData {
   user: {
     id: string;
@@ -24,10 +37,13 @@ export interface UserProfileData {
   trips: Trip[];
   savedPlaces: Place[];
   likedPlaces: Place[];
+  ratedPlaces?: UserRatedPlaceItem[];
+  sharedPlaces?: UserSharedPlaceItem[];
   stats: {
     tripsCount: number;
     likedCount: number;
     savedCount: number;
     ratedCount: number;
+    sharedCount?: number;
   };
 }

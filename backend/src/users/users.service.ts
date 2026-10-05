@@ -73,30 +73,36 @@ export class UsersService {
       throw new NotFoundException('Không tìm thấy người dùng');
     }
 
-    const [trips, likedEvents, saveEvents, removeSaveEvents, ratedEvents] = await Promise.all([
-      this.prisma.trip.findMany({
-        where: { userId },
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.userInteractionEvent.findMany({
-        where: { userId, eventType: 'LIKE' },
-        include: { place: true },
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.userInteractionEvent.findMany({
-        where: { userId, eventType: 'SAVE' },
-        select: { placeId: true, createdAt: true },
-      }),
-      this.prisma.userInteractionEvent.findMany({
-        where: { userId, eventType: 'REMOVE_SAVE' },
-        select: { placeId: true, createdAt: true },
-      }),
-      this.prisma.userInteractionEvent.findMany({
-        where: { userId, eventType: 'RATE' },
-        include: { place: true },
-        orderBy: { createdAt: 'desc' },
-      }),
-    ]);
+    const [trips, likedEvents, saveEvents, removeSaveEvents, ratedEvents, shareEvents] =
+      await Promise.all([
+        this.prisma.trip.findMany({
+          where: { userId },
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.userInteractionEvent.findMany({
+          where: { userId, eventType: 'LIKE' },
+          include: { place: true },
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.userInteractionEvent.findMany({
+          where: { userId, eventType: 'SAVE' },
+          select: { placeId: true, createdAt: true },
+        }),
+        this.prisma.userInteractionEvent.findMany({
+          where: { userId, eventType: 'REMOVE_SAVE' },
+          select: { placeId: true, createdAt: true },
+        }),
+        this.prisma.userInteractionEvent.findMany({
+          where: { userId, eventType: 'RATE' },
+          include: { place: true },
+          orderBy: { createdAt: 'desc' },
+        }),
+        this.prisma.userInteractionEvent.findMany({
+          where: { userId, eventType: 'SHARE' },
+          include: { place: true },
+          orderBy: { createdAt: 'desc' },
+        }),
+      ]);
 
     // Active saved places
     const activeSavedPlaceIds = saveEvents
@@ -117,9 +123,38 @@ export class UsersService {
     const seenLikes = new Set<string>();
     const likedPlaces = [];
     for (const l of likedEvents) {
-      if (!seenLikes.has(l.placeId)) {
+      if (!seenLikes.has(l.placeId) && l.place) {
         seenLikes.add(l.placeId);
         likedPlaces.push(l.place);
+      }
+    }
+
+    // Unique rated places (keeping latest rating per place)
+    const seenRated = new Set<string>();
+    const ratedPlaces = [];
+    for (const r of ratedEvents) {
+      if (!seenRated.has(r.placeId) && r.place) {
+        seenRated.add(r.placeId);
+        ratedPlaces.push({
+          place: r.place,
+          rating: r.ratingValue || 5,
+          ratedAt: r.createdAt,
+        });
+      }
+    }
+
+    // Unique shared places (keeping latest share per place)
+    const seenShared = new Set<string>();
+    const sharedPlaces = [];
+    for (const s of shareEvents) {
+      if (!seenShared.has(s.placeId) && s.place) {
+        seenShared.add(s.placeId);
+        sharedPlaces.push({
+          id: s.id,
+          place: s.place,
+          note: s.sessionId || undefined,
+          sharedAt: s.createdAt,
+        });
       }
     }
 
@@ -128,11 +163,14 @@ export class UsersService {
       trips,
       savedPlaces,
       likedPlaces,
+      ratedPlaces,
+      sharedPlaces,
       stats: {
         tripsCount: trips.length,
         likedCount: likedPlaces.length,
         savedCount: savedPlaces.length,
-        ratedCount: ratedEvents.length,
+        ratedCount: ratedPlaces.length,
+        sharedCount: sharedPlaces.length,
       },
     };
   }

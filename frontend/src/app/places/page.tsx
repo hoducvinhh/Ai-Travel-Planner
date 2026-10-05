@@ -33,6 +33,11 @@ const PlaceDirectionsModal = dynamic(
   { ssr: false }
 );
 
+const SharePlaceModal = dynamic(
+  () => import('@/components/SharePlaceModal'),
+  { ssr: false }
+);
+
 const PROVINCES = [
   { key: 'ALL', label: 'Tất cả điểm đến', icon: '🌟' },
   { key: 'Hanoi', label: 'Hà Nội', icon: '🏛️' },
