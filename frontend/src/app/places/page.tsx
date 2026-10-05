@@ -85,6 +85,12 @@ export default function PlacesSocialFeedPage() {
   // Directions & Weather Modal state
   const [directionsPlace, setDirectionsPlace] = useState<Place | null>(null);
 
+  // Share to profile modal state
+  const [sharingPlace, setSharingPlace] = useState<Place | null>(null);
+
+  // Star hover preview state
+  const [hoverRating, setHoverRating] = useState<Record<string, number>>({});
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -247,21 +253,42 @@ export default function PlacesSocialFeedPage() {
     }
   };
 
-  // Share place
-  const handleShare = async (place: Place) => {
-    const url = `${window.location.origin}/places#${place.id}`;
-    if (navigator.clipboard) {
-      await navigator.clipboard.writeText(url);
-      showToast('Đã sao chép liên kết địa điểm vào bộ nhớ tạm! 📋');
-    }
+  // Handle Unrate (remove user rating)
+  const handleUnrate = async (placeId: string) => {
+    if (!isAuthenticated || !user) return;
 
-    if (user?.id) {
-      api.post('/interactions/track', {
+    try {
+      const res = await api.post<{
+        success: boolean;
+        userRating: null;
+        ratingAvg: number;
+        ratingCount: number;
+      }>('/interactions/unrate', {
         userId: user.id,
-        placeId: place.id,
-        eventType: 'SHARE',
-      }).catch(() => {});
+        placeId,
+      });
+
+      setPlaces((prev) =>
+        prev.map((p) =>
+          p.id === placeId
+            ? {
+                ...p,
+                userRating: null,
+                ratingAvg: res.ratingAvg,
+                ratingCount: res.ratingCount,
+              }
+            : p,
+        ),
+      );
+      showToast('Đã hủy đánh giá của bạn');
+    } catch (err) {
+      showToast('Có lỗi xảy ra khi hủy đánh giá');
     }
+  };
+
+  // Share place - open Share Modal
+  const handleShare = (place: Place) => {
+    setSharingPlace(place);
   };
 
   // Toggle comments expand and fetch comments
