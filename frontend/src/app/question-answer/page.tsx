@@ -602,6 +602,17 @@ export default function QuestionAnswerPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Nút mở Modal Khám Phá Chủ Đề */}
+            <button
+              onClick={() => setIsTopicModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 hover:from-emerald-500/20 hover:to-teal-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-medium transition shadow-sm hover:scale-[1.02]"
+              title="Khám phá tất cả các chủ đề trong kho RAG"
+            >
+              <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">10 Chủ đề RAG</span>
+              <span className="sm:hidden">Chủ đề</span>
+            </button>
+
             {/* Status indicator */}
             <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-800 text-[11px]">
               <Database className="w-3.5 h-3.5 text-emerald-400" />
@@ -629,6 +640,7 @@ export default function QuestionAnswerPage() {
               </button>
             )}
           </div>
+
         </div>
 
         {/* Message Content List */}
