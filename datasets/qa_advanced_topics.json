@@ -1,0 +1,1402 @@
+[
+  {
+    "id": "qa_route_01",
+    "province": "Tây Nguyên",
+    "title": "Cung đường liên tỉnh: Pleiku (Gia Lai) - Măng Đen (Kon Tum) 4 ngày 3 đêm",
+    "question": "Lịch trình 4 ngày 3 đêm kết hợp Gia Lai (Pleiku) và Kon Tum (Măng Đen) đi thế nào thuận tiện nhất?",
+    "answer": "Ngày 1: Bay đến Pleiku, check-in Biển Hồ Tơ Nưng, hàng thông trăm tuổi, Biển Hồ Chè, tối ăn phở khô hai tô. Ngày 2: Sáng thăm Chùa Minh Thành, sau đó đi xe sang TP. Kon Tum (50km, 1 giờ) thăm Nhà thờ gỗ, Cầu treo Kon Klor, ăn gỏi lá Kon Tum; chiều lên Măng Đen (55km qua đèo Măng Đen), tối ăn lẩu xuyên tiêu. Ngày 3: Trọn ngày ở Măng Đen viếng Đức Mẹ Măng Đen, ngắm thác Pa Sỹ, hồ Đăk Ke, dạo đồi thông, ăn gà nướng cơm lam. Ngày 4: Săn mây sáng sớm Măng Đen, mua sâm Ngọc Linh rồi về sân bay Pleiku về lại Hà Nội/TP.HCM."
+  },
+  {
+    "id": "qa_route_02",
+    "province": "Đông Bắc",
+    "title": "Cung đường liên tỉnh: Hà Nội - Thái Nguyên - Bắc Kạn - Cao Bằng 4 ngày",
+    "question": "Cung đường phượt Đông Bắc Hà Nội - Thái Nguyên - Ba Bể - Thác Bản Giốc nên đi theo lộ trình nào?",
+    "answer": "Ngày 1: Hà Nội đi Thái Nguyên (thăm đồi chè Tân Cương), chạy tiếp lên hồ Ba Bể (Bắc Kạn), đi thuyền ngắm hồ, ngủ homestay người Tày. Ngày 2: Ba Bể vượt đèo Gió, đèo Khau Khang sang Cao Bằng, chiều thăm khu di tích Pác Bó, suối Lê-nin. Ngày 3: Cao Bằng đi đèo Mã Phục đến Thác Bản Giốc và Động Ngườm Ngao hoành tráng, tối về TP. Cao Bằng ăn bánh áp chao. Ngày 4: TP. Cao Bằng về Lạng Sơn (qua đèo Bông Lau) ghé chợ Đông Kinh, sau đó theo cao tốc Lạng Sơn - Hà Nội về lại thủ đô."
+  },
+  {
+    "id": "qa_route_03",
+    "province": "Tây Bắc",
+    "title": "Cung đường liên tỉnh: Sa Pa (Lào Cai) qua đèo Ô Quy Hồ sang Lai Châu",
+    "question": "Từ Sa Pa sang Lai Châu qua đèo Ô Quy Hồ mất bao lâu và có những điểm dừng nào đẹp?",
+    "answer": "Quãng đường từ thị xã Sa Pa sang TP. Lai Châu khoảng 70km theo quốc lộ 4D, chạy xe mất khoảng 1.5 - 2 giờ. Các điểm dừng ngoạn mục gồm: Thác Bạc, Thác Tình Yêu (Sa Pa), Cổng trời Ô Quy Hồ ngắm hoàng hôn biển mây, Cầu kính Rồng Mây (đỉnh đèo), thung lũng chè Tam Đường, bản du lịch Sin Suối Hồ và bản Sì Thâu Chải."
+  },
+  {
+    "id": "qa_route_04",
+    "province": "Miền Tây",
+    "title": "Cung đường liên tỉnh: TP.HCM - Cần Thơ - Sóc Trăng - Bạc Liêu - Cà Mau",
+    "question": "Lộ trình khám phá miền Tây từ TP.HCM về Đất Mũi Cà Mau 4 ngày 3 đêm đi ra sao?",
+    "answer": "Ngày 1: TP.HCM đi Cần Thơ (3 giờ cao tốc), dạo bến Ninh Kiều, chợ đêm. Ngày 2: Sáng đi chợ nổi Cái Răng, chạy quốc lộ 1A qua Sóc Trăng thăm Chùa Dơi, Chùa Chén Kiểu, trưa đến Bạc Liêu thăm Nhà Công tử Bạc Liêu, Cánh đồng điện gió, chiều tối về TP. Cà Mau. Ngày 3: TP. Cà Mau theo đường Hồ Chí Minh xuống Đất Mũi check-in Mốc tọa độ GPS 0001, Cột cờ Hà Nội, đi vỏ lãi xuyên rừng đước; chiều về lại TP. Cà Mau thưởng thức cua Năm Căn. Ngày 4: Sáng thăm rừng tràm U Minh Hạ, sau đó chạy xe về lại TP.HCM."
+  },
+  {
+    "id": "qa_route_05",
+    "province": "Miền Trung",
+    "title": "Cung đường liên tỉnh: Đà Nẵng - Hội An - Đảo Lý Sơn (Quảng Ngãi)",
+    "question": "Từ Đà Nẵng / Hội An kết hợp đi đảo Lý Sơn (Quảng Ngãi) như thế nào?",
+    "answer": "Từ Hội An/Đà Nẵng đi theo cao tốc Đà Nẵng - Quảng Ngãi hoặc quốc lộ 1A đến Cảng Sa Kỳ (khoảng 130km, mất 2.5 giờ). Tại cảng Sa Kỳ bắt tàu cao tốc (35 phút) ra Đảo Lớn Lý Sơn. Lịch trình lý tưởng là dành 2 ngày 1 đêm trên đảo Lý Sơn (thăm Hang Câu, Đỉnh Thới Lới, Cổng Tò Vò, cano sang Đảo Bé tắm biển lặn san hô), sau đó quay về đất liền tiếp tục nghỉ dưỡng tại Hội An và Đà Nẵng."
+  },
+  {
+    "id": "qa_route_06",
+    "province": "Đông Nam Bộ & Tây Nguyên",
+    "title": "Cung đường liên tỉnh: TP.HCM - Bình Phước - Đắk Nông (Hồ Tà Đùng)",
+    "question": "Cung đường từ TP.HCM đi hồ Tà Đùng qua Bình Phước có gì trải nghiệm?",
+    "answer": "Tuyến đường dài khoảng 250km: Từ TP.HCM đi Bình Dương, Bình Phước theo quốc lộ 13 và ĐT741 qua Đồng Xoài, Phước Long (ngắm núi Bà Rá, rừng cao su mùa thay lá). Tiếp tục theo quốc lộ 14 sang Gia Nghĩa (Đắk Nông), rẽ quốc lộ 28 đến Hồ Tà Đùng. Lịch trình 2 ngày 1 đêm hoặc 3 ngày 2 đêm rất thích hợp cho phượt thủ cắm trại ngắm \"Vịnh Hạ Long Tây Nguyên\" và săn mây."
+  },
+  {
+    "id": "qa_route_07",
+    "province": "Tây Bắc",
+    "title": "Cung đường liên tỉnh: Hà Nội - Mai Châu (Hòa Bình) - Mộc Châu (Sơn La) - Pù Luông (Thanh Hóa)",
+    "question": "Cung đường tam giác Mai Châu - Mộc Châu - Pù Luông 3 ngày 2 đêm đi thế nào?",
+    "answer": "Ngày 1: Hà Nội qua đèo Đá Trắng lên Mai Châu (Hòa Bình), đạp xe thăm bản Lác, bản Pom Coọng, trưa chạy tiếp lên cao nguyên Mộc Châu (Sơn La) thăm đồi chè trái tim, rừng thông Bản Áng. Ngày 2: Sáng ngắm thác Dải Yếm Mộc Châu, sau đó đi theo quốc lộ 6 quay lại ngã ba Co Lương rẽ quốc lộ 15 sang Khu bảo tồn Pù Luông (Thanh Hóa), chiều đi bè tre ngắm guồng nước sông Chàm, nghỉ resort/homestay bản Đôn. Ngày 3: Sáng trekking ruộng bậc thang bản Kho Mường ngắm hang Dơi, trưa về Hà Nội theo đường mòn Hồ Chí Minh (khoảng 4 giờ)."
+  },
+  {
+    "id": "qa_route_08",
+    "province": "Bắc Bộ",
+    "title": "Cung đường văn hóa tâm linh: Hà Nội - Bắc Ninh - Hải Dương - Quảng Ninh",
+    "question": "Tuyến du lịch văn hóa tâm linh Hà Nội - Bắc Ninh - Yên Tử đi theo trình tự nào?",
+    "answer": "Ngày 1: Hà Nội sang Bắc Ninh viếng Đền Đô (thờ 8 vua Lý), Chùa Phật Tích, làng tranh Đông Hồ. Chiều sang Chí Linh (Hải Dương) viếng đền thờ Chu Văn An, quần thể Côn Sơn - Kiếp Bạc (thờ Nguyễn Trãi, Trần Hưng Đạo), tối nghỉ tại Uông Bí. Ngày 2: Sáng hành hương lên non thiêng Yên Tử (Quảng Ninh) chiêm bái Chùa Hoa Yên, Chùa Đồng trên đỉnh mây, chiều ghé vịnh Hạ Long hoặc trở về Hà Nội."
+  },
+  {
+    "id": "qa_route_09",
+    "province": "Miền Tây",
+    "title": "Cung đường hoa và sen: TP.HCM - Tiền Giang - Bến Tre - Đồng Tháp 2 ngày",
+    "question": "Lịch trình kết hợp Bến Tre xứ dừa và Đồng Tháp sen hồng 2 ngày 1 đêm?",
+    "answer": "Ngày 1: TP.HCM qua Mỹ Tho sang Bến Tre đi cồn Thới Sơn nghe đờn ca tài tử, chèo xuồng ba lá rợp bóng dừa nước, thăm lò kẹo dừa; chiều chạy sang Sa Đéc (Đồng Tháp) thăm làng hoa Sa Đéc, nhà cổ Huỳnh Thủy Lê, tối ăn hủ tiếu Sa Đéc. Ngày 2: Sáng đi Vườn quốc gia Tràm Chim hoặc khu sinh thái Xẻo Quýt chèo xuồng rừng tràm ăn cá lóc nướng trui cuốn lá sen non, mua nem Lai Vung rồi về lại TP.HCM."
+  },
+  {
+    "id": "qa_route_10",
+    "province": "Bắc Trung Bộ",
+    "title": "Cung đường di sản: Ninh Bình - Thanh Hóa - Nghệ An - Hà Tĩnh",
+    "question": "Hành trình khám phá di sản Bắc Trung Bộ từ Tràng An đến Ngã ba Đồng Lộc 3 ngày 2 đêm?",
+    "answer": "Ngày 1: Hà Nội xuống Ninh Bình khám phá Tràng An, Hang Múa; chiều xuôi cao tốc vào Thanh Hóa thăm Di sản thế giới Thành Nhà Hồ, tối ngủ TP. Thanh Hóa ăn nem chua, chả tôm. Ngày 2: Thanh Hóa vào Nghệ An thăm Khu di tích Kim Liên Nam Đàn (quê Bác), bãi biển Cửa Lò. Ngày 3: Nghệ An sang Hà Tĩnh viếng Khu lưu niệm Nguyễn Du, dâng hương Ngã ba Đồng Lộc, chiều vãn cảnh Chùa Hương Tích núi Hồng Lĩnh rồi quay về."
+  },
+  {
+    "id": "qa_route_11",
+    "province": "Tây Nguyên",
+    "title": "Cung đường 5 tỉnh Tây Nguyên (Kon Tum - Gia Lai - Đắk Lắk - Đắk Nông - Lâm Đồng)",
+    "question": "Hành trình xuyên trọn vẹn 5 tỉnh Tây Nguyên bằng xe máy/ô tô cần bao nhiêu ngày?",
+    "answer": "Hành trình xuyên 5 tỉnh Tây Nguyên cần tối thiểu 6 đến 7 ngày theo trục quốc lộ 14 và quốc lộ 20: Bắt đầu từ Măng Đen / TP. Kon Tum (nhà thờ gỗ) -> Pleiku Gia Lai (Biển Hồ, Chư Đăng Ya) -> Buôn Ma Thuột Đắk Lắk (Bảo tàng cà phê, thác Dray Nur) -> Gia Nghĩa / Tà Đùng Đắk Nông (hồ Tà Đùng) -> Đà Lạt Lâm Đồng (thành phố ngàn hoa, đồi thông) -> xuống đèo về TP.HCM hoặc Nha Trang."
+  },
+  {
+    "id": "qa_route_12",
+    "province": "Đông Bắc",
+    "title": "Cung đường biên cương: Lạng Sơn - Cao Bằng theo quốc lộ 4A huyền thoại",
+    "question": "Tuyến quốc lộ 4A từ Lạng Sơn sang Cao Bằng có gì đặc sắc trong lịch sử?",
+    "answer": "Quốc lộ 4A nối Lạng Sơn qua Thất Khê, Đông Khê lên Cao Bằng là con đường số 4 lịch sử gắn liền Chiến dịch Biên giới Thu Đông 1950. Cung đường uốn lượn qua những hẻm núi đá vôi hùng vĩ, qua cụm cứ điểm Đông Khê lịch sử và rừng hồi ngát hương thơm."
+  },
+  {
+    "id": "qa_route_13",
+    "province": "Miền Tây",
+    "title": "Cung đường sông nước: Cần Thơ - Hậu Giang - Kiên Giang (Rạch Giá - Phú Quốc)",
+    "question": "Từ Cần Thơ đi Hậu Giang rồi ra đảo Phú Quốc sắp xếp lộ trình thế nào?",
+    "answer": "Ngày 1: Khám phá Cần Thơ (chợ nổi Cái Răng), chạy sang Hậu Giang (45 phút) thăm Lung Ngọc Hoàng chèo thuyền ngắm chim, thăm vùng khóm Cầu Đúc. Chiều chạy sang TP. Rạch Giá (Kiên Giang, khoảng 1.5 giờ) ngủ đêm. Ngày 2: Tại cảng Rạch Giá đi tàu cao tốc Superdong hoặc Phú Quốc Express (2.5 giờ) ra đảo Phú Quốc bắt đầu kỳ nghỉ biển đảo."
+  },
+  {
+    "id": "qa_route_14",
+    "province": "Tây Bắc",
+    "title": "Cung đường Tây Bắc: Lai Châu - Điện Biên theo quốc lộ 12",
+    "question": "Quãng đường từ TP. Lai Châu đi TP. Điện Biên Phủ đi qua những cảnh đẹp nào?",
+    "answer": "Tuyến quốc lộ 12 từ TP. Lai Châu đi TP. Điện Biên Phủ dài khoảng 190km chạy men theo dòng sông Nậm Na hùng vĩ, qua thị xã Mường Lay - nơi giao thoa của sông Đà, sông Nậm Na và nậm Mức với những nếp nhà sàn người Thái trắng soi bóng lòng hồ thủy điện Sơn La tráng lệ, trước khi đến thung lũng Mường Thanh Điện Biên."
+  },
+  {
+    "id": "qa_route_15",
+    "province": "Bắc Bộ",
+    "title": "Cung đường làng cổ: Hà Nội - Bắc Giang - Bắc Ninh 2 ngày cuối tuần",
+    "question": "Lịch trình 2 ngày cuối tuần khám phá văn hóa Kinh Bắc (Bắc Ninh - Bắc Giang)?",
+    "answer": "Ngày 1: Hà Nội - Chùa Dâu - Chùa Bút Tháp - Làng tranh Đông Hồ (Bắc Ninh) - Chiều sang Chùa Vĩnh Nghiêm (Bắc Giang) chiêm bái mộc bản kinh Phật, tối nghỉ TP. Bắc Giang ăn gà đồi Yên Thế. Ngày 2: Sáng thăm Chùa Bổ Đà với vườn tháp đất nung cổ lớn nhất VN, ghé làng cổ Thổ Hà ngắm đình cổ ven sông Cầu và nghề làm bánh đa nem, chiều mua rượu làng Vân rồi về Hà Nội."
+  },
+  {
+    "id": "qa_route_16",
+    "province": "Duyên hải Nam Trung Bộ",
+    "title": "Cung đường ven biển: Quảng Ngãi - Bình Định (Quy Nhơn) - Phú Yên 3 ngày",
+    "question": "Tuyến du lịch biển kết hợp Quảng Ngãi - Quy Nhơn - Phú Yên có thuận tiện không?",
+    "answer": "Rất thuận tiện vì 3 tỉnh liền kề nhau dọc theo duyên hải Nam Trung Bộ và quốc lộ 1A / đường sắt Bắc Nam. Ngày 1: Đảo Lý Sơn (Quảng Ngãi). Ngày 2: Về đất liền chạy vào Quy Nhơn (Bình Định) tham quan Kỳ Co, Eo Gió, tháp Đôi Chăm Pa. Ngày 3: Từ Quy Nhơn chạy vào Phú Yên ngắm Ghềnh Đá Đĩa, Bãi Xép hoa vàng trên cỏ xanh, Mũi Điện cực Đông."
+  },
+  {
+    "id": "qa_route_17",
+    "province": "Đồng bằng sông Hồng",
+    "title": "Cung đường chùa cổ: Hà Nam - Nam Định - Thái Bình 2 ngày",
+    "question": "Lịch trình hành hương văn hóa tâm linh Hà Nam - Nam Định 2 ngày 1 đêm?",
+    "answer": "Ngày 1: Hà Nội xuống Hà Nam vãn cảnh Chùa Tam Chúc đi thuyền hồ Lục Nhạc, Chùa Địa Tạng Phi Lai Tự thanh tịnh, ăn bánh cuốn chả Phủ Lý; chiều sang Nam Định viếng Đền Trần, tháp Phổ Minh thời Trần. Ngày 2: Sáng ăn phở bò Nam Định, xuống Hải Hậu đón bình minh nhà thờ đổ Hải Lý, chiêm ngưỡng Vương cung thánh đường Phú Nhai nguy nga, mua nem nắm Giao Thủy rồi về."
+  },
+  {
+    "id": "qa_route_18",
+    "province": "Tây Nguyên",
+    "title": "Cung đường thác nước: Buôn Ma Thuột (Đắk Lắk) - Đắk Nông",
+    "question": "Từ Buôn Ma Thuột sang Đắk Nông tham quan cụm thác Đray Sáp - Gia Long thế nào?",
+    "answer": "Cụm thác Đray Sáp - Gia Long chỉ cách TP. Buôn Ma Thuột khoảng 30km về phía nam theo quốc lộ 14. Thác nằm ngay ranh giới hai tỉnh. Du khách có thể đi xe máy hoặc ô tô trong ngày: Sáng khám phá thác Đray Sáp tung bọt trắng xóa, đi bộ xuyên rừng bazan sang thác Gia Long tắm hồ bơi tự nhiên trong vắt, thưởng thức gà nướng cơm lam rồi chiều chạy tiếp về Gia Nghĩa / hồ Tà Đùng."
+  },
+  {
+    "id": "qa_route_19",
+    "province": "Miền Tây",
+    "title": "Cung đường Đất ngập nước: Long An - Đồng Tháp (Đồng Tháp Mười)",
+    "question": "Tuyến du lịch mùa nước nổi Đồng Tháp Mười kết hợp Long An và Đồng Tháp?",
+    "answer": "Theo tuyến quốc lộ 62 và N2: Bắt đầu từ Làng nổi Tân Lập (Long An) ngắm con đường xuyên rừng tràm và khu dược liệu Cánh Đồng Bất Tận. Sau đó chạy thẳng vào huyện Tam Nông (Đồng Tháp) khám phá Vườn quốc gia Tràm Chim mùa chim về và khu di tích Gò Tháp. Đây là hành trình trọn vẹn nhất để cảm nhận vẻ đẹp hoang dại của rốn lũ Đồng Tháp Mười."
+  },
+  {
+    "id": "qa_route_20",
+    "province": "Đông Bắc",
+    "title": "Cung đường chè và gió: Hà Nội - Thái Nguyên - Lạng Sơn",
+    "question": "Phượt xe máy Hà Nội - Thái Nguyên - Lạng Sơn cuối tuần nên chia chặng ra sao?",
+    "answer": "Thứ 7: Sáng Hà Nội lên Thái Nguyên theo quốc lộ 3 cũ hoặc cao tốc (75km) thăm đồi chè Tân Cương, Không gian văn hóa Trà, Bảo tàng Dân tộc học; chiều rẽ quốc lộ 1B sang Lạng Sơn qua đèo Đình Cả ngắm cảnh núi đá vôi Võ Nhai kỳ vĩ, tối dạo chợ đêm Kỳ Lừa ăn vịt quay mắc mật. Chủ nhật: Thăm động Tam Thanh, núi Tô Thị, lên đỉnh Mẫu Sơn săn mây rồi chiều xuôi cao tốc Lạng Sơn - Bắc Giang về Hà Nội."
+  },
+  {
+    "id": "qa_route_21",
+    "province": "Tây Bắc",
+    "title": "Cung đường phượt mạo hiểm: Mù Cang Chải (Yên Bái) sang Than Uyên (Lai Châu)",
+    "question": "Vượt đèo Khau Phạ từ Mù Cang Chải sang Lai Châu có trải nghiệm gì đẹp?",
+    "answer": "Đèo Khau Phạ (Yên Bái) là một trong Tứ đại đỉnh đèo. Qua đỉnh đèo Khau Phạ hùng vĩ, bạn sẽ tiến vào thung lũng Than Uyên (Lai Châu) - nơi có cánh đồng Mường Than rộng bao la. Cung đường này đẹp mê hồn vào tháng 9 - 10 khi cả thung lũng lúa bậc thang chuyển sang màu vàng rực rỡ dưới nắng thu."
+  },
+  {
+    "id": "qa_route_22",
+    "province": "Bắc Bộ",
+    "title": "Tuyến du lịch di sản ven sông Hồng: Hà Nội - Hưng Yên - Nam Định",
+    "question": "Tuyến đường đê sông Hồng từ Hà Nội qua Hưng Yên về Nam Định có điểm tham quan nào?",
+    "answer": "Cung đường đê sông Hồng thanh bình rợp bóng nhãn và phù sa: Xuất phát từ Hà Nội qua làng gốm Bát Tràng, đến Hưng Yên thăm đền Chử Đồng Tử (Khoái Châu), cụm di tích Phố Hiến (Chùa Chuông, Đền Mẫu ven hồ Bán Nguyệt), làng đan đó Thủ Sỹ; tiếp tục theo đê qua cầu Triều Dương sang Nam Định thưởng thức phở bò và thăm quần thể Đền Trần."
+  },
+  {
+    "id": "qa_route_23",
+    "province": "Miền Trung",
+    "title": "Tuyến hành hương lịch sử: Quảng Trị (DMZ) - Hà Tĩnh (Đồng Lộc) - Nghệ An",
+    "question": "Cung đường \"Về chiến trường xưa\" Bắc Trung Bộ từ Quảng Trị ra Hà Tĩnh gồm những điểm nào?",
+    "answer": "Hành trình tri ân lịch sử hào hùng: Bắt đầu từ Quảng Trị (Nghĩa trang Trường Sơn, Thành Cổ Quảng Trị, Địa đạo Vịnh Mốc) -> vượt Đèo Ngang sang Hà Tĩnh viếng mộ Đại tướng Võ Nguyên Giáp (Vũng Chùa - Quảng Bình sát ranh Hà Tĩnh) -> dâng hương Khu di tích Ngã ba Đồng Lộc -> sang Nghệ An thăm Khu di tích Kim Liên Nam Đàn."
+  },
+  {
+    "id": "qa_route_24",
+    "province": "Tây Nguyên",
+    "title": "Tuyến chinh phục biên giới: Kon Tum (Ngã ba Đông Dương) sang Gia Lai",
+    "question": "Từ TP. Kon Tum đi Cột mốc Ngã ba Đông Dương Bờ Y bao xa?",
+    "answer": "Từ TP. Kon Tum lên Cửa khẩu quốc tế Bờ Y (huyện Ngọc Hồi) khoảng 80km theo quốc lộ 14. Tại đây xin phép biên phòng leo bậc thang đá lên Cột mốc ba biên giới Việt - Lào - Campuchia check-in. Sau đó quay về ngã ba Plei Kần theo quốc lộ 14C chạy về Chư Păh và Pleiku (Gia Lai)."
+  },
+  {
+    "id": "qa_route_25",
+    "province": "Miền Tây",
+    "title": "Tuyến biển Tây Nam: Cà Mau - Kiên Giang (Hà Tiên)",
+    "question": "Từ Cà Mau đi Hà Tiên (Kiên Giang) theo tuyến hành lang ven biển phía Nam thế nào?",
+    "answer": "Tuyến đường hành lang ven biển phía Nam nối TP. Cà Mau qua Rạch Giá đến thị xã Hà Tiên dài khoảng 180km đường nhựa êm ái. Du khách được ngắm sông nước miệt vườn U Minh, đầm rừng ngập mặn rồi đến với phong cảnh \"Hà Tiên thập cảnh\" (Thạch Động, Mũi Nai, Chùa Hang)."
+  },
+  {
+    "id": "qa_route_26",
+    "province": "Bắc Bộ",
+    "title": "Tuyến tránh nóng mùa hè: Hà Nội - Vĩnh Phúc (Tam Đảo) - Thái Nguyên (Hồ Núi Cốc)",
+    "question": "Lịch trình 2 ngày 1 đêm trốn nóng mùa hè kết hợp Tam Đảo và Hồ Núi Cốc?",
+    "answer": "Ngày 1: Hà Nội lên Tam Đảo (Vĩnh Phúc, 75km) hưởng không khí 4 mùa trong 1 ngày, check-in Nhà thờ đá, Cầu Mây, Quán Gió, tối ăn ngọn su su xào tỏi, thịt nướng. Ngày 2: Sáng xuống núi theo ĐT261 sang Đại Từ (Thái Nguyên, khoảng 40km) thăm đồi chè và đi du thuyền ngắm lòng hồ Núi Cốc mát rượi, chiều mua trà Tân Cương rồi về lại Hà Nội."
+  },
+  {
+    "id": "qa_route_27",
+    "province": "Đông Nam Bộ",
+    "title": "Cung đường đất đỏ: TP.HCM - Bình Dương - Bình Phước - Tây Ninh",
+    "question": "Cung đường phượt khám phá miền Đông Nam Bộ 2 ngày?",
+    "answer": "Ngày 1: TP.HCM lên Bình Phước thăm Vườn quốc gia Bù Gia Mập tắm thác hoặc cắm trại trảng cỏ Bù Lạch, ăn gà nướng cơm lam, đọt mây. Ngày 2: Từ Đồng Xoài chạy theo ĐT744 cắt qua Dầu Tiếng sang Tây Ninh chinh phục Núi Bà Đen bằng cáp treo chiêm bái tượng Phật Bà Tây Bổ Đà Sơn, viếng Tòa Thánh Cao Đài rồi về TP.HCM."
+  },
+  {
+    "id": "qa_route_28",
+    "province": "Bắc Bộ",
+    "title": "Tuyến tâm linh Mẫu: Đền Mẫu Đồng Đăng (Lạng Sơn) - Đền Mẫu Hưng Yên - Phủ Dầy (Nam Định)",
+    "question": "Tín đồ Đạo Mẫu thường hành hương qua những đền Mẫu lớn nào ở miền Bắc?",
+    "answer": "Hành trình chiêm bái Đạo Mẫu Tam phủ: Đền Mẫu Đồng Đăng (Lạng Sơn - thờ Mẫu Liễu Hạnh nơi biên ải), Đền Mẫu Thoải Cầu Đền Hàn (Thanh Hóa), Đền Mẫu Hưng Yên (bên hồ Bán Nguyệt cây đa 700 năm) và trung tâm thực hành tín ngưỡng thờ Mẫu tại Quần thể di tích Phủ Dầy (Vụ Bản, Nam Định - nơi phát tích Thánh Mẫu Liễu Hạnh)."
+  },
+  {
+    "id": "qa_route_29",
+    "province": "Tây Nguyên",
+    "title": "Tuyến khám phá cà phê: Đắk Nông - Đắk Lắk - Gia Lai",
+    "question": "Tuyến đường \"Thủ phủ cà phê Việt Nam\" đi qua những địa danh nào?",
+    "answer": "Hành trình khám phá văn hóa cà phê dọc quốc lộ 14: Bắt đầu từ những nương cà phê đất đỏ núi lửa Đắk Nông (Gia Nghĩa, Đắk Mil) -> thủ phủ cà phê Buôn Ma Thuột (Bảo tàng thế giới cà phê, làng cà phê Trung Nguyên) -> phố núi Pleiku Gia Lai (văn hóa cà phê phin đậm đặc, Biển Hồ Chè). Mùa đẹp nhất là tháng 2 - 3 khi hoa cà phê nở trắng muốt ngát hương thơm."
+  },
+  {
+    "id": "qa_route_30",
+    "province": "Miền Tây",
+    "title": "Tuyến ẩm thực bún: Trà Vinh (bún nước lèo) - Sóc Trăng (bún nước lèo) - Bạc Liêu (bún nước lèo)",
+    "question": "Hành trình trải nghiệm \"Con đường bún nước lèo\" miền Tây có gì thú vị?",
+    "answer": "Bún nước lèo là linh hồn ẩm thực giao thoa Kinh - Khmer - Hoa. Mỗi tỉnh có biến tấu độc đáo: Bún nước lèo Trà Vinh đậm đà mắm bò hóc; Bún nước lèo Sóc Trăng ngọt thanh mắm cá sặc và ngải bún ăn kèm cá lóc đồng và thịt heo quay giòn; Bún nước lèo Bạc Liêu chan nước dừa béo bùi ăn cùng bì heo và tôm đất tươi rói."
+  },
+  {
+    "id": "qa_route_31",
+    "province": "Tây Bắc",
+    "title": "Tuyến trekking đỉnh cao: Fansipan (Lào Cai) kết hợp Bạch Mộc Lương Tử (Lai Châu)",
+    "question": "Dân trekking chuyên nghiệp thường kết hợp những đỉnh núi nào ở Lào Cai và Lai Châu?",
+    "answer": "Dãy Hoàng Liên Sơn giáp ranh giữa 2 tỉnh sở hữu các đỉnh núi trekking hàng đầu: Fansipan (3.143m), Bạch Mộc Lương Tử / Kỳ Quan San (3.046m - điểm săn mây bình minh đỉnh Muối số 1 Việt Nam), Pu Ta Leng (3.049m - mùa hoa đỗ quyên) và Nhìu Cồ San. Cần người dẫn đường (porter) bản địa và chuẩn bị thể lực 2-3 ngày."
+  },
+  {
+    "id": "qa_route_32",
+    "province": "Bắc Bộ",
+    "title": "Cung đường cổ tích: Làng gốm Phù Lãng (Bắc Ninh) sang làng cổ Thổ Hà (Bắc Giang)",
+    "question": "Khoảng cách giữa làng gốm Phù Lãng và làng Thổ Hà ven sông Cầu?",
+    "answer": "Hai làng cổ này chỉ cách nhau khoảng 20km nằm bên dòng sông Cầu êm đềm. Du khách có thể đi xe máy hoặc ô tô kết hợp trong 1 ngày: Sáng ghé Phù Lãng (Bắc Ninh) ngắm lò gốm củi truyền thống màu men da lươn; chiều qua đò hoặc cầu sang Thổ Hà (Bắc Giang) ngắm cổng làng cổ và những giàn bánh đa nem phơi kín các ngõ ngách rêu phong."
+  },
+  {
+    "id": "qa_route_33",
+    "province": "Miền Trung",
+    "title": "Tuyến di sản thành quách: Thành Nhà Hồ (Thanh Hóa) - Hoàng thành Thăng Long - Cố đô Huế",
+    "question": "Tuyến du lịch nghiên cứu kinh đô cổ Việt Nam có những điểm dừng nào?",
+    "answer": "Tuyến tham quan các kinh đô cổ lịch sử: Hoàng thành Thăng Long (Hà Nội, kinh đô ngàn năm) -> Cổ Loa (Đông Anh) -> Cố đô Hoa Lư (Ninh Bình) -> Thành Nhà Hồ (Thanh Hóa, kinh đô đá UNESCO thế kỷ 14) -> Lam Kinh (Thanh Hóa) -> Quần thể Cố đô Huế (kinh đô triều Nguyễn)."
+  },
+  {
+    "id": "qa_route_34",
+    "province": "Tây Nguyên",
+    "title": "Cung đường hoa dã quỳ: Gia Lai - Kon Tum tháng 11",
+    "question": "Đi săn hoa dã quỳ Tây Nguyên vào tháng 11 nên đi những điểm nào?",
+    "answer": "Tuyến săn hoa dã quỳ rực rỡ nhất: Miệng núi lửa Chư Đăng Ya (Chư Păh, Gia Lai) - nơi diễn ra Tuần lễ hoa dã quỳ -> cung đường đèo Chư Păh sang TP. Kon Tum -> cung đường đèo Măng Đen hoa dã quỳ mọc tự nhiên vàng rực hai bên rừng thông bát ngát."
+  },
+  {
+    "id": "qa_route_35",
+    "province": "Miền Tây",
+    "title": "Tuyến khám phá cù lao trái cây: Tiền Giang - Bến Tre - Vĩnh Long - Đồng Tháp",
+    "question": "Hành trình phượt miệt vườn cây trái đồng bằng sông Cửu Long?",
+    "answer": "Khám phá các cù lao trù phú giữa sông Tiền và sông Cổ Chiên: Cù lao Thới Sơn (Tiền Giang) -> Cù lao Phụng, Cù lao An Bình (Vĩnh Long) với những vườn sầu riêng, chôm chôm, nhãn chín trĩu cành -> sang làng hoa Sa Đéc và vườn quýt hồng Lai Vung (Đồng Tháp) thưởng thức trái cây bao bụng tại vườn."
+  },
+  {
+    "id": "qa_route_36",
+    "province": "Đông Bắc",
+    "title": "Tuyến cửa khẩu thương mại: Lạng Sơn (Hữu Nghị) sang Quảng Ninh (Móng Cái)",
+    "question": "Tuyến quốc lộ 4B nối Lạng Sơn và Quảng Ninh có gì trải nghiệm?",
+    "answer": "Quốc lộ 4B kết nối từ TP. Lạng Sơn qua huyện Lộc Bình, Đình Lập sang Tiên Yên và Móng Cái (Quảng Ninh). Tuyến đường đưa du khách từ vùng núi cao Mẫu Sơn xứ Lạng xuống biển đảo vùng vịnh Bái Tử Long và Cửa khẩu quốc tế Móng Cái sầm uất."
+  },
+  {
+    "id": "qa_route_37",
+    "province": "Duyên hải Miền Trung",
+    "title": "Cung đường biển đảo hoang sơ: Cù Lao Chàm (Quảng Nam) - Đảo Lý Sơn (Quảng Ngãi)",
+    "question": "So sánh và kinh nghiệm đi 2 hòn đảo nổi tiếng Cù Lao Chàm và Lý Sơn?",
+    "answer": "Cù Lao Chàm (Hội An) thích hợp đi tour về trong ngày lặn ngắm san hô và đi bộ dưới biển sinh thái; Đảo Lý Sơn (Quảng Ngãi) rộng lớn hơn với kỳ quan địa chất núi lửa độc nhất vô nhị, văn hóa hải đội Hoàng Sa và ẩm thực hải sản phong phú, cần dành tối thiểu 2 ngày 1 đêm để trải nghiệm trọn vẹn."
+  },
+  {
+    "id": "qa_route_38",
+    "province": "Bắc Bộ",
+    "title": "Tuyến du lịch suối nước nóng phục hồi sức khỏe: Vĩnh Phúc - Phú Thọ - Hòa Bình",
+    "question": "Những điểm tắm khoáng nóng thư giãn tốt nhất quanh Hà Nội?",
+    "answer": "Các điểm suối khoáng nóng thiên nhiên giàu khoáng chất cách Hà Nội 1-2 giờ di chuyển: Suối khoáng nóng Thanh Thủy (Phú Thọ) chứa radon quý hiếm; Suối khoáng nóng Kim Bôi (Hòa Bình); Tắm khoáng Onsen kiểu Nhật tại Quang Hanh (Quảng Ninh) hoặc Flamingo Đại Lải (Vĩnh Phúc)."
+  },
+  {
+    "id": "qa_route_39",
+    "province": "Miền Tây",
+    "title": "Cung đường biên giới Tây Nam: Long An - Đồng Tháp - An Giang",
+    "question": "Cung đường biên giới N1 chạy dọc miền Tây có gì thú vị?",
+    "answer": "Tuyến quốc lộ N1 men theo biên giới Việt Nam - Campuchia từ Đức Huệ (Long An) qua Hồng Ngự, Tân Hồng (Đồng Tháp) đến Châu Đốc, Tịnh Biên (An Giang). Du khách được ngắm những cánh đồng lúa giáp biên mênh mông, rừng tràm Trà Sư và viếng Miếu Bà Chúa Xứ núi Sam."
+  },
+  {
+    "id": "qa_route_40",
+    "province": "Tây Bắc & Đông Bắc",
+    "title": "Vòng cung Đông - Tây Bắc trọn vẹn 10 ngày",
+    "question": "Lịch trình tour Vòng cung Đông - Tây Bắc 10 ngày cho du khách phương Nam hoặc nước ngoài?",
+    "answer": "Lịch trình trọn vẹn 10 ngày: Hà Nội -> Mai Châu -> Mộc Châu -> Điện Biên Phủ -> Lai Châu (đèo Ô Quy Hồ) -> Sa Pa (Fansipan) -> Hà Giang (Đồng Văn, Mã Pí Lèng) -> Cao Bằng (Thác Bản Giốc) -> Ba Bể -> Lạng Sơn -> Hà Nội. Đây là cung đường huyền thoại ngắm trọn vẹn vẻ đẹp non sông gấm vóc hùng vĩ nhất Việt Nam."
+  },
+  {
+    "id": "qa_cost_01",
+    "province": "Kon Tum",
+    "title": "Dự toán chi phí: Du lịch Măng Đen 3 ngày 2 đêm",
+    "question": "Chi phí đi du lịch tự túc Măng Đen 3 ngày 2 đêm khoảng bao nhiêu tiền một người?",
+    "answer": "Chi phí du lịch tự túc Măng Đen 3 ngày 2 đêm dao động từ 2.500.000 đến 3.500.000 VNĐ/người (chưa gồm vé máy bay đến Pleiku). Chi tiết: Khách sạn/Homestay rừng thông (350.000 - 600.000đ/đêm, chia đôi phòng còn 200.000 - 300.000đ/người); Thuê xe máy tại Măng Đen (150.000đ/ngày); Vé tham quan thác Pa Sỹ (20.000đ), hồ Đăk Ke (miễn phí); Ăn uống lẩu xuyên tiêu, gà nướng cơm lam, gỏi lá (300.000 - 450.000đ/ngày); Xe buýt/taxi Pleiku - Măng Đen (100.000 - 150.000đ/lượt)."
+  },
+  {
+    "id": "qa_cost_02",
+    "province": "Quảng Ngãi",
+    "title": "Dự toán chi phí: Du lịch Đảo Lý Sơn 2 ngày 1 đêm",
+    "question": "Đi du lịch đảo Lý Sơn 2 ngày 1 đêm tự túc hết khoảng bao nhiêu tiền?",
+    "answer": "Chi phí trọn gói 2N1Đ tại đảo Lý Sơn khoảng 1.800.000 - 2.500.000 VNĐ/người (tính từ cảng Sa Kỳ). Chi tiết: Vé tàu cao tốc khứ hồi Sa Kỳ - Lý Sơn (khoảng 360.000 - 400.000đ/khứ hồi); Thuê xe máy trên đảo (150.000đ/ngày); Khách sạn/nhà nghỉ (300.000 - 500.000đ/phòng); Cano khứ hồi sang Đảo Bé (100.000 - 120.000đ); Xe điện Đảo Bé (30.000đ); Thuyền thúng lặn san hô (80.000 - 100.000đ); Ăn uống hải sản cua huỳnh đế, ốc cừ, don, tỏi Lý Sơn (600.000 - 800.000đ)."
+  },
+  {
+    "id": "qa_cost_03",
+    "province": "Hà Nam",
+    "title": "Bảng giá vé: Khu du lịch tâm linh Chùa Tam Chúc",
+    "question": "Bảng giá vé tham quan du thuyền và xe điện Chùa Tam Chúc hiện nay là bao nhiêu?",
+    "answer": "Giá vé vào cửa chùa Tam Chúc là miễn phí. Giá dịch vụ di chuyển tham quan gồm: Gói xe điện khứ hồi (90.000đ/người); Gói du thuyền phổ thông ngắm lòng hồ Lục Nhạc khứ hồi (200.000đ/người); Gói du thuyền VIP kèm trà bánh buffet (250.000 - 270.000đ/người); Vé kết hợp du thuyền lượt đi + xe điện lượt về (khoảng 240.000đ/người)."
+  },
+  {
+    "id": "qa_cost_04",
+    "province": "Lai Châu",
+    "title": "Bảng giá vé: Cầu kính Rồng Mây đèo Ô Quy Hồ",
+    "question": "Giá vé tham quan thang máy và Cầu kính Rồng Mây ở Lai Châu là bao nhiêu?",
+    "answer": "Giá vé tham quan Cầu kính Rồng Mây (gồm thang máy lồng kính ngoài trời cao 300m lên cầu kính): Người lớn là 400.000 VNĐ/vé; Trẻ em (1m - 1.4m) là 200.000 VNĐ/vé; Trẻ em dưới 1m miễn phí. Các trò chơi mạo hiểm tính phí riêng: Cầu độc mộc (150.000đ), Xích đu tử thần (150.000đ), Zipline trượt cáp (150.000đ), Dù lượn (khoảng 1.000.000đ/lượt)."
+  },
+  {
+    "id": "qa_cost_05",
+    "province": "Thanh Hóa",
+    "title": "Dự toán chi phí: Du lịch Pù Luông 2 ngày 1 đêm",
+    "question": "Du lịch Pù Luông 2 ngày 1 đêm ở homestay hoặc resort hết bao nhiêu?",
+    "answer": "Nếu ở homestay nhà sàn bản Đôn/Kho Mường: Khoảng 1.200.000 - 1.600.000 VNĐ/người (ngủ nhà sàn cộng đồng 100.000 - 150.000đ/người, ăn vịt Cổ Lũng, măng rừng, thuê bè tre 50.000đ/người). Nếu ở resort cao cấp (Pù Luông Retreat, Puluong Bocbandi, Puluong Casa) có bể bơi vô cực ngắm ruộng bậc thang: Khoảng 2.200.000 - 3.200.000 VNĐ/người."
+  },
+  {
+    "id": "qa_cost_06",
+    "province": "Đắk Nông",
+    "title": "Bảng giá dịch vụ: Thuê thuyền tham quan Hồ Tà Đùng",
+    "question": "Giá thuê thuyền hoặc cano ngắm cảnh lòng hồ Tà Đùng là bao nhiêu?",
+    "answer": "Giá thuê thuyền du lịch tại bến thuyền Tà Đùng: Nếu đi ghép đoàn, giá vé thuyền khoảng 100.000 - 150.000 VNĐ/người cho chuyến dạo hồ 1.5 đến 2 giờ. Nếu thuê trọn gói nguyên thuyền riêng cho đoàn gia đình (10 - 20 người), giá dao động từ 1.000.000 đến 1.500.000 VNĐ/chuyến."
+  },
+  {
+    "id": "qa_cost_07",
+    "province": "Vĩnh Phúc",
+    "title": "Dự toán chi phí: Du lịch Tam Đảo 2 ngày 1 đêm từ Hà Nội",
+    "question": "Chi phí đi du lịch Tam Đảo 2N1Đ tự túc bằng xe máy hoặc xe buýt/limousine?",
+    "answer": "Chi phí khoảng 1.000.000 - 1.500.000 VNĐ/người: Xăng xe máy hoặc vé xe Limousine khứ hồi Hà Nội - Tam Đảo (250.000 - 300.000đ); Khách sạn/Homestay (400.000 - 700.000đ/phòng, chia đôi còn 200.000 - 350.000đ/người); Ăn uống ngọn su su xào, gà đồi, thịt nướng than quảng trường (400.000 - 500.000đ); Vé Cầu Mây (30.000đ), Thác Bạc (miễn phí hoặc 20.000đ)."
+  },
+  {
+    "id": "qa_cost_08",
+    "province": "Cà Mau",
+    "title": "Bảng giá dịch vụ: Thuê vỏ lãi xuyên rừng ngập mặn Đất Mũi",
+    "question": "Giá thuê cano vỏ lãi tham quan xuyên rừng đước tại Vườn quốc gia Mũi Cà Mau?",
+    "answer": "Tại Khu du lịch Quốc gia Mũi Cà Mau, giá tuyến tham quan xuyên rừng ngập mặn bằng xuồng vỏ lãi hoặc cano dao động theo tuyến: Tuyến ngắn (khoảng 20 phút) giá khoảng 500.000 - 600.000 VNĐ/chuyến (chở 6 người); Tuyến dài xuyên rừng đước ra bãi bồi ven biển (khoảng 45 - 60 phút) giá khoảng 800.000 - 1.000.000 VNĐ/chuyến. Đi theo nhóm chia ra khoảng 100.000 - 150.000đ/người."
+  },
+  {
+    "id": "qa_cost_09",
+    "province": "Bắc Giang",
+    "title": "Bảng giá vé: Cáp treo Tây Yên Tử",
+    "question": "Giá vé cáp treo Khu di tích danh thắng Tây Yên Tử Bắc Giang bao nhiêu?",
+    "answer": "Giá vé cáp treo Tây Yên Tử (từ ga Chùa Hạ lên ga Chùa Thượng): Vé khứ hồi người lớn là 260.000 VNĐ/vé; Vé khứ hồi trẻ em (1m - 1.3m) là 180.000 VNĐ/vé; Vé một chiều là 150.000 VNĐ/vé. Trẻ em dưới 1m được miễn phí."
+  },
+  {
+    "id": "qa_cost_10",
+    "province": "Vĩnh Phúc",
+    "title": "Bảng giá vé: Cáp treo Tây Thiên",
+    "question": "Giá vé cáp treo danh thắng Tây Thiên Vĩnh Phúc?",
+    "answer": "Giá vé cáp treo Tây Thiên vượt suối lên Đền Quốc Mẫu: Người lớn khứ hồi là 240.000 VNĐ/vé (một chiều 150.000đ); Trẻ em (1m - 1.3m) khứ hồi là 160.000 VNĐ/vé (một chiều 100.000đ); Trẻ em dưới 1m miễn phí. Xe điện trung chuyển từ bãi xe vào chân ga cáp treo: 20.000đ/người/lượt."
+  },
+  {
+    "id": "qa_cost_11",
+    "province": "Gia Lai",
+    "title": "Dự toán chi phí: Du lịch Pleiku 3 ngày 2 đêm",
+    "question": "Đi du lịch Pleiku Gia Lai 3 ngày 2 đêm tự túc tốn khoảng bao nhiêu?",
+    "answer": "Khoảng 2.000.000 - 2.800.000 VNĐ/người (chưa vé máy bay). Chi tiết: Thuê xe máy Pleiku (120.000 - 150.000đ/ngày); Khách sạn trung tâm (300.000 - 500.000đ/đêm); Vé thắng cảnh Biển Hồ Tơ Nưng (10.000đ/người), thác Phú Cường (15.000đ); Ăn uống phở hai tô (40.000 - 50.000đ/bát), bò một nắng muối kiến vàng, gà nướng cơm lam (khoảng 300.000đ/ngày)."
+  },
+  {
+    "id": "qa_cost_12",
+    "province": "Đồng Tháp",
+    "title": "Bảng giá vé: Vườn quốc gia Tràm Chim",
+    "question": "Giá vé tham quan và đi xuồng máy tại Vườn quốc gia Tràm Chim?",
+    "answer": "Vé vào cổng Vàm Tràm Chim: 20.000 VNĐ/người. Giá thuê xuồng máy (tắc ráng) luồn lách tham quan rừng tràm đồng cỏ: Tuyến ngắn 12km (khoảng 45 phút) giá 500.000đ/xuồng (tối đa 10 người); Tuyến dài 21km (khoảng 1.5 giờ) giá 800.000đ/xuồng. Đi nhóm chia ra chỉ khoảng 60.000 - 90.000đ/người."
+  },
+  {
+    "id": "qa_cost_13",
+    "province": "Long An",
+    "title": "Bảng giá vé: Khu du lịch Làng nổi Tân Lập",
+    "question": "Giá vé tham quan Làng nổi Tân Lập và đi thuyền rồng/xuồng ba lá?",
+    "answer": "Giá vé vào cổng tham quan đường xuyên rừng tràm: 60.000 VNĐ/người. Vé đi thuyền máy hoặc xuồng ba lá chèo tay trên dòng kênh hoa súng: 70.000 - 80.000 VNĐ/người. Gói combo vào cổng + đi thuyền khoảng 130.000 - 140.000 VNĐ/người."
+  },
+  {
+    "id": "qa_cost_14",
+    "province": "Bạc Liêu",
+    "title": "Bảng giá vé: Nhà Công tử Bạc Liêu và Cánh đồng điện gió",
+    "question": "Giá vé tham quan Dinh thự Công tử Bạc Liêu và Cánh đồng quạt gió là bao nhiêu?",
+    "answer": "Vé tham quan Dinh thự Công tử Bạc Liêu: Người lớn là 30.000 VNĐ/vé, trẻ em là 15.000 VNĐ/vé. Vé tham quan cầu dẫn ngắm Cánh đồng điện gió Bạc Liêu: 30.000 VNĐ/người lớn. Vé vào Khu lưu niệm nhạc sĩ Cao Văn Lầu: 20.000 VNĐ/người."
+  },
+  {
+    "id": "qa_cost_15",
+    "province": "Thái Nguyên",
+    "title": "Bảng giá vé: Khu du lịch Hồ Núi Cốc",
+    "question": "Giá vé trọn gói vào cổng Khu du lịch Hồ Núi Cốc Thái Nguyên?",
+    "answer": "Giá vé trọn gói vào cổng Hồ Núi Cốc: 130.000 VNĐ/người lớn (đã bao gồm tham quan Chùa Thác Vàng, Động Huyền Thoại Cung, Động Ba Cây Thông, xem nhạc nước nghệ thuật và công viên nước). Dịch vụ đi tàu du thuyền trên mặt hồ tính riêng: khoảng 30.000 - 50.000 VNĐ/người."
+  },
+  {
+    "id": "qa_cost_16",
+    "province": "Thanh Hóa",
+    "title": "Bảng giá vé: Di sản thế giới Thành Nhà Hồ và Lam Kinh",
+    "question": "Giá vé tham quan Thành Nhà Hồ và Di tích Lam Kinh Thanh Hóa?",
+    "answer": "Vé tham quan Di sản văn hóa thế giới Thành Nhà Hồ: Người lớn là 40.000 VNĐ/vé; Trẻ em là 20.000 VNĐ/vé. Vé tham quan Khu di tích quốc gia đặc biệt Lam Kinh: Người lớn là 30.000 VNĐ/vé; Trẻ em là 15.000 VNĐ/vé. Xe điện tham quan trong khuôn viên Lam Kinh: 20.000đ/người."
+  },
+  {
+    "id": "qa_cost_17",
+    "province": "Bình Phước",
+    "title": "Dự toán chi phí: Trekking Vườn quốc gia Bù Gia Mập 2 ngày 1 đêm",
+    "question": "Chi phí đi tour trekking Bù Gia Mập 2N1Đ có người dẫn đường hết bao nhiêu?",
+    "answer": "Chi phí tour tự túc hoặc ghép đoàn Bù Gia Mập khoảng 1.200.000 - 1.800.000 VNĐ/người. Đã bao gồm: Phí tham quan và bảo hiểm rừng (khoảng 70.000đ); Thuê kiểm lâm/hướng dẫn viên địa phương dẫn đường (khoảng 400.000 - 500.000đ/ngày/đoàn chia ra); Thuê lều trại ngủ rừng (100.000đ/lều); Ăn uống 4 bữa chính gà nướng, cơm lam, cá suối, canh thụt của người bản địa."
+  },
+  {
+    "id": "qa_cost_18",
+    "province": "Nam Định",
+    "title": "Bảng giá vé: Vườn quốc gia Xuân Thủy",
+    "question": "Chi phí thuê thuyền ngắm chim và rừng ngập mặn Vườn quốc gia Xuân Thủy?",
+    "answer": "Vé vào cửa Vườn quốc gia Xuân Thủy miễn phí. Chi phí thuê tàu thuyền máy tham quan cửa sông Ba Lạt và cồn Ngạn, cồn Lu ngắm chim di cư dao động từ 800.000 đến 1.500.000 VNĐ/chuyến thuyền (chở được đoàn 10 - 15 người, chia ra chỉ khoảng 80.000 - 100.000đ/người)."
+  },
+  {
+    "id": "qa_cost_19",
+    "province": "Hà Tĩnh",
+    "title": "Bảng giá vé: Cáp treo Chùa Hương Tích núi Hồng Lĩnh",
+    "question": "Giá vé cáp treo và thuyền hồ Nhà Đường lên Chùa Hương Tích Hà Tĩnh?",
+    "answer": "Vé thuyền máy qua lòng hồ Nhà Đường lên chân núi: 50.000 VNĐ/người/khứ hồi. Vé cáp treo Chùa Hương Tích: Người lớn khứ hồi là 160.000 VNĐ/vé (một chiều 100.000đ); Trẻ em khứ hồi là 120.000 VNĐ/vé (một chiều 80.000đ). Du khách cũng có thể chọn đi bộ leo núi miễn phí qua rừng thông mất khoảng 1.5 - 2 giờ."
+  },
+  {
+    "id": "qa_cost_20",
+    "province": "Hậu Giang",
+    "title": "Bảng giá vé: Khu bảo tồn thiên nhiên Lung Ngọc Hoàng",
+    "question": "Giá vé tham quan và dịch vụ thuyền tại Lung Ngọc Hoàng?",
+    "answer": "Giá vé vào cổng tham quan Lung Ngọc Hoàng: 60.000 VNĐ/người lớn (trẻ em 30.000đ). Dịch vụ đi xuồng máy hoặc chèo xuồng ba lá lướt trên thảm bèo xanh: 50.000 VNĐ/người. Thuê xe điện nội khu: 30.000 VNĐ/người."
+  },
+  {
+    "id": "qa_cost_21",
+    "province": "Cà Mau",
+    "title": "Giá cua Cà Mau tại chỗ là bao nhiêu một ký?",
+    "question": "Giá cua biển Cà Mau Năm Căn mua ăn tại địa phương khoảng bao nhiêu 1kg?",
+    "answer": "Giá cua Cà Mau tại Năm Căn hoặc Đất Mũi tùy thời điểm: Cua thịt loại 1 (cua Y, khoảng 2-3 con/kg) giá dao động từ 250.000 đến 350.000 VNĐ/kg; Cua gạch son loại 1 (gạch đặc đỏ au) giá khoảng 450.000 đến 600.000 VNĐ/kg (vào dịp lễ tết có thể lên 650.000 - 700.000đ/kg). Dây trói cua tại các vựa uy tín rất mỏng không ăn gian trọng lượng."
+  },
+  {
+    "id": "qa_cost_22",
+    "province": "Toàn quốc",
+    "title": "Dự toán chi phí: Phượt xe máy xuyên Việt 1 tháng",
+    "question": "Ngân sách phượt xe máy xuyên Việt trong 30 ngày cần khoảng bao nhiêu tiền?",
+    "answer": "Ngân sách phượt xe máy 30 ngày tiết kiệm đến vừa phải dao động từ 15.000.000 đến 22.000.000 VNĐ/người. Chi tiết trung bình mỗi ngày: Xăng xe (70.000 - 100.000đ); Nhà nghỉ/Homestay bình dân (150.000 - 250.000đ); Ăn uống 3 bữa đặc sản địa phương (150.000 - 200.000đ); Vé tham quan danh lam thắng cảnh và phát sinh bảo dưỡng xe (100.000đ/ngày)."
+  },
+  {
+    "id": "qa_cost_23",
+    "province": "Lai Châu",
+    "title": "Chi phí thuê porter dẫn đường leo núi Pu Ta Leng / Bạch Mộc Lương Tử",
+    "question": "Thuê porter người Mông dẫn đường leo đỉnh Pu Ta Leng chi phí thế nào?",
+    "answer": "Chi phí thuê 1 porter (người khuân vác kiêm dẫn đường, nấu ăn) người Mông hoặc Dao bản địa khoảng 400.000 - 500.000 VNĐ/ngày công. Thường một tour leo Pu Ta Leng 3 ngày 2 đêm chi phí porter khoảng 1.200.000 - 1.500.000đ (1 porter gùi được khoảng 15-20kg đồ đạc cho 2-3 khách)."
+  },
+  {
+    "id": "qa_cost_24",
+    "province": "Lạng Sơn",
+    "title": "Giá vịt quay Lạng Sơn nguyên con bao nhiêu tiền?",
+    "question": "Mua một con vịt quay lá mắc mật ở Lạng Sơn khoảng bao nhiêu?",
+    "answer": "Vịt quay Thất Khê / Lạng Sơn nguyên con nướng mật ong lá mắc mật có giá dao động từ 280.000 đến 350.000 VNĐ/con (khoảng 2.2 - 2.6kg vịt hơi), ăn kèm nước chấm lòng vịt pha mắc mật sánh đậm và dưa góp rau thơm."
+  },
+  {
+    "id": "qa_cost_25",
+    "province": "Kon Tum",
+    "title": "Giá sâm Ngọc Linh thật là bao nhiêu tiền 1 lạng?",
+    "question": "Giá sâm củ Ngọc Linh Kon Tum chuẩn nguồn gốc khoảng bao nhiêu?",
+    "answer": "Sâm Ngọc Linh là loại dược liệu đắt giá hàng đầu thế giới: Củ sâm tươi loại 20-30 củ/kg giá khoảng 70 - 90 triệu đồng/kg (khoảng 7-9 triệu/lạng); Củ sâm to loại 10-15 củ/kg giá từ 100 - 150 triệu đồng/kg; Các củ sâm rừng lâu năm quý hiếm có thể lên đến hàng trăm triệu đến cả tỷ đồng. Du khách nên mua tại Trung tâm giới thiệu Sâm Ngọc Linh huyện Tu Mơ Rông để tránh sâm giả."
+  },
+  {
+    "id": "qa_cost_26",
+    "province": "Bắc Ninh",
+    "title": "Giá vé tham quan Chùa Dâu, Chùa Bút Tháp, Đền Đô",
+    "question": "Giá vé vào cửa các di tích lịch sử lớn tại Bắc Ninh?",
+    "answer": "Hầu hết các di tích lịch sử, đình chùa tại Bắc Ninh như Đền Đô, Chùa Dâu, Chùa Bút Tháp, Chùa Phật Tích, Lăng Kinh Dương Vương đều mở cửa đón khách tự do với mức vé mang tính tượng trưng hoặc miễn phí (vé vào cửa chùa Bút Tháp khoảng 10.000đ, Đền Đô miễn phí hoặc 10.000đ/người)."
+  },
+  {
+    "id": "qa_cost_27",
+    "province": "Hưng Yên",
+    "title": "Giá nhãn lồng Hưng Yên chính gốc vào vụ bao nhiêu 1kg?",
+    "question": "Giá nhãn lồng Hưng Yên mua tại vườn vào tháng 7 - 8 khoảng bao nhiêu?",
+    "answer": "Nhãn lồng tiến vua Hưng Yên cùi dày ráo nước, ngọt thanh mua tại vườn vào chính vụ (tháng 7 - 8) dao động từ 40.000 đến 70.000 VNĐ/kg tùy chất lượng quả. Long nhãn sấy khô sạch tự nhiên làm quà giá khoảng 250.000 - 350.000 VNĐ/kg."
+  },
+  {
+    "id": "qa_cost_28",
+    "province": "Bình Phước",
+    "title": "Giá hạt điều rang muối Bình Phước loại A cồ",
+    "question": "Hạt điều rang muối Bình Phước nguyên lụa loại 1 giá bao nhiêu?",
+    "answer": "Hạt điều rang muối nguyên vỏ lụa Bình Phước (loại A cồ hạt to mẩy, không mẻ vỡ) đóng hộp tròn 500g có giá dao động từ 130.000 đến 170.000 VNĐ/hộp (tương đương 260.000 - 340.000 VNĐ/kg)."
+  },
+  {
+    "id": "qa_cost_29",
+    "province": "Thái Nguyên",
+    "title": "Giá trà Tân Cương Thái Nguyên các loại",
+    "question": "Giá Trà đinh, Trà tôm nõn, Trà móc câu Tân Cương Thái Nguyên?",
+    "answer": "Bảng giá trà Tân Cương theo phân cấp: Trà búp / Trà móc câu truyền thống: 250.000 - 450.000 VNĐ/kg; Trà tôm nõn thượng hạng (1 tôm 1 lá): 600.000 - 1.200.000 VNĐ/kg; Trà đinh ngọc cao cấp nhất (chỉ hái 1 đọt đinh non sáng sớm): 2.500.000 đến 5.000.000 VNĐ/kg."
+  },
+  {
+    "id": "qa_cost_30",
+    "province": "Quảng Ngãi",
+    "title": "Giá tỏi cô đơn Lý Sơn chính hiệu",
+    "question": "Tỏi cô đơn (tỏi một tép) đảo Lý Sơn có giá bao nhiêu 1kg?",
+    "answer": "Tỏi thường Lý Sơn (nhiều tép) có giá khoảng 150.000 - 250.000 VNĐ/kg. Riêng Tỏi cô đơn Lý Sơn (tỏi 1 tép hình tròn giàu dược chất) cực kỳ quý hiếm, giá dao động từ 1.000.000 đến 1.500.000 VNĐ/kg tỏi khô."
+  },
+  {
+    "id": "qa_cost_31",
+    "province": "Hà Nam",
+    "title": "Giá niêu cá kho làng Vũ Đại",
+    "question": "Một niêu cá kho làng Vũ Đại chính gốc có giá bao nhiêu?",
+    "answer": "Cá kho Vũ Đại (cá trắm đen kho niêu đất 16 tiếng củi nhãn) có giá tính theo trọng lượng cá tươi trong niêu: Niêu nhỏ 1.5kg giá khoảng 500.000 - 600.000đ; Niêu 2kg - 3kg giá khoảng 700.000 - 900.000đ; Niêu lớn 4kg - 5kg giá từ 1.100.000 đến 1.400.000 VNĐ/niêu."
+  },
+  {
+    "id": "qa_cost_32",
+    "province": "Đồng Tháp",
+    "title": "Giá vé nhà cổ Huỳnh Thủy Lê và ngủ lại qua đêm",
+    "question": "Giá vé tham quan và giá phòng ngủ đêm tại Nhà cổ Huỳnh Thủy Lê Sa Đéc?",
+    "answer": "Vé tham quan ban ngày kèm hướng dẫn viên thuyết minh tiếng Việt/Pháp/Anh và trà mứt: 40.000 VNĐ/người. Giá thuê phòng ngủ qua đêm trong gian phòng cổ của gia tộc Huỳnh Thủy Lê khoảng 1.000.000 - 1.500.000 VNĐ/phòng/đêm (bao gồm ăn sáng và ăn tối)."
+  },
+  {
+    "id": "qa_cost_33",
+    "province": "Gia Lai",
+    "title": "Giá tour trekking Thác K50 Kon Chư Răng",
+    "question": "Chi phí đi tour trekking thác K50 Gia Lai 2 ngày 1 đêm?",
+    "answer": "Chi phí tham gia tour trekking thác K50 trọn gói ghép đoàn (xuất phát từ Quy Nhơn hoặc Pleiku) khoảng 2.200.000 - 2.800.000 VNĐ/người, bao gồm xe đưa đón, giấy phép vào khu bảo tồn, kiểm lâm dẫn đường, lều trại ngủ rừng, ăn uống 4 bữa và áo phao bảo hộ."
+  },
+  {
+    "id": "qa_cost_34",
+    "province": "Thanh Hóa",
+    "title": "Giá vé vào suối cá thần Cẩm Lương",
+    "question": "Vé tham quan Suối cá thần Cẩm Lương Thanh Hóa bao nhiêu tiền?",
+    "answer": "Giá vé tham quan Suối cá thần Cẩm Lương: Người lớn là 20.000 VNĐ/vé; Trẻ em là 10.000 VNĐ/vé. Dịch vụ xe điện chở từ bãi đỗ xe vào chân suối: 10.000 VNĐ/người/lượt."
+  },
+  {
+    "id": "qa_cost_35",
+    "province": "Vĩnh Phúc",
+    "title": "Giá vé vào cổng Flamingo Đại Lải Resort",
+    "question": "Giá vé vào tham quan trong ngày tại Flamingo Đại Lải là bao nhiêu?",
+    "answer": "Khách không lưu trú mua vé vào tham quan trong ngày: Người lớn khoảng 280.000 - 330.000 VNĐ/vé; Trẻ em (5-12 tuổi) khoảng 190.000 - 230.000 VNĐ/vé. Đã bao gồm xe điện nội khu, tham quan công viên nghệ thuật Art in the Forest, câu lạc bộ bãi biển và khu vui chơi."
+  },
+  {
+    "id": "qa_cost_36",
+    "province": "Nam Định",
+    "title": "Giá bánh xíu páo và bánh gai Bà Thi",
+    "question": "Giá bánh xíu páo Nam Định và bánh gai Bà Thi mua ăn tại chỗ?",
+    "answer": "Bánh xíu páo nướng nóng giòn nhân thịt xá xíu trứng có giá rất bình dân: chỉ từ 8.000 đến 12.000 VNĐ/chiếc. Bánh gai Bà Thi truyền thống nhân đậu xanh sen dừa thịt mỡ giá từ 12.000 đến 18.000 VNĐ/chiếc."
+  },
+  {
+    "id": "qa_cost_37",
+    "province": "Hà Tĩnh",
+    "title": "Giá mực nhảy Vũng Áng ăn tại bè",
+    "question": "Mực nhảy Vũng Áng Kỳ Anh giá bao nhiêu 1kg?",
+    "answer": "Mực nhảy tươi sống vớt từ lồng bè tại chỗ giá dao động từ 450.000 đến 700.000 VNĐ/kg tùy kích cỡ và theo mùa (mùa rộ từ tháng 4 đến tháng 7). Mực được chế biến hấp gừng hoặc nướng ngay tại bàn ăn giòn ngọt thơm lừng."
+  },
+  {
+    "id": "qa_cost_38",
+    "province": "Lai Châu",
+    "title": "Bảng giá tắm lá thuốc người Dao Đỏ tại Sìn Hồ",
+    "question": "Giá một lượt ngâm bồn tắm lá thuốc cổ truyền người Dao Đỏ ở Sìn Hồ?",
+    "answer": "Dịch vụ ngâm bồn gỗ thông pơ-mu với nước lá thuốc thảo dược cổ truyền (nấu từ hơn 20 loại vỏ và rễ cây rừng) tại Sìn Hồ hoặc Tam Đường có giá dao động từ 80.000 đến 120.000 VNĐ/lượt ngâm 20-30 phút."
+  },
+  {
+    "id": "qa_cost_39",
+    "province": "Đồng Tháp",
+    "title": "Giá nem Lai Vung mua làm quà",
+    "question": "Một xâu nem Lai Vung Đồng Tháp giá bao nhiêu tiền?",
+    "answer": "Nem Lai Vung đóng gói theo xâu 10 chiếc bọc lá chuối hoặc hộp nhựa 10 chiếc có giá dao động từ 35.000 đến 50.000 VNĐ/chục tùy thương hiệu uy tín (như Nem Giáo Thơ, Nem Út Thẳng, Nem Hoàng Sơn)."
+  },
+  {
+    "id": "qa_cost_40",
+    "province": "Toàn quốc",
+    "title": "Mẹo tiết kiệm chi phí du lịch tự túc tối đa",
+    "question": "Những bí quyết vàng giúp tiết kiệm 30-40% chi phí khi du lịch tự túc?",
+    "answer": "Bí quyết: 1) Săn vé máy bay/tàu xe trước 1-2 tháng và tránh các ngày cao điểm cuối tuần; 2) Đi theo nhóm từ 4-6 người để chia đều tiền phòng khách sạn, xe thuê và mâm cơm gia đình; 3) Ăn uống tại các quán ăn dân dã đông người bản địa thay vì nhà hàng du lịch ven đường; 4) Mua vé tham quan combo hoặc đặt qua các ứng dụng du lịch; 5) Thuê xe máy tự túc thay vì đi taxi đoạn đường dài."
+  },
+  {
+    "id": "qa_style_01",
+    "province": "Vĩnh Phúc",
+    "title": "Du lịch gia đình: Nghỉ dưỡng Tam Đảo - Đại Lải cho người già và trẻ nhỏ",
+    "question": "Gia đình có người cao tuổi và trẻ nhỏ đi Vĩnh Phúc nên chọn Tam Đảo hay Flamingo Đại Lải?",
+    "answer": "Flamingo Đại Lải phù hợp hơn cho người cao tuổi và trẻ nhỏ nhờ địa hình bằng phẳng ven hồ, không phải leo dốc đèo quanh co, có xe điện đưa đón tận cửa villa, bể bơi nước ấm 4 mùa, bãi cỏ rộng rãi và khu vui chơi trẻ em an toàn. Tam Đảo thích hợp hơn nếu gia đình muốn đổi gió hưởng khí hậu lạnh, nhưng cần lưu ý đường dốc nhiều bậc thang đá dốc đứng."
+  },
+  {
+    "id": "qa_style_02",
+    "province": "Kon Tum",
+    "title": "Du lịch cặp đôi: Tuần trăng mật lãng mạn tại Măng Đen",
+    "question": "Măng Đen có điểm gì hấp dẫn các cặp đôi đi trăng mật hoặc hẹn hò?",
+    "answer": "Măng Đen sở hữu khí hậu se lạnh quanh năm dưới 20 độ C, sương mây bồng bềnh giữa rừng thông tĩnh lặng không xô bồ thương mại hóa như Đà Lạt. Các cặp đôi có thể dạo bước bên hồ Đăk Ke rợp bóng mai anh đào mùa xuân, sưởi ấm bên bếp lửa homestay gỗ xinh xắn, thưởng thức lẩu xuyên tiêu cay nồng và cà phê ngắm mây trôi bình yên."
+  },
+  {
+    "id": "qa_style_03",
+    "province": "Miền Tây",
+    "title": "Du lịch gia đình: Tour miệt vườn Sa Đéc - Cần Thơ cho cả gia đình",
+    "question": "Lịch trình du lịch miền Tây 2 ngày 1 đêm thư giãn nhẹ nhàng cho gia đình 3 thế hệ?",
+    "answer": "Ngày 1: Xe đưa đón từ TP.HCM về Sa Đéc (Đồng Tháp), ghé làng hoa Sa Đéc dạo ngắm hoa trên lối đi bê tông thoáng mát không phải lội bùn, thăm nhà cổ Huỳnh Thủy Lê nghe thuyết minh lịch sử; chiều sang Cần Thơ nghỉ khách sạn 4 sao ven sông Hậu, tối lên du thuyền bến Ninh Kiều ăn tối nghe đờn ca tài tử. Ngày 2: Sáng đi thuyền lớn tham quan chợ nổi Cái Răng nhẹ nhàng, vào vườn cây trái Chín Hồng hái trái cây ăn tại chỗ, trưa ăn bánh xèo miền Tây rồi về."
+  },
+  {
+    "id": "qa_style_04",
+    "province": "Thanh Hóa",
+    "title": "Du lịch gia đình: Biển Sầm Sơn và FLC Sầm Sơn",
+    "question": "Đưa gia đình đi nghỉ mát Sầm Sơn nên chọn bãi tắm và khu vực nào để đỡ xô bồ?",
+    "answer": "Nên chọn khu vực Bãi D Sầm Sơn hoặc quần thể nghỉ dưỡng FLC Sầm Sơn nằm ở phía nam đường Hồ Xuân Hương. Khu vực này bãi cát sạch sẽ, không gian thoáng đãng riêng tư, có bãi tắm riêng và hệ thống bể bơi nước mặn trong nhà ngoài trời rất an toàn cho trẻ nhỏ và người lớn tuổi nghỉ ngơi."
+  },
+  {
+    "id": "qa_style_05",
+    "province": "Hà Nam",
+    "title": "Du lịch người cao tuổi: Hành hương Chùa Tam Chúc và Địa Tạng Phi Lai",
+    "question": "Người già đi chùa Tam Chúc và chùa Địa Tạng Phi Lai Tự có đi lại dễ dàng không?",
+    "answer": "Cả 2 ngôi chùa đều có hạ tầng rất thuận lợi cho người cao tuổi: Chùa Tam Chúc có hệ thống xe điện và du thuyền di chuyển êm ái xuyên suốt giữa các cổng và tòa điện, các lối đi đều có bậc tam cấp thoải và đường dốc nhẹ. Chùa Địa Tạng Phi Lai Tự (Thanh Liêm) có khuôn viên rải sỏi trắng phẳng phiu, không gian thiền định yên tĩnh dưới chân núi."
+  },
+  {
+    "id": "qa_style_06",
+    "province": "Đắk Nông",
+    "title": "Du lịch cặp đôi: Hẹn hò ngắm hoàng hôn Hồ Tà Đùng",
+    "question": "Trải nghiệm lãng mạn nhất cho các cặp đôi tại Hồ Tà Đùng?",
+    "answer": "Trải nghiệm tuyệt vời nhất là đặt phòng tại các glamping/homestay trên triền đồi có ban công hoặc lều trong suốt view thẳng ra lòng hồ Tà Đùng. Cùng nhau thưởng thức bữa tiệc nướng BBQ ngoài trời ngắm hoàng hôn đỏ rực buông xuống mặt hồ, sáng thức dậy sớm săn biển mây cuồn cuộn phủ kín các ốc đảo ngay trước tầm mắt."
+  },
+  {
+    "id": "qa_style_07",
+    "province": "Quảng Ngãi",
+    "title": "Du lịch gia đình: Đưa trẻ nhỏ ra đảo Lý Sơn cần chuẩn bị gì?",
+    "question": "Gia đình có trẻ em từ 3 - 6 tuổi đi đảo Lý Sơn cần lưu ý những điều gì?",
+    "answer": "Lưu ý quan trọng: 1) Chọn đi tàu cao tốc lớn (chạy 35 phút) vào buổi sáng khi biển lặng sóng để bé không bị say sóng; 2) Chuẩn bị đầy đủ nón rộng vành, kem chống nắng, áo khoác mỏng vì nắng đảo Lý Sơn rất gắt; 3) Khi sang Đảo Bé tắm biển bãi cát thoai thoải cần mặc áo phao trẻ em chuyên dụng và có người lớn giám sát chặt chẽ; 4) Mang theo men vi sinh và thuốc hạ sốt phòng khi bé lạ nước lạ thức ăn."
+  },
+  {
+    "id": "qa_style_08",
+    "province": "Thái Nguyên",
+    "title": "Du lịch gia đình: Trải nghiệm giáo dục văn hóa tại Bảo tàng 54 Dân tộc và Làng Thái Hải",
+    "question": "Điểm du lịch nào ở Thái Nguyên mang tính giáo dục trải nghiệm bổ ích cho học sinh, trẻ nhỏ?",
+    "answer": "Bảo tàng Văn hóa các Dân tộc Việt Nam (TP. Thái Nguyên) với 5 phòng trưng bày hiện đại tái hiện sinh động trang phục, nhạc cụ, nhà ở của 54 dân tộc. Kế đó là Khu bảo tồn làng nhà sàn Thái Hải - nơi các bé được trải nghiệm làm nông dân, giã gạo, học hát then gảy đàn tính và học tinh thần đoàn kết cộng đồng."
+  },
+  {
+    "id": "qa_style_09",
+    "province": "Bắc Ninh",
+    "title": "Du lịch gia đình: Trải nghiệm in tranh Đông Hồ và nặn gốm cho trẻ nhỏ",
+    "question": "Đưa con nhỏ về Bắc Ninh trải nghiệm làng nghề thủ công ở đâu?",
+    "answer": "Đến Trung tâm bảo tồn tranh dân gian Đông Hồ (Thuận Thành), các bé được nghệ nhân hướng dẫn cầm chổi lá thông quét màu tự nhiên lên mộc bản gỗ rồi in tranh \"Đám cưới chuột\", \"Chăn trâu thả diều\" mang về làm kỷ niệm. Ghé làng gốm Phù Lãng (Quế Võ), các bé được tự tay nhào nặn đất sét trên bàn xoay làm chiếc cốc, con giống gốm ngộ nghĩnh."
+  },
+  {
+    "id": "qa_style_10",
+    "province": "Hà Tĩnh",
+    "title": "Du lịch người cao tuổi: Nghỉ dưỡng biển Thiên Cầm và suối khoáng Sơn Kim",
+    "question": "Tuyến du lịch phục hồi sức khỏe cho người lớn tuổi tại Hà Tĩnh?",
+    "answer": "Hành trình 3 ngày kết hợp: Bãi biển Thiên Cầm sóng êm cát phẳng thoai thoải đi dạo sáng sớm hít thở không khí i-ốt trong lành; sau đó lên khu du lịch suối nước khoáng nóng Nước Sốt Sơn Kim (Hương Sơn) ngâm tắm nước khoáng tự nhiên 40-50 độ C giữa rừng nguyên sinh giúp lưu thông khí huyết, trị đau khớp và thư giãn thần kinh."
+  },
+  {
+    "id": "qa_style_11",
+    "province": "Cà Mau",
+    "title": "Du lịch gia đình: Hành trình chinh phục Đất Mũi Cà Mau",
+    "question": "Cả gia đình lái xe tự lái về Đất Mũi Cà Mau cần lưu ý điều gì?",
+    "answer": "Tuyến đường Hồ Chí Minh từ TP. Cà Mau xuống Đất Mũi đã trải nhựa rất đẹp nhưng đường hẹp 2 làn xe và nhiều cầu bê tông dốc gù, cần lái xe đúng tốc độ 50-60km/h. Tại Đất Mũi, cả nhà đi xe điện dạo quanh công viên ngắm Cột mốc tọa độ và Cột cờ Hà Nội rất thong thả, thích hợp cho cả ông bà và trẻ nhỏ chụp ảnh kỷ niệm."
+  },
+  {
+    "id": "qa_style_12",
+    "province": "Lai Châu",
+    "title": "Du lịch cặp đôi: Cổng trời Ô Quy Hồ ngắm hoàng hôn",
+    "question": "Điểm ngắm hoàng hôn lãng mạn nhất Tây Bắc dành cho các cặp đôi?",
+    "answer": "Đỉnh đèo Ô Quy Hồ (phía Lai Châu) vào khoảng 17h00 - 17h45 chiều. Khi mặt trời đỏ ối như hòn than từ từ chìm xuống biển mây cuồn cuộn giữa dãy núi Hoàng Liên Sơn hùng vĩ, thưởng thức tách trà nóng và trứng nướng bên người thương là khoảnh khắc kỳ diệu khó quên."
+  },
+  {
+    "id": "qa_style_13",
+    "province": "Thanh Hóa",
+    "title": "Du lịch cặp đôi: Nghỉ dưỡng riêng tư Pù Luông Retreat",
+    "question": "Trải nghiệm nghỉ dưỡng cho cặp đôi tại Pù Luông có gì đặc biệt?",
+    "answer": "Các bungalow nhà sàn gỗ biệt lập lợp mái cọ với ban công kính mở toang nhìn thẳng ra thung lũng ruộng bậc thang xanh ngát. Cùng nhau bơi tại bể bơi vô cực tràn bờ soi bóng núi mây, ngắm đom đóm lập lòe đêm hè và thưởng thức bữa tối lãng mạn bên ánh nến lung linh giữa đại ngàn."
+  },
+  {
+    "id": "qa_style_14",
+    "province": "Bắc Giang",
+    "title": "Du lịch gia đình: Trải nghiệm hái vải thiều Lục Ngạn mùa hè",
+    "question": "Gia đình đưa con nhỏ đi hái vải thiều Lục Ngạn vào thời điểm nào vui nhất?",
+    "answer": "Nên đi vào khoảng giữa tháng 6 đến đầu tháng 7 dương lịch. Đến các nhà vườn sinh thái tại Lục Ngạn (xã Quý Sơn, Hồng Giang), các bé được tự tay trèo thang hái những chùm vải thiều đỏ rực mọng nước ngay trên cành, ăn vải ngọt lịm tại vườn và học cách đóng sọt vải cùng người nông dân."
+  },
+  {
+    "id": "qa_style_15",
+    "province": "Gia Lai",
+    "title": "Du lịch cặp đôi: Chụp ảnh đôi lãng mạn tại Hàng thông trăm tuổi Pleiku",
+    "question": "Địa điểm chụp ảnh cưới hoặc ảnh đôi đẹp nhất tại Pleiku?",
+    "answer": "Con đường Hàng thông trăm tuổi dẫn vào Biển Hồ Chè (huyện Chư Păh) với hai hàng thông cổ thụ vươn cao rợp bóng kim xanh rì, điểm xuyết hoa dã quỳ vàng ven đường vào mùa đông, được mệnh danh là \"con đường tình yêu\" đẹp như phim trường lãng mạn."
+  },
+  {
+    "id": "qa_style_16",
+    "province": "Long An",
+    "title": "Du lịch gia đình cuối tuần: Cắm trại dã ngoại Làng nổi Tân Lập",
+    "question": "Gia đình từ TP.HCM đi chơi Làng nổi Tân Lập trong ngày có mệt không?",
+    "answer": "Rất nhẹ nhàng vì chỉ cách TP.HCM hơn 2 giờ chạy xe. Các bé được đi xuồng ba lá len lỏi rừng tràm, ngắm hoa sen, hoa súng nở rộ, đi dạo trên con đường bê tông rợp bóng mát không có xe cộ nguy hiểm, thưởng thức bữa trưa cá lóc nướng trui và trở về TP.HCM trước 18h tối."
+  },
+  {
+    "id": "qa_style_17",
+    "province": "Hưng Yên",
+    "title": "Du lịch gia đình: Thăm làng đan đó Thủ Sỹ và nếm nhãn lồng",
+    "question": "Trải nghiệm du lịch văn hóa làng quê cho gia đình tại Hưng Yên?",
+    "answer": "Đưa con nhỏ về làng Thủ Sỹ ngắm các cụ già đan đó tre thoăn thoắt, xem cách đan ngư cụ bẫy cá truyền thống của cha ông; ghé vườn nhãn Phố Hiến tự tay bẻ chùm nhãn ngọt mát và thưởng thức bát chè sen long nhãn thanh tao bên hồ Bán Nguyệt."
+  },
+  {
+    "id": "qa_style_18",
+    "province": "Bình Phước",
+    "title": "Du lịch gia đình: Dã ngoại picnic Trảng cỏ Bù Lạch",
+    "question": "Đi cắm trại dã ngoại gia đình tại Trảng cỏ Bù Lạch cần chuẩn bị gì?",
+    "answer": "Trảng cỏ Bù Lạch là thảo nguyên cỏ tự nhiên bao quanh hồ nước ngọt. Gia đình nên mang theo thảm trải picnic, lều che nắng, đồ ăn nhẹ, xúc xích và thịt ướp sẵn để nướng BBQ. Trẻ nhỏ có thể thỏa thích chạy nhảy trên thảm cỏ xanh mịn màng, thả diều và ngắm đàn bò gặm cỏ thanh bình."
+  },
+  {
+    "id": "qa_style_19",
+    "province": "Nam Định",
+    "title": "Du lịch gia đình: Tour khám phá thánh đường nhà thờ và biển Hải Hậu",
+    "question": "Gia đình đi Nam Định 1 ngày cuối tuần nên ghé những điểm nào?",
+    "answer": "Buổi sáng ghé TP. Nam Định ăn phở bò Giao Cù, thăm Đền Trần; sau đó xuôi Hải Hậu chiêm ngưỡng Vương cung thánh đường Phú Nhai nguy nga cho các bé ngắm kiến trúc lâu đài châu Âu, chiều ghé nhà thờ đổ Hải Lý đón gió biển, ăn nem nắm và mua bánh xíu páo nóng hổi về làm quà."
+  },
+  {
+    "id": "qa_style_20",
+    "province": "Đồng Tháp",
+    "title": "Du lịch gia đình: Đứng trên lá sen khổng lồ tại Chùa Phước Kiển",
+    "question": "Trẻ em và người lớn có thể đứng lên lá sen khổng lồ Chùa Lá Sen chụp ảnh thật không?",
+    "answer": "Hoàn toàn có thật! Tại Chùa Phước Kiển (huyện Châu Thành, Đồng Tháp), lá sen vua khổng lồ có đường kính tới 2m. Nhà chùa đặt một chiếc mâm thiếc tròn mỏng lên trên mặt lá để phân tán đều trọng lượng, trẻ em và người lớn dưới 65-70kg có thể bước lên đứng hoặc ngồi tạo dáng chụp ảnh mà lá không hề bị chìm hay rách."
+  },
+  {
+    "id": "qa_style_21",
+    "province": "Gia Lai",
+    "title": "Trekking & Mạo hiểm: Chinh phục thác K50 Kon Chư Răng",
+    "question": "Trekking thác K50 (Hang Én) Gia Lai cần chuẩn bị thể lực và trang thiết bị gì?",
+    "answer": "Trekking thác K50 đòi hỏi đi bộ xuyên rừng già nguyên sinh khoảng 10-14km với nhiều đoạn dốc và lội suối đá trơn trượt. Du khách cần rèn luyện thể lực trước 1-2 tuần, chuẩn bị giày trekking có độ bám gai cao, tất chống vắt dài cổ, gậy leo núi, đèn pin siêu sáng, thuốc chống côn trùng và túi bọc chống nước cho đồ điện tử. Bắt buộc phải có kiểm lâm hoặc porter địa phương dẫn đường."
+  },
+  {
+    "id": "qa_style_22",
+    "province": "Vĩnh Phúc",
+    "title": "Cắm trại (Camping): Hạ lều bên bờ Hồ Xạ Hương hoang sơ",
+    "question": "Kinh nghiệm cắm trại tự túc tại Hồ Xạ Hương (Tam Đảo, Vĩnh Phúc)?",
+    "answer": "Hồ Xạ Hương nằm sâu trong thung lũng không có sóng điện thoại và dịch vụ thương mại. Khi cắm trại cần: Mang theo thuyền kayak hoặc sup bơm hơi để chèo qua bãi hạ lều ven hồ, mang đủ lều 2 lớp chống sương, túi ngủ ấm, bếp củi/bếp gas du lịch, đồ ăn nước uống và túi rác tự gom sạch sẽ trước khi rời đi (nguyên tắc Leave No Trace)."
+  },
+  {
+    "id": "qa_style_23",
+    "province": "Lai Châu",
+    "title": "Trekking đỉnh cao: Kinh nghiệm leo đỉnh Pu Ta Leng mùa đỗ quyên",
+    "question": "Cung đường trekking đỉnh Pu Ta Leng 3 ngày 2 đêm đi theo hướng nào đẹp nhất?",
+    "answer": "Cung đường leo đẹp nhất là đi từ bản Sì Thâu Chải (Tam Đường) và xuống tại bản Tả Lèng. Thời điểm vàng là tháng 3 - 4 khi rừng hoa đỗ quyên cổ thụ bung nở rực rỡ sắc tím đỏ thắp sáng cả cánh rừng rêu phong ma mị. Cần thuê porter người Mông bản địa gùi đồ, dẫn đường và nấu nướng tại các lán gỗ dọc đường."
+  },
+  {
+    "id": "qa_style_24",
+    "province": "Miền Tây",
+    "title": "Solo Travel: Nữ đi phượt một mình ở miền Tây có an toàn không?",
+    "question": "Nữ giới đi du lịch một mình (solo travel) ở các tỉnh miền Tây cần lưu ý gì?",
+    "answer": "Miền Tây là một trong những vùng đất an toàn và thân thiện nhất Việt Nam với con người chất phác, hiếu khách. Nữ đi một mình chỉ cần lưu ý: 1) Chọn các homestay hoặc khách sạn trung tâm có đánh giá uy tín; 2) Sử dụng xe khách giường nằm chất lượng cao (Phương Trang, Mai Linh) di chuyển giữa các tỉnh; 3) Mặc trang phục gọn gàng lịch sự; 4) Giữ liên lạc định vị với người thân khi đi thuyền vào các vườn sâu."
+  },
+  {
+    "id": "qa_style_25",
+    "province": "Thái Nguyên",
+    "title": "Trekking suối: Khám phá cung Suối Cửa Tử Đại Từ",
+    "question": "Trekking Suối Cửa Tử ở Thái Nguyên có những cấp độ trải nghiệm nào?",
+    "answer": "Suối Cửa Tử có 3 cửa (cửa 1, 2, 3) với độ khó tăng dần. Cửa 1 thích hợp cho người mới bắt đầu lội suối ngắm máng trượt đá tự nhiên; Cửa 2 và Cửa 3 đòi hỏi kỹ năng bơi lội vượt thác sâu và nhảy vách đá (cliff jumping) từ độ cao 5-7m xuống hồ nước sâu mát lạnh. Bắt buộc phải mặc áo phao và có đội dẫn tour chuyên nghiệp trang bị dây an toàn."
+  },
+  {
+    "id": "qa_style_26",
+    "province": "Đắk Nông",
+    "title": "Cắm trại: Glamping sang chảnh ngắm trọn vẹn Hồ Tà Đùng",
+    "question": "Xu hướng glamping cắm trại tiện nghi bên hồ Tà Đùng có gì thú vị?",
+    "answer": "Glamping tại Tà Đùng cung cấp lều Mông Cổ cao cấp có đệm ấm, điều hòa hoặc quạt mát, vệ sinh khép kín nhưng đặt giữa thiên nhiên bao la. Du khách vừa được tận hưởng cảm giác cắm trại ngắm sao trời, vừa thoải mái nướng BBQ thịt rừng mà không phải vất vả chuẩn bị lều bạt."
+  },
+  {
+    "id": "qa_style_27",
+    "province": "Bình Phước",
+    "title": "Phượt xe máy: Trải nghiệm cắm trại Trảng cỏ Bù Lạch",
+    "question": "Nhóm bạn trẻ phượt xe máy cắm trại qua đêm ở Trảng cỏ Bù Lạch cần lưu ý gì?",
+    "answer": "Cần đổ đầy bình xăng từ thị trấn Đức Phong vì vào trảng cỏ không có trạm xăng. Mang theo lều bạt có cọc ghim chắc chắn chống gió đồng, đèn pin công suất lớn, áo khoác ấm vì đêm thảo nguyên xuống nhiệt độ khá lạnh và nhiều sương sớm."
+  },
+  {
+    "id": "qa_style_28",
+    "province": "Bắc Giang",
+    "title": "Trekking sinh thái: Khám phá rừng nguyên sinh Khe Rỗ",
+    "question": "Trekking suối Vũng Tròn và suối Khe Đin ở rừng Khe Rỗ có gì hấp dẫn?",
+    "answer": "Khe Rỗ là cung trekking nhẹ nhàng khoảng 6-8km ven dòng suối nước trong nhìn thấy đáy sỏi. Du khách được ngâm mình dưới các vũng tắm tự nhiên xanh biếc, ngắm các cây cổ thụ lim, sến nghìn năm tuổi và ăn bữa cơm trưa cá suối nướng do người Tày chuẩn bị."
+  },
+  {
+    "id": "qa_style_29",
+    "province": "Lai Châu",
+    "title": "Săn mây: Tọa độ săn mây bồng bềnh tại Sìn Hồ",
+    "question": "Điểm săn biển mây bình minh đẹp nhất trên cao nguyên Sìn Hồ?",
+    "answer": "Đỉnh núi Tả Ngảo hoặc đèo Sìn Hồ vào sáng sớm khoảng 5h30 - 6h30. Khi bình minh ló rạng, những tia nắng vàng chiếu xuyên qua lớp mây trắng bồng bềnh phủ kín các thung lũng bản làng người Mông, tạo nên khung cảnh tiên cảnh tráng lệ."
+  },
+  {
+    "id": "qa_style_30",
+    "province": "Quảng Ngãi",
+    "title": "Camping biển: Cắm trại qua đêm trên bãi cát Đảo Bé Lý Sơn",
+    "question": "Có được cắm trại hạ lều ngủ đêm trên Đảo Bé Lý Sơn không?",
+    "answer": "Được phép nhưng cần đăng ký với chính quyền xã đảo An Bình hoặc homestay địa phương. Cắm trại bên bãi cát trắng Đảo Bé nghe sóng biển rì rào vỗ vào bờ nham thạch, nướng mực một nắng và ngắm dải ngân hà rực sáng không bị ô nhiễm ánh sáng là trải nghiệm vô giá."
+  },
+  {
+    "id": "qa_style_31",
+    "province": "Thanh Hóa",
+    "title": "Trekking bản làng: Cung đường đi bộ xuyên bản Pù Luông",
+    "question": "Cung trekking đi bộ qua các bản làng đẹp nhất ở Pù Luông dài bao nhiêu km?",
+    "answer": "Cung trekking bản Đôn - bản Hiêu - bản Kho Mường dài khoảng 12 - 15km đi qua những thửa ruộng bậc thang thoai thoải, xuyên qua rừng tre bương và những con suối róc rách. Dọc đường du khách được ghé thăm thác Hiêu hùng vĩ và khám phá hang Dơi kỳ bí."
+  },
+  {
+    "id": "qa_style_32",
+    "province": "Cà Mau",
+    "title": "Trải nghiệm sinh tồn: Ngủ đêm tại nhà dân giữa rừng ngập mặn Đất Mũi",
+    "question": "Trải nghiệm du lịch sinh thái cộng đồng ngủ đêm ở Đất Mũi Cà Mau có gì độc lạ?",
+    "answer": "Du khách được ở nhà sàn không cửa thoáng đãng của người dân ven tán rừng đước, đêm đến cùng chủ nhà bơi xuồng đi soi ba khía, bắt cua biển, giăng lưới tôm cá. Sáng sớm thức dậy đón bình minh biển Đông và ăn bát cháo cá thòi lòi nóng hổi."
+  },
+  {
+    "id": "qa_style_33",
+    "province": "Bắc Ninh",
+    "title": "Solo Travel: Đạp xe khám phá làng quan họ ven sông Đuống",
+    "question": "Tuyến đạp xe một mình khám phá di tích Kinh Bắc 1 ngày?",
+    "answer": "Tuyến đạp xe ven đê sông Đuống thơ mộng: Từ Hà Nội đạp qua cầu Đuống sang chùa Dâu -> Chùa Bút Tháp -> làng tranh Đông Hồ -> Lăng Kinh Dương Vương. Đường đê bằng phẳng, thoáng đãng rợp bóng tre làng quê Bắc Bộ, ghé quán ven đê ăn bánh phu thê và nghe hát quan họ rất thư thái."
+  },
+  {
+    "id": "qa_style_34",
+    "province": "Đồng Tháp",
+    "title": "Chèo thuyền Kayak: Chèo sup xuyên rừng tràm Xẻo Quýt",
+    "question": "Du khách có thể tự chèo thuyền kayak/sup trong rừng tràm Xẻo Quýt không?",
+    "answer": "Tại khu du lịch sinh thái Xẻo Quýt và một số điểm sinh thái Đồng Tháp Mười hiện có dịch vụ cho thuê thuyền sup/kayak. Du khách tự tay khua mái chèo lướt trên mặt nước phủ đầy bèo tấm xanh mướt, len lỏi dưới tán tràm mát rượi hòa mình tuyệt đối vào thiên nhiên hoang dã."
+  },
+  {
+    "id": "qa_style_35",
+    "province": "Kon Tum",
+    "title": "Phượt mạo hiểm: Khám phá thác Voi và rừng nguyên sinh Kon Plông",
+    "question": "Trekking thác Voi hoang sơ ở Măng Đen cần lưu ý gì?",
+    "answer": "Thác Voi nằm sâu trong rừng cách trung tâm Măng Đen khoảng 7km. Đường xuống thác có bậc dốc trơn và cây cối rậm rạp, cần mang giày thể thao bám tốt, không đi dép lê và cẩn thận trơn trượt vào mùa mưa."
+  },
+  {
+    "id": "qa_style_36",
+    "province": "Bình Phước",
+    "title": "Trekking suối: Tắm suối Đắk Mai và thác Lưu Ly Bù Gia Mập",
+    "question": "Vẻ đẹp của suối Đắk Mai trong Vườn quốc gia Bù Gia Mập?",
+    "answer": "Suối Đắk Mai có lòng suối rộng với những ghềnh đá phẳng phiu và dòng nước trong xanh như pha lê luồn dưới tán rừng khộp râm mát. Nơi đây là điểm dừng chân nghỉ ngơi tắm suối, nướng cá tuyệt vời trên hành trình trekking."
+  },
+  {
+    "id": "qa_style_37",
+    "province": "Hà Tĩnh",
+    "title": "Cắm trại hồ: Hạ lều bên bờ hồ Kẻ Gỗ",
+    "question": "Cắm trại ven hồ Kẻ Gỗ có được phép không và chuẩn bị gì?",
+    "answer": "Được cắm trại tại các bãi cỏ bán ngập ven hồ Kẻ Gỗ ngoài phân khu bảo vệ nghiêm ngặt. Khung cảnh mặt hồ mênh mông như biển hồ soi bóng rừng cây rất thơ mộng. Cần mang lều chống gió, than củi nướng BBQ và thuốc chống muỗi rừng."
+  },
+  {
+    "id": "qa_style_38",
+    "province": "Lạng Sơn",
+    "title": "Phượt xe máy: Chinh phục cung đường đèo lên đỉnh Mẫu Sơn",
+    "question": "Kinh nghiệm phượt xe máy lên đỉnh Mẫu Sơn an toàn?",
+    "answer": "Đường đèo lên Mẫu Sơn dài khoảng 15km từ quốc lộ 4B có nhiều khúc cua tay áo và cua gấp dốc đứng. Người lái xe máy cần đi xe số hoặc xe côn tay, về số thấp (số 1, số 2) khi lên và xuống dốc, tuyệt đối không âm côn thả trôi dốc và cẩn thận sương mù dày đặc che khuất tầm nhìn vào mùa đông."
+  },
+  {
+    "id": "qa_style_39",
+    "province": "Long An",
+    "title": "Trekking rừng dược liệu: Trải nghiệm tại Cánh Đồng Bất Tận",
+    "question": "Trải nghiệm tắm hồ nước mưa dược liệu tại Cánh Đồng Bất Tận?",
+    "answer": "Hồ nước mưa tự nhiên giữa rừng tràm gió có màu nâu đỏ óng ánh như nước trà do lá tràm gió rụng ngâm tự nhiên qua nhiều năm. Tắm và bơi trong hồ nước dược liệu mang lại cảm giác thư giãn sảng khoái, thơm nức hương tinh dầu tràm tự nhiên và dưỡng da rất tốt."
+  },
+  {
+    "id": "qa_style_40",
+    "province": "Toàn quốc",
+    "title": "Nguyên tắc an toàn cho phượt thủ một mình",
+    "question": "Những quy tắc bất di bất dịch khi đi phượt một mình (Solo Travelling) tại Việt Nam?",
+    "answer": "1) Luôn thông báo lịch trình và điểm dừng chân cho người thân; 2) Không lái xe trên đường đèo rừng núi vắng vẻ sau 18h tối; 3) Chuẩn bị bộ dụng cụ vá xe, bơm xe khẩn cấp và sạc dự phòng điện thoại; 4) Tôn trọng phong tục tập quán bản địa, không chụp ảnh người dân khi chưa xin phép; 5) Giữ tinh thần cởi mở, lịch sự, người dân Việt Nam ở khắp mọi miền luôn sẵn lòng giúp đỡ bạn."
+  },
+  {
+    "id": "qa_stay_01",
+    "province": "Lai Châu",
+    "title": "Lưu trú bản làng: Homestay người Mông tại Sin Suối Hồ",
+    "question": "Homestay tại bản du lịch cộng đồng Sin Suối Hồ Lai Châu có tiện nghi thế nào?",
+    "answer": "Homestay tại Sin Suối Hồ là những ngôi nhà gỗ truyền thống có hàng rào đá xếp tay tinh xảo, xung quanh rợp bóng hoa phong lan. Bên trong được trang bị đệm ấm, chăn thổ cẩm sạch sẽ, khu vệ sinh riêng hiện đại có bình nóng lạnh đầy đủ, chủ nhà người Mông phục vụ các món ăn truyền thống rất mến khách."
+  },
+  {
+    "id": "qa_stay_02",
+    "province": "Thanh Hóa",
+    "title": "Lưu trú sinh thái: Các resort đẹp nhất tại Pù Luông",
+    "question": "Những khu nghỉ dưỡng resort nổi tiếng nhất tại Pù Luông có view ruộng bậc thang?",
+    "answer": "Các resort sinh thái hàng đầu gồm: Pù Luông Retreat (tiên phong với bể bơi vô cực ngắm thung lũng), Puluong Bocbandi Retreat (kiến trúc vòng tròn độc đáo), Puluong Natura Bungalow (nhiều xích đu và góc check-in sống ảo bên ruộng lúa), Puluong Casa Resort. Giá phòng dao động từ 1.200.000 đến 3.000.000 VNĐ/đêm."
+  },
+  {
+    "id": "qa_stay_03",
+    "province": "Kon Tum",
+    "title": "Lưu trú Măng Đen: Các homestay gỗ thông xinh xắn giữa rừng",
+    "question": "Gợi ý các homestay đẹp, ấm cúng và yên tĩnh ở Măng Đen Kon Tum?",
+    "answer": "Những homestay nổi bật: Sum Villa Măng Đen (khu vườn hoa rực rỡ, không gian bình yên), Bạch Dương Homestay, Chàng Thi Sĩ Măng Đen, Nắng Homestay, Sóc's House. Kiến trúc chủ yếu bằng gỗ thông mộc mạc, có lò sưởi củi và bếp trà cà phê chung ấm cúng giá từ 350.000 - 600.000 VNĐ/đêm."
+  },
+  {
+    "id": "qa_stay_04",
+    "province": "Vĩnh Phúc",
+    "title": "Lưu trú Tam Đảo: Nên chọn khách sạn trung tâm hay homestay sườn đồi?",
+    "question": "Kinh nghiệm chọn phòng lưu trú tại thị trấn Tam Đảo?",
+    "answer": "Khách sạn trung tâm (quanh Quảng trường, Nhà thờ đá như Venus Hotel Tam Đảo, Sofitel/khách sạn lâu đài) thuận tiện đi bộ dạo phố ăn đêm nhưng đông đúc ồn ào. Nếu thích yên tĩnh, săn mây ngắm hoàng hôn nên chọn homestay ven sườn đồi (90s Homestay, Cầu Mây Homestay, Le Vent Homestay) có ban công kính nhìn xuống thung lũng mây trôi."
+  },
+  {
+    "id": "qa_stay_05",
+    "province": "Đắk Nông",
+    "title": "Lưu trú Tà Đùng: Top homestay và resort có view hồ đẹp nhất",
+    "question": "Ở đâu tại Tà Đùng để ngắm trọn vẹn toàn cảnh các hòn đảo trên hồ?",
+    "answer": "Các điểm lưu trú có vị trí đắc địa nhất: Tà Đùng Topview Homestay (Nhà chú Đông - điểm ngắm hồ kinh điển đầu tiên có hồ bơi vô cực), MeGarden Tà Đùng, Freedom Green Village, Tà Đùng May Farm. Buổi sáng chỉ cần kéo rèm cửa là thấy biển mây và hồ Tà Đùng hiện ra ngay trước mắt."
+  },
+  {
+    "id": "qa_stay_06",
+    "province": "Quảng Ngãi",
+    "title": "Lưu trú Lý Sơn: Nên ở khách sạn gần cầu cảng hay homestay Đảo Bé?",
+    "question": "Kinh nghiệm đặt phòng khách sạn, homestay tại đảo Lý Sơn?",
+    "answer": "Ở Đảo Lớn: Khu vực gần Cảng Sa Kỳ / Cảng Bến Đình có nhiều khách sạn lớn tiện nghi (Mường Thanh Holiday Lý Sơn, Lý Sơn Center Hotel) thuận tiện ăn uống và di chuyển. Ở Đảo Bé: Có các homestay mộc mạc sát biển (BeEcolodge, Gió Biển Homestay) dành cho ai muốn tận hưởng đêm biển hoang sơ không tiếng còi xe."
+  },
+  {
+    "id": "qa_stay_07",
+    "province": "Đồng Tháp",
+    "title": "Lưu trú miệt vườn: Homestay vườn hoa Sa Đéc và nhà cổ Huỳnh Thủy Lê",
+    "question": "Trải nghiệm ngủ đêm tại homestay giữa vườn hoa Sa Đéc có gì thú vị?",
+    "answer": "Các homestay như Flower & Frog Homestay, Tư Tôn Homestay nằm lọt thỏm giữa những luống cúc mâm xôi, hoa hồng ngát hương. Sáng sớm thức dậy nghe tiếng chim hót, ngắm người nông dân chèo xuồng tưới hoa và thưởng thức bữa sáng hủ tiếu Sa Đéc tươi ngon."
+  },
+  {
+    "id": "qa_stay_08",
+    "province": "Thái Nguyên",
+    "title": "Lưu trú di sản: Ngủ nhà sàn người Tày tại Làng Thái Hải",
+    "question": "Trải nghiệm lưu trú tại Làng nhà sàn du lịch cộng đồng Thái Hải?",
+    "answer": "Du khách được nghỉ đêm trên những ngôi nhà sàn gỗ cổ nguyên bản trăm năm tuổi, ngủ đệm chiếu truyền thống trên sàn gỗ mát rượi, ăn cơm canh rau rừng nướng cá suối do đồng bào Tày phục vụ và nghe tiếng đàn tính ngân vang bên ánh lửa bập bùng."
+  },
+  {
+    "id": "qa_stay_09",
+    "province": "Bắc Giang",
+    "title": "Lưu trú cộng đồng: Homestay Bản Ven Yên Thế",
+    "question": "Dịch vụ ăn nghỉ tại bản du lịch cộng đồng Bản Ven Bắc Giang?",
+    "answer": "Bản Ven có các ngôi nhà sàn cộng đồng của người Cao Lan sạch sẽ, thoáng mát, bao quanh là nương chè xanh mướt và rừng cây. Giá lưu trú khoảng 100.000 - 150.000 VNĐ/người/đêm, phục vụ gà đồi Yên Thế luộc lá chanh, xôi ngũ sắc và múa sạp truyền thống."
+  },
+  {
+    "id": "qa_stay_10",
+    "province": "Gia Lai",
+    "title": "Khách sạn Pleiku: Nên ở khu vực nào thuận tiện nhất?",
+    "question": "Chọn khách sạn ở Pleiku Gia Lai gần trung tâm ăn uống và đi lại?",
+    "answer": "Nên chọn khách sạn quanh Quảng trường Đại Đoàn Kết hoặc trục đường Hùng Vương, Trần Hưng Đạo, Lê Duẩn (như HAGL Hotel Pleiku, Khách sạn Mê Kông, Khách sạn Khánh Linh, Pleiku Hotel). Khu vực này tập trung các quán phở khô hai tô, quán cà phê phố núi và rất tiện bắt taxi đi Biển Hồ."
+  },
+  {
+    "id": "qa_stay_11",
+    "province": "Cà Mau",
+    "title": "Lưu trú Đất Mũi: Các homestay sinh thái ven rừng ngập mặn",
+    "question": "Những homestay sinh thái cộng đồng uy tín tại Đất Mũi Cà Mau?",
+    "answer": "Các homestay nổi bật: Homestay Hoàng Hôn Đất Mũi, Homestay Tư Thọ, Homestay Quách Văn Ngãi, Homestay Ba Sứ. Nhà dựng hoàn toàn bằng gỗ đước trên mặt nước bãi bồi, phục vụ bữa ăn hải sản cua biển tươi ngon và dẫn khách đi bắt ốc len, soi ba khía ban đêm."
+  },
+  {
+    "id": "qa_stay_12",
+    "province": "Hà Tĩnh",
+    "title": "Lưu trú biển Thiên Cầm: Khách sạn nào sát biển và dịch vụ tốt?",
+    "question": "Khách sạn view biển đẹp tại bãi biển Thiên Cầm Hà Tĩnh?",
+    "answer": "Các khách sạn nằm ngay sát mặt biển đường bờ biển Thiên Cầm: Khách sạn Tre Nguồn Thiên Cầm, Khách sạn Công Đoàn Thiên Cầm, Khách sạn Sông La, Thiên Ý Hotel. Mở cửa sổ là nghe tiếng sóng vỗ và ngắm bình minh trên biển tuyệt đẹp."
+  },
+  {
+    "id": "qa_stay_13",
+    "province": "Hậu Giang",
+    "title": "Lưu trú miệt vườn: Nghỉ đêm tại Khóm Cầu Đúc hoặc Homestay Mương Đình",
+    "question": "Trải nghiệm homestay miệt vườn Hậu Giang có gì đặc sắc?",
+    "answer": "Du khách được nghỉ ngơi giữa rặng dừa xanh mát và rẫy khóm Cầu Đúc bạt ngàn, cùng người dân tát mương bắt cá thác lác, hái đọt choại sau vườn nấu canh và nghe đờn ca tài tử cải lương mộc mạc thắm tình phù sa."
+  },
+  {
+    "id": "qa_stay_14",
+    "province": "Bạc Liêu",
+    "title": "Khách sạn Bạc Liêu: Trải nghiệm ngủ phòng cổ tại Dinh thự Công tử Bạc Liêu",
+    "question": "Có dịch vụ khách sạn nghỉ đêm trong Dinh thự Công tử Bạc Liêu không?",
+    "answer": "Có! Ngay trong quần thể di tích Nhà Công tử Bạc Liêu có Khách sạn Công tử Bạc Liêu. Du khách có thể đặt phòng ngủ được bài trí theo phong cách quý tộc Pháp cổ kính đầu thế kỷ 20 với giường ngủ gỗ cẩn ốc xà cừ và đèn chùm hoa lệ."
+  },
+  {
+    "id": "qa_stay_15",
+    "province": "Nam Định",
+    "title": "Lưu trú sinh thái: Homestay Ecohost Hải Hậu",
+    "question": "Mô hình homestay làng quê Ecohost tại Hải Hậu Nam Định có gì độc đáo?",
+    "answer": "Ecohost Hải Hậu là chuỗi nhà rường cổ kết hợp văn hóa đồng bằng Bắc Bộ. Du khách nghỉ trong không gian nhà ngói cây cau thanh bình, đạp xe quanh các nhà thờ cổ kính, học nấu bánh xíu páo và nghe tiếng chuông nhà thờ ngân nga sớm chiều."
+  },
+  {
+    "id": "qa_stay_16",
+    "province": "Long An",
+    "title": "Lưu trú rừng tràm: Khách sạn nổi Làng nổi Tân Lập",
+    "question": "Khách sạn khu du lịch Làng nổi Tân Lập có view thế nào?",
+    "answer": "Khách sạn Tân Lập nằm bên bờ kênh ngay sát rừng tràm nguyên sinh cao 8 tầng. Từ ban công phòng nghỉ có thể phóng tầm mắt bao quát toàn bộ thảm rừng tràm xanh ngắt và đầm sen súng nở rực rỡ."
+  },
+  {
+    "id": "qa_stay_17",
+    "province": "Lai Châu",
+    "title": "Lưu trú bản Sì Thâu Chải: Homestay của người Dao Đỏ",
+    "question": "Ở homestay bản Sì Thâu Chải ngắm thung lũng Tam Đường?",
+    "answer": "Các homestay nhà gỗ lợp ngói âm dương của người Dao Đỏ tại Sì Thâu Chải nằm cheo leo trên sườn núi. Du khách được ngâm bồn tắm lá thuốc thơm lừng, sáng sớm ngắm hoa đào hoa mận nở rộ và biển mây cuồn cuộn dưới chân núi."
+  },
+  {
+    "id": "qa_stay_18",
+    "province": "Thanh Hóa",
+    "title": "Khách sạn biển Hải Tiến: Các resort nghỉ dưỡng yên bình",
+    "question": "Nghỉ dưỡng tại bãi biển Hải Tiến Thanh Hóa nên chọn resort nào?",
+    "answer": "Các resort ven biển Hải Tiến đẹp và tiện nghi: Hải Tiến Resort, Eureka Linh Trường Resort, Ánh Phương Hotel, Marissa Hotel. Các resort nằm nép mình bên rặng phi lao xanh mát, có bể bơi ngoài trời và bãi tắm riêng yên tĩnh."
+  },
+  {
+    "id": "qa_stay_19",
+    "province": "Vĩnh Phúc",
+    "title": "Resort nghỉ dưỡng Đại Lải: Flamingo Đại Lải Resort",
+    "question": "Hệ thống biệt thự villa nghỉ dưỡng tại Flamingo Đại Lải?",
+    "answer": "Flamingo Đại Lải sở hữu hàng trăm căn biệt thự sinh thái biệt lập ẩn mình giữa rừng thông và ven hồ Đại Lải (Villa trên cọ, Villa trên đồi, Biệt thự Hoàng Anh, Forest in the Sky). Mỗi villa có bể bơi riêng, sân vườn BBQ và xe đạp dạo hồ lãng mạn."
+  },
+  {
+    "id": "qa_stay_20",
+    "province": "Bình Phước",
+    "title": "Lưu trú thiên nhiên: Lán nghỉ Vườn quốc gia Bù Gia Mập",
+    "question": "Điều kiện lưu trú tại trạm bảo tồn Vườn quốc gia Bù Gia Mập?",
+    "answer": "Tại trung tâm bảo tồn có hệ thống phòng nghỉ nhà khách khép kín sạch sẽ giá bình dân (khoảng 200.000 - 300.000đ/phòng). Khi đi sâu vào tuyến trekking rừng có hệ thống lán trại cố định ven suối Đắk Mai trang bị bạt che mưa, võng màn và khu nướng than củi dã chiến."
+  },
+  {
+    "id": "qa_stay_21",
+    "province": "Hà Nam",
+    "title": "Khách sạn Tam Chúc: Khách sạn Xá Lợi bên hồ Tam Chúc",
+    "question": "Khách sạn Xá Lợi trong khuôn viên Chùa Tam Chúc có tiện nghi gì?",
+    "answer": "Khách sạn Xá Lợi (Tam Chúc) nằm ngay trong quần thể khu du lịch tâm linh Tam Chúc hướng thẳng ra hồ Lục Nhạc và núi Thất Tinh. Không gian thanh tịnh trang nghiêm, nội thất gỗ sang trọng, phục vụ cả tiệc chay buffet và mâm cỗ chay thanh tao cho Phật tử hành hương."
+  },
+  {
+    "id": "qa_stay_22",
+    "province": "Lạng Sơn",
+    "title": "Lưu trú Mẫu Sơn: Biệt thự cổ trên đỉnh núi sương mù",
+    "question": "Ở đâu trên đỉnh Mẫu Sơn ngắm băng tuyết và biệt thự cổ?",
+    "answer": "Trên đỉnh Mẫu Sơn có các nhà nghỉ, khách sạn xây dựng trên nền tàn tích biệt thự Pháp xưa như Nhà khách Mẫu Sơn, Khách sạn Hương Sơn. Phòng ốc trang bị đệm điện sưởi ấm và lò sưởi củi phục vụ du khách lên săn tuyết vào mùa đông giá rét."
+  },
+  {
+    "id": "qa_stay_23",
+    "province": "Gia Lai",
+    "title": "Homestay nông trại: Farmstay sinh thái ngoại ô Pleiku",
+    "question": "Các nông trại farmstay nghỉ dưỡng gần Biển Hồ Pleiku?",
+    "answer": "Xu hướng farmstay cà phê tại Chư Păh và Đak Đoa: Tiêu biểu như Jrai Farmstay, Đồi Chè Farmstay. Du khách được hòa mình vào nương cà phê, tự tay hái hạt tiêu, hái bơ sáp và thưởng thức bữa tối ngoài trời bên bếp củi hồng."
+  },
+  {
+    "id": "qa_stay_24",
+    "province": "Bắc Ninh",
+    "title": "Khách sạn TP. Bắc Ninh: Các khách sạn tiện nghi cao cấp",
+    "question": "Khách sạn 4-5 sao tại TP. Bắc Ninh cho chuyến công tác và du lịch?",
+    "answer": "TP. Bắc Ninh có hệ thống khách sạn quốc tế hiện đại hàng đầu: Mường Thanh Luxury Bắc Ninh, Grand Phoenix Hotel, Le Indochina Hotel, Mandala Hotel & Spa. Các khách sạn nằm ngay trung tâm thành phố, có bể bơi bốn mùa, phòng gym và nhà hàng buffet ẩm thực Kinh Bắc."
+  },
+  {
+    "id": "qa_stay_25",
+    "province": "Hưng Yên",
+    "title": "Lưu trú Ecopark Văn Giang: Căn hộ nghỉ dưỡng cuối tuần",
+    "question": "Kinh nghiệm thuê homestay căn hộ nghỉ dưỡng tại Ecopark Văn Giang Hưng Yên?",
+    "answer": "Khu đô thị sinh thái Ecopark (huyện Văn Giang) là điểm đổi gió cuối tuần số 1 của người dân Hà Nội. Du khách có thể thuê các căn hộ homestay view công viên hồ Thiên Nga (khu Rừng Cọ, Westbay, Aquabay, Haven Park) giá từ 600.000 - 1.200.000đ/đêm để cắm trại picnic trên thảm cỏ xanh mướt."
+  },
+  {
+    "id": "qa_stay_26",
+    "province": "Đồng Tháp",
+    "title": "Khách sạn TP. Cao Lãnh: Gợi ý điểm lưu trú trung tâm",
+    "question": "Khách sạn tốt tại thành phố Cao Lãnh Đồng Tháp?",
+    "answer": "Các khách sạn uy tín trung tâm TP. Cao Lãnh: Sao Mai Hotel (4 sao), Khách sạn Bông Sen Cao Lãnh, Khách sạn Mộng Yến, Khách sạn Huỳnh Đức. Vị trí rất gần Khu di tích Cụ Phó bảng Nguyễn Sinh Sắc và chợ đêm ẩm thực Cao Lãnh."
+  },
+  {
+    "id": "qa_stay_27",
+    "province": "Quảng Ngãi",
+    "title": "Khách sạn TP. Quảng Ngãi: Nghỉ đêm trước khi ra đảo Lý Sơn",
+    "question": "Khách sạn tại TP. Quảng Ngãi gần ga tàu và tiện đi cảng Sa Kỳ?",
+    "answer": "Các khách sạn thuận tiện: Cẩm Thành Hotel, Khách sạn Central Quảng Ngãi, Hùng Vương Hotel, Thiên Ấn Riverside Hotel nằm bên bờ sông Trà Khúc. Từ đây đi taxi hoặc xe buýt xuống Cảng Sa Kỳ chỉ mất khoảng 25-30 phút."
+  },
+  {
+    "id": "qa_stay_28",
+    "province": "Kon Tum",
+    "title": "Khách sạn TP. Kon Tum: Điểm nghỉ chân gần Cầu treo Kon Klor",
+    "question": "Khách sạn trung tâm thành phố Kon Tum có thiết kế bản địa đẹp?",
+    "answer": "Indochine Hotel Kon Tum (ngay bên dòng sông Đăk Bla thơ mộng, có quán cà phê Indochine bằng tre khổng lồ tuyệt đẹp của KTS Võ Trọng Nghĩa), Khách sạn Window Kon Tum, Konklor Hotel (nằm sát Nhà rông và Cầu treo Kon Klor)."
+  },
+  {
+    "id": "qa_stay_29",
+    "province": "Hà Tĩnh",
+    "title": "Resort biển Xuân Thành: Hoa Tiên Paradise",
+    "question": "Khu nghỉ dưỡng biển Xuân Thành Hà Tĩnh có dịch vụ gì?",
+    "answer": "Khu du lịch Hoa Tiên Paradise (huyện Nghi Xuân) sở hữu các căn villa ven biển cát trắng, sân golf tiêu chuẩn quốc tế và trường đua chó độc đáo đầu tiên ở miền Bắc, mang lại kỳ nghỉ thư thái cách sân bay Vinh chỉ 20 phút chạy xe."
+  },
+  {
+    "id": "qa_stay_30",
+    "province": "Nam Định",
+    "title": "Khách sạn TP. Nam Định: Nghỉ dưỡng tham quan Đền Trần",
+    "question": "Khách sạn tiện nghi tại thành phố Nam Định dịp lễ Khai ấn Đền Trần?",
+    "answer": "Các khách sạn trung tâm thành phố: Nam Cường Hotel Nam Định (4 sao hiện đại ngay cạnh hồ Truyền Thống), Khách sạn Vị Hoàng, Dệt Hotel. Vào dịp rằm tháng Giêng lễ Khai ấn Đền Trần du khách cần đặt phòng trước từ 2-3 tuần vì các khách sạn thường cháy phòng."
+  },
+  {
+    "id": "qa_stay_31",
+    "province": "Miền Tây",
+    "title": "Lưu trú nhà vườn: Homestay ven sông rạch miền Tây",
+    "question": "Nét đặc trưng khi ngủ homestay nhà vườn miệt vườn sông nước?",
+    "answer": "Phòng ốc thoáng mát bằng tre lá giữa vườn cây trái, mắc võng đu đưa dưới bóng dừa, tối ngủ có mùng chống muỗi nghe tiếng ếch nhái râm ran, cùng gia đình chủ nhà quây quần nấu bữa cơm cá kho tộ, canh chua bông điên điển ấm áp nghĩa tình."
+  },
+  {
+    "id": "qa_stay_32",
+    "province": "Tây Bắc",
+    "title": "Lưu trú nhà sàn người Thái: Nét văn hóa ngủ chung nhà sàn",
+    "question": "Quy tắc và trải nghiệm ngủ nhà sàn cộng đồng của người Thái?",
+    "answer": "Nhà sàn người Thái (ở Mai Châu, Pù Luông, Mường Than) lát sàn gỗ hoặc bương tre mát rượi. Mỗi khách được bố trí một ô đệm gối thổ cẩm ngăn cách bằng rèm buông riêng tư. Nền nếp sinh hoạt tôn trọng không gian chung, không cười đùa ồn ào sau 22h đêm."
+  },
+  {
+    "id": "qa_stay_33",
+    "province": "Toàn quốc",
+    "title": "Mẹo đặt phòng mùa cao điểm du lịch lễ tết",
+    "question": "Làm sao để đặt được phòng khách sạn giá tốt và không bị hủy phòng dịp lễ?",
+    "answer": "1) Đặt trước tối thiểu 3-4 tuần cho các điểm hot (Măng Đen, Sa Pa, Tam Đảo, Lý Sơn); 2) Đặt trực tiếp qua số hotline của chủ khách sạn/homestay hoặc qua các nền tảng OTA uy tín có cam kết xác nhận giữ phòng; 3) Chuyển cọc 30-50% và lưu lại ủy nhiệm chi/tin nhắn xác nhận; 4) Gọi điện kiểm tra lại trước ngày đến 2 ngày."
+  },
+  {
+    "id": "qa_stay_34",
+    "province": "Đắk Nông",
+    "title": "Homestay cà phê: Nghỉ ngơi giữa trang trại cà phê Gia Nghĩa",
+    "question": "Trải nghiệm ngủ giữa nương cà phê tại Đắk Nông?",
+    "answer": "Du khách được ở trong những căn nhà gỗ nhỏ giữa vườn cà phê rợp bóng cây che phủ. Sáng sớm tự tay pha phin cà phê thơm lùng hái từ chính vườn nhà, hít hà mùi đất đỏ bazan và ngắm đồi dốc thoai thoải thanh bình."
+  },
+  {
+    "id": "qa_stay_35",
+    "province": "Thanh Hóa",
+    "title": "Homestay bản Kho Mường Pù Luông",
+    "question": "Ở homestay trong thung lũng bản Kho Mường có gì biệt lập?",
+    "answer": "Bản Kho Mường nằm lọt thỏm trong thung lũng sâu bốn bề là vách núi đá vôi dựng đứng không có sóng 4G mạnh. Homestay nhà sàn mộc mạc của người Thái ở đây mang lại cảm giác sống chậm tách biệt hoàn toàn với thế giới ồn ào náo nhiệt."
+  },
+  {
+    "id": "qa_stay_36",
+    "province": "Vĩnh Phúc",
+    "title": "Homestay Tam Đảo view bể bơi mây",
+    "question": "Top homestay có bể bơi view mây cực chill ở Tam Đảo?",
+    "answer": "Le Vent Homestay (bể bơi vô cực ngắm mây đồi thông), 90s Homestay Tam Đảo (lều chữ A gỗ ven triền dốc), Cầu Mây Homestay, Morico Tam Đảo. Các homestay này có dịch vụ nướng BBQ tiệc nướng ban đêm giữa không khí se lạnh cực kỳ lãng mạn."
+  },
+  {
+    "id": "qa_stay_37",
+    "province": "Lai Châu",
+    "title": "Homestay Tam Đường: Nghỉ đêm dưới chân đèo Ô Quy Hồ",
+    "question": "Điểm lưu trú tiện nghi tại huyện Tam Đường Lai Châu?",
+    "answer": "Khu vực Bản Bo và thị trấn Tam Đường có các homestay ven suối và khu nghỉ dưỡng Ô Quy Hồ Resort, Cầu Kính Rồng Mây Resort (ở bungalow trên đỉnh núi cao 2.200m bồng bềnh trong sương)."
+  },
+  {
+    "id": "qa_stay_38",
+    "province": "Cà Mau",
+    "title": "Khách sạn TP. Cà Mau: Trung tâm thành phố",
+    "question": "Khách sạn chất lượng tốt tại trung tâm TP. Cà Mau?",
+    "answer": "Mường Thanh Luxury Cà Mau (5 sao cao cấp nhất tỉnh), Khách sạn Ánh Nguyệt (4 sao có hồ bơi), Khách sạn Phú Cường Cà Mau (ngay trung tâm chợ), Khách sạn Ozon Năm Căn (thuận tiện trên đường đi Đất Mũi)."
+  },
+  {
+    "id": "qa_stay_39",
+    "province": "Hưng Yên",
+    "title": "Homestay phố cổ Phố Hiến Hưng Yên",
+    "question": "Tìm chỗ nghỉ ngơi gần Chùa Chuông và Đền Mẫu Phố Hiến?",
+    "answer": "Khu vực quanh hồ Bán Nguyệt và trung tâm TP. Hưng Yên có các khách sạn, nhà nghỉ tiện nghi: Khách sạn Thái Bình Hưng Yên, Khách sạn Phố Hiến, Khách sạn Hưng Yên Riverside view bờ sông Hồng thơ mộng."
+  },
+  {
+    "id": "qa_stay_40",
+    "province": "Toàn quốc",
+    "title": "Phân biệt Homestay, Farmstay và Glamping",
+    "question": "Sự khác biệt giữa Homestay, Farmstay và Glamping khi đi du lịch?",
+    "answer": "Homestay: Lưu trú tại nhà người dân bản địa cùng ăn cùng ở để trải nghiệm văn hóa địa phương; Farmstay: Khu nghỉ dưỡng gắn liền với nông trại, vườn rau cây ăn quả, du khách tham gia làm nông nghiệp; Glamping (Glamorous Camping): Cắm trại sang chảnh với lều bạt cao cấp đầy đủ tiện nghi điều hòa, nệm ấm, phục vụ tiệc nướng tận nơi giữa thiên nhiên."
+  },
+  {
+    "id": "qa_tip_01",
+    "province": "Quảng Ngãi",
+    "title": "Mẹo chống say sóng: Đi tàu cao tốc ra đảo Lý Sơn",
+    "question": "Làm sao để không bị say sóng khi đi tàu cao tốc từ cảng Sa Kỳ ra đảo Lý Sơn?",
+    "answer": "1) Uống 1 viên thuốc chống say sóng (như Nautamine hoặc Dimenhydrinate) trước khi lên tàu 30 - 45 phút; 2) Ăn nhẹ bánh mì hoặc cháo ấm lót dạ trước đó 1 tiếng, không để bụng quá đói hoặc quá no; 3) Khi lên tàu chọn ngồi ở hàng ghế giữa hoặc phía đuôi tàu (nơi ít bị chao đảo rung lắc nhất), tránh ngồi mũi tàu; 4) Nhìn thẳng ra đường chân trời xa, không bấm điện thoại hay đọc sách; 5) Ngậm kẹo gừng hoặc dán miếng dán sau tai."
+  },
+  {
+    "id": "qa_tip_02",
+    "province": "Tây Bắc",
+    "title": "An toàn lái xe: Kinh nghiệm đổ đèo dốc sương mù đèo Ô Quy Hồ",
+    "question": "Lái xe máy và ô tô qua đèo Ô Quy Hồ mùa sương mù cần lưu ý an toàn gì?",
+    "answer": "1) Tuyệt đối tuân thủ nguyên tắc \"Lên số nào thì xuống số đó\", về số thấp (số 2 hoặc số 1 cho xe máy/số bán tự động ô tô) để hãm phanh bằng động cơ, tránh rà phanh liên tục làm cháy má phanh mất phanh tử thần; 2) Bật đèn sương mù vàng và đèn cos chiếu gần, không bật đèn pha chiếu xa gây lóa mắt trong màn sương; 3) Không vượt ẩu ở các khúc cua khuất tầm nhìn, bóp còi cảnh báo khi vào cua; 4) Giữ khoảng cách an toàn gấp đôi ngày thường."
+  },
+  {
+    "id": "qa_tip_03",
+    "province": "Văn hóa bản địa",
+    "title": "Quy tắc ứng xử: Điều kiêng kỵ khi vào thăm nhà sàn của người Thái",
+    "question": "Vào thăm nhà sàn của đồng bào người Thái cần chú ý kiêng kỵ những gì?",
+    "answer": "1) Bước lên cầu thang nhà sàn người Thái nên rửa chân sạch sẽ tại vò nước đầu cầu thang; 2) Không tự ý ngồi quay lưng vào bàn thờ tổ tiên (thường đặt ở gian đầu linh thiêng); 3) Không đi thẳng vào gian buồng riêng của phụ nữ/con gái chủ nhà; 4) Không ngồi tựa lưng hoặc gác chân vào cột thiêng (cột cái) của ngôi nhà sàn; 5) Khi chủ nhà mời rượu cần hoặc rượu chén, nên đón nhận bằng hai tay để thể hiện sự tôn trọng."
+  },
+  {
+    "id": "qa_tip_04",
+    "province": "Văn hóa bản địa",
+    "title": "Quy tắc ứng xử: Điều kiêng kỵ khi vào bản làng người Mông",
+    "question": "Đến các bản làng người Mông (như Sin Suối Hồ, Mù Cang Chải) cần tránh điều gì?",
+    "answer": "1) Nếu trước cổng bản hoặc cổng nhà có cắm cành lá xanh hoặc buộc chùm dao gỗ (dấu hiệu bản đang làm lễ cúng thần rừng xua đuổi tà ma), tuyệt đối không được tự ý bước vào; 2) Không xoa đầu trẻ em vì theo quan niệm người Mông hồn vía trẻ ngụ trên đầu; 3) Không huýt sáo trong bản làng vì người Mông tin tiếng huýt sáo gọi gió bão và tà ma về; 4) Không ngồi ở ngưỡng cửa nhà."
+  },
+  {
+    "id": "qa_tip_05",
+    "province": "Cà Mau",
+    "title": "An toàn rừng ngập mặn: Tránh muỗi, vắt và bọ mắt khi đi rừng U Minh & Đất Mũi",
+    "question": "Đi vào rừng tràm U Minh Hạ và rừng đước Cà Mau cần chuẩn bị thuốc men gì?",
+    "answer": "Vùng ngập mặn và rừng tràm có nhiều muỗi rừng và con bọ mắt (bù mắt): 1) Mặc quần áo dài tay sáng màu bằng chất liệu vải dù thoáng mát; 2) Thoa kem chống muỗi Soffell hoặc Remos lên các vùng da hở; 3) Mang theo chai xịt tinh dầu tràm hoặc xịt côn trùng; 4) Đi ủng cao su hoặc giày bọc kín cổ chân; 5) Mang theo tuýp thuốc mỡ kháng viêm (như Phenergan, Remos IB) nếu lỡ bị muỗi hoặc bù mắt đốt để giảm ngứa tức thì."
+  },
+  {
+    "id": "qa_tip_06",
+    "province": "Tây Nguyên",
+    "title": "Quy tắc ứng xử: Thăm nhà rông và nhà mồ của người Jrai, Ba Na",
+    "question": "Khi vào thăm nhà rông và khu nhà mồ ở Tây Nguyên cần lưu ý điều gì?",
+    "answer": "Nhà rông là trái tim thiêng liêng của buôn làng: Khi lên nhà rông cần xin phép già làng hoặc trưởng thôn, không nói tục chửi bậy, không tự ý gõ chiêng trống cúng lễ khi chưa được phép. Tại khu nhà mồ có tượng gỗ dân gian: Không cười đùa cợt nhả, không ngồi lên tượng mồ hay bẻ gãy các vật phẩm cúng lễ tiễn đưa linh hồn người chết."
+  },
+  {
+    "id": "qa_tip_07",
+    "province": "Văn hóa tâm linh",
+    "title": "Trang phục khi vào đền chùa lớn (Tam Chúc, Yên Tử, Đền Đô, Bút Tháp)",
+    "question": "Quy định trang phục và hành lễ chuẩn mực khi vãn cảnh chùa chiền đền miếu?",
+    "answer": "1) Mặc trang phục kín đáo lịch sự: Áo có tay, quần dài hoặc váy dài quá đầu gối, không mặc áo sát nách, quần đùi, váy ngắn xẻ tà hay đồ xuyên thấu; 2) Đi lại nhẹ nhàng, nói năng nhỏ nhẹ, không cười đùa lớn tiếng nơi tôn nghiêm; 3) Khi vào tam quan chùa nên đi cửa bên phải (cửa Giả thoát) và ra cửa bên trái (cửa Không môn), không đi cửa chính giữa dành cho bậc cao tăng; 4) Không dẫm chân lên bậu cửa chùa."
+  },
+  {
+    "id": "qa_tip_08",
+    "province": "Vĩnh Phúc",
+    "title": "Mẹo an toàn: Lái xe đổ dốc đèo Tam Đảo",
+    "question": "Tại sao nghiêm cấm đi xe tay ga đổ đèo Tam Đảo nếu không vững tay lái?",
+    "answer": "Đoạn dốc đèo Tam Đảo dài 13km có độ dốc trung bình 10-12% liên tục. Xe tay ga không có số để hãm động cơ (phanh số) nên người lái bắt buộc phải bóp phanh liên tục suốt 13km khiến má phanh bị ma sát sinh nhiệt cực lớn làm sôi dầu phanh, cháy má phanh dẫn đến mất phanh hoàn toàn đâm vào vách núi hoặc vực sâu. Nên đi xe số, xe côn tay hoặc xe khách buýt chuyên dụng."
+  },
+  {
+    "id": "qa_tip_09",
+    "province": "Quảng Ngãi",
+    "title": "Mẹo bản địa: Tránh mua phải tỏi Lý Sơn giả",
+    "question": "Làm thế nào để phân biệt tỏi Lý Sơn chính gốc với tỏi nơi khác trà trộn?",
+    "answer": "Tỏi Lý Sơn xịn: Củ tỏi nhỏ chỉ bằng ngón tay cái, vỏ tỏi mỏng màu trắng ngà tự nhiên, rễ tỏi ngắn cắt sát đáy, tép tỏi ôm chặt vào nhau, khi bóc ra ăn sống vị cay dịu thơm nồng không cay gắt hay nồng xộc lên mũi. Tỏi giả (thường là tỏi Khánh Hòa hoặc Ninh Hiển chuyển ra đảo): Củ to hơn hẳn, vỏ bóng trắng tinh hoặc tím nhạt, vị hăng cay xộc."
+  },
+  {
+    "id": "qa_tip_10",
+    "province": "Lai Châu",
+    "title": "Mẹo đi Cầu kính Rồng Mây cho người sợ độ cao",
+    "question": "Người bị chứng sợ độ cao có nên đi Cầu kính Rồng Mây không và cách khắc phục?",
+    "answer": "Người có tiền sử bệnh tim mạch hoặc huyết áp cao nặng không nên lên cầu kính. Nếu chỉ sợ độ cao nhẹ: 1) Luôn nhìn thẳng về phía rặng núi mây phía trước, tuyệt đối không nhìn chăm chú xuống đáy kính dưới chân; 2) Đi men sát lan can bằng thép kiên cố phía trong; 3) Có bạn đồng hành nắm tay đi cùng; 4) Đi tất bao giày do ban quản lý cấp để tránh trơn trượt."
+  },
+  {
+    "id": "qa_tip_11",
+    "province": "Cà Mau",
+    "title": "Mẹo mua cua Cà Mau không bị dây trói to ăn gian ký",
+    "question": "Kinh nghiệm chọn mua cua Cà Mau chắc thịt và tránh bẫy dây trói nặng?",
+    "answer": "1) Chọn vựa cua cam kết \"cua trói dây không trọng lượng\" (dây nilon mỏng chỉ vài gram); 2) Bấm tay vào yếm cua: Nếu yếm cứng đanh không lún là cua chắc thịt đầy ắp, nếu yếm mềm lún vào là cua ốp ít thịt; 3) Nhìn phần gai trên mai cua và càng cua có màu sẫm bóng loáng, lông chân cua màu sẫm là cua già trưởng thành ngon nhất."
+  },
+  {
+    "id": "qa_tip_12",
+    "province": "Thanh Hóa",
+    "title": "Mẹo tránh chặt chém khi đi du lịch biển Sầm Sơn",
+    "question": "Làm sao để du lịch Sầm Sơn vui vẻ, văn minh và không lo bị chặt chém giá cả?",
+    "answer": "1) Luôn hỏi giá rõ ràng và chốt giá trước khi sử dụng bất kỳ dịch vụ nào (ghế ngồi bãi biển, xe điện, dừa tươi, tắm tráng nước ngọt); 2) Ăn uống tại các nhà hàng có niêm yết bảng giá công khai của ban quản lý thành phố; 3) Cân hải sản tươi sống trước mặt khách và yêu cầu đầu bếp chế biến đúng con đó; 4) Lưu số điện thoại đường dây nóng của Đội quản lý thị trường Sầm Sơn dán công khai trên các cột đèn ven biển để phản ánh ngay khi có vấn đề."
+  },
+  {
+    "id": "qa_tip_13",
+    "province": "Gia Lai & Kon Tum",
+    "title": "Mẹo ứng xử khi uống rượu cần Tây Nguyên",
+    "question": "Phép lịch sự khi được già làng mời uống rượu cần trong lễ hội Tây Nguyên?",
+    "answer": "Uống rượu cần là biểu tượng của sự hiếu khách và gắn kết: 1) Cầm cần trúc bằng hai tay đón nhận; 2) Uống theo thứ tự già làng mời, người lớn tuổi uống trước; 3) Khi uống, mắt nhìn thẳng vào chủ nhà mỉm cười thân thiện; 4) Không dùng tay bịt lỗ cần hút hoặc nhổ nước rượu ra ngoài; 5) Khi người phục vụ châm thêm nước suối vào ché (gọi là \"châm cần\"), bạn nên hút một hơi sâu để biểu thị sự trân trọng lòng mến khách."
+  },
+  {
+    "id": "qa_tip_14",
+    "province": "Nam Định",
+    "title": "Mẹo đi hội Khai ấn Đền Trần không bị chen lấn xô đẩy",
+    "question": "Kinh nghiệm đi xin ấn Đền Trần đêm 14 tháng Giêng an toàn?",
+    "answer": "Đêm khai ấn Đền Trần thường có hàng vạn người đổ về: 1) Giữ gìn cẩn thận ví tiền, điện thoại trong túi đeo trước ngực đề phòng móc túi; 2) Nhà đền phát ấn liên tục từ sáng sớm ngày 15 tháng Giêng đến hết tháng Giêng âm lịch, do đó không nhất thiết phải chen lấn xô đẩy vào lúc nửa đêm rạng sáng 14 để lấy ấn; 3) Giữ tâm thế thành kính hướng thiện, không ném tiền lẻ lên kiệu rước hay ban thờ."
+  },
+  {
+    "id": "qa_tip_15",
+    "province": "Đồng Tháp",
+    "title": "Mẹo chụp ảnh đẹp tại Làng hoa Sa Đéc không làm hư hại hoa",
+    "question": "Văn hóa tham quan chụp ảnh tại các nhà vườn làng hoa Sa Đéc?",
+    "answer": "1) Xin phép chủ vườn trước khi vào luống hoa chụp ảnh và mua ủng hộ một vài chậu hoa nhỏ hoặc trả phí tham quan tượng trưng (10.000 - 20.000đ); 2) Đi lại cẩn thận trên các lối đi hẹp, không dẫm đạp lên gốc cây, không tự ý bẻ cành ngắt hoa hay kéo cành làm gãy nụ hoa của nông dân chuẩn bị bán Tết."
+  },
+  {
+    "id": "qa_tip_16",
+    "province": "Bắc Ninh",
+    "title": "Mẹo thưởng thức hát Quan họ đúng điệu",
+    "question": "Khi nghe các liền anh liền chị hát Quan họ có phong tục gì?",
+    "answer": "Khi nghe quan họ tại hội Lim hoặc nhà nghệ nhân: Giữ trật tự lắng nghe từng câu luyến láy; khi liền chị têm trầu cánh phượng mời trầu bằng hai tay, người nghe nên đón nhận bằng hai tay với lời cảm ơn tao nhã; có thể \"thưởng\" cho canh hát bằng cách bỏ tiền mừng vào khay phủ khăn đỏ một cách tế nhị, không nhét tiền vào tay áo nghệ nhân."
+  },
+  {
+    "id": "qa_tip_17",
+    "province": "Hà Tĩnh",
+    "title": "Mẹo mua kẹo cu đơ Hà Tĩnh chuẩn giòn ngon",
+    "question": "Cách nhận biết kẹo cu đơ mới nấu ngon và cách bảo quản?",
+    "answer": "Kẹo cu đơ chuẩn: Bánh tráng nướng phồng đều không cháy khét, mật mía màu nâu cánh gián dẻo quánh, hạt đậu phộng mẩy thơm không ỉu, thơm nức mùi gừng tươi. Mua xong nên bọc kín túi nilon tránh gió ẩm làm ỉu bánh tráng, bảo quản nơi khô ráo ăn trong vòng 1-2 tháng."
+  },
+  {
+    "id": "qa_tip_18",
+    "province": "Tây Nguyên & Tây Bắc",
+    "title": "An toàn đi rừng: Nguyên tắc vàng \"Không để lại gì ngoài những dấu chân\"",
+    "question": "Quy tắc bảo vệ môi trường Leave No Trace khi đi trekking rừng nguyên sinh?",
+    "answer": "1) Tuyệt đối không xả rác bừa bãi, mang toàn bộ túi nilon, chai nhựa, vỏ đồ hộp ra khỏi rừng; 2) Không khắc tên, vẽ bậy lên thân cây cổ thụ hay vách đá; 3) Dập tắt hoàn toàn tàn lửa bếp cắm trại trước khi rời đi để phòng cháy rừng; 4) Không hái hoa lan rừng hay săn bắt động vật hoang dã."
+  },
+  {
+    "id": "qa_tip_19",
+    "province": "Miền Tây",
+    "title": "Mẹo đi chợ nổi Cái Răng hoặc Ngã Bảy lúc mấy giờ?",
+    "question": "Thời điểm đi chợ nổi miền Tây sinh động và tấp nập nhất?",
+    "answer": "Chợ nổi họp rất sớm từ lúc rạng đông 5h00 đến 7h30 sáng. Nên thuê thuyền xuất bến từ 5h00 sáng để đón bình minh trên sông, chứng kiến cảnh hàng trăm ghe thuyền giao thương tấp nập và thưởng thức tô hủ tiếu/bún riêu nóng hổi bồng bềnh trên sông cùng ly cà phê đá."
+  },
+  {
+    "id": "qa_tip_20",
+    "province": "Toàn quốc",
+    "title": "Mẹo xử lý khi bị ngộ độc thực phẩm nhẹ khi đi du lịch",
+    "question": "Cách sơ cứu và xử lý khi bị đau bụng, tiêu chảy do lạ thức ăn du lịch?",
+    "answer": "1) Ngừng ngay các đồ ăn lạ, hải sản sống; 2) Uống nhiều nước ấm pha oresol bù nước và điện giải liên tục; 3) Uống men vi sinh hoặc berberin thảo dược; 4) Ăn cháo hoa nấu muối hoặc cháo gừng ấm lót dạ; 5) Nếu có triệu chứng sốt cao, nôn liên tục cần đến ngay cơ sở y tế gần nhất."
+  },
+  {
+    "id": "qa_tip_21",
+    "province": "Lai Châu",
+    "title": "Mẹo chụp ảnh với trang phục dân tộc bản địa",
+    "question": "Thuê trang phục truyền thống người Mông, Dao chụp ảnh cần lưu ý gì?",
+    "answer": "Nên thuê trang phục dệt thổ cẩm thật từ chính các gia đình trong bản (như Sin Suối Hồ, Sì Thâu Chải) thay vì đồ may sẵn giá rẻ, vừa giữ được nét đẹp hoa văn nguyên bản, vừa ủng hộ thu nhập cho đồng bào phụ nữ vùng cao."
+  },
+  {
+    "id": "qa_tip_22",
+    "province": "Lạng Sơn",
+    "title": "Mẹo mua sắm tại chợ cửa khẩu Đông Kinh Lạng Sơn",
+    "question": "Kinh nghiệm trả giá và chọn đồ tại chợ Đông Kinh và chợ Tân Thanh?",
+    "answer": "Chợ cửa khẩu đa dạng mặt hàng nhưng chất lượng vàng thau lẫn lộn: 1) Nên mặc cả trả giá khoảng 1/2 đến 2/3 giá người bán ban đầu đưa ra; 2) Kiểm tra kỹ tem mác, đường may và cắm điện thử đồ gia dụng tại chỗ trước khi trả tiền; 3) Đồ điện tử giá rẻ thường không có bảo hành chính hãng."
+  },
+  {
+    "id": "qa_tip_23",
+    "province": "Thái Nguyên",
+    "title": "Mẹo pha trà Tân Cương thơm ngon chuẩn nghệ nhân",
+    "question": "Nhiệt độ nước và cách hãm trà Tân Cương Thái Nguyên chuẩn phong vị?",
+    "answer": "Bí quyết pha trà: 1) Tráng ấm chén bằng nước sôi; 2) Không dùng nước sôi sùng sục 100 độ C làm cháy khét búp trà, nhiệt độ lý tưởng là 80 - 85 độ C; 3) Đánh thức trà (rót nước ngập trà rồi chắt nhanh bỏ đi); 4) Hãm trà trong khoảng 20 - 25 giây rồi rót hết ra chén tống trước khi chia ra các chén quân, không ngâm trà lâu làm chát đắng và nồng nước."
+  },
+  {
+    "id": "qa_tip_24",
+    "province": "Bình Phước",
+    "title": "Mẹo ăn đọt mây nướng đúng cách",
+    "question": "Làm sao để người lần đầu ăn đọt mây không bị khó chịu bởi vị đắng?",
+    "answer": "Đọt mây nướng lúc mới cắn vào sẽ rất đắng. Mẹo là nhai chậm rãi cùng một chút muối hột ớt hiểm cay nồng, nuốt từ từ. Chỉ sau khoảng 10 giây, vị đắng biến mất hoàn toàn và nhường chỗ cho vị ngọt thanh mát lịm đọng lại nơi cuống họng cực kỳ dễ chịu."
+  },
+  {
+    "id": "qa_tip_25",
+    "province": "Hà Nam",
+    "title": "Mẹo bảo quản niêu cá kho Vũ Đại mang đi đường xa",
+    "question": "Cá kho làng Vũ Đại để được bao lâu và vận chuyển xa thế nào?",
+    "answer": "Cá kho Vũ Đại kho cạn kiệt nước bằng củi nhãn nên để được 7 - 10 ngày ở nhiệt độ phòng mùa đông và 2 - 3 tuần trong ngăn mát tủ lạnh. Khi mang đi máy bay hoặc xe khách đường dài, nên bọc kỹ màng bọc thực phẩm ngoài niêu đất và đóng thùng xốp để giữ nguyên hương vị."
+  },
+  {
+    "id": "qa_tip_26",
+    "province": "Bắc Giang",
+    "title": "Mẹo gửi xe và chống trộm khi đi lễ hội Tây Yên Tử",
+    "question": "Lưu ý khi gửi xe máy/ô tô mùa lễ hội đông đúc?",
+    "answer": "Gửi xe tại các bãi xe chính thống có vé in niêm yết dấu của ban quản lý di tích, không gửi xe tại các điểm tự phát ven đường; khóa cổ khóa càng xe máy cẩn thận và chụp ảnh lại vị trí đỗ xe để không bị lạc khi ra về."
+  },
+  {
+    "id": "qa_tip_27",
+    "province": "Hưng Yên",
+    "title": "Mẹo chọn mua tương Bần ngon chuẩn vị",
+    "question": "Cách nhận biết chai tương Bần truyền thống chất lượng cao?",
+    "answer": "Tương Bần chuẩn: Nước tương có màu vàng nâu sẫm óng ả, sánh đặc không loãng như nước lã, thơm lừng mùi đỗ tương rang và nếp cái lên men, có vị bùi ngọt đậm đà nơi cổ họng, hạt xôi nếp còn lơ lửng dẻo quánh, không có mùi chua lạ hay nồng cồn."
+  },
+  {
+    "id": "qa_tip_28",
+    "province": "Đắk Nông",
+    "title": "An toàn khi tắm thác tự nhiên ở Tây Nguyên",
+    "question": "Những lưu ý bắt buộc khi tắm tại các thác nước Tây Nguyên (Liêng Nung, Đray Sáp)?",
+    "answer": "1) Luôn mặc áo phao ngay cả khi biết bơi; 2) Không nhảy từ vách đá cao xuống vì dưới lòng hồ có nhiều tảng đá ngầm và xoáy nước sâu hiểm trở; 3) Tránh tắm sát chân thác nơi dòng nước dội từ trên cao xuống có lực đập cực mạnh; 4) Rời khỏi lòng suối ngay lập tức nếu thấy nước chuyển sang màu đục đỏ hoặc có tiếng ầm lớn báo hiệu lũ quét từ thượng nguồn đổ về."
+  },
+  {
+    "id": "qa_tip_29",
+    "province": "Gia Lai",
+    "title": "Mẹo thưởng thức Phở khô hai tô Pleiku chuẩn người bản xứ",
+    "question": "Ăn phở hai tô Pleiku thế nào mới đúng điệu người Gia Lai?",
+    "answer": "Cho một thìa tương nâu bí truyền vào tô bánh phở khô, thêm một chút tương ớt, dấm ớt và chanh, xới đều nhẹ tay cho sợi phở ngấm sốt. Gắp một đũa phở khô kèm rau thơm thưởng thức vị dai bùi mặn ngọt, sau đó húp một thìa nước dùng bò ngọt lịm từ tô nước súp bên cạnh."
+  },
+  {
+    "id": "qa_tip_30",
+    "province": "Long An",
+    "title": "Mẹo chọn lạp xưởng tươi Cần Đước ngon",
+    "question": "Nhận biết lạp xưởng tươi Cần Đước truyền thống ngon?",
+    "answer": "Lạp xưởng tươi có màu đỏ hồng tự nhiên của thịt nạc heo tươi (không phẩm màu đỏ rực), hạt tiêu sọ đen giòn rải đều, khi ấn tay có độ đàn hồi dẻo dai. Khi chiên lăn nước dừa xèo xèo tỏa mùi thơm lừng của rượu mai quế lộ, vị chua nhẹ lên men tự nhiên hòa quyện vị ngọt béo hài hòa."
+  },
+  {
+    "id": "qa_tip_31",
+    "province": "Nam Định",
+    "title": "Mẹo chọn mua kẹo sìu châu không bị ỉu",
+    "question": "Cách bảo quản kẹo sìu châu giòn tan lâu ngày?",
+    "answer": "Kẹo sìu châu sau khi mở hộp thiếc nên dùng ngay hoặc đậy nắp thật kín, bảo quản nơi thoáng mát. Kẹo có lớp bột nếp bọc ngoài hút ẩm tự nhiên giúp kẹo giữ độ giòn xốp và không dính răng."
+  },
+  {
+    "id": "qa_tip_32",
+    "province": "Hà Tĩnh",
+    "title": "Mẹo mua bưởi Phúc Trạch chuẩn gốc Hương Khê",
+    "question": "Cách nhận biết quả bưởi Phúc Trạch chính hiệu?",
+    "answer": "Quả bưởi Phúc Trạch có hình cầu dẹt cuống lõm, vỏ mỏng màu vàng chanh khi chín. Bổ ra tép bưởi màu trắng hồng róc hạt mọng nước, ăn giòn ngọt thanh tao có vị thơm ngát đặc trưng không he đắng."
+  },
+  {
+    "id": "qa_tip_33",
+    "province": "Bạc Liêu",
+    "title": "Mẹo chụp ảnh đẹp tại Cánh đồng điện gió Bạc Liêu",
+    "question": "Thời gian chụp ảnh đẹp nhất tại cánh đồng quạt gió Bạc Liêu?",
+    "answer": "Khung giờ vàng là từ 15h30 đến 17h30 chiều. Lúc này nắng biển đã bớt gắt, ánh hoàng hôn vàng cam đổ bóng dài trên cây cầu dẫn ra biển, làm nổi bật những cánh quạt gió trắng muốt trên nền trời xanh thẳm."
+  },
+  {
+    "id": "qa_tip_34",
+    "province": "Kon Tum",
+    "title": "Mẹo ăn gỏi lá Kon Tum không bị đau bụng",
+    "question": "Ăn gỏi lá có hàng chục loại lá rừng có sợ bị lạnh bụng không?",
+    "answer": "Món gỏi lá được người Ba Na thiết kế rất cân bằng âm dương: Các loại lá rừng có tính hàn chát được cân bằng hoàn toàn nhờ tiêu rừng, ớt hiểm, nước chấm hèm gạo nóng ấm và chén rượu cần nồng ấm, giúp kích thích tiêu hóa tốt mà không lo đau bụng."
+  },
+  {
+    "id": "qa_tip_35",
+    "province": "Đồng Tháp",
+    "title": "Mẹo bảo quản nem Lai Vung khi mua về làm quà",
+    "question": "Nem Lai Vung để được bao nhiêu ngày?",
+    "answer": "Nem chua Lai Vung mua tại lò thường sau 2-3 ngày là chín tới ăn ngon nhất. Khi nem đạt độ chua vừa miệng, nên cất vào ngăn mát tủ lạnh để hãm quá trình lên men, có thể bảo quản ăn dần trong vòng 7 - 10 ngày vẫn giữ nguyên độ giòn dai sần sật."
+  },
+  {
+    "id": "qa_tip_36",
+    "province": "Vĩnh Phúc",
+    "title": "Mẹo chọn mua rau su su Tam Đảo tươi ngon",
+    "question": "Cách chọn ngọn su su Tam Đảo non mềm không bị xơ già?",
+    "answer": "Chọn những bó ngọn su su có ngọn mập mạp màu xanh nhạt, lá non có lớp lông tơ mịn, đoạn thân bẻ kêu \"tách\" giòn tan róc nước không có xơ dai. Tránh mua những bó ngọn dài ngoẵng thân cứng lá xanh đậm vì đã bị già xơ."
+  },
+  {
+    "id": "qa_tip_37",
+    "province": "Toàn quốc",
+    "title": "Mẹo rút tiền mặt và thanh toán quét mã QR ở vùng sâu vùng xa",
+    "question": "Đi du lịch các vùng núi Tây Bắc, Tây Nguyên có thanh toán mã QR chuyển khoản được không?",
+    "answer": "Hầu hết các homestay, quán ăn lớn hiện nay đều có mã QR ngân hàng. Tuy nhiên tại các chợ phiên vùng cao (Sìn Hồ, Bắc Hà, chợ biên giới) hoặc đi thuyền xuồng sâu trong rừng đước Cà Mau, sóng điện thoại yếu và tiểu thương lớn tuổi chỉ nhận tiền mặt. Du khách nên luôn chuẩn bị sẵn từ 1 đến 2 triệu đồng tiền mặt mệnh giá nhỏ (10k, 20k, 50k, 100k)."
+  },
+  {
+    "id": "qa_tip_38",
+    "province": "Hậu Giang",
+    "title": "Mẹo chọn khóm Cầu Đúc ngọt đậm đà",
+    "question": "Cách chọn quả khóm Cầu Đúc chín cây ngon nhất?",
+    "answer": "Chọn quả khóm có dáng tròn bầu, cuống nhỏ, mắt khóm to nở đều và thưa, màu vỏ chuyển sang vàng tươi từ cuống đến chóp quả, ngửi thấy mùi thơm ngọt ngào tự nhiên. Tránh chọn quả mắt bé còn xanh vì sẽ bị chua chát."
+  },
+  {
+    "id": "qa_tip_39",
+    "province": "Thanh Hóa",
+    "title": "Mẹo bóc nem chua Thanh Hóa sạch sẽ không dính tay",
+    "question": "Cách bóc lớp lá chuối nem chua Thanh Hóa nhanh và đẹp?",
+    "answer": "Cắt nhẹ vòng dây chun buộc ngoài, dùng tay bóc ngược lớp lá chuối từ đầu nụ theo đường xoắn ốc để tách dần các lớp lá. Khi lộ ra chiếc nem bọc màng nilon trong suốt, giữ vào lớp nilon cầm ăn trực tiếp chấm tương ớt mà ngón tay vẫn sạch sẽ tinh tươm."
+  },
+  {
+    "id": "qa_tip_40",
+    "province": "Toàn quốc",
+    "title": "Văn hóa du lịch văn minh và tự hào Việt Nam",
+    "question": "Mỗi du khách có thể đóng góp gì cho sự phát triển du lịch bền vững của Việt Nam?",
+    "answer": "Mỗi hành động nhỏ đều góp phần làm rạng danh vẻ đẹp non sông: 1) Tôn trọng văn hóa, phong tục bản địa của 54 dân tộc anh em; 2) Ủng hộ mua sản phẩm làng nghề, nông sản OCOP của người nông dân địa phương; 3) Giữ gìn môi trường xanh sạch, không xả rác bừa bãi tại các danh thắng; 4) Lan tỏa những hình ảnh đẹp, câu chuyện nhân văn của đất nước và con người Việt Nam đến bạn bè năm châu."
+  }
+]

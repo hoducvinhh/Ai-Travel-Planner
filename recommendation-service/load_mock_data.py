@@ -13,9 +13,20 @@ load_dotenv()
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost:5432/travel_planner')
 
+def resolve_file_path(filename: str) -> str:
+    """Find file in current directory or in root datasets directory"""
+    if os.path.exists(filename):
+        return filename
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    datasets_path = os.path.join(os.path.dirname(current_dir), 'datasets', filename)
+    if os.path.exists(datasets_path):
+        return datasets_path
+    return filename
+
 def load_json_file(filename: str):
     """Load JSON file"""
-    with open(filename, 'r', encoding='utf-8') as f:
+    target = resolve_file_path(filename)
+    with open(target, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def load_users(engine, users):

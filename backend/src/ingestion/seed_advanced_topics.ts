@@ -1,12 +1,19 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
-import { ADVANCED_QA_PART1 } from './qa_advanced_topics_part1';
-import { ADVANCED_QA_PART2 } from './qa_advanced_topics_part2';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const prisma = new PrismaClient();
+
+interface QAItem {
+  id: string;
+  province: string;
+  title: string;
+  question: string;
+  answer: string;
+}
 
 function getTopicName(id: string): string {
   if (id.startsWith('qa_route_')) return 'Tuyến cung đường liên tỉnh & Lộ trình kết hợp';
@@ -25,8 +32,18 @@ async function seedAdvancedTopics() {
     await prisma.$connect();
     console.log('✅ Đã kết nối cơ sở dữ liệu PostgreSQL!');
 
-    // 1. Tổng hợp dữ liệu
-    const allQA = [...ADVANCED_QA_PART1, ...ADVANCED_QA_PART2];
+    // 1. Tổng hợp dữ liệu từ datasets
+    const datasetsDir = path.resolve(__dirname, '../../../datasets');
+    const combinedPath = path.join(datasetsDir, 'qa_advanced_topics.json');
+    let allQA: QAItem[] = [];
+
+    if (fs.existsSync(combinedPath)) {
+      allQA = JSON.parse(fs.readFileSync(combinedPath, 'utf-8'));
+    } else {
+      const part1 = JSON.parse(fs.readFileSync(path.join(datasetsDir, 'qa_advanced_topics_part1.json'), 'utf-8'));
+      const part2 = JSON.parse(fs.readFileSync(path.join(datasetsDir, 'qa_advanced_topics_part2.json'), 'utf-8'));
+      allQA = [...part1, ...part2];
+    }
 
     console.log(`📊 Tổng số cặp QA đã chuẩn bị: ${allQA.length}`);
 

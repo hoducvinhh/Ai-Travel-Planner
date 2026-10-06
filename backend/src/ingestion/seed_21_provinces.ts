@@ -1,13 +1,19 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import { PrismaClient } from '@prisma/client';
 import * as dotenv from 'dotenv';
-import { NORTHERN_QA_DATA } from './qa_data_northern';
-import { CENTRAL_HIGHLANDS_QA_DATA } from './qa_data_central_highlands';
-import { SOUTHERN_QA_DATA } from './qa_data_southern';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const prisma = new PrismaClient();
+
+interface QAItem {
+  id: string;
+  province: string;
+  title: string;
+  question: string;
+  answer: string;
+}
 
 async function seed21Provinces() {
   const startTime = Date.now();
@@ -17,12 +23,19 @@ async function seed21Provinces() {
     await prisma.$connect();
     console.log('✅ Đã kết nối cơ sở dữ liệu PostgreSQL!');
 
-    // 1. Tổng hợp dữ liệu
-    const allQA = [
-      ...NORTHERN_QA_DATA,
-      ...CENTRAL_HIGHLANDS_QA_DATA,
-      ...SOUTHERN_QA_DATA,
-    ];
+    // 1. Tổng hợp dữ liệu từ datasets
+    const datasetsDir = path.resolve(__dirname, '../../../datasets');
+    const combinedPath = path.join(datasetsDir, 'qa_21_provinces.json');
+    let allQA: QAItem[] = [];
+
+    if (fs.existsSync(combinedPath)) {
+      allQA = JSON.parse(fs.readFileSync(combinedPath, 'utf-8'));
+    } else {
+      const northern = JSON.parse(fs.readFileSync(path.join(datasetsDir, 'qa_data_northern.json'), 'utf-8'));
+      const central = JSON.parse(fs.readFileSync(path.join(datasetsDir, 'qa_data_central_highlands.json'), 'utf-8'));
+      const southern = JSON.parse(fs.readFileSync(path.join(datasetsDir, 'qa_data_southern.json'), 'utf-8'));
+      allQA = [...northern, ...central, ...southern];
+    }
 
     console.log(`📊 Tổng số cặp QA đã chuẩn bị: ${allQA.length} (21 tỉnh x 20 QA)`);
 
