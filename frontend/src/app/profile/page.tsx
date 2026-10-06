@@ -6,27 +6,27 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import {
-  User as UserIcon,
   Heart,
   Bookmark,
   Calendar,
   Settings,
   Sparkles,
   MapPin,
-  Clock,
   DollarSign,
   Star,
   Check,
   ChevronRight,
   Loader2,
   Trash2,
-  Edit3,
-  ExternalLink,
-  Shield,
-  Compass,
   Share2,
 } from 'lucide-react';
 import { Place, Trip, UserProfileData } from '@/types';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 const AVAILABLE_STYLES = [
   'Thiên nhiên',
@@ -67,122 +67,6 @@ export default function ProfilePage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Remove from Wishlist
-  const handleRemoveSaved = async (placeId: string) => {
-    if (!authUser) return;
-
-    // Optimistic UI update
-    setProfileData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        savedPlaces: prev.savedPlaces.filter((p) => p.id !== placeId),
-        stats: {
-          ...prev.stats,
-          savedCount: Math.max(0, (prev.stats?.savedCount || 1) - 1),
-        },
-      };
-    });
-
-    try {
-      await api.post('/interactions/toggle-save', {
-        userId: authUser.id,
-        placeId,
-      });
-      showToast('Đã xóa địa điểm khỏi Wishlist 🔖');
-    } catch (err) {
-      showToast('Có lỗi xảy ra khi xóa');
-      loadProfile(authUser.id);
-    }
-  };
-
-  // Remove from Liked Places
-  const handleRemoveLiked = async (placeId: string) => {
-    if (!authUser) return;
-
-    // Optimistic UI update
-    setProfileData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        likedPlaces: prev.likedPlaces.filter((p) => p.id !== placeId),
-        stats: {
-          ...prev.stats,
-          likedCount: Math.max(0, (prev.stats?.likedCount || 1) - 1),
-        },
-      };
-    });
-
-    try {
-      await api.post('/interactions/toggle-like', {
-        userId: authUser.id,
-        placeId,
-      });
-      showToast('Đã bỏ thích địa điểm ❤️');
-    } catch (err) {
-      showToast('Có lỗi xảy ra khi bỏ thích');
-      loadProfile(authUser.id);
-    }
-  };
-
-  // Remove Rating
-  const handleRemoveRating = async (placeId: string) => {
-    if (!authUser) return;
-
-    // Optimistic UI update
-    setProfileData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        ratedPlaces: (prev.ratedPlaces || []).filter((r) => r.place.id !== placeId),
-        stats: {
-          ...prev.stats,
-          ratedCount: Math.max(0, (prev.stats?.ratedCount || 1) - 1),
-        },
-      };
-    });
-
-    try {
-      await api.post('/interactions/unrate', {
-        userId: authUser.id,
-        placeId,
-      });
-      showToast('Đã xóa đánh giá sao ⭐');
-    } catch (err) {
-      showToast('Có lỗi xảy ra khi xóa đánh giá');
-      loadProfile(authUser.id);
-    }
-  };
-
-  // Remove Shared Place
-  const handleRemoveShared = async (placeId: string) => {
-    if (!authUser) return;
-
-    // Optimistic UI update
-    setProfileData((prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        sharedPlaces: (prev.sharedPlaces || []).filter((s) => s.place.id !== placeId),
-        stats: {
-          ...prev.stats,
-          sharedCount: Math.max(0, (prev.stats?.sharedCount || 1) - 1),
-        },
-      };
-    });
-
-    try {
-      await api.post('/interactions/unshare', {
-        userId: authUser.id,
-        placeId,
-      });
-      showToast('Đã xóa bài chia sẻ khỏi trang cá nhân 🚀');
-    } catch (err) {
-      showToast('Có lỗi xảy ra khi xóa bài chia sẻ');
-      loadProfile(authUser.id);
-    }
-  };
-
   const loadProfile = async (userId: string) => {
     setIsLoading(true);
     try {
@@ -208,6 +92,118 @@ export default function ProfilePage() {
     }
   }, [authLoading, isAuthenticated, authUser, router]);
 
+  // Remove from Wishlist
+  const handleRemoveSaved = async (placeId: string) => {
+    if (!authUser) return;
+
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        savedPlaces: prev.savedPlaces.filter((p) => p.id !== placeId),
+        stats: {
+          ...prev.stats,
+          savedCount: Math.max(0, (prev.stats?.savedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/toggle-save', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa địa điểm khỏi Wishlist');
+    } catch {
+      showToast('Có lỗi xảy ra khi xóa');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove from Liked Places
+  const handleRemoveLiked = async (placeId: string) => {
+    if (!authUser) return;
+
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        likedPlaces: prev.likedPlaces.filter((p) => p.id !== placeId),
+        stats: {
+          ...prev.stats,
+          likedCount: Math.max(0, (prev.stats?.likedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/toggle-like', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã bỏ thích địa điểm');
+    } catch {
+      showToast('Có lỗi xảy ra khi bỏ thích');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove Rating
+  const handleRemoveRating = async (placeId: string) => {
+    if (!authUser) return;
+
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ratedPlaces: (prev.ratedPlaces || []).filter((r) => r.place.id !== placeId),
+        stats: {
+          ...prev.stats,
+          ratedCount: Math.max(0, (prev.stats?.ratedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/unrate', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa đánh giá sao');
+    } catch {
+      showToast('Có lỗi xảy ra khi xóa đánh giá');
+      loadProfile(authUser.id);
+    }
+  };
+
+  // Remove Shared Place
+  const handleRemoveShared = async (placeId: string) => {
+    if (!authUser) return;
+
+    setProfileData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        sharedPlaces: (prev.sharedPlaces || []).filter((s) => s.place.id !== placeId),
+        stats: {
+          ...prev.stats,
+          sharedCount: Math.max(0, (prev.stats?.sharedCount || 1) - 1),
+        },
+      };
+    });
+
+    try {
+      await api.post('/interactions/unshare', {
+        userId: authUser.id,
+        placeId,
+      });
+      showToast('Đã xóa bài chia sẻ khỏi trang cá nhân');
+    } catch {
+      showToast('Có lỗi xảy ra khi xóa bài chia sẻ');
+      loadProfile(authUser.id);
+    }
+  };
+
   const handleSavePreferences = async () => {
     if (!authUser) return;
     setIsSavingPref(true);
@@ -219,8 +215,8 @@ export default function ProfilePage() {
       });
       await refreshProfile();
       await loadProfile(authUser.id);
-      showToast('Đã cập nhật thông tin và sở thích thành công! ✨');
-    } catch (err) {
+      showToast('Đã cập nhật thông tin và sở thích thành công!');
+    } catch {
       showToast('Có lỗi khi lưu thông tin');
     } finally {
       setIsSavingPref(false);
@@ -235,8 +231,8 @@ export default function ProfilePage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-emerald-400">
-        <Loader2 className="w-10 h-10 animate-spin" />
+      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
       </div>
     );
   }
@@ -250,201 +246,199 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white pb-24">
-      {/* Toast */}
+    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
+      {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900/95 border border-emerald-500/40 text-emerald-300 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 animate-bounce">
-          <Sparkles className="w-5 h-5 text-emerald-400" />
-          <span className="text-sm font-medium">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#333333] flex items-center gap-2.5 text-xs font-medium animate-in fade-in duration-200">
+          <Sparkles className="w-4 h-4 text-[#D4F066]" />
+          <span>{toastMessage}</span>
         </div>
       )}
 
       {/* Profile Header Hero */}
-      <section className="relative overflow-hidden border-b border-slate-800/80 bg-slate-950/70 backdrop-blur-md pt-12 pb-8">
+      <section className="border-b border-[#E5E7EB] bg-white pt-10 pb-8">
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
             {/* Avatar */}
-            <div className="relative group">
-              <div className="w-24 h-24 rounded-3xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-cyan-400 p-1 shadow-xl shadow-emerald-500/20">
-                <div className="w-full h-full bg-slate-900 rounded-[22px] flex items-center justify-center text-3xl font-black text-emerald-400 uppercase">
-                  {u?.name ? u.name.charAt(0) : u?.email.charAt(0)}
-                </div>
-              </div>
-              <div className="absolute -bottom-2 -right-2 px-2.5 py-0.5 rounded-full bg-emerald-500 text-[10px] font-bold text-slate-950 uppercase border-2 border-slate-900 shadow">
+            <div className="relative">
+              <Avatar className="w-20 h-20 border-2 border-[#E5E7EB] shadow-xs">
+                <AvatarFallback className="bg-[#1A1A1A] text-white text-2xl font-bold">
+                  {u?.name ? u.name.charAt(0) : u?.email ? u.email.charAt(0) : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <Badge variant="lime" className="absolute -bottom-2 -right-1 text-[10px] uppercase font-semibold h-5">
                 {u?.role}
-              </div>
+              </Badge>
             </div>
 
             {/* User Info */}
             <div className="flex-1 text-center md:text-left space-y-2">
               <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
+                <h1 className="text-2xl font-bold tracking-tight text-[#1A1A1A]">
                   {u?.name || u?.email.split('@')[0]}
                 </h1>
-                <span className="text-xs text-slate-400 md:ml-2">({u?.email})</span>
+                <span className="text-xs text-muted-foreground md:ml-1">({u?.email})</span>
               </div>
 
               {/* Personality Badges */}
-              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-1">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-0.5">
                 {u?.preferredStyles && u.preferredStyles.length > 0 ? (
                   u.preferredStyles.map((style) => (
-                    <span
+                    <Badge
                       key={style}
-                      className="px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium"
+                      variant="outline"
+                      className="text-xs font-normal text-muted-foreground border-[#E5E7EB]"
                     >
                       {style}
-                    </span>
+                    </Badge>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-500 italic">
+                  <span className="text-xs text-muted-foreground italic">
                     Chưa thiết lập gu du lịch. Vào tab &ldquo;Cài đặt sở thích&rdquo; để cập nhật.
                   </span>
                 )}
                 {u?.budgetLevel && (
-                  <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-medium">
+                  <Badge variant="lime" className="text-xs font-medium">
                     Ngân sách: {u.budgetLevel}
-                  </span>
+                  </Badge>
                 )}
               </div>
 
-              <div className="text-[11px] text-slate-500 pt-1">
+              <div className="text-[11px] text-muted-foreground">
                 Thành viên từ:{' '}
                 {u?.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : '2026'}
               </div>
             </div>
 
             {/* Quick Action Button */}
-            <div className="flex items-center gap-3">
-              <Link
-                href="/trips/new"
-                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/25 transition-all hover:scale-105"
-              >
-                <Sparkles className="w-4 h-4" />
-                <span>Tạo Chuyến Đi Mới</span>
+            <Button asChild size="sm" className="gap-2 font-medium">
+              <Link href="/trips/new">
+                <Sparkles className="w-4 h-4 text-[#D4F066]" />
+                <span>Tạo chuyến đi mới</span>
               </Link>
-            </div>
+            </Button>
           </div>
 
-          {/* 5 Stat Metric Cards */}
+          {/* Metric Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-8">
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto mb-1.5">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div className="text-2xl font-black text-white">{stats.tripsCount}</div>
-              <div className="text-[11px] text-slate-400 font-medium">Chuyến đi đã tạo</div>
-            </div>
+            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+              <CardContent className="p-0">
+                <Calendar className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#1A1A1A]">{stats.tripsCount}</div>
+                <div className="text-[11px] text-muted-foreground">Chuyến đi đã tạo</div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center">
-              <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto mb-1.5">
-                <Bookmark className="w-4 h-4" />
-              </div>
-              <div className="text-2xl font-black text-white">{stats.savedCount}</div>
-              <div className="text-[11px] text-slate-400 font-medium">Địa điểm đã lưu</div>
-            </div>
+            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+              <CardContent className="p-0">
+                <Bookmark className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#1A1A1A]">{stats.savedCount}</div>
+                <div className="text-[11px] text-muted-foreground">Địa điểm đã lưu</div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center">
-              <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto mb-1.5">
-                <Heart className="w-4 h-4" />
-              </div>
-              <div className="text-2xl font-black text-white">{stats.likedCount}</div>
-              <div className="text-[11px] text-slate-400 font-medium">Địa điểm đã thích</div>
-            </div>
+            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+              <CardContent className="p-0">
+                <Heart className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#1A1A1A]">{stats.likedCount}</div>
+                <div className="text-[11px] text-muted-foreground">Địa điểm đã thích</div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center">
-              <div className="w-8 h-8 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center mx-auto mb-1.5">
-                <Star className="w-4 h-4" />
-              </div>
-              <div className="text-2xl font-black text-white">{stats.ratedCount}</div>
-              <div className="text-[11px] text-slate-400 font-medium">Lượt đánh giá sao</div>
-            </div>
+            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+              <CardContent className="p-0">
+                <Star className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#1A1A1A]">{stats.ratedCount}</div>
+                <div className="text-[11px] text-muted-foreground">Lượt đánh giá sao</div>
+              </CardContent>
+            </Card>
 
-            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center col-span-2 sm:col-span-1">
-              <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mx-auto mb-1.5">
-                <Share2 className="w-4 h-4" />
-              </div>
-              <div className="text-2xl font-black text-white">
-                {stats.sharedCount ?? profileData?.sharedPlaces?.length ?? 0}
-              </div>
-              <div className="text-[11px] text-slate-400 font-medium">Đã chia sẻ</div>
-            </div>
+            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs col-span-2 sm:col-span-1">
+              <CardContent className="p-0">
+                <Share2 className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#1A1A1A]">
+                  {stats.sharedCount ?? profileData?.sharedPlaces?.length ?? 0}
+                </div>
+                <div className="text-[11px] text-muted-foreground">Đã chia sẻ</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Main Content with Tabs */}
       <section className="container mx-auto px-4 max-w-5xl py-8">
-        {/* Tab Navigation */}
-        <div className="flex border-b border-slate-800/80 mb-8 overflow-x-auto space-x-2">
+        {/* Tab Pills */}
+        <div className="flex border-b border-[#E5E7EB] mb-8 overflow-x-auto space-x-1 pb-1">
           <button
             onClick={() => setActiveTab('wishlist')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'wishlist'
-                ? 'border-amber-400 text-amber-300 bg-amber-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Bookmark className="w-4 h-4" />
+            <Bookmark className="w-3.5 h-3.5" />
             <span>Wishlist ({profileData?.savedPlaces.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('liked')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'liked'
-                ? 'border-rose-400 text-rose-300 bg-rose-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Heart className="w-4 h-4" />
+            <Heart className="w-3.5 h-3.5" />
             <span>Đã thích ({profileData?.likedPlaces.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('rated')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'rated'
-                ? 'border-yellow-400 text-yellow-300 bg-yellow-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Star className="w-4 h-4" />
+            <Star className="w-3.5 h-3.5" />
             <span>Đã đánh giá ({profileData?.ratedPlaces?.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('shared')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'shared'
-                ? 'border-sky-400 text-sky-300 bg-sky-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Share2 className="w-4 h-4" />
+            <Share2 className="w-3.5 h-3.5" />
             <span>Đã chia sẻ ({profileData?.sharedPlaces?.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('trips')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'trips'
-                ? 'border-emerald-400 text-emerald-300 bg-emerald-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Calendar className="w-4 h-4" />
+            <Calendar className="w-3.5 h-3.5" />
             <span>Chuyến đi ({profileData?.trips.length || 0})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('preferences')}
-            className={`flex items-center gap-2 px-4 py-3 font-semibold text-xs transition border-b-2 whitespace-nowrap ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'preferences'
-                ? 'border-cyan-400 text-cyan-300 bg-cyan-500/10'
-                : 'border-transparent text-slate-400 hover:text-white'
+                ? 'bg-[#1A1A1A] text-white shadow-xs'
+                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
             }`}
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-3.5 h-3.5" />
             <span>Cài đặt sở thích</span>
           </button>
         </div>
@@ -452,79 +446,77 @@ export default function ProfilePage() {
         {/* Tab 1: Wishlist */}
         {activeTab === 'wishlist' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                <Bookmark className="w-4 h-4 text-amber-400" />
-                Các địa điểm bạn đã lưu vào danh sách mong muốn
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Bookmark className="w-3.5 h-3.5" />
+                Địa điểm đã lưu vào danh sách mong muốn
               </h2>
               {profileData?.savedPlaces && profileData.savedPlaces.length > 0 && (
-                <Link
-                  href="/trips/new"
-                  className="px-3.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-semibold hover:bg-amber-500/30 transition flex items-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> Lập lịch trình từ các điểm này
-                </Link>
+                <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs">
+                  <Link href="/trips/new">
+                    <Sparkles className="w-3.5 h-3.5 text-[#365314]" /> Tạo lịch trình từ Wishlist
+                  </Link>
+                </Button>
               )}
             </div>
 
             {profileData?.savedPlaces.length === 0 ? (
-              <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-3xl">
-                <Bookmark className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-slate-300 mb-1">Chưa có địa điểm nào được lưu</h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Dạo qua trang Khám phá và bấm biểu tượng 🔖 để lưu các điểm đến yêu thích nhé!
-                </p>
-                <Link
-                  href="/places"
-                  className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl shadow hover:bg-emerald-400 transition"
-                >
-                  Khám phá địa điểm ngay
-                </Link>
-              </div>
+              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+                <CardContent className="p-0">
+                  <Bookmark className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có địa điểm nào được lưu</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Khám phá địa điểm và bấm lưu lại các điểm đến bạn quan tâm!
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href="/places">Khám phá địa điểm</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profileData?.savedPlaces.map((place) => (
-                  <div
+                  <Card
                     key={place.id}
-                    className="bg-slate-900/80 border border-slate-800/80 hover:border-amber-500/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-md group"
+                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
                           {place.province || 'Việt Nam'}
-                        </span>
-                        <span className="text-[11px] font-semibold text-amber-300">
+                        </Badge>
+                        <span className="text-xs font-mono font-medium text-[#1A1A1A]">
                           {place.priceEstimate > 0
-                            ? `${place.priceEstimate.toLocaleString('vi-VN')}đ`
+                            ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
                             : 'Miễn phí'}
                         </span>
                       </div>
-                      <h4 className="font-bold text-white text-sm mb-1.5 group-hover:text-amber-300 transition-colors">
+                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
                         {place.name}
                       </h4>
-                      <p className="text-xs text-slate-400 line-clamp-2 mb-3">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
                         {place.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <button
-                        type="button"
+                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleRemoveSaved(place.id)}
-                        className="text-slate-500 hover:text-rose-400 transition text-[11px] flex items-center gap-1"
-                        title="Bỏ lưu khỏi danh sách"
+                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                         <span>Bỏ lưu</span>
-                      </button>
+                      </Button>
                       <Link
                         href={`/places#${place.id}`}
-                        className="text-amber-400 hover:text-amber-300 font-semibold text-[11px] flex items-center gap-1"
+                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
                       >
                         Chi tiết <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}
@@ -534,65 +526,64 @@ export default function ProfilePage() {
         {/* Tab 2: Liked Places */}
         {activeTab === 'liked' && (
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2 mb-4">
-              <Heart className="w-4 h-4 text-rose-500" />
-              Bộ sưu tập địa điểm bạn đã bấm thích (❤️)
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
+              <Heart className="w-3.5 h-3.5 text-rose-500" />
+              Địa điểm bạn đã thích
             </h2>
 
             {profileData?.likedPlaces.length === 0 ? (
-              <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-3xl">
-                <Heart className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-slate-300 mb-1">Bạn chưa thả tim địa điểm nào</h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Bấm tim các địa điểm để AI hiểu gu du lịch của bạn sâu sắc hơn!
-                </p>
-                <Link
-                  href="/places"
-                  className="px-4 py-2 bg-rose-500 text-white font-bold text-xs rounded-xl shadow hover:bg-rose-400 transition"
-                >
-                  Khám phá và thả tim
-                </Link>
-              </div>
+              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+                <CardContent className="p-0">
+                  <Heart className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa thích địa điểm nào</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Thả tim các địa điểm để AI hiểu gu du lịch của bạn tốt hơn!
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href="/places">Khám phá địa điểm</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profileData?.likedPlaces.map((place) => (
-                  <div
+                  <Card
                     key={place.id}
-                    className="bg-slate-900/80 border border-slate-800/80 hover:border-rose-500/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-md group"
+                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
                           {place.province || 'Việt Nam'}
-                        </span>
-                        <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                        </Badge>
+                        <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
                       </div>
-                      <h4 className="font-bold text-white text-sm mb-1.5 group-hover:text-rose-300 transition-colors">
+                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
                         {place.name}
                       </h4>
-                      <p className="text-xs text-slate-400 line-clamp-2 mb-3">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
                         {place.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <button
-                        type="button"
+                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleRemoveLiked(place.id)}
-                        className="text-slate-500 hover:text-rose-400 transition text-[11px] flex items-center gap-1"
-                        title="Bỏ thích địa điểm này"
+                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                         <span>Bỏ thích</span>
-                      </button>
+                      </Button>
                       <Link
                         href={`/places#${place.id}`}
-                        className="text-rose-400 hover:text-rose-300 font-semibold text-[11px] flex items-center gap-1"
+                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
                       >
                         Xem <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}
@@ -602,70 +593,67 @@ export default function ProfilePage() {
         {/* Tab 3: Rated Places */}
         {activeTab === 'rated' && (
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2 mb-4">
-              <Star className="w-4 h-4 text-yellow-400" />
-              Các địa điểm bạn đã chấm điểm & đánh giá sao
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
+              <Star className="w-3.5 h-3.5" />
+              Địa điểm bạn đã chấm điểm & đánh giá
             </h2>
 
             {(!profileData?.ratedPlaces || profileData.ratedPlaces.length === 0) ? (
-              <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-3xl">
-                <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-slate-300 mb-1">Bạn chưa đánh giá địa điểm nào</h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Chấm sao các địa điểm bạn đã ghé thăm để chia sẻ trải nghiệm với cộng đồng!
-                </p>
-                <Link
-                  href="/places"
-                  className="px-4 py-2 bg-yellow-500 text-slate-950 font-bold text-xs rounded-xl shadow hover:bg-yellow-400 transition"
-                >
-                  Khám phá và đánh giá ngay
-                </Link>
-              </div>
+              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+                <CardContent className="p-0">
+                  <Star className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa đánh giá địa điểm nào</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Đánh giá các địa điểm bạn đã trải nghiệm để chia sẻ cùng cộng đồng.
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href="/places">Đánh giá địa điểm</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profileData.ratedPlaces.map((item) => (
-                  <div
+                  <Card
                     key={item.place.id}
-                    className="bg-slate-900/80 border border-slate-800/80 hover:border-yellow-500/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-md group"
+                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
                           {item.place.province || 'Việt Nam'}
-                        </span>
-                        <div className="flex items-center gap-1 bg-yellow-500/15 border border-yellow-500/30 px-2 py-0.5 rounded-full">
-                          <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                          <span className="text-[11px] font-bold text-yellow-300">
-                            {item.rating}/5 sao
-                          </span>
-                        </div>
+                        </Badge>
+                        <Badge variant="secondary" className="gap-1 text-[11px] font-medium">
+                          <Star className="w-3 h-3 fill-neutral-700" />
+                          <span>{item.rating}/5</span>
+                        </Badge>
                       </div>
-                      <h4 className="font-bold text-white text-sm mb-1.5 group-hover:text-yellow-300 transition-colors">
+                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
                         {item.place.name}
                       </h4>
-                      <p className="text-xs text-slate-400 line-clamp-2 mb-3">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
                         {item.place.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <button
-                        type="button"
+                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleRemoveRating(item.place.id)}
-                        className="text-slate-500 hover:text-rose-400 transition text-[11px] flex items-center gap-1"
-                        title="Xóa đánh giá này"
+                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                         <span>Xóa đánh giá</span>
-                      </button>
+                      </Button>
                       <Link
                         href={`/places#${item.place.id}`}
-                        className="text-yellow-400 hover:text-yellow-300 font-semibold text-[11px] flex items-center gap-1"
+                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
                       >
                         Chi tiết <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}
@@ -675,265 +663,257 @@ export default function ProfilePage() {
         {/* Tab 4: Shared Places */}
         {activeTab === 'shared' && (
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2 mb-4">
-              <Share2 className="w-4 h-4 text-sky-400" />
-              Các địa điểm bạn đã chia sẻ lên trang cá nhân
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
+              <Share2 className="w-3.5 h-3.5" />
+              Địa điểm bạn đã chia sẻ
             </h2>
 
             {(!profileData?.sharedPlaces || profileData.sharedPlaces.length === 0) ? (
-              <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-3xl">
-                <Share2 className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-slate-300 mb-1">Chưa có bài chia sẻ nào</h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Tại trang Khám phá, bấm nút Chia sẻ để đăng các địa điểm thú vị lên hồ sơ của bạn!
-                </p>
-                <Link
-                  href="/places"
-                  className="px-4 py-2 bg-sky-500 text-slate-950 font-bold text-xs rounded-xl shadow hover:bg-sky-400 transition"
-                >
-                  Khám phá và chia sẻ
-                </Link>
-              </div>
+              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+                <CardContent className="p-0">
+                  <Share2 className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có bài chia sẻ nào</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Tại trang Khám phá, bấm nút Chia sẻ để giới thiệu các địa điểm yêu thích lên hồ sơ của bạn.
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href="/places">Khám phá và chia sẻ</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {profileData.sharedPlaces.map((item) => (
-                  <div
+                  <Card
                     key={item.id}
-                    className="bg-slate-900/80 border border-slate-800/80 hover:border-sky-500/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-md group"
+                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
                           {item.place.province || 'Việt Nam'}
-                        </span>
-                        <span className="text-[10px] text-slate-500">
+                        </Badge>
+                        <span className="text-[10px] text-muted-foreground">
                           {new Date(item.sharedAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
 
-                      {/* Personal Note / Caption Box */}
                       {item.note && (
-                        <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800/70 mb-3 text-xs text-slate-300 italic flex items-start gap-2">
-                          <span className="text-sky-400 font-serif text-sm">&ldquo;</span>
-                          <span className="line-clamp-2">{item.note}</span>
-                          <span className="text-sky-400 font-serif text-sm">&rdquo;</span>
+                        <div className="p-2 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] mb-2.5 text-xs text-muted-foreground italic">
+                          &ldquo;{item.note}&rdquo;
                         </div>
                       )}
 
-                      <h4 className="font-bold text-white text-sm mb-1.5 group-hover:text-sky-300 transition-colors">
+                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
                         {item.place.name}
                       </h4>
-                      <p className="text-xs text-slate-400 line-clamp-2 mb-3">
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
                         {item.place.description}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
-                      <button
-                        type="button"
+                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={() => handleRemoveShared(item.place.id)}
-                        className="text-slate-500 hover:text-rose-400 transition text-[11px] flex items-center gap-1"
-                        title="Xóa bài chia sẻ này"
+                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                         <span>Xóa chia sẻ</span>
-                      </button>
+                      </Button>
                       <Link
                         href={`/places#${item.place.id}`}
-                        className="text-sky-400 hover:text-sky-300 font-semibold text-[11px] flex items-center gap-1"
+                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
                       >
-                        Xem địa điểm <ChevronRight className="w-3 h-3" />
+                        Xem <ChevronRight className="w-3 h-3" />
                       </Link>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {/* Tab 3: My Trips */}
+        {/* Tab 5: My Trips */}
         {activeTab === 'trips' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-slate-300 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
                 Lịch sử các chuyến đi đã tạo
               </h2>
-              <Link
-                href="/trips/new"
-                className="px-3.5 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold hover:bg-emerald-500/30 transition flex items-center gap-1.5"
-              >
-                + Tạo chuyến đi mới
-              </Link>
+              <Button asChild size="sm" className="gap-1.5 text-xs">
+                <Link href="/trips/new">+ Tạo chuyến đi mới</Link>
+              </Button>
             </div>
 
             {profileData?.trips.length === 0 ? (
-              <div className="p-12 text-center bg-slate-900/40 border border-slate-800 rounded-3xl">
-                <Calendar className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-slate-300 mb-1">Chưa có chuyến đi nào</h3>
-                <p className="text-xs text-slate-500 mb-4">
-                  Hãy để AI lên kế hoạch chi tiết cho chuyến hành trình sắp tới của bạn!
-                </p>
-                <Link
-                  href="/trips/new"
-                  className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold text-xs rounded-xl shadow hover:bg-emerald-400 transition"
-                >
-                  Tạo lịch trình ngay
-                </Link>
-              </div>
+              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+                <CardContent className="p-0">
+                  <Calendar className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có chuyến đi nào</h3>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Tạo chuyến đi đầu tiên để AI tối ưu hóa lịch trình cho bạn.
+                  </p>
+                  <Button asChild size="sm">
+                    <Link href="/trips/new">Lập lịch trình ngay</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             ) : (
               <div className="space-y-3">
                 {profileData?.trips.map((trip) => (
-                  <div
+                  <Card
                     key={trip.id}
-                    className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-emerald-500/40 transition shadow-md"
+                    className="bg-white border-[#E5E7EB] rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#1A1A1A]/30 transition shadow-2xs"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <Badge variant="lime" className="text-[10px]">
                           {trip.status}
-                        </span>
-                        <span className="text-xs text-slate-400">
+                        </Badge>
+                        <span className="text-[11px] text-muted-foreground">
                           Tạo ngày {new Date(trip.createdAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
-                      <h4 className="text-base font-bold text-white flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-emerald-400" />
+                      <h4 className="text-base font-bold text-[#1A1A1A] flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
                         Chuyến đi {trip.destination}
                       </h4>
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 pt-1">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-0.5">
                         <span>
-                          📅 {new Date(trip.startDate).toLocaleDateString('vi-VN')} -{' '}
+                          {new Date(trip.startDate).toLocaleDateString('vi-VN')} -{' '}
                           {new Date(trip.endDate).toLocaleDateString('vi-VN')}
                         </span>
-                        <span>👥 {trip.groupSize} người</span>
-                        <span>
-                          💰 {trip.budgetPerPerson ? trip.budgetPerPerson.toLocaleString('vi-VN') : 0}đ/người
+                        <span>{trip.groupSize} người</span>
+                        <span className="font-medium text-[#1A1A1A]">
+                          {trip.budgetPerPerson ? trip.budgetPerPerson.toLocaleString('vi-VN') : 0} đ / người
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <Link
-                        href={`/trips/${trip.id}`}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-slate-200 text-xs font-semibold transition"
-                      >
-                        <span>Xem chi tiết</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
+                      <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
+                        <Link href={`/trips/${trip.id}`}>
+                          <span>Xem chi tiết</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </Button>
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {/* Tab 4: Preferences & Settings */}
+        {/* Tab 6: Preferences & Settings */}
         {activeTab === 'preferences' && (
-          <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 md:p-8 space-y-8 backdrop-blur-md">
-            <div>
-              <h2 className="text-base font-bold text-white mb-1 flex items-center gap-2">
-                <Settings className="w-4 h-4 text-cyan-400" />
-                Cài Đặt Hồ Sơ & Huấn Luyện AI Recommendation
-              </h2>
-              <p className="text-xs text-slate-400">
-                Gu du lịch và ngân sách dưới đây sẽ đóng vai trò là đặc trưng người dùng (User Features)
-                truyền vào mô hình học máy **LightFM** để cá nhân hóa kết quả gợi ý.
-              </p>
-            </div>
-
-            {/* Display Name */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Tên hiển thị của bạn
-              </label>
-              <input
-                type="text"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Nhập tên của bạn..."
-                className="w-full max-w-md px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-200 focus:outline-none focus:border-cyan-500 transition"
-              />
-            </div>
-
-            {/* Preferred Styles */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Gu du lịch yêu thích (Chọn nhiều)
-              </label>
-              <div className="flex flex-wrap gap-2 max-w-2xl">
-                {AVAILABLE_STYLES.map((style) => {
-                  const isSelected = selectedStyles.includes(style);
-                  return (
-                    <button
-                      key={style}
-                      type="button"
-                      onClick={() => toggleStyle(style)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition ${
-                        isSelected
-                          ? 'bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 shadow-md scale-105'
-                          : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {isSelected && <Check className="w-3.5 h-3.5 text-cyan-400" />}
-                      <span>{style}</span>
-                    </button>
-                  );
-                })}
+          <Card className="bg-white border-[#E5E7EB] rounded-2xl p-6 space-y-6 shadow-2xs">
+            <CardContent className="p-0 space-y-6">
+              <div>
+                <h2 className="text-base font-bold text-[#1A1A1A] mb-1 flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-muted-foreground" />
+                  Cài đặt hồ sơ & huấn luyện AI gợi ý
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  Gu du lịch và ngân sách dưới đây sẽ đóng vai trò là đặc trưng người dùng (User Features) truyền vào mô hình học máy để cá nhân hóa kết quả gợi ý.
+                </p>
               </div>
-            </div>
 
-            {/* Budget Level */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                Mức ngân sách thông thường
-              </label>
-              <div className="grid md:grid-cols-3 gap-3 max-w-3xl">
-                {BUDGET_LEVELS.map((b) => {
-                  const isSelected = selectedBudget === b.key;
-                  return (
-                    <button
-                      key={b.key}
-                      type="button"
-                      onClick={() => setSelectedBudget(b.key)}
-                      className={`text-left p-4 rounded-2xl border transition ${
-                        isSelected
-                          ? 'bg-cyan-500/15 border-cyan-500 text-white shadow-lg'
-                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                      }`}
-                    >
-                      <div className="font-bold text-xs text-white mb-1">{b.label}</div>
-                      <div className="text-[11px] text-slate-400 leading-relaxed">{b.desc}</div>
-                    </button>
-                  );
-                })}
+              {/* Display Name */}
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                  Tên hiển thị của bạn
+                </label>
+                <Input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Nhập tên của bạn..."
+                  className="max-w-md bg-[#FAFAFA]"
+                />
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className="pt-4 border-t border-slate-800 flex justify-end">
-              <button
-                type="button"
-                onClick={handleSavePreferences}
-                disabled={isSavingPref}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition disabled:opacity-50"
-              >
-                {isSavingPref ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Đang lưu...</span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>Lưu Cài Đặt Hồ Sơ</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+              {/* Preferred Styles */}
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  Gu du lịch yêu thích (Chọn nhiều)
+                </label>
+                <div className="flex flex-wrap gap-1.5 max-w-2xl">
+                  {AVAILABLE_STYLES.map((style) => {
+                    const isSelected = selectedStyles.includes(style);
+                    return (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => toggleStyle(style)}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#1A1A1A] text-white shadow-xs'
+                            : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3 h-3 text-[#D4F066]" />}
+                        <span>{style}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Budget Level */}
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  Mức ngân sách thông thường
+                </label>
+                <div className="grid md:grid-cols-3 gap-3 max-w-3xl">
+                  {BUDGET_LEVELS.map((b) => {
+                    const isSelected = selectedBudget === b.key;
+                    return (
+                      <button
+                        key={b.key}
+                        type="button"
+                        onClick={() => setSelectedBudget(b.key)}
+                        className={`text-left p-3.5 rounded-xl border transition cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#F4FCE3] border-[#D9F99D] text-[#365314] shadow-xs'
+                            : 'bg-white border-[#E5E7EB] text-muted-foreground hover:border-[#1A1A1A]/30'
+                        }`}
+                      >
+                        <div className="font-semibold text-xs text-[#1A1A1A] mb-1">{b.label}</div>
+                        <div className="text-[11px] text-muted-foreground leading-relaxed">{b.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="pt-4 border-t border-[#E5E7EB] flex justify-end">
+                <Button
+                  onClick={handleSavePreferences}
+                  disabled={isSavingPref}
+                  size="sm"
+                  className="gap-1.5 text-xs font-medium"
+                >
+                  {isSavingPref ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Đang lưu...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Lưu cài đặt hồ sơ</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
       </section>
     </div>
