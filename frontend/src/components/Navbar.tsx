@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   MapPin,
   Calendar,
@@ -16,7 +19,6 @@ import {
   X,
   Compass,
   Users,
-  User as UserIcon,
   ShieldCheck,
 } from 'lucide-react';
 
@@ -113,9 +115,9 @@ export default function Navbar() {
                   <Icon className="w-3.5 h-3.5" />
                   <span>{link.label}</span>
                   {link.isAdmin && (
-                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-[#1A1A1A] text-white font-semibold uppercase tracking-wider">
+                    <Badge variant="default" className="text-[9px] px-1.5 py-0 rounded-full font-semibold">
                       Admin
-                    </span>
+                    </Badge>
                   )}
                 </Link>
               );
@@ -138,9 +140,9 @@ export default function Navbar() {
                 <Icon className="w-3.5 h-3.5" />
                 <span>{link.label}</span>
                 {link.isAdmin && (
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500 text-white font-bold uppercase tracking-wider">
+                  <Badge variant="secondary" className="text-[9px] px-1 py-0 rounded uppercase tracking-wider">
                     Admin
-                  </span>
+                  </Badge>
                 )}
               </Link>
             );
@@ -169,71 +171,79 @@ export default function Navbar() {
                     : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-200'
                 }`}
               >
-                <div
-                  className={`w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] uppercase ${
-                    isQaPage
-                      ? 'bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB]'
-                      : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                  }`}
-                >
-                  {user.name ? user.name.charAt(0) : user.email.charAt(0)}
-                </div>
+                <Avatar className="w-6 h-6 rounded-md">
+                  <AvatarFallback
+                    className={`font-bold text-[10px] uppercase ${
+                      isQaPage
+                        ? 'bg-[#F5F5F4] text-[#1A1A1A]'
+                        : 'bg-emerald-500/20 text-emerald-400'
+                    }`}
+                  >
+                    {user.name ? user.name.charAt(0) : user.email.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex flex-col text-left">
                   <span className="text-xs font-semibold max-w-[100px] truncate">
                     {user.name || user.email.split('@')[0]}
                   </span>
                 </div>
-                <UserIcon
-                  className={`w-3.5 h-3.5 ${
-                    isQaPage ? 'text-[#6B7280]' : 'text-slate-400'
-                  }`}
-                />
               </Link>
 
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={handleLogout}
                 title="Đăng xuất"
-                className={`flex items-center gap-1 p-2 rounded-xl text-xs font-medium transition-colors ${
+                className={`h-8 w-8 rounded-xl ${
                   isQaPage
                     ? 'text-[#6B7280] hover:text-rose-600 hover:bg-rose-50 border border-[#E5E7EB]'
                     : 'text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-slate-800 hover:border-rose-500/30'
                 }`}
               >
                 <LogOut className="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <Link
-                href="/login"
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition ${
+              <Button
+                asChild
+                variant="outline"
+                className={`h-8 px-3 rounded-xl text-xs font-medium ${
                   isQaPage
-                    ? 'text-[#1A1A1A] hover:bg-[#F5F5F4] border border-[#E5E7EB]'
-                    : 'text-slate-200 hover:text-white hover:bg-slate-800 border border-slate-800'
+                    ? 'text-[#1A1A1A] border-[#E5E7EB] hover:bg-[#F5F5F4]'
+                    : 'text-slate-200 hover:text-white bg-slate-900 border-slate-800 hover:bg-slate-800'
                 }`}
               >
-                <LogIn className="w-3.5 h-3.5" />
-                <span>Đăng nhập</span>
-              </Link>
-              <Link
-                href="/register"
-                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-medium text-white transition shadow-xs ${
+                <Link href="/login" className="flex items-center gap-1.5">
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Đăng nhập</span>
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="default"
+                className={`h-8 px-3.5 rounded-xl text-xs font-medium text-white shadow-xs ${
                   isQaPage
                     ? 'bg-[#1A1A1A] hover:bg-[#2C2C2C]'
                     : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 shadow-emerald-500/20'
                 }`}
               >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>Đăng ký</span>
-              </Link>
+                <Link href="/register" className="flex items-center gap-1.5">
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Đăng ký</span>
+                </Link>
+              </Button>
             </div>
           )}
         </div>
 
         {/* Mobile Menu Toggle Button */}
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className={`lg:hidden p-2 rounded-lg transition ${
+          className={`lg:hidden h-9 w-9 rounded-lg ${
             isQaPage
               ? 'text-[#6B7280] hover:text-[#1A1A1A] hover:bg-[#F5F5F4]'
               : 'text-slate-400 hover:text-white hover:bg-slate-800'
@@ -241,7 +251,7 @@ export default function Navbar() {
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        </Button>
       </div>
 
       {/* Mobile Dropdown Menu */}
@@ -291,7 +301,9 @@ export default function Navbar() {
                     : 'text-slate-300 hover:bg-slate-900'
                 }`}
               >
-                <UserIcon className="w-4 h-4" />
+                <Avatar className="w-4 h-4">
+                  <AvatarFallback className="text-[9px]">U</AvatarFallback>
+                </Avatar>
                 <span>Hồ sơ cá nhân & Wishlist</span>
               </Link>
             )}
@@ -305,15 +317,17 @@ export default function Navbar() {
             {isAuthenticated && user ? (
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs uppercase ${
-                      isQaPage
-                        ? 'bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB]'
-                        : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
-                    }`}
-                  >
-                    {user.name ? user.name.charAt(0) : user.email.charAt(0)}
-                  </div>
+                  <Avatar className="w-7 h-7 rounded-lg">
+                    <AvatarFallback
+                      className={`font-bold text-xs uppercase ${
+                        isQaPage
+                          ? 'bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB]'
+                          : 'bg-emerald-500/20 text-emerald-400'
+                      }`}
+                    >
+                      {user.name ? user.name.charAt(0) : user.email.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <div
                       className={`text-xs font-semibold ${
@@ -331,45 +345,51 @@ export default function Navbar() {
                     </div>
                   </div>
                 </div>
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className={`px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 ${
+                  className={`h-7 px-2.5 text-xs gap-1 ${
                     isQaPage
-                      ? 'text-rose-600 hover:bg-rose-50 border border-rose-200'
-                      : 'text-rose-400 hover:bg-rose-500/10 border border-rose-500/30'
+                      ? 'text-rose-600 hover:bg-rose-50 border-rose-200'
+                      : 'text-rose-400 hover:bg-rose-500/10 border-rose-500/30'
                   }`}
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Đăng xuất</span>
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`text-center py-2 px-3 rounded-lg text-xs font-medium ${
+                <Button
+                  asChild
+                  variant="outline"
+                  className={`h-8 text-xs font-medium ${
                     isQaPage
-                      ? 'text-[#1A1A1A] bg-white border border-[#E5E7EB]'
-                      : 'text-slate-200 bg-slate-900 border border-slate-800'
+                      ? 'text-[#1A1A1A] bg-white border-[#E5E7EB]'
+                      : 'text-slate-200 bg-slate-900 border-slate-800'
                   }`}
                 >
-                  Đăng nhập
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`text-center py-2 px-3 rounded-lg text-xs font-medium text-white ${
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                    Đăng nhập
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="default"
+                  className={`h-8 text-xs font-medium text-white ${
                     isQaPage
                       ? 'bg-[#1A1A1A] hover:bg-[#2C2C2C]'
                       : 'bg-emerald-600 hover:bg-emerald-500'
                   }`}
                 >
-                  Đăng ký
-                </Link>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                    Đăng ký
+                  </Link>
+                </Button>
               </div>
             )}
           </div>

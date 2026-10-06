@@ -4,7 +4,16 @@ import React, { useState } from 'react';
 import { Place } from '@/types';
 import { api } from '@/lib/api';
 import {
-  X,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import {
   Share2,
   Copy,
   Check,
@@ -13,7 +22,6 @@ import {
   MapPin,
   Ticket,
   Loader2,
-  Heart,
 } from 'lucide-react';
 
 interface SharePlaceModalProps {
@@ -25,11 +33,11 @@ interface SharePlaceModalProps {
 }
 
 const QUICK_TAGS = [
-  'View đẹp mê ly ✨',
-  'Ẩm thực ngon đỉnh 🍜',
-  'Không gian cực chill 🍃',
-  'Rất đáng trải nghiệm 🌟',
-  'Gợi ý cho cuối tuần 🎒',
+  'View đẹp chụp ảnh',
+  'Ẩm thực đặc sắc',
+  'Không gian thư giãn',
+  'Đáng để trải nghiệm',
+  'Gợi ý đi cuối tuần',
 ];
 
 export default function SharePlaceModal({
@@ -50,7 +58,7 @@ export default function SharePlaceModal({
         await navigator.clipboard.writeText(url);
       }
       setCopied(true);
-      showToast('Đã sao chép liên kết vào bộ nhớ tạm! 📋');
+      showToast('Đã sao chép liên kết vào bộ nhớ tạm!');
       setTimeout(() => setCopied(false), 2500);
     } catch (e) {
       showToast('Không thể sao chép liên kết');
@@ -71,7 +79,7 @@ export default function SharePlaceModal({
         note: note.trim() || undefined,
       });
 
-      showToast('Đã chia sẻ địa điểm lên trang cá nhân của bạn! 🚀');
+      showToast('Đã chia sẻ địa điểm lên trang cá nhân của bạn!');
       if (onShared) onShared(note.trim());
       onClose();
     } catch (err: any) {
@@ -87,37 +95,27 @@ export default function SharePlaceModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div
-        className="relative w-full max-w-lg bg-slate-900/95 border border-slate-700/80 rounded-3xl p-6 shadow-2xl text-slate-100 flex flex-col gap-5 overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Background glow effect */}
-        <div className="absolute -top-24 -right-24 w-52 h-52 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-52 h-52 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
-
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 relative z-10">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-slate-950 shadow-md">
-              <Share2 className="w-5 h-5" />
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md rounded-2xl border-[#E5E7EB] bg-white p-6 shadow-xl">
+        <DialogHeader className="pb-3 border-b border-[#F0F0EF]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center shrink-0">
+              <Share2 className="w-4 h-4 text-white" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white">Chia sẻ địa điểm</h3>
-              <p className="text-xs text-slate-400">Đăng lên trang cá nhân để bạn bè cùng khám phá</p>
+              <DialogTitle className="text-base font-semibold text-[#1A1A1A]">
+                Chia sẻ địa điểm
+              </DialogTitle>
+              <DialogDescription className="text-xs text-[#6B7280]">
+                Đăng lên trang cá nhân để bạn bè cùng khám phá
+              </DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 transition"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        </DialogHeader>
 
         {/* Place Card Preview */}
-        <div className="flex gap-3.5 p-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 relative z-10">
-          <div className="w-20 h-20 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0 relative">
+        <div className="flex gap-3.5 p-3.5 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB]">
+          <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#F5F5F4] border border-[#E5E7EB] flex-shrink-0 relative">
             {place.imageUrl ? (
               <img
                 src={place.imageUrl}
@@ -125,21 +123,26 @@ export default function SharePlaceModal({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-tr from-slate-900 to-emerald-950 text-2xl">
-                🏞️
+              <div className="w-full h-full flex items-center justify-center text-[#9CA3AF]">
+                <MapPin className="w-6 h-6" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
             <div>
-              <h4 className="text-sm font-bold text-white truncate">{place.name}</h4>
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-1">
-                <MapPin className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                <span className="truncate">{place.district ? `${place.district}, ` : ''}{place.province || 'Việt Nam'}</span>
+              <h4 className="text-sm font-semibold text-[#1A1A1A] truncate">
+                {place.name}
+              </h4>
+              <div className="flex items-center gap-1.5 text-xs text-[#6B7280] mt-1">
+                <MapPin className="w-3.5 h-3.5 text-[#6B7280] flex-shrink-0" />
+                <span className="truncate">
+                  {place.district ? `${place.district}, ` : ''}
+                  {place.province || 'Việt Nam'}
+                </span>
               </div>
             </div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-amber-300">
-              <Ticket className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex items-center gap-1.5 text-xs font-medium text-[#1A1A1A]">
+              <Ticket className="w-3.5 h-3.5 text-[#6B7280]" />
               <span>
                 {place.priceEstimate > 0
                   ? `${place.priceEstimate.toLocaleString('vi-VN')}đ`
@@ -150,18 +153,18 @@ export default function SharePlaceModal({
         </div>
 
         {/* Note / Caption Input */}
-        <div className="space-y-2 relative z-10">
-          <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-[#1A1A1A] flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#6B7280]" />
             Cảm nghĩ của bạn về địa điểm này (tùy chọn)
           </label>
-          <textarea
+          <Textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Bạn thấy địa điểm này thế nào? Có mẹo gì hay muốn nhắn nhủ không?..."
             rows={3}
             maxLength={300}
-            className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/80 border border-slate-700/80 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500/80 focus:ring-1 focus:ring-emerald-500/40 resize-none transition"
+            className="rounded-xl border-[#E5E7EB] text-xs text-[#1A1A1A] placeholder-[#9CA3AF] resize-none focus-visible:ring-1 focus-visible:ring-[#1A1A1A]"
           />
 
           {/* Quick Tags Suggestions */}
@@ -171,7 +174,7 @@ export default function SharePlaceModal({
                 key={tag}
                 type="button"
                 onClick={() => addTagToNote(tag)}
-                className="px-2.5 py-1 rounded-full bg-slate-800/80 hover:bg-emerald-500/20 hover:text-emerald-300 border border-slate-700/60 text-[11px] text-slate-300 transition"
+                className="px-2.5 py-1 rounded-full bg-[#F5F5F4] hover:bg-[#E5E7EB] border border-[#E5E7EB] text-[11px] text-[#4B5563] transition-colors"
               >
                 + {tag}
               </button>
@@ -180,45 +183,47 @@ export default function SharePlaceModal({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-3 pt-2 border-t border-slate-800 relative z-10">
-          <button
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#F0F0EF]">
+          <Button
             type="button"
+            variant="outline"
             onClick={handleCopyLink}
-            className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-semibold transition"
+            className="rounded-xl text-xs gap-1.5 border-[#E5E7EB]"
           >
             {copied ? (
               <>
-                <Check className="w-4 h-4 text-emerald-400" />
-                <span className="text-emerald-400">Đã sao chép</span>
+                <Check className="w-3.5 h-3.5 text-[#1A1A1A]" />
+                <span>Đã sao chép</span>
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
+                <Copy className="w-3.5 h-3.5" />
                 <span>Sao chép link</span>
               </>
             )}
-          </button>
+          </Button>
 
-          <button
+          <Button
             type="button"
+            variant="default"
             onClick={handleShareToProfile}
             disabled={isSubmitting}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg shadow-emerald-500/20 transition disabled:opacity-50"
+            className="flex-1 rounded-xl text-xs gap-1.5 bg-[#1A1A1A] text-white hover:bg-[#2C2C2C]"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 <span>Đang chia sẻ...</span>
               </>
             ) : (
               <>
-                <Send className="w-4 h-4" />
+                <Send className="w-3.5 h-3.5" />
                 <span>Chia sẻ lên trang cá nhân</span>
               </>
             )}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

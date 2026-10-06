@@ -1,31 +1,41 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { CloudSun, Droplets, Loader2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import {
+  Sun,
+  CloudSun,
+  Cloud,
+  CloudFog,
+  CloudRain,
+  CloudLightning,
+  Loader2,
+  LucideIcon,
+} from 'lucide-react';
 
 interface PlaceWeatherPillProps {
   latitude: number;
   longitude: number;
 }
 
-function getWeatherInfo(code: number): { text: string; icon: string } {
-  if (code === 0) return { text: 'Nắng trong', icon: '☀️' };
-  if (code === 1 || code === 2) return { text: 'Nắng nhẹ', icon: '🌤️' };
-  if (code === 3) return { text: 'Nhiều mây', icon: '⛅' };
-  if (code === 45 || code === 48) return { text: 'Sương mù', icon: '🌫️' };
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { text: 'Có mưa', icon: '🌧️' };
-  if ([95, 96, 99].includes(code)) return { text: 'Giông bão', icon: '⛈️' };
-  return { text: 'Trời đẹp', icon: '🌤️' };
+function getWeatherInfo(code: number): { text: string; Icon: LucideIcon } {
+  if (code === 0) return { text: 'Nắng trong', Icon: Sun };
+  if (code === 1 || code === 2) return { text: 'Nắng nhẹ', Icon: CloudSun };
+  if (code === 3) return { text: 'Nhiều mây', Icon: Cloud };
+  if (code === 45 || code === 48) return { text: 'Sương mù', Icon: CloudFog };
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return { text: 'Có mưa', Icon: CloudRain };
+  if ([95, 96, 99].includes(code)) return { text: 'Giông bão', Icon: CloudLightning };
+  return { text: 'Trời đẹp', Icon: CloudSun };
 }
 
 // Simple in-memory cache by lat/lng rounded to 2 decimals
-const weatherCache: Record<string, { temp: number; text: string; icon: string; humidity: number }> = {};
+const weatherCache: Record<string, { temp: number; text: string; Icon: LucideIcon; humidity: number }> = {};
 
 export default function PlaceWeatherPill({ latitude, longitude }: PlaceWeatherPillProps) {
   const [weather, setWeather] = useState<{
     temp: number;
     text: string;
-    icon: string;
+    Icon: LucideIcon;
     humidity: number;
   } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,7 +66,7 @@ export default function PlaceWeatherPill({ latitude, longitude }: PlaceWeatherPi
             const wData = {
               temp: Math.round(data.current.temperature_2m),
               text: info.text,
-              icon: info.icon,
+              Icon: info.Icon,
               humidity: data.current.relative_humidity_2m,
             };
             weatherCache[cacheKey] = wData;
@@ -79,23 +89,26 @@ export default function PlaceWeatherPill({ latitude, longitude }: PlaceWeatherPi
 
   if (loading) {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-800/60 border border-slate-700/60 text-[11px] text-slate-400">
-        <Loader2 className="w-3 h-3 animate-spin text-amber-400" />
+      <Badge variant="secondary" className="gap-1 text-[11px] font-normal border-[#E5E7EB]">
+        <Loader2 className="w-3 h-3 animate-spin text-[#6B7280]" />
         <span>Thời tiết...</span>
-      </span>
+      </Badge>
     );
   }
 
   if (!weather) return null;
 
+  const WeatherIcon = weather.Icon;
+
   return (
-    <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/25 text-amber-300 text-[11px] font-medium shadow-sm"
+    <Badge
+      variant="secondary"
+      className="gap-1.5 text-[11px] font-medium border-[#E5E7EB] bg-[#F5F5F4] text-[#1A1A1A] hover:bg-[#E5E7EB] transition-colors"
       title={`Thời tiết hiện tại: ${weather.temp}°C, ${weather.text}, độ ẩm ${weather.humidity}%`}
     >
-      <span>{weather.icon}</span>
-      <span className="font-bold">{weather.temp}°C</span>
-      <span className="text-amber-200/80">({weather.text})</span>
-    </span>
+      <WeatherIcon className="w-3.5 h-3.5 text-[#6B7280]" />
+      <span className="font-semibold">{weather.temp}°C</span>
+      <span className="text-[#6B7280]">({weather.text})</span>
+    </Badge>
   );
 }

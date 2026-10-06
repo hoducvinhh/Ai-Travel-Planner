@@ -1,141 +1,155 @@
-# Universal UI Design System - Tailwind CSS Cheatsheet
+# Universal UI Design System - Cheatsheet & Code Snippets
 
-Quick reference for copy-paste Tailwind CSS utility classes adhering to the Universal UI Design System.
+Quick reference for copy-paste shadcn/ui components, Lucide icons, and Tailwind utility classes adhering to the Universal UI Design System.
 
 ---
 
-## 1. Palette & Surface Tokens
+## 1. Core Tokens & CSS Variables
 
-### Backgrounds
-```html
-<!-- Page Main Background -->
-<div class="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] font-sans">
-
-<!-- Clean White Card / Surface -->
-<div class="bg-white border border-[#E5E7EB] rounded-2xl shadow-xs p-5">
-
-<!-- Muted Surface / Secondary Card -->
-<div class="bg-[#F5F5F4] border border-[#E5E7EB] rounded-xl p-3.5">
-```
-
-### Typography Hierarchy
-```html
-<!-- Page Heading -->
-<h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1A1A1A]">
-
-<!-- Section Heading -->
-<h2 class="text-lg font-semibold text-[#1A1A1A]">
-
-<!-- Component / Card Title -->
-<h3 class="text-sm font-semibold text-[#1A1A1A]">
-
-<!-- Body Text -->
-<p class="text-sm text-[#1A1A1A] leading-relaxed">
-
-<!-- Caption / Secondary Text -->
-<p class="text-xs text-[#6B7280]">
-
-<!-- Metadata / Microcopy -->
-<span class="text-[11px] text-[#9CA3AF]">
+```css
+/* src/app/globals.css */
+:root {
+  --background: #F9F9F8;
+  --foreground: #1A1A1A;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A1A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A1A;
+  --primary: #1A1A1A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F5F5F4;
+  --secondary-foreground: #1A1A1A;
+  --muted: #F5F5F4;
+  --muted-foreground: #6B7280;
+  --accent: #F4FCE3;
+  --accent-foreground: #365314;
+  --destructive: #EF4444;
+  --destructive-foreground: #FFFFFF;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
+  --ring: #1A1A1A;
+  --radius: 0.875rem;
+}
 ```
 
 ---
 
-## 2. Navigation & Pill Controls
+## 2. shadcn/ui Component Recipes
 
-### Segmented Control
-```html
-<div class="inline-flex items-center p-1 rounded-full bg-[#F0F0EF] border border-[#E5E7EB] text-xs">
-  <!-- Active Tab -->
-  <button class="px-3.5 py-1.5 rounded-full font-medium bg-[#1A1A1A] text-white shadow-xs transition-all">
-    Tab Đang Chọn
-  </button>
-  <!-- Inactive Tab -->
-  <button class="px-3.5 py-1.5 rounded-full font-medium text-[#6B7280] hover:text-[#1A1A1A] transition-all">
-    Tab Khác
-  </button>
-</div>
-```
+### Buttons (`src/components/ui/button.tsx`)
+```tsx
+import { Button } from "@/components/ui/button"
+import { Plus, ArrowRight, Trash2 } from "lucide-react"
 
-### Filter Pill Carousel
-```html
-<!-- Active Pill -->
-<button class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium bg-[#1A1A1A] text-white border border-[#1A1A1A] shadow-xs transition-all">
-  <Compass class="w-3.5 h-3.5 text-white" />
-  <span>Khám phá</span>
-</button>
+// Primary CTA (Dark Charcoal)
+<Button variant="default" className="rounded-xl">
+  <Plus className="w-4 h-4 text-white" />
+  <span>Tạo lịch trình mới</span>
+</Button>
 
-<!-- Inactive Pill -->
-<button class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB] transition-all">
-  <Compass class="w-3.5 h-3.5 text-[#6B7280]" />
-  <span>Khám phá</span>
-</button>
-```
+// Secondary / Neutral Button
+<Button variant="secondary" className="rounded-xl">
+  <span>Xem chi tiết</span>
+</Button>
 
----
-
-## 3. Badges & Status Indicators
-
-### Subtle Lime Accent Badges
-```html
-<!-- Lime Badge (Small) -->
-<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] text-[10px] font-semibold">
-  Mới cập nhật
-</span>
-
-<!-- Status Online Dot (Semantic) -->
-<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-[#E5E7EB] text-[11px] text-[#4B5563] shadow-2xs">
-  <span class="w-1.5 h-1.5 rounded-full bg-[#65A30D]"></span>
-  <span>Đang hoạt động</span>
-</div>
-```
-
----
-
-## 4. Buttons
-
-```html
-<!-- Primary Button (Dark Charcoal) -->
-<button class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] active:scale-[0.99] text-white font-medium text-xs sm:text-sm transition-all shadow-xs">
-  <Plus class="w-4 h-4 text-white" />
-  <span>Tạo mới</span>
-</button>
-
-<!-- Secondary Button (White / Subtle Border) -->
-<button class="flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB] text-xs font-medium transition shadow-2xs">
+// Outline Button
+<Button variant="outline" className="rounded-xl border-[#E5E7EB]">
   <span>Hủy bỏ</span>
-</button>
+</Button>
+```
 
-<!-- Subtle Icon Action Button -->
-<button class="p-2 rounded-xl bg-white hover:bg-[#F5F5F4] text-[#6B7280] hover:text-[#1A1A1A] border border-[#E5E7EB] transition shadow-2xs">
-  <PanelLeft class="w-4 h-4" />
-</button>
+### Badges (`src/components/ui/badge.tsx`)
+```tsx
+import { Badge } from "@/components/ui/badge"
+
+// Subtle Lime Accent Badge (Status, active, tags)
+<Badge variant="lime">
+  10.856 Chunks
+</Badge>
+
+// Dark Charcoal Badge
+<Badge variant="default">
+  Admin
+</Badge>
+
+// Outline Badge
+<Badge variant="outline" className="border-[#E5E7EB] text-[#1A1A1A]">
+  63 Tỉnh thành
+</Badge>
+```
+
+### Cards (`src/components/ui/card.tsx`)
+```tsx
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card"
+import { Route } from "lucide-react"
+
+<Card className="rounded-2xl border-[#E5E7EB] bg-white shadow-2xs">
+  <CardHeader className="flex flex-row items-center gap-3 space-y-0 pb-3">
+    <div className="w-9 h-9 rounded-lg bg-[#F5F5F4] border border-[#E5E7EB] flex items-center justify-center text-[#1A1A1A]">
+      <Route className="w-4 h-4 text-[#1A1A1A]" />
+    </div>
+    <div>
+      <CardTitle className="text-sm font-semibold text-[#1A1A1A]">Tuyến Liên Tỉnh</CardTitle>
+      <CardDescription className="text-xs text-[#6B7280]">40+ lộ trình tối ưu</CardDescription>
+    </div>
+  </CardHeader>
+  <CardContent className="text-xs text-[#4B5563]">
+    Khám phá các cung đường phượt đẹp nhất nối liền các tỉnh thành Việt Nam.
+  </CardContent>
+</Card>
+```
+
+### Segmented Tabs (`src/components/ui/tabs.tsx`)
+```tsx
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { ListFilter, Grid } from "lucide-react"
+
+<Tabs defaultValue="list">
+  <TabsList className="rounded-full bg-[#F0F0EF] border border-[#E5E7EB] p-1">
+    <TabsTrigger
+      value="list"
+      className="rounded-full px-3.5 py-1.5 text-xs font-medium data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white shadow-xs"
+    >
+      <ListFilter className="w-3.5 h-3.5 mr-1.5" />
+      <span>Chi tiết</span>
+    </TabsTrigger>
+    <TabsTrigger
+      value="grid"
+      className="rounded-full px-3.5 py-1.5 text-xs font-medium data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white shadow-xs"
+    >
+      <Grid className="w-3.5 h-3.5 mr-1.5" />
+      <span>Lưới</span>
+    </TabsTrigger>
+  </TabsList>
+  <TabsContent value="list">...</TabsContent>
+  <TabsContent value="grid">...</TabsContent>
+</Tabs>
 ```
 
 ---
 
-## 5. Input Fields
+## 3. Lucide Icons Catalog Quick-Reference
 
-```html
-<!-- Text Input Container with Focus Ring -->
-<div class="relative flex items-center bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 shadow-2xs focus-within:border-[#1A1A1A] focus-within:ring-2 focus-within:ring-[#1A1A1A]/10 transition-all">
-  <Search class="w-4 h-4 text-[#9CA3AF] mr-2 shrink-0" />
-  <input
-    type="text"
-    placeholder="Tìm kiếm nội dung..."
-    class="w-full bg-transparent text-xs sm:text-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none"
-  />
-</div>
+```tsx
+import {
+  // Navigation & Places
+  Compass, MapPin, Calendar, Users, Route, Landmark, Mountain, Waves, Hotel, Utensils,
+  // Actions & Controls
+  Plus, Send, Search, Trash2, Edit3, Check, X, RotateCcw, ArrowRight, ArrowUpRight,
+  // State & Feedback
+  Sparkles, Clock, BookOpen, HardDrive, Database, Loader2, HelpCircle, AlertCircle
+} from "lucide-react";
 ```
 
----
-
-## 6. Icon Formatting Rules
-
-| Context | Class | Color Rule |
-| :--- | :--- | :--- |
-| Action Button | `w-4 h-4 text-white` | White on dark button |
-| Muted Icon | `w-4 h-4 text-[#6B7280]` | Monochrome gray |
-| Active Icon | `w-4 h-4 text-[#1A1A1A]` | Dark charcoal |
-| Inline Chip | `w-3.5 h-3.5 text-[#6B7280]` | Standard micro size |
-| Icon Wrapper | `w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E5E7EB] flex items-center justify-center text-[#1A1A1A]` | Neutral box, no color glow |
+### Icon Sizing Rules:
+- Inline Metadata / Chips: `w-3.5 h-3.5`
+- Button / Actions: `w-4 h-4`
+- Icon Box Wrapper: `w-8 h-8 rounded-lg bg-[#F5F5F4] border border-[#E5E7EB] flex items-center justify-center text-[#1A1A1A]`
+- Colors: Always monochrome (`text-[#1A1A1A]`, `text-[#6B7280]`, or `text-white` on dark surface).
