@@ -24,33 +24,19 @@ import {
   User as UserIcon,
   Clock,
   ExternalLink,
+  Layers,
+  Lightbulb,
+  HelpCircle,
+  ChevronRight,
+  Grid,
+  ListFilter,
+  ArrowUpRight,
 } from 'lucide-react';
 import { SourceCitation, Message, SystemStatus, ChatSession } from '@/types';
 import { chatApi, getStoredToken } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { RAG_TOPICS, RagTopic } from '@/lib/ragTopics';
 
-const SUGGESTED_QUESTIONS = [
-  {
-    category: 'Văn hóa & Con người',
-    icon: '👥',
-    question: 'Người dân Việt Nam nổi tiếng với đặc điểm gì?',
-  },
-  {
-    category: 'Thủ đô Hà Nội',
-    icon: '🏛️',
-    question: 'Thủ đô Hà Nội có những nét hấp dẫn nào về văn hóa và ẩm thực?',
-  },
-  {
-    category: 'Kỳ quan Thiên nhiên',
-    icon: '🏝️',
-    question: 'Vịnh Hạ Long được miêu tả và có những giá trị đặc sắc gì?',
-  },
-  {
-    category: 'Di sản & Ẩm thực',
-    icon: '🏮',
-    question: 'Phố cổ Hội An và các món ăn đặc trưng ở miền Trung có gì nổi bật?',
-  },
-];
 
 const GUEST_STORAGE_KEY = 'vietnam_travel_rag_guest_sessions';
 
