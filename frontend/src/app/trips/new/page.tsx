@@ -123,7 +123,7 @@ function NewTripContent() {
   return (
     <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
       {/* Step Header */}
-      <div className="border-b border-[#E5E7EB] bg-white sticky top-0 z-30">
+      <div className="border-b border-[#E5E7EB] bg-white/95 backdrop-blur-md sticky top-[57px] z-30">
         <div className="container mx-auto px-4 py-4 max-w-4xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
