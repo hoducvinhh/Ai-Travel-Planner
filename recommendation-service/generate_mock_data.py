@@ -245,8 +245,11 @@ def expand_places_with_llm_style(base_places: List[Dict], target_count: int = 20
 
     # If mock_places.json already exists with curated places, load from it to keep real places
     import os
-    if os.path.exists('mock_places.json'):
-        with open('mock_places.json', 'r', encoding='utf-8') as f:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    datasets_dir = os.path.join(os.path.dirname(current_dir), 'datasets')
+    places_file = os.path.join(datasets_dir, 'mock_places.json') if os.path.exists(os.path.join(datasets_dir, 'mock_places.json')) else 'mock_places.json'
+    if os.path.exists(places_file):
+        with open(places_file, 'r', encoding='utf-8') as f:
             existing = json.load(f)
             if len(existing) >= target_count and not any("Branch" in p.get("name", "") for p in existing):
                 return existing[:target_count]
@@ -288,20 +291,28 @@ def main():
     # Save to JSON files
     print("Saving data...")
 
-    with open('mock_users.json', 'w', encoding='utf-8') as f:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    datasets_dir = os.path.join(os.path.dirname(current_dir), 'datasets')
+    out_dir = datasets_dir if os.path.exists(datasets_dir) else current_dir
+
+    users_file = os.path.join(out_dir, 'mock_users.json')
+    places_file = os.path.join(out_dir, 'mock_places.json')
+    interactions_file = os.path.join(out_dir, 'mock_interactions.json')
+
+    with open(users_file, 'w', encoding='utf-8') as f:
         json.dump(users, f, ensure_ascii=False, indent=2, default=str)
 
-    with open('mock_places.json', 'w', encoding='utf-8') as f:
+    with open(places_file, 'w', encoding='utf-8') as f:
         json.dump(places, f, ensure_ascii=False, indent=2, default=str)
 
-    with open('mock_interactions.json', 'w', encoding='utf-8') as f:
+    with open(interactions_file, 'w', encoding='utf-8') as f:
         json.dump(interactions, f, ensure_ascii=False, indent=2, default=str)
 
     print(f"✅ Generated:")
     print(f"   - {len(users)} users")
     print(f"   - {len(places)} places")
     print(f"   - {len(interactions)} interactions")
-    print("\nFiles saved:")
+    print(f"\nFiles saved to {out_dir}:")
     print("   - mock_users.json")
     print("   - mock_places.json")
     print("   - mock_interactions.json")
