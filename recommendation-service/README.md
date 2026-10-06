@@ -35,10 +35,10 @@ TOP_K=50
 python generate_mock_data.py
 ```
 
-This generates:
-- `mock_users.json` - 400 synthetic users with diverse personas
-- `mock_places.json` - 200 places across Vietnam
-- `mock_interactions.json` - 15,000 simulated user interactions
+This generates (saved in `datasets/`):
+- `datasets/mock_users.json` - 400 synthetic users with diverse personas
+- `datasets/mock_places.json` - 200+ places across Vietnam
+- `datasets/mock_interactions.json` - 15,000 simulated user interactions
 
 ### 4. Load Data into Database
 
