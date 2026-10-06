@@ -60,8 +60,16 @@ export default function QuestionAnswerPage() {
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
 
+  // Trạng thái Chủ đề RAG (Topic Explorer)
+  const [selectedTopicId, setSelectedTopicId] = useState<string>('routes');
+  const [topicViewMode, setTopicViewMode] = useState<'tabs' | 'grid'>('tabs');
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [activeQuickTopic, setActiveQuickTopic] = useState<string | null>(null);
+  const [searchTopicQuery, setSearchTopicQuery] = useState('');
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
 
   // Helper lấy guest IDs từ localStorage
   const getGuestSessionIds = (): string[] => {
