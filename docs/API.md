@@ -1,480 +1,323 @@
-# API Documentation - AI Travel Planner
+# 📖 Tài Liệu API (API Documentation) - AI Travel Planner
 
-## Base URL
-```
-http://localhost:3000
-```
-
-## Authentication
-Currently not implemented. Will be added in Phase 2.
+Hệ thống backend cung cấp RESTful API và luồng dữ liệu thời gian thực (Server-Sent Events) phục vụ toàn bộ các tính năng của nền tảng **AI Travel Planner**.
 
 ---
 
-## Trips API
+## 🌐 Cổng Dịch Vụ (Base URLs)
 
-### Create Trip & Generate Itinerary
+| Dịch vụ | Môi trường Local | Công nghệ | Mô tả |
+| :--- | :--- | :--- | :--- |
+| **Backend API Gateway** | `http://localhost:3002` | NestJS | Quản lý dữ liệu chính, xác thực, chuyến đi, RAG chat |
+| **Frontend Web** | `http://localhost:3000` | Next.js 16 | Giao diện người dùng web application |
+| **Recommendation Service** | `http://localhost:8000` | FastAPI (Python) | Dịch vụ tính toán và đề xuất địa điểm bằng ML |
 
-**Endpoint:** `POST /trips`
+---
 
-**Description:** Creates a new trip and generates a personalized itinerary using ML recommendations and LLM planning.
+## 🔐 Xác Thực (Authentication & Authorization)
 
-**Request Body:**
-```json
-{
-  "userId": "uuid",
-  "destination": "Lam Dong",
-  "startDate": "2026-11-01T00:00:00.000Z",
-  "endDate": "2026-11-04T00:00:00.000Z",
-  "budgetPerPerson": 5000000,
-  "groupSize": 2,
-  "preferences": ["Nature", "Adventure", "Photography"]
-}
-```
+Hệ thống sử dụng **JSON Web Token (JWT)** với tiêu chuẩn RFC 7519.
+- Token được gửi kèm trong Header của mỗi yêu cầu:
+  ```http
+  Authorization: Bearer <jwt_access_token>
+  ```
+- **Phân quyền người dùng (Role-Based Access Control)**:
+  - `USER`: Khách hàng thông thường (tạo chuyến đi, hỏi đáp RAG, tương tác, bình luận, đăng bài).
+  - `ADMIN`: Quản trị viên (quản lý địa điểm, người dùng, cập nhật trạng thái hệ thống).
 
-**Response:** `201 Created`
-```json
-{
-  "id": "trip-uuid",
-  "userId": "user-uuid",
-  "destination": "Lam Dong",
-  "startDate": "2026-11-01T00:00:00.000Z",
-  "endDate": "2026-11-04T00:00:00.000Z",
-  "budgetPerPerson": 5000000,
-  "groupSize": 2,
-  "status": "GENERATED",
-  "itinerary": {
-    "days": [
-      {
-        "dayNumber": 1,
-        "date": "Day 1",
-        "places": [
-          {
-            "placeId": "place-uuid",
-            "name": "Hồ Xuân Hương",
-            "description": "Beautiful lake in the heart of Da Lat",
-            "categories": ["Nature", "Lake", "Scenic"],
-            "estimatedTime": "2 hours",
-            "orderInDay": 1,
-            "latitude": 11.9404,
-            "longitude": 108.4380,
-            "priceEstimate": 0
-          }
-        ],
-        "notes": "Start your day with scenic views"
-      }
-    ],
-    "summary": "3-day nature and adventure trip in Da Lat",
-    "totalEstimatedCost": 1500000
-  },
-  "createdAt": "2026-10-02T07:44:11.147Z",
-  "updatedAt": "2026-10-02T07:44:11.147Z"
-}
-```
+---
 
-### Get Trip by ID
+## 1. 🔑 Auth API (`/auth`)
 
-**Endpoint:** `GET /trips/:id`
-
-**Response:** `200 OK`
-```json
-{
-  "id": "trip-uuid",
-  "userId": "user-uuid",
-  "user": {
-    "id": "user-uuid",
-    "name": "John Doe",
-    "email": "john@example.com"
-  },
-  "destination": "Lam Dong",
-  "startDate": "2026-11-01T00:00:00.000Z",
-  "endDate": "2026-11-04T00:00:00.000Z",
-  "budgetPerPerson": 5000000,
-  "groupSize": 2,
-  "status": "GENERATED",
-  "itinerary": { /* ... */ },
-  "places": [
-    {
-      "id": "trip-place-uuid",
-      "tripId": "trip-uuid",
-      "placeId": "place-uuid",
-      "dayNumber": 1,
-      "orderInDay": 1,
-      "notes": "Beautiful lake",
-      "place": { /* place details */ }
-    }
-  ],
-  "createdAt": "2026-10-02T07:44:11.147Z",
-  "updatedAt": "2026-10-02T07:44:11.147Z"
-}
-```
-
-### Get User Trips
-
-**Endpoint:** `GET /trips?userId={userId}`
-
-**Query Parameters:**
-- `userId` (required): User UUID
-
-**Response:** `200 OK`
-```json
-[
+### 1.1 Đăng ký tài khoản
+- **Endpoint**: `POST /auth/register`
+- **Body**:
+  ```json
   {
-    "id": "trip-uuid",
-    "destination": "Lam Dong",
+    "email": "user@example.com",
+    "password": "Password123@",
+    "name": "Nguyễn Văn A"
+  }
+  ```
+- **Response**: `201 Created`
+  ```json
+  {
+    "user": {
+      "id": "uuid",
+      "email": "user@example.com",
+      "name": "Nguyễn Văn A",
+      "role": "USER"
+    },
+    "accessToken": "jwt_token_string"
+  }
+  ```
+
+### 1.2 Đăng nhập
+- **Endpoint**: `POST /auth/login`
+- **Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "Password123@"
+  }
+  ```
+- **Response**: `200 OK` (Trả về thông tin user và accessToken).
+
+### 1.3 Lấy thông tin cá nhân hiện tại
+- **Endpoint**: `GET /auth/profile`
+- **Header**: `Authorization: Bearer <token>`
+- **Response**: `200 OK`
+
+---
+
+## 2. 💬 Chatbot & RAG Q&A API (`/api/chat`)
+
+### 2.1 Gửi tin nhắn hỏi đáp RAG (Hỗ trợ SSE Streaming)
+- **Endpoint**: `POST /api/chat`
+- **Header**: `Authorization: Bearer <token>` *(tùy chọn - nếu có sẽ tự liên kết với tài khoản user)*
+- **Header SSE**: `Accept: text/event-stream`
+- **Body**:
+  ```json
+  {
+    "message": "Chi phí du lịch Măng Đen 3 ngày 2 đêm tự túc hết bao nhiêu?",
+    "sessionId": "session-uuid" 
+  }
+  ```
+- **Luồng dữ liệu phản hồi (SSE Events)**:
+  - `event: session`: Trả về `{"sessionId": "uuid"}`.
+  - `event: sources`: Trả về danh sách Top chunks tham chiếu từ pgvector:
+    ```json
+    {
+      "sources": [
+        {
+          "id": "qa_cost_03",
+          "title": "Dự toán chi phí Măng Đen 3N2Đ",
+          "chunkType": "qa",
+          "similarity": 0.942,
+          "content": "...",
+          "metadata": { "province": "Kon Tum", "topic": "Dự toán chi phí" }
+        }
+      ]
+    }
+    ```
+  - `event: token`: Từng từ/token sinh ra từ Google Gemini LLM (`{"token": "Chi "}`).
+  - `event: done`: `{"done": true}` khi hoàn tất.
+
+### 2.2 Quản lý phiên hội thoại (Chat Sessions)
+- **`GET /api/chat/sessions`**: Lấy danh sách phiên hội thoại của user hoặc khách (hỗ trợ query `?guest_ids=id1,id2`).
+- **`POST /api/chat/sessions`**: Tạo phiên hội thoại mới (`{"title": "Kế hoạch đi Tây Bắc"}`).
+- **`GET /api/chat/sessions/:id`**: Xem chi tiết phiên kèm toàn bộ lịch sử tin nhắn và nguồn trích dẫn.
+- **`PATCH /api/chat/sessions/:id`**: Đổi tên tiêu đề phiên hội thoại (`{"title": "Tiêu đề mới"}`).
+- **`DELETE /api/chat/sessions/:id`**: Xóa phiên hội thoại.
+
+### 2.3 Kiểm tra trạng thái kho tri thức RAG
+- **Endpoint**: `GET /api/chat/status`
+- **Response**: `200 OK`
+  ```json
+  {
+    "status": "online",
+    "database": {
+      "connected": true,
+      "totalChunks": 10856,
+      "breakdown": [
+        { "type": "context", "count": 1386 },
+        { "type": "qa", "count": 9470 }
+      ]
+    },
+    "services": {
+      "bgeM3Local": true,
+      "geminiConfigured": true
+    }
+  }
+  ```
+
+---
+
+## 3. 🗺️ Trips & Itinerary API (`/trips`)
+
+### 3.1 Tạo chuyến đi & Lập lịch trình tự động bằng AI
+- **Endpoint**: `POST /trips`
+- **Header**: `Authorization: Bearer <token>`
+- **Description**: Gọi hệ thống Recommendation Service để đề xuất địa điểm tối ưu, sau đó kết hợp Google Gemini LLM để thiết kế lịch trình chi tiết theo từng ngày (sáng/trưa/tối) bám sát ngân sách.
+- **Body**:
+  ```json
+  {
+    "destination": "Lâm Đồng",
     "startDate": "2026-11-01T00:00:00.000Z",
     "endDate": "2026-11-04T00:00:00.000Z",
-    "status": "GENERATED",
-    "places": [ /* ... */ ]
+    "budgetPerPerson": 5000000,
+    "groupSize": 2,
+    "preferences": ["Nature", "Adventure", "Photography"]
   }
-]
-```
+  ```
+- **Response**: `201 Created`
+  ```json
+  {
+    "id": "trip-uuid",
+    "destination": "Lâm Đồng",
+    "startDate": "2026-11-01T00:00:00.000Z",
+    "endDate": "2026-11-04T00:00:00.000Z",
+    "budgetPerPerson": 5000000,
+    "groupSize": 2,
+    "status": "GENERATED",
+    "itinerary": {
+      "summary": "Chuyến đi 4 ngày 3 đêm khám phá Đà Lạt mộng mơ",
+      "totalEstimatedCost": 4200000,
+      "days": [
+        {
+          "dayNumber": 1,
+          "date": "2026-11-01",
+          "notes": "Tham quan trung tâm thành phố và ngắm hoàng hôn Hồ Xuân Hương",
+          "places": [
+            {
+              "placeId": "place-uuid-1",
+              "name": "Hồ Xuân Hương",
+              "estimatedTime": "2 giờ",
+              "orderInDay": 1,
+              "priceEstimate": 0,
+              "latitude": 11.9404,
+              "longitude": 108.4380
+            }
+          ]
+        }
+      ]
+    }
+  }
+  ```
 
-### Update Trip Status
+### 3.2 Lấy danh sách chuyến đi của người dùng
+- **Endpoint**: `GET /trips`
+- **Header**: `Authorization: Bearer <token>`
+- **Response**: `200 OK` (Danh sách các chuyến đi đã tạo).
 
-**Endpoint:** `PATCH /trips/:id/status`
+### 3.3 Xem chi tiết chuyến đi
+- **Endpoint**: `GET /trips/:id`
+- **Header**: `Authorization: Bearer <token>`
 
-**Request Body:**
-```json
-{
-  "status": "CONFIRMED"
-}
-```
+### 3.4 Cập nhật trạng thái chuyến đi
+- **Endpoint**: `PATCH /trips/:id/status`
+- **Header**: `Authorization: Bearer <token>` *(ADMIN hoặc Chủ chuyến đi)*
+- **Body**: `{"status": "CONFIRMED"}` (Giá trị: `DRAFT`, `GENERATED`, `CONFIRMED`, `COMPLETED`, `CANCELLED`).
 
-**Status Values:**
-- `DRAFT` - Initial state
-- `GENERATED` - Itinerary generated
-- `CONFIRMED` - User confirmed
-- `COMPLETED` - Trip finished
-- `CANCELLED` - Cancelled
-
-**Response:** `200 OK`
-
-### Delete Trip
-
-**Endpoint:** `DELETE /trips/:id`
-
-**Response:** `204 No Content`
+### 3.5 Xóa chuyến đi
+- **Endpoint**: `DELETE /trips/:id`
+- **Header**: `Authorization: Bearer <token>`
 
 ---
 
-## Interactions API
+## 4. 📍 Places API (`/places`)
 
-### Track User Interaction
+### 4.1 Danh sách địa điểm du lịch (Lọc, Tìm kiếm, Phân trang)
+- **Endpoint**: `GET /places`
+- **Query Parameters**:
+  - `page`: Trang hiện tại (mặc định: 1)
+  - `limit`: Số lượng/trang (mặc định: 20)
+  - `province`: Lọc theo tỉnh thành (ví dụ: `Hà Nội`, `Đà Nẵng`, `Lâm Đồng`)
+  - `category`: Lọc theo danh mục (`Nature`, `Historical`, `Food`, `Culture`...)
+  - `search`: Tìm theo từ khóa tên hoặc mô tả
+  - `sortBy`: Sắp xếp theo `popularity` hoặc `price`
+- **Response**: `200 OK` kèm tổng số bản ghi và thông tin phân trang.
 
-**Endpoint:** `POST /interactions`
+### 4.2 Lấy danh sách các tỉnh thành
+- **Endpoint**: `GET /places/provinces`
+- **Response**: `200 OK` danh sách các tỉnh thành cùng số lượng địa điểm tương ứng.
 
-**Description:** Track user interactions with places for ML training.
+### 4.3 Xem chi tiết một địa điểm
+- **Endpoint**: `GET /places/:id?userId={userId}`
+- **Response**: `200 OK` (Thông tin chi tiết, tọa độ GPS, mức giá, ảnh, đánh giá trung bình, trạng thái user đã Like/Save).
 
-**Request Body:**
-```json
-{
-  "userId": "user-uuid",
-  "placeId": "place-uuid",
-  "eventType": "LIKE",
-  "sessionId": "session-uuid",
-  "ratingValue": 4.5
-}
-```
+### 4.4 Thao tác Quản trị (Admin Only)
+- `POST /places`: Tạo địa điểm mới.
+- `PATCH /places/:id`: Cập nhật thông tin địa điểm.
+- `DELETE /places/:id`: Xóa địa điểm.
 
-**Event Types:**
-- `VIEW_DETAIL` - User viewed place details (weight: 1.0)
-- `LIKE` - User liked the place (weight: 5.0)
-- `SAVE` - User saved for later (weight: 5.0)
-- `REMOVE_SAVE` - User removed from saved (weight: -2.0)
-- `RATE` - User rated the place (weight: (rating-3)*2)
-- `SHARE` - User shared the place (weight: 3.0)
+---
 
-**Response:** `201 Created`
-```json
-{
-  "id": "interaction-uuid",
-  "userId": "user-uuid",
-  "placeId": "place-uuid",
-  "eventType": "LIKE",
-  "sessionId": "session-uuid",
-  "ratingValue": null,
-  "createdAt": "2026-10-02T07:44:11.147Z"
-}
-```
+## 5. 🎯 Recommendations API (`/recommendations`)
 
-### Get User Interactions
+Cổng giao tiếp giữa Backend NestJS và Recommendation Microservice (Python/FastAPI):
 
-**Endpoint:** `GET /interactions/user/:userId`
-
-**Query Parameters:**
-- `placeId` (optional): Filter by specific place
-
-**Response:** `200 OK`
-```json
-[
+### 5.1 Lấy danh sách địa điểm đề xuất bằng ML
+- **Endpoint**: `POST /recommendations`
+- **Body**:
+  ```json
   {
-    "id": "interaction-uuid",
+    "userId": "user-uuid",
+    "destination": "Lâm Đồng",
+    "budgetPerPerson": 5000000,
+    "days": 3,
+    "groupSize": 2,
+    "explicitPreferences": ["Nature", "Photography"]
+  }
+  ```
+- **Response**: `200 OK`
+  ```json
+  {
+    "placeIds": ["uuid-1", "uuid-2", "uuid-3"],
+    "scores": [0.95, 0.88, 0.82]
+  }
+  ```
+
+### 5.2 Huấn luyện lại mô hình đề xuất
+- **Endpoint**: `POST /recommendations/train`
+- **Response**: `200 OK` (`{"status": "success", "message": "Model trained successfully"}`)
+
+### 5.3 Kiểm tra sức khỏe dịch vụ đề xuất
+- **Endpoint**: `GET /recommendations/health`
+- **Response**: `200 OK` (`{"status": "healthy", "modelStatus": "loaded"}`)
+
+---
+
+## 6. 👆 Interactions API (`/interactions`)
+
+Ghi nhận hành vi người dùng để nạp vào mô hình đề xuất Machine Learning:
+
+### 6.1 Ghi nhận sự kiện tương tác
+- **Endpoint**: `POST /interactions`
+- **Body**:
+  ```json
+  {
     "userId": "user-uuid",
     "placeId": "place-uuid",
     "eventType": "LIKE",
-    "createdAt": "2026-10-02T07:44:11.147Z",
-    "place": {
-      "id": "place-uuid",
-      "name": "Hồ Xuân Hương",
-      "categories": ["Nature", "Lake"]
-    }
+    "sessionId": "session-uuid",
+    "ratingValue": 5.0
   }
-]
-```
+  ```
+- **Loại sự kiện & Trọng số**:
+  - `VIEW_DETAIL` (weight: 1.0)
+  - `LIKE` (weight: 5.0)
+  - `SAVE` (weight: 5.0)
+  - `REMOVE_SAVE` (weight: -2.0)
+  - `RATE` (weight: công thức điểm đánh giá)
+  - `SHARE` (weight: 3.0)
 
-### Get User Saved Places
-
-**Endpoint:** `GET /interactions/user/:userId/saved`
-
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": "place-uuid",
-    "name": "Hồ Xuân Hương",
-    "description": "Beautiful lake",
-    "categories": ["Nature", "Lake"],
-    "latitude": 11.9404,
-    "longitude": 108.4380,
-    "priceEstimate": 0,
-    "popularityScore": 150.5
-  }
-]
-```
-
-### Get User Liked Places
-
-**Endpoint:** `GET /interactions/user/:userId/liked`
-
-**Response:** Same format as saved places
-
-### Get Place Ratings
-
-**Endpoint:** `GET /interactions/place/:placeId/ratings`
-
-**Response:** `200 OK`
-```json
-{
-  "averageRating": 4.3,
-  "totalRatings": 25,
-  "ratings": [
-    {
-      "ratingValue": 5.0,
-      "userId": "user-uuid",
-      "createdAt": "2026-10-02T07:44:11.147Z"
-    }
-  ]
-}
-```
-
-### Get Place Interactions
-
-**Endpoint:** `GET /interactions/place/:placeId`
-
-**Response:** `200 OK`
-```json
-[
-  {
-    "id": "interaction-uuid",
-    "userId": "user-uuid",
-    "placeId": "place-uuid",
-    "eventType": "VIEW_DETAIL",
-    "createdAt": "2026-10-02T07:44:11.147Z",
-    "user": {
-      "id": "user-uuid",
-      "name": "John Doe"
-    }
-  }
-]
-```
-
-### Get User Interaction Stats
-
-**Endpoint:** `GET /interactions/user/:userId/stats`
-
-**Response:** `200 OK`
-```json
-{
-  "VIEW_DETAIL": 45,
-  "LIKE": 12,
-  "SAVE": 8,
-  "RATE": 5,
-  "SHARE": 3
-}
-```
+### 6.2 Tra cứu tương tác
+- **`GET /interactions/user/:userId/saved`**: Danh sách địa điểm đã lưu.
+- **`GET /interactions/user/:userId/liked`**: Danh sách địa điểm đã thích.
+- **`GET /interactions/place/:placeId/ratings`**: Thống kê đánh giá của một địa điểm.
+- **`GET /interactions/user/:userId/stats`**: Thống kê số lượng từng loại hành động của user.
 
 ---
 
-## Recommendations API
+## 7. 💬 Comments & Community API
 
-### Get Recommendations
+### 7.1 Bình luận địa điểm (`/places/:placeId/comments`)
+- **`GET /places/:placeId/comments`**: Xem danh sách bình luận của địa điểm.
+- **`POST /places/:placeId/comments`**: Thêm bình luận (`{"content": "Cảnh rất đẹp, nên đi vào sáng sớm"}`).
+- **`DELETE /comments/:id`**: Xóa bình luận của chính mình.
 
-**Endpoint:** `POST /recommendations`
-
-**Description:** Get ML-powered place recommendations for a trip.
-
-**Request Body:**
-```json
-{
-  "userId": "user-uuid",
-  "destination": "Lam Dong",
-  "budgetPerPerson": 5000000,
-  "days": 3,
-  "groupSize": 2,
-  "monthOfYear": 11,
-  "explicitPreferences": ["Nature", "Adventure"]
-}
-```
-
-**Response:** `200 OK`
-```json
-{
-  "placeIds": [
-    "place-uuid-1",
-    "place-uuid-2",
-    "place-uuid-3"
-  ],
-  "scores": [
-    0.95,
-    0.87,
-    0.82
-  ]
-}
-```
-
-### Train Recommendation Model
-
-**Endpoint:** `POST /recommendations/train`
-
-**Description:** Trigger ML model training. Should be called periodically or after significant data updates.
-
-**Response:** `200 OK`
-```json
-{
-  "status": "success",
-  "message": "Model trained successfully",
-  "stats": {
-    "users": 400,
-    "places": 200,
-    "interactions": 15000
-  }
-}
-```
-
-### Check Recommendation Service Health
-
-**Endpoint:** `GET /recommendations/health`
-
-**Response:** `200 OK`
-```json
-{
-  "status": "healthy",
-  "modelStatus": "loaded"
-}
-```
+### 7.2 Bài viết cộng đồng (`/community/posts`)
+- **`GET /community/posts`**: Xem bảng tin bài viết cộng đồng (lọc theo `tag`, `search`, phân trang).
+- **`POST /community/posts`**: Đăng bài viết chia sẻ kinh nghiệm (`{"title": "...", "content": "...", "tags": ["Đà Lạt", "Review"]}`).
+- **`POST /community/posts/:id/like`**: Thả tim/bỏ thả tim bài viết.
+- **`GET /community/posts/:id/comments`**: Xem bình luận trên bài viết.
+- **`POST /community/posts/:id/comments`**: Bình luận bài viết.
 
 ---
 
-## Error Responses
+## 8. 👤 Users API (`/users`)
 
-### 400 Bad Request
-```json
-{
-  "statusCode": 400,
-  "message": "Validation failed",
-  "error": "Bad Request"
-}
-```
-
-### 404 Not Found
-```json
-{
-  "statusCode": 404,
-  "message": "Trip with ID xxx not found",
-  "error": "Not Found"
-}
-```
-
-### 500 Internal Server Error
-```json
-{
-  "statusCode": 500,
-  "message": "Internal server error",
-  "error": "Internal Server Error"
-}
-```
-
-### 503 Service Unavailable
-```json
-{
-  "statusCode": 503,
-  "message": "Recommendation model not loaded. Please train the model first.",
-  "error": "Service Unavailable"
-}
-```
-
----
-
-## Rate Limits
-
-Currently not implemented. Will be added in production.
-
----
-
-## Webhooks
-
-Currently not implemented. Future feature for real-time updates.
-
----
-
-## Testing Examples
-
-### Complete Flow Example
-
-```bash
-# 1. Track some interactions
-curl -X POST http://localhost:3000/interactions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": "user-123",
-    "placeId": "place-456",
-    "eventType": "VIEW_DETAIL"
-  }'
-
-curl -X POST http://localhost:3000/interactions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": "user-123",
-    "placeId": "place-456",
-    "eventType": "LIKE"
-  }'
-
-# 2. Create a trip
-curl -X POST http://localhost:3000/trips \
-  -H "Content-Type: application/json" \
-  -d '{
-    "userId": "user-123",
-    "destination": "Lam Dong",
-    "startDate": "2026-11-01",
-    "endDate": "2026-11-04",
-    "budgetPerPerson": 5000000,
-    "groupSize": 2,
-    "preferences": ["Nature", "Adventure"]
-  }'
-
-# 3. Get user's saved places
-curl http://localhost:3000/interactions/user/user-123/saved
-
-# 4. Get user's trips
-curl http://localhost:3000/trips?userId=user-123
-```
-
----
-
-## Notes
-
-- All timestamps are in ISO 8601 format (UTC)
-- UUIDs are used for all IDs
-- Budget amounts are in VND (Vietnamese Dong)
-- Coordinates use decimal degrees format
-- The recommendation system requires at least 100 interactions to produce good results
+- **`GET /users/:id/profile`**: Xem hồ sơ người dùng (phong cách yêu thích, ngân sách ưu tiên, số chuyến đi, số địa điểm đã lưu).
+- **`PATCH /users/:id/profile`**: Cập nhật hồ sơ (`preferredStyles`, `budgetLevel`, `name`).
+- **`GET /users`** *(Admin)*: Danh sách toàn bộ tài khoản có phân trang và tìm kiếm.
