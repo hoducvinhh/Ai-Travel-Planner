@@ -13,6 +13,29 @@ export interface Message {
   content: string;
   sources?: SourceCitation[];
   timestamp: string;
+  createdAt?: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  userId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    messages: number;
+  };
+}
+
+export interface ChatSessionDetail extends ChatSession {
+  messages: Array<{
+    id: string;
+    sessionId: string;
+    role: 'user' | 'assistant';
+    content: string;
+    sources?: SourceCitation[];
+    createdAt: string;
+  }>;
 }
 
 export interface SystemStatus {

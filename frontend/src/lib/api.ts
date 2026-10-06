@@ -126,3 +126,22 @@ export const api = {
   delete: <T = any>(endpoint: string, options?: RequestOptions) =>
     apiFetch<T>(endpoint, { ...options, method: 'DELETE' }),
 };
+
+export const chatApi = {
+  getSessions: async (guestIds?: string[]) => {
+    const params = guestIds && guestIds.length > 0 ? `?guest_ids=${guestIds.join(',')}` : '';
+    return api.get(`/api/chat/sessions${params}`);
+  },
+  getSessionDetail: async (id: string) => {
+    return api.get(`/api/chat/sessions/${id}`);
+  },
+  createSession: async (title?: string) => {
+    return api.post('/api/chat/sessions', { title });
+  },
+  updateSessionTitle: async (id: string, title: string) => {
+    return api.patch(`/api/chat/sessions/${id}`, { title });
+  },
+  deleteSession: async (id: string) => {
+    return api.delete(`/api/chat/sessions/${id}`);
+  },
+};
