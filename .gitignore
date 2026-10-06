@@ -50,6 +50,7 @@ coverage/
 *.sqlite
 *.sqlite3
 tourism_chunks_data.sql
+datasets/*.sql
 
 # Docker
 .docker/
@@ -68,6 +69,7 @@ backend/prisma/migrations/*_initial/
 *.env
 
 # Mock data (optional - uncomment if you don't want to commit)
+# datasets/mock_*.json
 # recommendation-service/mock_*.json
 
 # ML Models

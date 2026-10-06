@@ -14,6 +14,8 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "ingest": "tsx src/ingestion/ingest.ts",
+    "seed:provinces": "tsx src/ingestion/seed_21_provinces.ts",
+    "seed:topics": "tsx src/ingestion/seed_advanced_topics.ts",
     "seed:admin": "tsx prisma/seed.ts",
     "enrich:images": "tsx prisma/enrich-place-images.ts",
     "lint": "oxlint --type-aware src/ test/",
