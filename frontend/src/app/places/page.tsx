@@ -19,14 +19,26 @@ import {
   Send,
   Loader2,
   Check,
-  Tag,
-  Sparkles,
   Ticket,
   ChevronLeft,
   ChevronRight,
   TrendingUp,
+  Sparkles,
 } from 'lucide-react';
 import { Place, CommentItem } from '@/types';
+import { VIETNAM_PROVINCES, getProvinceMeta } from '@/lib/provinces';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const PlaceDirectionsModal = dynamic(
   () => import('@/components/PlaceDirectionsModal'),
@@ -38,14 +50,11 @@ const SharePlaceModal = dynamic(
   { ssr: false }
 );
 
-import { VIETNAM_PROVINCES, getProvinceMeta } from '@/lib/provinces';
-
 const PROVINCES = [
-  { key: 'ALL', label: 'Tất cả điểm đến', icon: '🌟' },
+  { key: 'ALL', label: 'Tất cả điểm đến' },
   ...VIETNAM_PROVINCES.map((p) => ({
     key: p.key,
     label: p.label,
-    icon: p.icon,
   })),
 ];
 
@@ -71,7 +80,7 @@ export default function PlacesSocialFeedPage() {
   const [search, setSearch] = useState('');
   const [selectedProvince, setSelectedProvince] = useState('ALL');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
-  const [sortBy, setSortBy] = useState<'popularity' | 'rating' | 'price_asc' | 'price_desc' | 'newest'>('popularity');
+  const [sortBy, setSortBy] = useState<string>('popularity');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -148,7 +157,6 @@ export default function PlacesSocialFeedPage() {
       return;
     }
 
-    // Optimistic UI update
     const prevLiked = !!place.isLiked;
     const nextLiked = !prevLiked;
     setPlaces((prev) =>
@@ -173,8 +181,7 @@ export default function PlacesSocialFeedPage() {
           p.id === place.id ? { ...p, isLiked: res.isLiked, likesCount: res.likesCount } : p,
         ),
       );
-    } catch (err) {
-      // Revert on error
+    } catch {
       setPlaces((prev) =>
         prev.map((p) => (p.id === place.id ? { ...p, isLiked: prevLiked } : p)),
       );
@@ -211,8 +218,8 @@ export default function PlacesSocialFeedPage() {
       setPlaces((prev) =>
         prev.map((p) => (p.id === place.id ? { ...p, isSaved: res.isSaved } : p)),
       );
-      showToast(res.isSaved ? 'Đã lưu vào danh sách Wishlist! 🔖' : 'Đã bỏ lưu khỏi Wishlist');
-    } catch (err) {
+      showToast(res.isSaved ? 'Đã lưu vào danh sách Wishlist!' : 'Đã bỏ lưu khỏi Wishlist');
+    } catch {
       setPlaces((prev) =>
         prev.map((p) => (p.id === place.id ? { ...p, isSaved: prevSaved } : p)),
       );
@@ -251,13 +258,13 @@ export default function PlacesSocialFeedPage() {
             : p,
         ),
       );
-      showToast(`Cảm ơn bạn đã đánh giá ${ratingValue} sao! ⭐`);
-    } catch (err) {
+      showToast(`Cảm ơn bạn đã đánh giá ${ratingValue} sao!`);
+    } catch {
       showToast('Có lỗi xảy ra khi gửi đánh giá');
     }
   };
 
-  // Handle Unrate (remove user rating)
+  // Handle Unrate
   const handleUnrate = async (placeId: string) => {
     if (!isAuthenticated || !user) return;
 
@@ -285,17 +292,15 @@ export default function PlacesSocialFeedPage() {
         ),
       );
       showToast('Đã hủy đánh giá của bạn');
-    } catch (err) {
+    } catch {
       showToast('Có lỗi xảy ra khi hủy đánh giá');
     }
   };
 
-  // Share place - open Share Modal
   const handleShare = (place: Place) => {
     setSharingPlace(place);
   };
 
-  // Toggle comments expand and fetch comments
   const toggleComments = async (placeId: string) => {
     if (activeCommentsPlaceId === placeId) {
       setActiveCommentsPlaceId(null);
@@ -304,7 +309,6 @@ export default function PlacesSocialFeedPage() {
 
     setActiveCommentsPlaceId(placeId);
 
-    // Track VIEW_DETAIL interaction
     if (user?.id) {
       api.post('/interactions/track', {
         userId: user.id,
@@ -326,7 +330,6 @@ export default function PlacesSocialFeedPage() {
     }
   };
 
-  // Submit comment
   const handleCommentSubmit = async (placeId: string) => {
     const text = (newCommentText[placeId] || '').trim();
     if (!text) return;
@@ -353,177 +356,174 @@ export default function PlacesSocialFeedPage() {
       );
 
       setNewCommentText((prev) => ({ ...prev, [placeId]: '' }));
-      showToast('Bình luận của bạn đã được đăng! 💬');
-    } catch (err) {
+      showToast('Bình luận của bạn đã được đăng!');
+    } catch {
       showToast('Có lỗi xảy ra khi gửi bình luận');
     } finally {
       setIsSubmittingComment((prev) => ({ ...prev, [placeId]: false }));
     }
   };
 
-  const getProvinceBadge = (province?: string) => {
-    const meta = getProvinceMeta(province);
-    return { text: meta.label, bg: meta.bg, icon: meta.icon };
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white pb-20">
+    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
       {/* Toast Alert */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900/95 border border-emerald-500/40 text-emerald-300 px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 animate-bounce">
-          <Sparkles className="w-5 h-5 text-emerald-400" />
-          <span className="text-sm font-medium">{toastMessage}</span>
+        <div className="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#333333] flex items-center gap-2.5 text-xs font-medium animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <Sparkles className="w-4 h-4 text-[#D4F066]" />
+          <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Hero Header */}
-      <section className="relative overflow-hidden border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md py-12 md:py-16">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="container mx-auto px-4 relative z-10 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
+      {/* Header Section */}
+      <section className="border-b border-[#E5E7EB] bg-white py-12 md:py-16">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-xs font-medium mb-4">
             <Compass className="w-3.5 h-3.5" />
-            Social Travel Feed • Khám Phá 520+ Điểm Đến Thật
+            <span>Khám phá 520+ điểm đến thực tế tại Việt Nam</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
-            Khám Phá & Chia Sẻ Điểm Đến{' '}
-            <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">
-              Cá Nhân Hóa
-            </span>
+
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-3">
+            Khám phá & trải nghiệm điểm đến
           </h1>
-          <p className="text-slate-300 text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Tương tác với các địa điểm bằng cách Thích, Lưu và Đánh giá. Mô hình Machine Learning (LightFM)
-            sẽ học trực tiếp sở thích của bạn để thiết kế lịch trình du lịch thông minh nhất.
+
+          <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            Khám phá danh mục địa điểm, lưu lại mục yêu thích và đánh giá trải nghiệm. Hệ thống Machine Learning sẽ cá nhân hóa gợi ý cho hành trình tiếp theo của bạn.
           </p>
 
-          {/* Quick Stats Banner */}
-          <div className="mt-8 flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-300">
-            <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-emerald-400" />
-              <span>520+ Địa điểm tuyển chọn</span>
-            </div>
-            <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-teal-400" />
-              <span>Học máy tự động thích nghi</span>
-            </div>
-            <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span>11 Tỉnh thành du lịch trọng điểm</span>
-            </div>
+          {/* Key metadata pills */}
+          <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs font-medium">
+            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>520+ Điểm đến chọn lọc</span>
+            </Badge>
+            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
+              <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>Gợi ý LightFM cá nhân hoá</span>
+            </Badge>
+            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
+              <Compass className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>11 Tỉnh thành trọng điểm</span>
+            </Badge>
           </div>
         </div>
       </section>
 
-      {/* Control Bar: Search & Filters */}
+      {/* Search & Filter Controls */}
       <section className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="bg-slate-900/70 border border-slate-800/80 rounded-2xl p-5 backdrop-blur-md shadow-xl mb-8 space-y-5">
-          {/* Top row: Search input & Sort */}
-          <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-            <div className="relative w-full md:w-96">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
-                placeholder="Tìm theo tên địa điểm, quận, mô tả..."
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-950/70 border border-slate-800 rounded-xl text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500/60 transition"
-              />
-            </div>
+        <Card className="p-5 bg-white border-[#E5E7EB] shadow-2xs mb-8 space-y-5">
+          <CardContent className="p-0 space-y-5">
+            {/* Search and Sort row */}
+            <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
+              <div className="relative w-full md:w-96">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  type="text"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Tìm theo tên địa điểm, quận, mô tả..."
+                  className="pl-9 bg-[#FAFAFA] border-[#E5E7EB] text-sm"
+                />
+              </div>
 
-            <div className="flex items-center gap-3 w-full md:w-auto justify-end">
-              <span className="text-xs text-slate-400 flex items-center gap-1.5 whitespace-nowrap">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-emerald-400" /> Sắp xếp:
-              </span>
-              <select
-                value={sortBy}
-                onChange={(e: any) => {
-                  setSortBy(e.target.value);
-                  setPage(1);
-                }}
-                className="bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-200 focus:outline-none focus:border-emerald-500 transition"
-              >
-                <option value="popularity">Độ nổi tiếng (Mặc định)</option>
-                <option value="rating">Đánh giá cao nhất</option>
-                <option value="price_asc">Giá vé: Thấp đến cao</option>
-                <option value="price_desc">Giá vé: Cao đến thấp</option>
-                <option value="newest">Mới cập nhật</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Destination Province Pills */}
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-              Chọn Tỉnh / Thành Phố
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {PROVINCES.map((prov) => {
-                const isActive = selectedProvince === prov.key;
-                return (
-                  <button
-                    key={prov.key}
-                    onClick={() => {
-                      setSelectedProvince(prov.key);
+              <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+                <span className="text-xs text-muted-foreground flex items-center gap-1.5 whitespace-nowrap">
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" /> Sắp xếp:
+                </span>
+                <div className="w-[200px]">
+                  <Select
+                    value={sortBy}
+                    onValueChange={(val) => {
+                      setSortBy(val);
                       setPage(1);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-                      isActive
-                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 border border-emerald-400/30 scale-105'
-                        : 'bg-slate-950/60 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
-                    }`}
                   >
-                    <span>{prov.icon}</span>
-                    <span>{prov.label}</span>
-                  </button>
-                );
-              })}
+                    <SelectTrigger className="h-9 text-xs bg-[#FAFAFA] border-[#E5E7EB]">
+                      <SelectValue placeholder="Sắp xếp theo..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="popularity">Độ nổi tiếng (Mặc định)</SelectItem>
+                      <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
+                      <SelectItem value="price_asc">Giá vé: Thấp đến cao</SelectItem>
+                      <SelectItem value="price_desc">Giá vé: Cao đến thấp</SelectItem>
+                      <SelectItem value="newest">Mới cập nhật</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* Categories Horizontal Pills */}
-          <div>
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2.5">
-              Thể Loại Trải Nghiệm
+            {/* Province Filter Pills */}
+            <div>
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                Tỉnh / Thành phố
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {PROVINCES.map((prov) => {
+                  const isActive = selectedProvince === prov.key;
+                  return (
+                    <button
+                      key={prov.key}
+                      onClick={() => {
+                        setSelectedProvince(prov.key);
+                        setPage(1);
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-medium ${
+                        isActive
+                          ? 'bg-[#1A1A1A] text-white shadow-xs'
+                          : 'bg-[#F5F5F4] text-[#1A1A1A] hover:bg-[#E5E7EB]'
+                      }`}
+                    >
+                      {prov.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-1.5">
-              {CATEGORIES.map((cat) => {
-                const isActive = selectedCategory === cat;
-                return (
-                  <button
-                    key={cat}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setPage(1);
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                      isActive
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-slate-950/40 text-slate-400 hover:text-slate-200 border border-slate-800/80 hover:border-slate-700'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
 
-        {/* Results Count Summary */}
+            {/* Category Filter Pills */}
+            <div>
+              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
+                Thể loại trải nghiệm
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORIES.map((cat) => {
+                  const isActive = selectedCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setSelectedCategory(cat);
+                        setPage(1);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs transition cursor-pointer ${
+                        isActive
+                          ? 'bg-[#F4FCE3] text-[#365314] font-semibold border border-[#D9F99D]'
+                          : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Results Counter & Wishlist Link */}
         <div className="flex items-center justify-between mb-6 px-1">
-          <div className="text-sm text-slate-400">
-            Hiển thị <span className="font-bold text-emerald-400">{places.length}</span> / {totalCount} địa điểm
+          <div className="text-xs text-muted-foreground">
+            Hiển thị <span className="font-semibold text-[#1A1A1A]">{places.length}</span> / {totalCount} địa điểm
           </div>
           {isAuthenticated && (
             <Link
               href="/profile"
-              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-medium transition"
+              className="text-xs text-[#1A1A1A] hover:underline flex items-center gap-1 font-medium transition"
             >
-              <Bookmark className="w-3.5 h-3.5" /> Xem danh sách đã lưu (Wishlist) →
+              <Bookmark className="w-3.5 h-3.5" /> Xem Wishlist đã lưu →
             </Link>
           )}
         </div>
@@ -531,46 +531,48 @@ export default function PlacesSocialFeedPage() {
         {/* Loading State */}
         {isLoading ? (
           <div className="py-24 text-center">
-            <Loader2 className="w-10 h-10 text-emerald-400 animate-spin mx-auto mb-4" />
-            <p className="text-slate-400 text-sm">Đang tải bảng tin địa điểm du lịch...</p>
+            <Loader2 className="w-8 h-8 text-neutral-400 animate-spin mx-auto mb-3" />
+            <p className="text-muted-foreground text-xs">Đang tải danh sách địa điểm...</p>
           </div>
         ) : places.length === 0 ? (
-          <div className="py-20 text-center bg-slate-900/40 rounded-3xl border border-slate-800 p-8">
-            <Compass className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-200 mb-1">Không tìm thấy địa điểm nào</h3>
-            <p className="text-slate-400 text-sm mb-4">
-              Hãy thử tìm với từ khóa khác hoặc bỏ bớt các bộ lọc địa phương/thể loại.
-            </p>
-            <button
-              onClick={() => {
-                setSelectedProvince('ALL');
-                setSelectedCategory('Tất cả');
-                setSearch('');
-                setPage(1);
-              }}
-              className="px-4 py-2 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-semibold hover:bg-emerald-500/30 transition"
-            >
-              Xóa tất cả bộ lọc
-            </button>
-          </div>
+          <Card className="py-16 text-center bg-white border-[#E5E7EB] p-8">
+            <CardContent className="p-0">
+              <Compass className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-60" />
+              <h3 className="text-base font-semibold text-[#1A1A1A] mb-1">Không tìm thấy địa điểm phù hợp</h3>
+              <p className="text-muted-foreground text-xs mb-4">
+                Hãy thử đổi từ khóa tìm kiếm hoặc bỏ chọn các tiêu chí lọc tỉnh thành/thể loại.
+              </p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedProvince('ALL');
+                  setSelectedCategory('Tất cả');
+                  setSearch('');
+                  setPage(1);
+                }}
+              >
+                Đặt lại bộ lọc
+              </Button>
+            </CardContent>
+          </Card>
         ) : (
-          /* Places Grid / Social Post Feed */
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          /* Places Grid */
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {places.map((place) => {
-              const provBadge = getProvinceBadge(place.province);
+              const provMeta = getProvinceMeta(place.province);
               const isCommentsOpen = activeCommentsPlaceId === place.id;
               const placeComments = commentsMap[place.id] || [];
 
               return (
-                <div
+                <Card
                   key={place.id}
                   id={place.id}
-                  className="group bg-slate-900/80 border border-slate-800/90 hover:border-emerald-500/40 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col justify-between backdrop-blur-sm"
+                  className="group bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-2xl overflow-hidden shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between"
                 >
-                  {/* Card Header & Body */}
                   <div>
                     {/* Visual Banner Area */}
-                    <div className="relative h-48 w-full overflow-hidden bg-gradient-to-tr from-slate-950 via-slate-800 to-emerald-950">
+                    <div className="relative h-48 w-full overflow-hidden bg-[#F0F0EF]">
                       {place.imageUrl ? (
                         <img
                           src={place.imageUrl}
@@ -580,87 +582,85 @@ export default function PlacesSocialFeedPage() {
                             (e.target as HTMLImageElement).src =
                               'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80';
                           }}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center relative">
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent z-10" />
-                          <div className="text-center z-20 px-4">
-                            <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mx-auto mb-2 text-2xl shadow-lg">
-                              {provBadge.icon || '🏞️'}
-                            </div>
-                            <span className="text-xs font-medium text-slate-300 line-clamp-1">
-                              {place.district || provBadge.text}
+                        <div className="w-full h-full flex items-center justify-center bg-[#F5F5F4]">
+                          <div className="text-center p-4">
+                            <MapPin className="w-8 h-8 text-neutral-400 mx-auto mb-1 opacity-70" />
+                            <span className="text-xs text-muted-foreground font-medium">
+                              {place.district || provMeta.label}
                             </span>
                           </div>
                         </div>
                       )}
 
                       {/* Top Badges */}
-                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-20">
-                        <span
-                          className={`px-3 py-1 rounded-full text-[11px] font-bold border backdrop-blur-md shadow-md ${provBadge.bg}`}
-                        >
-                          {provBadge.text}
-                        </span>
+                      <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+                        <Badge variant="secondary" className="backdrop-blur-md bg-white/90 text-[#1A1A1A] border-[#E5E7EB] text-[11px] shadow-2xs">
+                          {provMeta.label}
+                        </Badge>
 
-                        <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-slate-950/80 border border-slate-700/80 text-amber-300 backdrop-blur-md flex items-center gap-1 shadow-md">
-                          <Ticket className="w-3 h-3 text-amber-400" />
+                        <Badge variant="secondary" className="backdrop-blur-md bg-white/90 text-[#1A1A1A] border-[#E5E7EB] text-[11px] shadow-2xs flex items-center gap-1 font-mono font-medium">
+                          <Ticket className="w-3 h-3 text-muted-foreground" />
                           {place.priceEstimate > 0
-                            ? `${place.priceEstimate.toLocaleString('vi-VN')}đ`
+                            ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
                             : 'Miễn phí'}
-                        </span>
+                        </Badge>
                       </div>
                     </div>
 
                     {/* Content Section */}
-                    <div className="p-5">
+                    <CardContent className="p-4 pb-2">
                       {/* Name */}
                       <h3
                         onClick={() => setDirectionsPlace(place)}
-                        className="text-lg font-bold text-white mb-2 line-clamp-1 group-hover:text-emerald-300 transition-colors cursor-pointer"
+                        className="text-base font-semibold text-[#1A1A1A] mb-1.5 line-clamp-1 hover:underline cursor-pointer"
                         title="Bấm để xem chỉ đường & thời tiết"
                       >
                         {place.name}
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs text-slate-400 line-clamp-3 mb-4 leading-relaxed">
-                        {place.description || 'Địa điểm du lịch nổi tiếng với nhiều trải nghiệm đặc sắc.'}
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                        {place.description || 'Địa điểm du lịch nổi tiếng với nhiều hoạt động hấp dẫn.'}
                       </p>
 
-                      {/* Category Badges & Meta */}
-                      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                      {/* Category Badges */}
+                      <div className="flex flex-wrap items-center gap-1 mb-3">
                         {place.categories?.slice(0, 3).map((cat) => (
-                          <span
+                          <Badge
                             key={cat}
-                            className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-medium text-slate-300"
+                            variant="outline"
+                            className="text-[10px] px-1.5 py-0 h-5 font-normal text-muted-foreground border-[#E5E7EB]"
                           >
                             #{cat}
-                          </span>
+                          </Badge>
                         ))}
                         {place.indoorOutdoor && (
-                          <span className="px-2 py-0.5 rounded-md bg-teal-500/10 text-teal-400 text-[10px] font-medium border border-teal-500/20">
+                          <Badge
+                            variant="lime"
+                            className="text-[10px] px-1.5 py-0 h-5 font-normal"
+                          >
                             {place.indoorOutdoor}
-                          </span>
+                          </Badge>
                         )}
                       </div>
 
-                      {/* Star Rating Interactive Bar */}
-                      <div className="py-2.5 px-3 rounded-2xl bg-slate-950/70 border border-slate-800/80 mb-2 transition-colors">
+                      {/* Rating Interactive Bar */}
+                      <div className="py-2 px-2.5 rounded-xl bg-[#FAFAFA] border border-[#E5E7EB] mb-2">
                         <div className="flex items-center justify-between gap-2">
-                          {/* Average Rating Display */}
                           <div className="flex items-center gap-1.5">
-                            <Star className="w-4 h-4 text-amber-400 fill-amber-400 flex-shrink-0" />
-                            <span className="text-xs font-bold text-amber-300">
-                              {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : 'Chưa có'}
+                            <Star className="w-3.5 h-3.5 text-[#1A1A1A] fill-[#1A1A1A] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-[#1A1A1A]">
+                              {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : '—'}
                             </span>
-                            <span className="text-[11px] text-slate-500">
-                              ({place.ratingCount} đánh giá)
+                            <span className="text-[10px] text-muted-foreground">
+                              ({place.ratingCount})
                             </span>
                           </div>
 
-                          {/* 5-Star Interactive Rating Picker */}
+                          {/* 5-Star Rating Picker */}
                           <div
                             className="flex items-center gap-0.5"
                             onMouseLeave={() =>
@@ -686,13 +686,13 @@ export default function PlacesSocialFeedPage() {
                                   }
                                   onClick={() => handleRate(place.id, star)}
                                   title={`Đánh giá ${star} sao`}
-                                  className="p-0.5 hover:scale-125 transition-transform"
+                                  className="p-0.5 transition-transform hover:scale-120 cursor-pointer"
                                 >
                                   <Star
                                     className={`w-3.5 h-3.5 transition-colors ${
                                       activeStar
-                                        ? 'text-amber-400 fill-amber-400'
-                                        : 'text-slate-700 hover:text-amber-300'
+                                        ? 'text-[#1A1A1A] fill-[#1A1A1A]'
+                                        : 'text-neutral-300 hover:text-neutral-600'
                                     }`}
                                   />
                                 </button>
@@ -701,116 +701,107 @@ export default function PlacesSocialFeedPage() {
                           </div>
                         </div>
 
-                        {/* Personal User Rating Indicator & Unrate Button */}
                         {place.userRating && (
-                          <div className="mt-1.5 pt-1.5 border-t border-slate-800/60 flex items-center justify-between text-[11px]">
-                            <span className="text-emerald-400 font-medium flex items-center gap-1">
-                              <Check className="w-3 h-3 text-emerald-400" /> Bạn đã đánh giá {place.userRating} sao
+                          <div className="mt-1.5 pt-1.5 border-t border-[#E5E7EB] flex items-center justify-between text-[11px]">
+                            <span className="text-[#365314] font-medium flex items-center gap-1">
+                              <Check className="w-3 h-3" /> Đã đánh giá {place.userRating} sao
                             </span>
                             <button
                               type="button"
                               onClick={() => handleUnrate(place.id)}
-                              className="text-slate-500 hover:text-rose-400 transition text-[10px] underline underline-offset-2"
-                              title="Hủy đánh giá này"
+                              className="text-muted-foreground hover:text-rose-600 transition text-[10px] underline underline-offset-2 cursor-pointer"
                             >
                               Hủy đánh giá
                             </button>
                           </div>
                         )}
                       </div>
-                    </div>
+                    </CardContent>
                   </div>
 
-                  {/* Social Action Bar */}
+                  {/* Actions Footer */}
                   <div>
-                    <div className="border-t border-slate-800/80 px-4 py-3 bg-slate-950/40 flex items-center justify-between text-xs">
-                      {/* Left: Like & Save & Comment buttons */}
-                      <div className="flex items-center gap-1 sm:gap-2">
-                        {/* Like Button */}
-                        <button
+                    <div className="border-t border-[#E5E7EB] px-3 py-2 bg-[#FAFAFA] flex items-center justify-between text-xs">
+                      {/* Left: Like & Save & Comment */}
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleToggleLike(place)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl font-semibold transition ${
-                            place.isLiked
-                              ? 'text-rose-400 bg-rose-500/15 border border-rose-500/30'
-                              : 'text-slate-400 hover:text-rose-400 hover:bg-slate-800'
+                          className={`h-7 px-2 text-xs gap-1 font-medium ${
+                            place.isLiked ? 'text-rose-600 hover:text-rose-700 bg-rose-50' : 'text-muted-foreground'
                           }`}
                           title={place.isLiked ? 'Bỏ thích' : 'Thích địa điểm'}
                         >
                           <Heart
-                            className={`w-4 h-4 transition-transform active:scale-125 ${
-                              place.isLiked ? 'fill-rose-500 text-rose-500' : ''
-                            }`}
+                            className={`w-3.5 h-3.5 ${place.isLiked ? 'fill-rose-600 text-rose-600' : ''}`}
                           />
                           <span>{place.likesCount}</span>
-                        </button>
+                        </Button>
 
-                        {/* Save / Wishlist Button */}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleToggleSave(place)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl font-semibold transition ${
-                            place.isSaved
-                              ? 'text-amber-400 bg-amber-500/15 border border-amber-500/30'
-                              : 'text-slate-400 hover:text-amber-400 hover:bg-slate-800'
+                          className={`h-7 px-2 text-xs gap-1 font-medium ${
+                            place.isSaved ? 'text-amber-700 hover:text-amber-800 bg-amber-50' : 'text-muted-foreground'
                           }`}
                           title={place.isSaved ? 'Đã lưu trong Wishlist' : 'Lưu vào Wishlist'}
                         >
                           <Bookmark
-                            className={`w-4 h-4 transition-transform active:scale-125 ${
-                              place.isSaved ? 'fill-amber-400 text-amber-400' : ''
-                            }`}
+                            className={`w-3.5 h-3.5 ${place.isSaved ? 'fill-amber-600 text-amber-600' : ''}`}
                           />
                           <span>{place.savesCount}</span>
-                        </button>
+                        </Button>
 
-                        {/* Comment Button */}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => toggleComments(place.id)}
-                          className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl font-semibold transition ${
-                            isCommentsOpen
-                              ? 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
-                              : 'text-slate-400 hover:text-emerald-400 hover:bg-slate-800'
+                          className={`h-7 px-2 text-xs gap-1 font-medium ${
+                            isCommentsOpen ? 'bg-[#E5E7EB] text-[#1A1A1A]' : 'text-muted-foreground'
                           }`}
                           title="Bình luận"
                         >
-                          <MessageCircle className="w-4 h-4" />
+                          <MessageCircle className="w-3.5 h-3.5" />
                           <span>{place.commentsCount}</span>
-                        </button>
+                        </Button>
                       </div>
 
-                      {/* Right: Map & Share */}
+                      {/* Right: Directions & Share */}
                       <div className="flex items-center gap-1">
-                        {/* Map Directions & Weather */}
-                        <button
-                          type="button"
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setDirectionsPlace(place);
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-500/20 hover:bg-teal-500/30 border border-teal-500/40 text-teal-300 hover:text-white transition text-xs font-semibold shadow-sm shadow-teal-500/10 cursor-pointer"
-                          title="Xem chỉ đường & Thời tiết thực tế"
+                          className="h-7 px-2.5 text-xs gap-1 font-medium"
+                          title="Xem chỉ đường & thời tiết"
                         >
-                          <Navigation className="w-3.5 h-3.5 text-teal-400" />
+                          <Navigation className="w-3.5 h-3.5" />
                           <span>Chỉ đường</span>
-                        </button>
+                        </Button>
 
-                        {/* Share Button */}
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => handleShare(place)}
-                          className="p-2 rounded-xl text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition"
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
                           title="Chia sẻ địa điểm"
                         >
                           <Share2 className="w-3.5 h-3.5" />
-                        </button>
+                        </Button>
                       </div>
                     </div>
 
-                    {/* In-feed Expanded Comments Section */}
+                    {/* Expandable Comments Drawer */}
                     {isCommentsOpen && (
-                      <div className="border-t border-slate-800 bg-slate-950/80 p-4 space-y-3 animate-fadeIn">
-                        {/* Add Comment Input */}
-                        <div className="flex gap-2 items-center">
-                          <input
+                      <div className="border-t border-[#E5E7EB] bg-white p-3 space-y-2.5">
+                        <div className="flex gap-1.5 items-center">
+                          <Input
                             type="text"
                             value={newCommentText[place.id] || ''}
                             onChange={(e) =>
@@ -824,55 +815,55 @@ export default function PlacesSocialFeedPage() {
                             }}
                             placeholder={
                               isAuthenticated
-                                ? 'Viết cảm nghĩ, review về địa điểm này...'
+                                ? 'Viết bình luận, chia sẻ trải nghiệm...'
                                 : 'Đăng nhập để để lại bình luận...'
                             }
                             disabled={!isAuthenticated}
-                            className="flex-1 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                            className="h-8 text-xs bg-[#FAFAFA]"
                           />
-                          <button
+                          <Button
+                            size="sm"
                             onClick={() => handleCommentSubmit(place.id)}
                             disabled={
                               !isAuthenticated ||
                               isSubmittingComment[place.id] ||
                               !(newCommentText[place.id] || '').trim()
                             }
-                            className="p-2 rounded-xl bg-emerald-500 text-white hover:bg-emerald-400 disabled:opacity-40 transition shadow-md"
+                            className="h-8 w-8 p-0 flex-shrink-0"
                           >
                             {isSubmittingComment[place.id] ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
                               <Send className="w-3.5 h-3.5" />
                             )}
-                          </button>
+                          </Button>
                         </div>
 
-                        {/* Comments List */}
                         {commentsLoading[place.id] ? (
-                          <div className="text-center py-3 text-xs text-slate-500">
-                            <Loader2 className="w-4 h-4 animate-spin mx-auto mb-1 text-emerald-400" />
+                          <div className="text-center py-2 text-xs text-muted-foreground">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto mb-1 text-neutral-400" />
                             Đang tải bình luận...
                           </div>
                         ) : placeComments.length === 0 ? (
-                          <div className="text-center py-2 text-[11px] text-slate-500">
-                            Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm nhận!
+                          <div className="text-center py-2 text-[11px] text-muted-foreground">
+                            Chưa có bình luận nào. Hãy là người đầu tiên!
                           </div>
                         ) : (
-                          <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                          <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
                             {placeComments.map((c) => (
                               <div
                                 key={c.id}
-                                className="bg-slate-900/90 border border-slate-800/80 rounded-xl p-2.5 text-xs"
+                                className="bg-[#FAFAFA] border border-[#E5E7EB] rounded-lg p-2 text-xs"
                               >
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="font-semibold text-emerald-400 text-[11px]">
+                                <div className="flex items-center justify-between mb-0.5">
+                                  <span className="font-medium text-[#1A1A1A] text-[11px]">
                                     {c.user.name || c.user.email.split('@')[0]}
                                   </span>
-                                  <span className="text-[10px] text-slate-500">
+                                  <span className="text-[10px] text-muted-foreground">
                                     {new Date(c.createdAt).toLocaleDateString('vi-VN')}
                                   </span>
                                 </div>
-                                <p className="text-slate-300 text-[11px] leading-relaxed">
+                                <p className="text-muted-foreground text-[11px] leading-relaxed">
                                   {c.content}
                                 </p>
                               </div>
@@ -882,7 +873,7 @@ export default function PlacesSocialFeedPage() {
                       </div>
                     )}
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>
@@ -890,26 +881,30 @@ export default function PlacesSocialFeedPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="mt-12 flex items-center justify-center gap-3">
-            <button
+          <div className="mt-10 flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 transition"
+              className="gap-1 text-xs"
             >
-              <ChevronLeft className="w-4 h-4" /> Trang trước
-            </button>
+              <ChevronLeft className="w-3.5 h-3.5" /> Trang trước
+            </Button>
 
-            <span className="text-xs font-semibold text-slate-400 px-3">
-              Trang <span className="text-emerald-400 font-bold">{page}</span> / {totalPages}
+            <span className="text-xs text-muted-foreground px-2">
+              Trang <strong className="text-[#1A1A1A]">{page}</strong> / {totalPages}
             </span>
 
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 text-slate-300 hover:text-white disabled:opacity-40 transition"
+              className="gap-1 text-xs"
             >
-              Trang sau <ChevronRight className="w-4 h-4" />
-            </button>
+              Trang sau <ChevronRight className="w-3.5 h-3.5" />
+            </Button>
           </div>
         )}
       </section>

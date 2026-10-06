@@ -2,14 +2,38 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import {
   Send,
   Sparkles,
   Compass,
   MapPin,
   BookOpen,
-  ChevronDown,
-  ChevronUp,
   RotateCcw,
   Database,
   MessageSquare,
@@ -21,7 +45,6 @@ import {
   X,
   PanelLeftClose,
   PanelLeft,
-  User as UserIcon,
   Clock,
   HelpCircle,
   ChevronRight,
@@ -39,6 +62,7 @@ import {
   Mountain,
   Waves,
   LucideIcon,
+  Ticket,
 } from 'lucide-react';
 import { SourceCitation, Message, SystemStatus, ChatSession } from '@/types';
 import { chatApi, getStoredToken } from '@/lib/api';
@@ -83,7 +107,6 @@ export default function QuestionAnswerPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
-  const [expandedSources, setExpandedSources] = useState<Record<string, boolean>>({});
 
   // Trạng thái Chủ đề RAG (Topic Explorer)
   const [selectedTopicId, setSelectedTopicId] = useState<string>('routes');
@@ -200,7 +223,6 @@ export default function QuestionAnswerPage() {
         }),
       }));
       setMessages(formattedMessages);
-      setExpandedSources({});
     } catch (err) {
       console.error('Lỗi khi tải chi tiết cuộc trò chuyện:', err);
       alert('Không thể tải chi tiết cuộc trò chuyện này.');
@@ -214,7 +236,6 @@ export default function QuestionAnswerPage() {
     if (isLoading) return;
     setCurrentSessionId(null);
     setMessages([]);
-    setExpandedSources({});
     setInput('');
     if (textareaRef.current) {
       textareaRef.current.focus();
@@ -268,13 +289,6 @@ export default function QuestionAnswerPage() {
   const handleCancelRename = (e: React.MouseEvent) => {
     e.stopPropagation();
     setEditingSessionId(null);
-  };
-
-  const toggleSource = (msgId: string) => {
-    setExpandedSources((prev) => ({
-      ...prev,
-      [msgId]: !prev[msgId],
-    }));
   };
 
   // Gửi tin nhắn qua SSE
@@ -446,23 +460,26 @@ export default function QuestionAnswerPage() {
       >
         {/* Nút Tạo Cuộc Trò Chuyện Mới */}
         <div className="p-3.5 border-b border-[#F0F0EF] flex items-center justify-between gap-2">
-          <button
+          <Button
             onClick={handleNewChat}
             disabled={isLoading}
-            className="flex-1 flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] active:scale-[0.99] text-white font-medium text-xs sm:text-sm transition-all shadow-xs disabled:opacity-40"
+            variant="default"
+            className="flex-1 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white text-xs sm:text-sm font-medium gap-2 shadow-xs"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>Cuộc trò chuyện mới</span>
-          </button>
+          </Button>
 
           {/* Nút đóng trên mobile */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Đóng sidebar"
-            className="md:hidden p-2 rounded-lg text-[#6B7280] hover:text-[#1A1A1A] hover:bg-[#F5F5F4] transition"
+            className="md:hidden h-9 w-9 rounded-lg text-[#6B7280] hover:text-[#1A1A1A]"
           >
             <PanelLeftClose className="w-4 h-4 text-[#6B7280]" />
-          </button>
+          </Button>
         </div>
 
         {/* Danh Sách Sessions */}
@@ -472,9 +489,9 @@ export default function QuestionAnswerPage() {
               <Clock className="w-3.5 h-3.5 text-[#6B7280]" />
               Lịch sử gần đây
             </span>
-            <span className="text-[10px] text-[#6B7280] bg-[#F5F5F4] border border-[#E5E7EB] px-2 py-0.5 rounded-full font-medium">
+            <Badge variant="secondary" className="text-[10px] px-2 py-0.5 rounded-full font-medium border-[#E5E7EB]">
               {sessions.length}
-            </span>
+            </Badge>
           </div>
 
           {isLoadingSessions && sessions.length === 0 ? (
@@ -515,7 +532,7 @@ export default function QuestionAnswerPage() {
                         className="flex-1 flex items-center gap-1"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <input
+                        <Input
                           type="text"
                           value={editTitleInput}
                           onChange={(e) => setEditTitleInput(e.target.value)}
@@ -524,22 +541,26 @@ export default function QuestionAnswerPage() {
                             if (e.key === 'Escape') handleCancelRename(e as any);
                           }}
                           autoFocus
-                          className="w-full bg-white px-2 py-1 rounded-md text-xs text-[#1A1A1A] border border-[#1A1A1A] focus:outline-none"
+                          className="h-7 text-xs bg-white text-[#1A1A1A] border-[#1A1A1A] rounded-md px-2 focus-visible:ring-0"
                         />
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={(e) => handleSaveRename(e, session.id)}
-                          className="p-1 text-[#1A1A1A] hover:bg-neutral-200 rounded transition"
+                          className="h-6 w-6 p-1 text-[#1A1A1A]"
                           title="Lưu"
                         >
-                          <Check className="w-3.5 h-3.5 text-[#1A1A1A]" />
-                        </button>
-                        <button
+                          <Check className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={handleCancelRename}
-                          className="p-1 text-[#6B7280] hover:text-[#1A1A1A] hover:bg-neutral-200 rounded transition"
+                          className="h-6 w-6 p-1 text-[#6B7280] hover:text-[#1A1A1A]"
                           title="Hủy"
                         >
-                          <X className="w-3.5 h-3.5 text-[#6B7280]" />
-                        </button>
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
                       </div>
                     ) : (
                       <span className="truncate text-left flex-1">
@@ -555,20 +576,24 @@ export default function QuestionAnswerPage() {
                         isActive ? 'flex' : 'hidden group-hover:flex'
                       }`}
                     >
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={(e) => handleStartRename(e, session)}
                         title="Đổi tên"
-                        className="p-1 rounded text-[#6B7280] hover:text-[#1A1A1A] hover:bg-neutral-200/60 transition"
+                        className="h-6 w-6 p-1 text-[#6B7280] hover:text-[#1A1A1A]"
                       >
-                        <Edit3 className="w-3.5 h-3.5 text-[#6B7280]" />
-                      </button>
-                      <button
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={(e) => handleDeleteSession(e, session.id)}
                         title="Xóa"
-                        className="p-1 rounded text-[#6B7280] hover:text-[#1A1A1A] hover:bg-neutral-200/60 transition"
+                        className="h-6 w-6 p-1 text-[#6B7280] hover:text-rose-600 hover:bg-rose-50"
                       >
-                        <Trash2 className="w-3.5 h-3.5 text-[#6B7280]" />
-                      </button>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -595,13 +620,15 @@ export default function QuestionAnswerPage() {
             </div>
           )}
 
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => loadSessions()}
             title="Làm mới danh sách"
-            className="p-1.5 rounded-lg hover:bg-[#F5F5F4] text-[#6B7280] hover:text-[#1A1A1A] transition"
+            className="h-7 w-7 text-[#6B7280] hover:text-[#1A1A1A]"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-[#6B7280]" />
-          </button>
+            <RotateCcw className="w-3.5 h-3.5" />
+          </Button>
         </div>
       </aside>
 
@@ -620,22 +647,24 @@ export default function QuestionAnswerPage() {
         {/* Top Header Bar */}
         <div className="bg-white/90 backdrop-blur-md border-b border-[#E5E7EB] px-4 sm:px-6 py-3 flex items-center justify-between shrink-0 z-20">
           <div className="flex items-center gap-3">
-            <button
+            <Button
+              variant="outline"
+              size="icon"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               title={isSidebarOpen ? 'Thu gọn thanh bên' : 'Mở lịch sử chat'}
-              className="p-2 rounded-xl bg-white hover:bg-[#F5F5F4] text-[#6B7280] hover:text-[#1A1A1A] border border-[#E5E7EB] transition shadow-2xs"
+              className="h-8 w-8 rounded-xl border-[#E5E7EB] text-[#6B7280] hover:text-[#1A1A1A]"
             >
-              <PanelLeft className="w-4 h-4 text-[#6B7280]" />
-            </button>
+              <PanelLeft className="w-4 h-4" />
+            </Button>
 
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-sm sm:text-base font-semibold text-[#1A1A1A] truncate max-w-xs sm:max-w-md">
                   {currentSession ? currentSession.title : 'Cố Vấn Du Lịch Việt Nam AI'}
                 </h1>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] shrink-0">
+                <Badge variant="lime" className="text-[10px] font-semibold">
                   RAG BGE-M3
-                </span>
+                </Badge>
               </div>
               <p className="text-[11px] text-[#6B7280] hidden sm:block mt-0.5">
                 Cơ sở tri thức 63 tỉnh thành & cẩm nang du lịch Việt Nam
@@ -645,18 +674,19 @@ export default function QuestionAnswerPage() {
 
           <div className="flex items-center gap-2">
             {/* Nút mở Modal 10 Chủ đề */}
-            <button
+            <Button
+              variant="outline"
               onClick={() => setIsTopicModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB] text-xs font-medium transition shadow-2xs"
+              className="h-8 px-3 rounded-full text-xs font-medium gap-1.5 border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]"
               title="Khám phá tất cả các chủ đề trong kho RAG"
             >
               <Compass className="w-3.5 h-3.5 text-[#6B7280]" />
               <span className="hidden sm:inline">10 Chủ đề RAG</span>
               <span className="sm:hidden">Chủ đề</span>
-            </button>
+            </Button>
 
             {/* Trạng thái pgvector */}
-            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-full bg-white border border-[#E5E7EB] text-[11px] shadow-2xs">
+            <Badge variant="secondary" className="gap-2 px-2.5 py-1 rounded-full text-[11px] border-[#E5E7EB] bg-white font-normal">
               <Database className="w-3.5 h-3.5 text-[#6B7280]" />
               {systemStatus?.database?.connected ? (
                 <span className="flex items-center gap-1.5 font-medium text-[#1A1A1A]">
@@ -669,16 +699,18 @@ export default function QuestionAnswerPage() {
                   <span>Đang kết nối</span>
                 </span>
               )}
-            </div>
+            </Badge>
 
             {messages.length > 0 && (
-              <button
+              <Button
+                variant="outline"
+                size="icon"
                 onClick={handleNewChat}
                 title="Tạo phiên mới"
-                className="p-1.5 rounded-lg bg-white hover:bg-[#F5F5F4] text-[#6B7280] hover:text-[#1A1A1A] border border-[#E5E7EB] transition shadow-2xs"
+                className="h-8 w-8 rounded-lg border-[#E5E7EB] text-[#6B7280] hover:text-[#1A1A1A]"
               >
-                <Plus className="w-4 h-4 text-[#6B7280]" />
-              </button>
+                <Plus className="w-4 h-4" />
+              </Button>
             )}
           </div>
         </div>
@@ -692,10 +724,10 @@ export default function QuestionAnswerPage() {
             <div className="max-w-4xl mx-auto py-6 sm:py-10 flex flex-col items-center">
               {/* Header Chào Mừng */}
               <div className="text-center mb-8 max-w-2xl">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-xs font-medium mb-3.5 shadow-2xs">
+                <Badge variant="lime" className="gap-1.5 px-3 py-1 text-xs font-medium mb-3.5 shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5 text-[#1A1A1A]" />
                   <span>Kho tri thức RAG • 10.856 Chunks • 63 Tỉnh thành</span>
-                </div>
+                </Badge>
                 <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1A1A1A] mb-2.5">
                   Bạn muốn khám phá du lịch Việt Nam thế nào?
                 </h2>
@@ -703,52 +735,49 @@ export default function QuestionAnswerPage() {
                   Chọn một trong 10 chủ đề bên dưới để xem gợi ý câu hỏi thực tế hoặc tự do đặt câu hỏi bất kỳ cho cố vấn AI.
                 </p>
 
-                {/* Segmented Pill Control */}
-                <div className="mt-5 inline-flex items-center p-1 rounded-full bg-[#F0F0EF] border border-[#E5E7EB] text-xs">
-                  <button
-                    onClick={() => setTopicViewMode('tabs')}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-medium transition-all ${
-                      topicViewMode === 'tabs'
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'text-[#6B7280] hover:text-[#1A1A1A]'
-                    }`}
-                  >
-                    <ListFilter className="w-3.5 h-3.5 text-inherit" />
-                    <span>Chi tiết theo chủ đề</span>
-                  </button>
-                  <button
-                    onClick={() => setTopicViewMode('grid')}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-medium transition-all ${
-                      topicViewMode === 'grid'
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'text-[#6B7280] hover:text-[#1A1A1A]'
-                    }`}
-                  >
-                    <Grid className="w-3.5 h-3.5 text-inherit" />
-                    <span>Lưới 10 chủ đề</span>
-                  </button>
+                {/* Segmented Pill Control với shadcn Tabs */}
+                <div className="mt-5">
+                  <Tabs value={topicViewMode} onValueChange={(val) => setTopicViewMode(val as any)}>
+                    <TabsList className="rounded-full bg-[#F0F0EF] border border-[#E5E7EB] p-1">
+                      <TabsTrigger
+                        value="tabs"
+                        className="rounded-full px-3.5 py-1.5 text-xs font-medium data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white shadow-xs transition-all"
+                      >
+                        <ListFilter className="w-3.5 h-3.5 mr-1.5" />
+                        <span>Chi tiết theo chủ đề</span>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="grid"
+                        className="rounded-full px-3.5 py-1.5 text-xs font-medium data-[state=active]:bg-[#1A1A1A] data-[state=active]:text-white shadow-xs transition-all"
+                      >
+                        <Grid className="w-3.5 h-3.5 mr-1.5" />
+                        <span>Lưới 10 chủ đề</span>
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               </div>
 
               {topicViewMode === 'tabs' ? (
                 /* CHẾ ĐỘ 1: TABS CHỦ ĐỀ + DANH SÁCH CÂU HỎI MẪU */
                 <div className="w-full space-y-4">
-                  {/* Thanh Cuộn Ngang 10 Chủ Đề (Horizontal Pills với Lucide Icons) */}
+                  {/* Thanh Cuộn Ngang 10 Chủ Đề (Horizontal Pills với Button + Lucide Icons) */}
                   <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
                     {RAG_TOPICS.map((topic) => {
                       const isSelected = topic.id === selectedTopicId;
                       const Icon = getTopicIcon(topic.id);
                       return (
-                        <button
+                        <Button
                           key={topic.id}
+                          variant={isSelected ? 'default' : 'outline'}
                           onClick={() => setSelectedTopicId(topic.id)}
-                          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                          className={`h-9 px-3.5 rounded-xl text-xs font-medium gap-2 shrink-0 ${
                             isSelected
-                              ? 'bg-[#1A1A1A] text-white shadow-xs border border-[#1A1A1A]'
-                              : 'bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB]'
+                              ? 'bg-[#1A1A1A] text-white hover:bg-[#2C2C2C]'
+                              : 'bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border-[#E5E7EB]'
                           }`}
                         >
-                          <Icon className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-white' : 'text-[#6B7280]'}`} />
+                          <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-[#6B7280]'}`} />
                           <span>{topic.shortName}</span>
                           {topic.badge && (
                             <span
@@ -761,18 +790,18 @@ export default function QuestionAnswerPage() {
                               {topic.badge}
                             </span>
                           )}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
 
-                  {/* Chi Tiết Chủ Đề & Các Câu Hỏi Gợi Ý */}
+                  {/* Chi Tiết Chủ Đề & Các Câu Hỏi Gợi Ý sử dụng shadcn Card */}
                   {(() => {
                     const currentTopic =
                       RAG_TOPICS.find((t) => t.id === selectedTopicId) || RAG_TOPICS[0];
                     const TopicIcon = getTopicIcon(currentTopic.id);
                     return (
-                      <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E5E7EB] shadow-xs space-y-5 animate-in fade-in duration-200">
+                      <Card className="p-5 sm:p-6 rounded-2xl bg-white border-[#E5E7EB] shadow-xs space-y-5 animate-in fade-in duration-200">
                         {/* Header của Topic */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#F0F0EF]">
                           <div className="flex items-center gap-3">
@@ -785,9 +814,9 @@ export default function QuestionAnswerPage() {
                                   {currentTopic.name}
                                 </h3>
                                 {currentTopic.badge && (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] font-medium">
+                                  <Badge variant="lime" className="text-[10px] font-medium">
                                     {currentTopic.badge}
-                                  </span>
+                                  </Badge>
                                 )}
                               </div>
                               <p className="text-xs text-[#6B7280] mt-0.5">
@@ -796,9 +825,9 @@ export default function QuestionAnswerPage() {
                             </div>
                           </div>
                           <div className="shrink-0">
-                            <span className="text-xs font-medium text-[#6B7280] bg-[#F9F9F8] px-2.5 py-1 rounded-lg border border-[#E5E7EB]">
+                            <Badge variant="secondary" className="border-[#E5E7EB] text-xs font-medium text-[#6B7280]">
                               {currentTopic.chunkCountEstimate}
-                            </span>
+                            </Badge>
                           </div>
                         </div>
 
@@ -811,16 +840,16 @@ export default function QuestionAnswerPage() {
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             {currentTopic.sampleQuestions.map((qItem, idx) => (
-                              <button
+                              <Card
                                 key={idx}
                                 onClick={() => handleSendMessage(qItem.question)}
-                                className="group relative p-3.5 rounded-xl bg-white hover:bg-[#FAFAF9] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 transition-all text-left flex items-start justify-between gap-3 shadow-2xs hover:shadow-xs"
+                                className="group p-3.5 rounded-xl bg-white hover:bg-[#FAFAF9] border-[#E5E7EB] hover:border-[#1A1A1A]/30 transition-all text-left flex items-start justify-between gap-3 shadow-2xs hover:shadow-xs cursor-pointer"
                               >
                                 <div className="space-y-1.5 flex-1">
                                   {qItem.badge && (
-                                    <span className="inline-block text-[10px] font-medium px-1.5 py-0.2 rounded bg-[#F4FCE3] text-[#365314] border border-[#D9F99D]">
+                                    <Badge variant="lime" className="text-[10px] font-medium px-1.5 py-0.2">
                                       {qItem.badge}
-                                    </span>
+                                    </Badge>
                                   )}
                                   <p className="text-xs text-[#1A1A1A] font-medium leading-relaxed group-hover:text-black">
                                     {qItem.question}
@@ -829,27 +858,27 @@ export default function QuestionAnswerPage() {
                                 <div className="p-1.5 rounded-lg bg-[#F5F5F4] group-hover:bg-[#1A1A1A] text-[#6B7280] group-hover:text-white transition-all shrink-0 mt-0.5">
                                   <ArrowUpRight className="w-3.5 h-3.5" />
                                 </div>
-                              </button>
+                              </Card>
                             ))}
                           </div>
                         </div>
-                      </div>
+                      </Card>
                     );
                   })()}
                 </div>
               ) : (
-                /* CHẾ ĐỘ 2: LƯỚI CARD TẤT CẢ 10 CHỦ ĐỀ VỚI LUCIDE ICONS */
+                /* CHẾ ĐỘ 2: LƯỚI CARD TẤT CẢ 10 CHỦ ĐỀ VỚI SHADCN CARD */
                 <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                   {RAG_TOPICS.map((topic) => {
                     const CardIcon = getTopicIcon(topic.id);
                     return (
-                      <div
+                      <Card
                         key={topic.id}
                         onClick={() => {
                           setSelectedTopicId(topic.id);
                           setTopicViewMode('tabs');
                         }}
-                        className="group cursor-pointer p-4 sm:p-5 rounded-2xl bg-white hover:bg-[#FAFAF9] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 transition-all flex flex-col justify-between gap-3.5 shadow-2xs hover:shadow-xs"
+                        className="group cursor-pointer p-4 sm:p-5 rounded-2xl bg-white hover:bg-[#FAFAF9] border-[#E5E7EB] hover:border-[#1A1A1A]/30 transition-all flex flex-col justify-between gap-3.5 shadow-2xs hover:shadow-xs"
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between gap-2">
@@ -857,9 +886,9 @@ export default function QuestionAnswerPage() {
                               <CardIcon className="w-4 h-4 text-[#1A1A1A]" />
                             </div>
                             {topic.badge && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] font-medium">
+                              <Badge variant="lime" className="text-[10px] font-medium">
                                 {topic.badge}
-                              </span>
+                              </Badge>
                             )}
                           </div>
                           <h4 className="text-sm font-semibold text-[#1A1A1A] line-clamp-1">
@@ -878,7 +907,7 @@ export default function QuestionAnswerPage() {
                             Xem câu hỏi <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-[#6B7280] group-hover:text-[#1A1A1A]" />
                           </span>
                         </div>
-                      </div>
+                      </Card>
                     );
                   })}
                 </div>
@@ -926,62 +955,55 @@ export default function QuestionAnswerPage() {
                       )}
                     </div>
 
-                    {/* Sources Accordion */}
+                    {/* Sources Accordion sử dụng shadcn Accordion */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-4 pt-3.5 border-t border-[#F0F0EF]">
-                        <button
-                          onClick={() => toggleSource(msg.id)}
-                          className="flex items-center justify-between w-full py-1 text-xs font-medium text-[#1A1A1A] hover:text-[#4B5563] transition-colors"
-                        >
-                          <span className="flex items-center gap-1.5">
-                            <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
-                            <span>Nguồn tham chiếu ({msg.sources.length} tài liệu)</span>
-                            {msg.sources[0]?.similarity && (
-                              <span className="text-[11px] text-[#6B7280] font-normal">
-                                • Độ khớp cao nhất: {(Number(msg.sources[0].similarity) * 100).toFixed(1)}%
+                      <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="sources" className="border-0">
+                            <AccordionTrigger className="py-1 text-xs font-medium text-[#1A1A1A] hover:no-underline">
+                              <span className="flex items-center gap-1.5">
+                                <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
+                                <span>Nguồn tham chiếu ({msg.sources.length} tài liệu)</span>
+                                {msg.sources[0]?.similarity && (
+                                  <span className="text-[11px] text-[#6B7280] font-normal">
+                                    • Độ khớp: {(Number(msg.sources[0].similarity) * 100).toFixed(1)}%
+                                  </span>
+                                )}
                               </span>
-                            )}
-                          </span>
-                          {expandedSources[msg.id] ? (
-                            <ChevronUp className="w-3.5 h-3.5 text-[#6B7280]" />
-                          ) : (
-                            <ChevronDown className="w-3.5 h-3.5 text-[#6B7280]" />
-                          )}
-                        </button>
+                            </AccordionTrigger>
+                            <AccordionContent className="pt-2 space-y-2.5">
+                              {msg.sources.map((src, sIdx) => {
+                                const matchPct = (Number(src.similarity) * 100).toFixed(1);
+                                const isQa = src.chunk_type === 'qa';
 
-                        {expandedSources[msg.id] && (
-                          <div className="mt-3 space-y-2.5">
-                            {msg.sources.map((src, sIdx) => {
-                              const matchPct = (Number(src.similarity) * 100).toFixed(1);
-                              const isQa = src.chunk_type === 'qa';
-
-                              return (
-                                <div
-                                  key={sIdx}
-                                  className="p-3.5 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB] text-xs space-y-2"
-                                >
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="font-semibold text-[#1A1A1A] truncate flex items-center gap-1.5">
-                                      <MapPin className="w-3.5 h-3.5 text-[#6B7280] shrink-0" />
-                                      {src.title}
-                                    </span>
-                                    <div className="flex items-center gap-1.5 shrink-0">
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white border border-[#E5E7EB] text-[#4B5563]">
-                                        {isQa ? 'Hỏi - Đáp gốc' : 'Ngữ cảnh bài viết'}
+                                return (
+                                  <Card
+                                    key={sIdx}
+                                    className="p-3.5 rounded-xl bg-[#F9F9F8] border-[#E5E7EB] text-xs space-y-2 shadow-none"
+                                  >
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="font-semibold text-[#1A1A1A] truncate flex items-center gap-1.5">
+                                        <MapPin className="w-3.5 h-3.5 text-[#6B7280] shrink-0" />
+                                        {src.title}
                                       </span>
-                                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#F4FCE3] text-[#365314] border border-[#D9F99D]">
-                                        {matchPct}% match
-                                      </span>
+                                      <div className="flex items-center gap-1.5 shrink-0">
+                                        <Badge variant="outline" className="text-[10px] font-medium bg-white border-[#E5E7EB] text-[#4B5563]">
+                                          {isQa ? 'Hỏi - Đáp gốc' : 'Ngữ cảnh bài viết'}
+                                        </Badge>
+                                        <Badge variant="lime" className="text-[10px] font-semibold">
+                                          {matchPct}% match
+                                        </Badge>
+                                      </div>
                                     </div>
-                                  </div>
-                                  <p className="text-[#4B5563] text-xs leading-relaxed bg-white p-2.5 rounded-lg border border-[#E5E7EB] line-clamp-3">
-                                    "{src.content}"
-                                  </p>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                                    <p className="text-[#4B5563] text-xs leading-relaxed bg-white p-2.5 rounded-lg border border-[#E5E7EB] line-clamp-3">
+                                      "{src.content}"
+                                    </p>
+                                  </Card>
+                                );
+                              })}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
                       </div>
                     )}
 
@@ -1010,22 +1032,24 @@ export default function QuestionAnswerPage() {
             if (!topic) return null;
             const FlyoutIcon = getTopicIcon(topic.id);
             return (
-              <div className="max-w-4xl mx-auto p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-md space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              <Card className="max-w-4xl mx-auto p-4 rounded-2xl bg-white border-[#E5E7EB] shadow-md space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-150">
                 <div className="flex items-center justify-between pb-2.5 border-b border-[#F0F0EF]">
                   <div className="flex items-center gap-2">
                     <FlyoutIcon className="w-4 h-4 text-[#1A1A1A]" />
                     <span className="text-xs font-semibold text-[#1A1A1A]">{topic.name}</span>
-                    <span className="text-[10px] text-[#365314] bg-[#F4FCE3] border border-[#D9F99D] px-2 py-0.5 rounded-full font-medium">
+                    <Badge variant="lime" className="text-[10px] font-medium">
                       Gợi ý câu hỏi
-                    </span>
+                    </Badge>
                   </div>
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setActiveQuickTopic(null)}
                     aria-label="Đóng gợi ý"
-                    className="p-1 rounded-lg text-[#6B7280] hover:text-[#1A1A1A] hover:bg-[#F5F5F4] transition"
+                    className="h-7 w-7 rounded-lg text-[#6B7280] hover:text-[#1A1A1A]"
                   >
-                    <X className="w-4 h-4 text-[#6B7280]" />
-                  </button>
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                   {topic.sampleQuestions.map((q, idx) => (
@@ -1044,7 +1068,7 @@ export default function QuestionAnswerPage() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </Card>
             );
           })()}
 
@@ -1059,33 +1083,37 @@ export default function QuestionAnswerPage() {
               const isActive = activeQuickTopic === topic.id;
               const ChipIcon = getTopicIcon(topic.id);
               return (
-                <button
+                <Button
                   key={topic.id}
+                  variant={isActive ? 'default' : 'outline'}
+                  size="sm"
                   onClick={() => {
                     setActiveQuickTopic(isActive ? null : topic.id);
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all shrink-0 text-xs ${
+                  className={`h-7 px-3 rounded-full text-xs gap-1.5 shrink-0 ${
                     isActive
-                      ? 'bg-[#1A1A1A] text-white font-medium shadow-xs'
-                      : 'bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border border-[#E5E7EB]'
+                      ? 'bg-[#1A1A1A] text-white'
+                      : 'bg-white hover:bg-[#F5F5F4] text-[#1A1A1A] border-[#E5E7EB]'
                   }`}
                 >
                   <ChipIcon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-[#6B7280]'}`} />
                   <span>{topic.shortName}</span>
-                </button>
+                </Button>
               );
             })}
 
-            <button
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsTopicModalOpen(true)}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#F4FCE3] hover:bg-[#EAF7B8] text-[#365314] border border-[#D9F99D] text-xs font-semibold shrink-0 transition"
+              className="h-7 px-3 rounded-full bg-[#F4FCE3] hover:bg-[#EAF7B8] text-[#365314] border-[#D9F99D] text-xs font-semibold shrink-0 gap-1"
             >
               <span>Xem tất cả (10)</span>
               <ChevronRight className="w-3.5 h-3.5 text-[#365314]" />
-            </button>
+            </Button>
           </div>
 
-          {/* Form Nhập Câu Hỏi */}
+          {/* Form Nhập Câu Hỏi với shadcn Textarea & Button */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -1093,28 +1121,29 @@ export default function QuestionAnswerPage() {
             }}
             className="max-w-4xl mx-auto relative flex items-end gap-2 p-2 rounded-2xl bg-white border border-[#E5E7EB] shadow-xs focus-within:border-[#1A1A1A] focus-within:ring-2 focus-within:ring-[#1A1A1A]/10 transition-all"
           >
-            <textarea
+            <Textarea
               ref={textareaRef}
               rows={1}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Đặt câu hỏi về danh lam thắng cảnh, văn hóa, ẩm thực Việt Nam..."
-              className="flex-1 bg-transparent px-3 py-2 text-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none resize-none max-h-32 min-h-[42px] leading-relaxed"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus-visible:ring-0 focus-visible:ring-offset-0 border-0 shadow-none resize-none max-h-32 min-h-[42px] leading-relaxed"
             />
 
-            <button
+            <Button
               type="submit"
+              size="icon"
               disabled={isLoading || !input.trim()}
               aria-label="Gửi câu hỏi"
-              className="p-2.5 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] disabled:opacity-30 disabled:cursor-not-allowed text-white shadow-2xs transition-colors shrink-0"
+              className="h-9 w-9 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] disabled:opacity-30 disabled:cursor-not-allowed text-white shadow-2xs transition-colors shrink-0"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
               ) : (
                 <Send className="w-4 h-4 text-white" />
               )}
-            </button>
+            </Button>
           </form>
 
           <p className="text-[11px] text-[#9CA3AF] text-center mt-1">
@@ -1127,128 +1156,126 @@ export default function QuestionAnswerPage() {
       {/* 4. MODAL: TOÀN BỘ 10 CHỦ ĐỀ & KHO TRI THỨC RAG           */}
       {/* ========================================================= */}
       {isTopicModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-150">
-          <div className="w-full max-w-4xl max-h-[90vh] bg-white border border-[#E5E7EB] rounded-2xl shadow-xl flex flex-col overflow-hidden">
+        <Dialog open={isTopicModalOpen} onOpenChange={setIsTopicModalOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] rounded-2xl border-[#E5E7EB] bg-white p-0 shadow-xl overflow-hidden flex flex-col">
             {/* Header Modal */}
-            <div className="p-4 sm:p-5 border-b border-[#F0F0EF] flex items-center justify-between gap-3 bg-white shrink-0">
+            <DialogHeader className="p-4 sm:p-5 border-b border-[#F0F0EF] bg-white shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center shrink-0">
                   <BookOpen className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-sm sm:text-base font-semibold text-[#1A1A1A] flex items-center gap-2">
+                  <DialogTitle className="text-sm sm:text-base font-semibold text-[#1A1A1A] flex items-center gap-2">
                     Toàn Bộ Chủ Đề Trong Kho Tri Thức RAG
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] font-medium">
+                    <Badge variant="lime" className="text-[10px] font-medium">
                       10.856 Chunks
-                    </span>
-                  </h3>
-                  <p className="text-xs text-[#6B7280]">
+                    </Badge>
+                  </DialogTitle>
+                  <DialogDescription className="text-xs text-[#6B7280]">
                     Bấm vào bất kỳ câu hỏi nào để trao đổi ngay với hệ thống AI
-                  </p>
+                  </DialogDescription>
                 </div>
               </div>
-              <button
-                onClick={() => setIsTopicModalOpen(false)}
-                aria-label="Đóng modal"
-                className="p-2 rounded-xl text-[#6B7280] hover:text-[#1A1A1A] hover:bg-[#F5F5F4] transition"
-              >
-                <X className="w-4 h-4 text-[#6B7280]" />
-              </button>
-            </div>
+            </DialogHeader>
 
             {/* Thanh Tìm Kiếm Chủ Đề Trong Modal */}
             <div className="px-4 sm:px-6 py-3 border-b border-[#F0F0EF] bg-[#FAFAF9]">
               <div className="relative flex items-center">
                 <Search className="w-3.5 h-3.5 text-[#6B7280] absolute left-3 pointer-events-none" />
-                <input
+                <Input
                   type="text"
                   value={searchTopicQuery}
                   onChange={(e) => setSearchTopicQuery(e.target.value)}
                   placeholder="Tìm kiếm chủ đề hoặc câu hỏi gợi ý..."
-                  className="w-full bg-white border border-[#E5E7EB] rounded-xl pl-9 pr-4 py-2 text-xs text-[#1A1A1A] placeholder-[#9CA3AF] focus:outline-none focus:border-[#1A1A1A] transition"
+                  className="w-full bg-white border-[#E5E7EB] rounded-xl pl-9 pr-8 text-xs text-[#1A1A1A] placeholder-[#9CA3AF]"
                 />
                 {searchTopicQuery && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setSearchTopicQuery('')}
-                    className="absolute right-3 p-1 text-[#6B7280] hover:text-[#1A1A1A]"
+                    className="absolute right-2 h-6 w-6 text-[#9CA3AF] hover:text-[#1A1A1A]"
                   >
-                    <X className="w-3.5 h-3.5 text-[#6B7280]" />
-                  </button>
+                    <X className="w-3.5 h-3.5" />
+                  </Button>
                 )}
               </div>
             </div>
 
             {/* Body Modal: Danh sách 10 chủ đề */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-              {filteredTopics.length === 0 ? (
-                <div className="text-center py-12 text-xs text-[#6B7280]">
-                  Không tìm thấy chủ đề hoặc câu hỏi phù hợp với từ khóa "{searchTopicQuery}".
-                </div>
-              ) : (
-                filteredTopics.map((topic) => {
-                  const ModalTopicIcon = getTopicIcon(topic.id);
-                  return (
-                    <div
-                      key={topic.id}
-                      className="p-4 sm:p-5 rounded-2xl bg-[#F9F9F8] border border-[#E5E7EB] space-y-3"
-                    >
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center text-[#1A1A1A] shrink-0">
-                            <ModalTopicIcon className="w-4 h-4 text-[#1A1A1A]" />
+            <ScrollArea className="flex-1 p-4 sm:p-6">
+              <div className="space-y-4">
+                {filteredTopics.length === 0 ? (
+                  <div className="text-center py-12 text-xs text-[#6B7280]">
+                    Không tìm thấy chủ đề hoặc câu hỏi phù hợp với từ khóa "{searchTopicQuery}".
+                  </div>
+                ) : (
+                  filteredTopics.map((topic) => {
+                    const ModalTopicIcon = getTopicIcon(topic.id);
+                    return (
+                      <Card
+                        key={topic.id}
+                        className="p-4 sm:p-5 rounded-2xl bg-[#F9F9F8] border-[#E5E7EB] space-y-3 shadow-none"
+                      >
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-[#E5E7EB] flex items-center justify-center text-[#1A1A1A] shrink-0">
+                              <ModalTopicIcon className="w-4 h-4 text-[#1A1A1A]" />
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-semibold text-[#1A1A1A] flex items-center gap-2">
+                                {topic.name}
+                                {topic.badge && (
+                                  <Badge variant="lime" className="text-[10px] font-medium">
+                                    {topic.badge}
+                                  </Badge>
+                                )}
+                              </h4>
+                              <p className="text-xs text-[#6B7280]">{topic.description}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="text-sm font-semibold text-[#1A1A1A] flex items-center gap-2">
-                              {topic.name}
-                              {topic.badge && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] font-medium">
-                                  {topic.badge}
-                                </span>
-                              )}
-                            </h4>
-                            <p className="text-xs text-[#6B7280]">{topic.description}</p>
-                          </div>
+                          <Badge variant="secondary" className="bg-white border-[#E5E7EB] text-xs font-medium text-[#6B7280]">
+                            {topic.chunkCountEstimate}
+                          </Badge>
                         </div>
-                        <span className="text-xs font-medium text-[#6B7280] bg-white px-2.5 py-1 rounded-lg border border-[#E5E7EB]">
-                          {topic.chunkCountEstimate}
-                        </span>
-                      </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#E5E7EB]/70">
-                        {topic.sampleQuestions.map((q, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              setIsTopicModalOpen(false);
-                              handleSendMessage(q.question);
-                            }}
-                            className="group p-2.5 rounded-xl bg-white hover:bg-[#F5F5F4] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 text-left transition flex items-center justify-between gap-2 shadow-2xs"
-                          >
-                            <span className="text-xs text-[#1A1A1A] group-hover:text-black line-clamp-2">
-                              {q.question}
-                            </span>
-                            <ArrowUpRight className="w-3.5 h-3.5 text-[#6B7280] group-hover:text-[#1A1A1A] shrink-0" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#E5E7EB]/70">
+                          {topic.sampleQuestions.map((q, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => {
+                                setIsTopicModalOpen(false);
+                                handleSendMessage(q.question);
+                              }}
+                              className="group p-2.5 rounded-xl bg-white hover:bg-[#F5F5F4] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 text-left transition flex items-center justify-between gap-2 shadow-2xs"
+                            >
+                              <span className="text-xs text-[#1A1A1A] group-hover:text-black line-clamp-2">
+                                {q.question}
+                              </span>
+                              <ArrowUpRight className="w-3.5 h-3.5 text-[#6B7280] group-hover:text-[#1A1A1A] shrink-0" />
+                            </button>
+                          ))}
+                        </div>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            </ScrollArea>
 
             {/* Footer Modal */}
             <div className="p-3.5 sm:p-4 border-t border-[#F0F0EF] bg-[#FAFAF9] flex items-center justify-between text-xs text-[#6B7280] shrink-0">
               <span>Được xây dựng với mô hình BGE-M3 và dữ liệu 63 tỉnh thành Việt Nam</span>
-              <button
+              <Button
+                variant="default"
                 onClick={() => setIsTopicModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white font-medium transition"
+                className="rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white text-xs font-medium px-4 py-2"
               >
                 Đóng
-              </button>
+              </Button>
             </div>
-          </div>
-        </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

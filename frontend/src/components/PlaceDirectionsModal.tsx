@@ -2,26 +2,37 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import L from 'leaflet';
-import { Place } from '@/types';
 import {
-  X,
   Navigation,
   Car,
   Bike,
   Footprints,
   MapPin,
   Clock,
-  Compass,
   CloudSun,
+  Sun,
+  Cloud,
+  CloudRain,
+  CloudLightning,
+  CloudFog,
   Droplets,
   Wind,
   ExternalLink,
   Loader2,
-  AlertTriangle,
   Sparkles,
   LocateFixed,
-  RefreshCw,
+  Map as MapIcon,
+  Layers,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 
 // Fix for default Leaflet marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -56,44 +67,36 @@ interface WeatherData {
   humidity: number;
   windSpeed: number;
   description: string;
-  icon: string;
+  code: number;
   isRain: boolean;
   advice: string;
 }
 
-// Convert WMO Weather Code to Vietnamese string, icon and advice
 function interpretWeatherCode(code: number, temp: number): {
   description: string;
-  icon: string;
+  code: number;
   isRain: boolean;
   advice: string;
 } {
   let description = 'Trời đẹp';
-  let icon = '☀️';
   let isRain = false;
   let advice = 'Thời tiết rất lý tưởng để tham quan và chụp ảnh ngoài trời!';
 
   if (code === 0) {
     description = 'Trời nắng trong xanh';
-    icon = '☀️';
   } else if (code === 1 || code === 2) {
     description = 'Ít mây, nắng nhẹ';
-    icon = '🌤️';
   } else if (code === 3) {
     description = 'Nhiều mây';
-    icon = '⛅';
   } else if (code === 45 || code === 48) {
     description = 'Sương mù';
-    icon = '🌫️';
     advice = 'Tầm nhìn có thể bị hạn chế, hãy chú ý an toàn khi di chuyển!';
   } else if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
     description = 'Có mưa rào';
-    icon = '🌧️';
     isRain = true;
     advice = 'Đang có mưa, hãy mang theo ô/áo mưa hoặc ưu tiên điểm đến trong nhà!';
   } else if ([95, 96, 99].includes(code)) {
     description = 'Giông bão sét';
-    icon = '⛈️';
     isRain = true;
     advice = 'Thời tiết có giông bão, nên hạn chế hoạt động ngoài trời lúc này!';
   }
@@ -104,7 +107,17 @@ function interpretWeatherCode(code: number, temp: number): {
     advice = 'Trời se lạnh, bạn nên mặc thêm áo ấm khi ra ngoài!';
   }
 
-  return { description, icon, isRain, advice };
+  return { description, code, isRain, advice };
+}
+
+function getWeatherIconComponent(code: number) {
+  if (code === 0) return <Sun className="w-5 h-5 text-amber-500" />;
+  if (code === 1 || code === 2) return <CloudSun className="w-5 h-5 text-amber-500" />;
+  if (code === 3) return <Cloud className="w-5 h-5 text-neutral-500" />;
+  if (code === 45 || code === 48) return <CloudFog className="w-5 h-5 text-neutral-500" />;
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return <CloudRain className="w-5 h-5 text-sky-500" />;
+  if ([95, 96, 99].includes(code)) return <CloudLightning className="w-5 h-5 text-amber-600" />;
+  return <Sun className="w-5 h-5 text-amber-500" />;
 }
 
 export default function PlaceDirectionsModal({
@@ -117,14 +130,11 @@ export default function PlaceDirectionsModal({
   const userMarkerRef = useRef<L.Marker | null>(null);
   const tileLayerRef = useRef<L.TileLayer | null>(null);
 
-  // Map layer style
   const [mapStyle, setMapStyle] = useState<'google' | 'osm' | 'satellite'>('google');
 
-  // Initial sensible start coordinates: approximately 3km from destination by default
   const defaultStartLat = place.latitude ? place.latitude + 0.025 : 21.0285;
   const defaultStartLng = place.longitude ? place.longitude + 0.025 : 105.8542;
 
-  // Starting location states
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number }>({
     lat: defaultStartLat,
     lng: defaultStartLng,
@@ -133,9 +143,10 @@ export default function PlaceDirectionsModal({
   const [locationStatus, setLocationStatus] = useState<
     'idle' | 'requesting' | 'granted' | 'denied'
   >('idle');
-  const [locationMessage, setLocationMessage] = useState('Đang dùng điểm xuất phát mẫu (~3km). Bạn có thể bấm để lấy GPS thực.');
+  const [locationMessage, setLocationMessage] = useState(
+    'Đang dùng điểm xuất phát mẫu (~3km). Bạn có thể bấm để lấy GPS thực.'
+  );
 
-  // Transport mode & Routing stats
   const [transportMode, setTransportMode] = useState<TransportMode>('motorbike');
   const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(null);
   const [modeDurations, setModeDurations] = useState<{
@@ -149,11 +160,9 @@ export default function PlaceDirectionsModal({
   });
   const [isRouting, setIsRouting] = useState(false);
 
-  // Weather state
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [weatherLoading, setWeatherLoading] = useState(true);
 
-  // Apply Tile Layer Function
   const applyTileLayer = useCallback((style: 'osm' | 'google' | 'satellite', map: L.Map) => {
     if (tileLayerRef.current) {
       map.removeLayer(tileLayerRef.current);
@@ -161,7 +170,6 @@ export default function PlaceDirectionsModal({
 
     let layer: L.TileLayer;
     if (style === 'osm') {
-      // 100% OpenStreetMap official data - NO WATERMARK
       layer = L.tileLayer(
         'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
         {
@@ -178,7 +186,6 @@ export default function PlaceDirectionsModal({
         attribution: '&copy; Google Satellite',
       });
     } else {
-      // Google Maps Streets - Clean, Fast, High Resolution in Vietnam
       layer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
         subdomains: ['0', '1', '2', '3'],
         maxZoom: 20,
@@ -190,7 +197,6 @@ export default function PlaceDirectionsModal({
     tileLayerRef.current = layer;
   }, []);
 
-  // Fetch Live Weather from Open-Meteo API
   useEffect(() => {
     async function fetchWeather() {
       setWeatherLoading(true);
@@ -201,7 +207,7 @@ export default function PlaceDirectionsModal({
           const data = await res.json();
           const current = data.current;
           if (current) {
-            const { description, icon, isRain, advice } = interpretWeatherCode(
+            const { description, code, isRain, advice } = interpretWeatherCode(
               current.weather_code,
               current.temperature_2m
             );
@@ -211,7 +217,7 @@ export default function PlaceDirectionsModal({
               humidity: current.relative_humidity_2m,
               windSpeed: Math.round(current.wind_speed_10m),
               description,
-              icon,
+              code,
               isRain,
               advice,
             });
@@ -227,7 +233,6 @@ export default function PlaceDirectionsModal({
     fetchWeather();
   }, [place.latitude, place.longitude]);
 
-  // Request browser Geolocation API
   const requestLocation = useCallback(() => {
     setLocationStatus('requesting');
     if (!navigator.geolocation) {
@@ -252,23 +257,21 @@ export default function PlaceDirectionsModal({
         if (err.code === 1) {
           setLocationMessage('Bạn đã từ chối quyền vị trí. Nhấn vào ổ khóa trên thanh URL để Bật vị trí.');
         } else {
-          setLocationMessage('Không lấy được GPS (thiết bị chưa bật định vị). Đang dùng điểm xuất phát mẫu.');
+          setLocationMessage('Không lấy được GPS. Đang dùng điểm xuất phát mẫu.');
         }
       },
       {
-        enableHighAccuracy: false, // Don't require GPS chip to avoid desktop timeouts
+        enableHighAccuracy: false,
         timeout: 8000,
         maximumAge: 60000,
       }
     );
   }, []);
 
-  // Request location on modal mount
   useEffect(() => {
     requestLocation();
   }, [requestLocation]);
 
-  // Initialize Map
   useEffect(() => {
     if (!mapContainerRef.current) return;
 
@@ -278,29 +281,26 @@ export default function PlaceDirectionsModal({
         zoom: 13,
       });
 
-      // Apply initial tile layer
       applyTileLayer(mapStyle, map);
 
-      // Destination Place Marker (Emerald Icon)
       const placeIcon = L.divIcon({
         className: 'dest-marker',
         html: `
           <div style="display:flex; flex-direction:column; align-items:center;">
-            <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.5); font-size: 18px;">
-              📍
+            <div style="background: #1A1A1A; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.95); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.4); margin-top: 3px; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.3);">
+            <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-top: 4px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
               ${place.name}
             </div>
           </div>
         `,
         iconSize: [120, 60],
-        iconAnchor: [60, 20],
+        iconAnchor: [60, 18],
       });
 
       L.marker([place.latitude, place.longitude], { icon: placeIcon }).addTo(map);
 
-      // Allow clicking on map to change starting location
       map.on('click', (e: L.LeafletMouseEvent) => {
         setUserCoords({
           lat: e.latlng.lat,
@@ -312,7 +312,6 @@ export default function PlaceDirectionsModal({
 
       mapRef.current = map;
 
-      // Invalidate size after modal render to fix blank/white tiles
       const timer1 = setTimeout(() => map.invalidateSize(), 150);
       const timer2 = setTimeout(() => map.invalidateSize(), 450);
       const timer3 = setTimeout(() => map.invalidateSize(), 800);
@@ -325,7 +324,6 @@ export default function PlaceDirectionsModal({
     }
   }, [applyTileLayer, mapStyle, place]);
 
-  // Switch Map Layer
   const handleSwitchMapStyle = (newStyle: 'osm' | 'google' | 'satellite') => {
     setMapStyle(newStyle);
     if (mapRef.current) {
@@ -333,26 +331,24 @@ export default function PlaceDirectionsModal({
     }
   };
 
-  // Update User Marker & Calculate Route
   useEffect(() => {
     if (!mapRef.current || !userCoords) return;
 
     const map = mapRef.current;
 
-    // Create or update user location marker (pulsing blue)
     if (!userMarkerRef.current) {
       const userIcon = L.divIcon({
         className: 'user-radar-marker',
         html: `
-          <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
-            <div style="position: absolute; width: 38px; height: 38px; border-radius: 50%; background: rgba(59, 130, 246, 0.4); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-            <div style="width: 24px; height: 24px; border-radius: 50%; background: #2563eb; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px;">
-              👤
+          <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
+            <div style="position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(26, 26, 26, 0.2); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #1A1A1A; border: 2.5px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
           </div>
         `,
-        iconSize: [38, 38],
-        iconAnchor: [19, 19],
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
       });
 
       const userMarker = L.marker([userCoords.lat, userCoords.lng], {
@@ -361,9 +357,9 @@ export default function PlaceDirectionsModal({
       }).addTo(map);
 
       userMarker.bindPopup(`
-        <div style="font-size: 12px; font-weight: 600; color: #1e293b;">
-          📍 Điểm xuất phát của bạn<br/>
-          <span style="font-weight: 400; font-size: 10px; color: #64748b;">(Kéo thả để đổi điểm đi)</span>
+        <div style="font-size: 12px; font-weight: 600; color: #1A1A1A;">
+          Điểm xuất phát của bạn<br/>
+          <span style="font-weight: 400; font-size: 10px; color: #6B7280;">(Kéo thả để đổi điểm đi)</span>
         </div>
       `);
 
@@ -379,7 +375,6 @@ export default function PlaceDirectionsModal({
       userMarkerRef.current.setLatLng([userCoords.lat, userCoords.lng]);
     }
 
-    // Call OSRM Route API
     async function calculateRoute() {
       if (!userCoords) return;
       setIsRouting(true);
@@ -396,19 +391,12 @@ export default function PlaceDirectionsModal({
             const distanceKm = Math.round((distanceMeters / 1000) * 10) / 10;
             setRouteDistanceKm(distanceKm);
 
-            // 1. Ô tô (Driving): calculated by OSRM route duration
             const drivingMins = Math.max(1, Math.round(primaryRoute.duration / 60));
-
-            // 2. Xe máy (Motorbike): Vietnam traffic conditions
-            // City (< 10km): ~28 km/h; suburban (10-50km): ~35 km/h; interprovincial (> 50km): ~40 km/h (no expressways)
             const bikeSpeed = distanceKm < 10 ? 28 : distanceKm < 50 ? 35 : 40;
             let motorbikeMins = Math.max(1, Math.round((distanceKm / bikeSpeed) * 60));
-            // In urban city traffic, motorbike can be slightly faster or equal to car
             if (distanceKm < 15 && motorbikeMins > drivingMins) {
               motorbikeMins = Math.max(1, Math.round(drivingMins * 0.9));
             }
-
-            // 3. Đi bộ (Walking): average walking speed ~4.8 km/h
             const walkingMins = Math.max(2, Math.round((distanceKm / 4.8) * 60));
 
             setModeDurations({
@@ -417,7 +405,6 @@ export default function PlaceDirectionsModal({
               walking: walkingMins,
             });
 
-            // Draw route line on map
             if (routeLayerRef.current) {
               map.removeLayer(routeLayerRef.current);
             }
@@ -427,20 +414,14 @@ export default function PlaceDirectionsModal({
             );
 
             const routeLine = L.polyline(coordinates, {
-              color:
-                transportMode === 'walking'
-                  ? '#38bdf8'
-                  : transportMode === 'motorbike'
-                  ? '#10b981'
-                  : '#a855f7',
-              weight: 5,
-              opacity: 0.9,
-              dashArray: transportMode === 'walking' ? '8, 8' : undefined,
+              color: '#1A1A1A',
+              weight: 4.5,
+              opacity: 0.85,
+              dashArray: transportMode === 'walking' ? '6, 6' : undefined,
             }).addTo(map);
 
             routeLayerRef.current = routeLine;
 
-            // Fit map to show both user and destination
             const bounds = L.latLngBounds([
               [userCoords.lat, userCoords.lng],
               [place.latitude, place.longitude],
@@ -450,7 +431,6 @@ export default function PlaceDirectionsModal({
         }
       } catch (err) {
         console.error('Lỗi khi tính toán tuyến đường OSRM:', err);
-        // Fallback: Haversine distance
         const R = 6371;
         const dLat = ((place.latitude - userCoords.lat) * Math.PI) / 180;
         const dLon = ((place.longitude - userCoords.lng) * Math.PI) / 180;
@@ -480,23 +460,16 @@ export default function PlaceDirectionsModal({
     }
 
     calculateRoute();
-  }, [userCoords, place.latitude, place.longitude, place.name]);
+  }, [userCoords, place.latitude, place.longitude, place.name, transportMode]);
 
-  // Update route polyline style instantly when transportMode changes
   useEffect(() => {
     if (!routeLayerRef.current) return;
     routeLayerRef.current.setStyle({
-      color:
-        transportMode === 'walking'
-          ? '#38bdf8'
-          : transportMode === 'motorbike'
-          ? '#10b981'
-          : '#a855f7',
-      dashArray: transportMode === 'walking' ? '8, 8' : undefined,
+      color: '#1A1A1A',
+      dashArray: transportMode === 'walking' ? '6, 6' : undefined,
     });
   }, [transportMode]);
 
-  // Format Duration string
   const formatDuration = (mins: number | null) => {
     if (mins === null) return '—';
     if (mins < 60) return `${mins} phút`;
@@ -511,280 +484,278 @@ export default function PlaceDirectionsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 md:p-6 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl max-h-[92vh] overflow-y-auto shadow-2xl relative flex flex-col">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Header */}
-        <div className="p-5 md:p-6 border-b border-slate-800/80 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold flex-shrink-0">
-              <Navigation className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base md:text-lg font-bold text-white line-clamp-1">
-                  Chỉ Đường & Thời Tiết: {place.name}
-                </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-semibold">
-                  OpenStreetMap
-                </span>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-4xl max-h-[92vh] p-0 overflow-hidden flex flex-col bg-white border-[#E5E7EB] text-[#1A1A1A] rounded-2xl shadow-xl">
+        {/* Header */}
+        <div className="p-5 border-b border-[#E5E7EB] bg-[#FAFAFA]">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[#F0F0EF] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+                <Navigation className="w-4 h-4" />
               </div>
-              <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                <span>
-                  {place.district ? `${place.district}, ` : ''}
-                  {place.province || 'Việt Nam'}
-                </span>
-              </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <DialogTitle className="text-base font-semibold text-[#1A1A1A] truncate">
+                    Chỉ đường & thời tiết: {place.name}
+                  </DialogTitle>
+                  <Badge variant="outline" className="text-[11px] font-normal text-muted-foreground">
+                    Bản đồ vệ tinh & OSRM
+                  </Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 truncate">
+                  <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">
+                    {place.district ? `${place.district}, ` : ''}
+                    {place.province || 'Việt Nam'}
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
+          </DialogHeader>
         </div>
 
-        {/* GPS Banner & Starting Point Notice */}
-        <div className="bg-slate-950/90 border-b border-slate-800 px-4 py-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 text-slate-300">
-            <div className={`w-2.5 h-2.5 rounded-full ${isRealGps ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-            <span>
-              {isRealGps ? '📍 Đang dùng vị trí GPS thực của bạn' : '📌 Điểm xuất phát: Mẫu / Tuỳ chọn'}
-              {' — '}{locationMessage}
+        {/* GPS Status Banner */}
+        <div className="bg-[#F9F9F8] border-b border-[#E5E7EB] px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-muted-foreground truncate">
+            <span
+              className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                isRealGps ? 'bg-[#365314] ring-2 ring-[#D9F99D]' : 'bg-neutral-400'
+              }`}
+            />
+            <span className="truncate">
+              {isRealGps ? 'Vị trí GPS thực' : 'Điểm mẫu'} — {locationMessage}
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <button
-              type="button"
-              onClick={requestLocation}
-              disabled={locationStatus === 'requesting'}
-              className="flex items-center gap-1 px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-[11px] shadow-sm disabled:opacity-50 transition"
-            >
-              {locationStatus === 'requesting' ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <LocateFixed className="w-3.5 h-3.5" />
-              )}
-              <span>Lấy vị trí GPS</span>
-            </button>
-          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={requestLocation}
+            disabled={locationStatus === 'requesting'}
+            className="h-7 text-xs gap-1.5 self-start sm:self-auto flex-shrink-0"
+          >
+            {locationStatus === 'requesting' ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <LocateFixed className="w-3.5 h-3.5" />
+            )}
+            Lấy lại GPS
+          </Button>
         </div>
 
-        {/* Top Info Bar: Transport Mode Tabs & Live Weather Card */}
-        <div className="p-4 md:p-5 bg-slate-950/60 border-b border-slate-800 grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
-          {/* Transport Mode Switcher */}
-          <div className="space-y-1.5">
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Thời gian di chuyển theo phương tiện:</span>
+        {/* Transport Modes & Live Weather */}
+        <div className="p-4 bg-white border-b border-[#E5E7EB] grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+          {/* Transport mode pills */}
+          <div className="space-y-2">
+            <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Thời gian ước tính theo phương tiện:</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              {/* Motorbike */}
               <button
                 type="button"
                 onClick={() => setTransportMode('motorbike')}
-                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs font-semibold transition ${
+                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'motorbike'
-                    ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300 shadow-md shadow-emerald-500/10'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
+                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <Bike className="w-4 h-4 text-emerald-400" />
-                  <span>Xe máy</span>
+                  <Bike className="w-3.5 h-3.5" />
+                  <span className="font-medium">Xe máy</span>
                 </div>
-                <span className="text-[12px] font-bold font-mono text-emerald-300">
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'motorbike' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
                   {formatDuration(modeDurations.motorbike)}
                 </span>
               </button>
 
-              {/* Car */}
               <button
                 type="button"
                 onClick={() => setTransportMode('driving')}
-                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs font-semibold transition ${
+                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'driving'
-                    ? 'bg-purple-500/20 border-purple-500/60 text-purple-300 shadow-md shadow-purple-500/10'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
+                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <Car className="w-4 h-4 text-purple-400" />
-                  <span>Ô tô</span>
+                  <Car className="w-3.5 h-3.5" />
+                  <span className="font-medium">Ô tô</span>
                 </div>
-                <span className="text-[12px] font-bold font-mono text-purple-300">
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'driving' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
                   {formatDuration(modeDurations.driving)}
                 </span>
               </button>
 
-              {/* Walking */}
               <button
                 type="button"
                 onClick={() => setTransportMode('walking')}
-                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs font-semibold transition ${
+                className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'walking'
-                    ? 'bg-sky-500/20 border-sky-500/60 text-sky-300 shadow-md shadow-sky-500/10'
-                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
+                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
-                  <Footprints className="w-4 h-4 text-sky-400" />
-                  <span>Đi bộ</span>
+                  <Footprints className="w-3.5 h-3.5" />
+                  <span className="font-medium">Đi bộ</span>
                 </div>
-                <span className="text-[12px] font-bold font-mono text-sky-300">
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'walking' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
                   {formatDuration(modeDurations.walking)}
                 </span>
               </button>
             </div>
 
-            {/* Distance Summary */}
-            <div className="text-[11px] text-slate-400 flex items-center justify-between px-1">
+            <div className="text-[11px] text-muted-foreground flex items-center justify-between px-1">
               <span>
-                Khoảng cách lộ trình: <strong className="text-white">{routeDistanceKm !== null ? `${routeDistanceKm} km` : 'Đang tính...'}</strong>
+                Khoảng cách: <strong className="text-[#1A1A1A]">{routeDistanceKm !== null ? `${routeDistanceKm} km` : '...'}</strong>
               </span>
               {isRouting && (
-                <span className="flex items-center gap-1 text-emerald-400 text-[10px]">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Đang vẽ đường...
+                <span className="flex items-center gap-1 text-muted-foreground text-[10px]">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Đang tính toán...
                 </span>
               )}
             </div>
           </div>
 
-          {/* Live Weather Widget (Open-Meteo) */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 shadow-inner">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <CloudSun className="w-3.5 h-3.5 text-amber-400" />
-                Thời tiết tại điểm đến hôm nay
-              </span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
-                Open-Meteo
-              </span>
-            </div>
-
-            {weatherLoading ? (
-              <div className="py-2 flex items-center justify-center text-slate-500 text-xs gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                <span>Đang tải thông tin thời tiết...</span>
+          {/* Weather card */}
+          <Card className="p-3 bg-[#FAFAFA] border-[#E5E7EB] shadow-2xs">
+            <CardContent className="p-0">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <CloudSun className="w-3.5 h-3.5 text-neutral-600" />
+                  Thời tiết hôm nay
+                </span>
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 font-normal text-muted-foreground">
+                  Open-Meteo
+                </Badge>
               </div>
-            ) : weather ? (
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{weather.icon}</span>
-                    <div>
-                      <div className="text-sm font-bold text-white flex items-center gap-1.5">
-                        <span>{weather.temp}°C</span>
-                        <span className="text-[11px] font-normal text-slate-400">
-                          (Cảm giác {weather.apparentTemp}°C)
-                        </span>
+
+              {weatherLoading ? (
+                <div className="py-2 flex items-center justify-center text-muted-foreground text-xs gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Đang tải thông tin thời tiết...</span>
+                </div>
+              ) : weather ? (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-1.5 rounded-lg bg-white border border-[#E5E7EB]">
+                        {getWeatherIconComponent(weather.code)}
                       </div>
-                      <div className="text-[11px] text-slate-300 font-medium">
-                        {weather.description}
+                      <div>
+                        <div className="text-sm font-semibold text-[#1A1A1A] flex items-center gap-1.5">
+                          <span>{weather.temp}°C</span>
+                          <span className="text-[11px] font-normal text-muted-foreground">
+                            (cảm giác {weather.apparentTemp}°C)
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground">
+                          {weather.description}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right text-[11px] text-muted-foreground space-y-0.5">
+                      <div className="flex items-center gap-1 justify-end">
+                        <Droplets className="w-3 h-3" />
+                        <span>Độ ẩm: {weather.humidity}%</span>
+                      </div>
+                      <div className="flex items-center gap-1 justify-end">
+                        <Wind className="w-3 h-3" />
+                        <span>Gió: {weather.windSpeed} km/h</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="text-right text-[10px] text-slate-400 space-y-0.5">
-                    <div className="flex items-center gap-1 justify-end">
-                      <Droplets className="w-3 h-3 text-cyan-400" />
-                      <span>Độ ẩm: {weather.humidity}%</span>
-                    </div>
-                    <div className="flex items-center gap-1 justify-end">
-                      <Wind className="w-3 h-3 text-teal-400" />
-                      <span>Gió: {weather.windSpeed} km/h</span>
-                    </div>
+                  <div className="pt-1.5 border-t border-[#E5E7EB] text-[11px] text-[#1A1A1A] flex items-start gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-neutral-700" />
+                    <span className="line-clamp-2">{weather.advice}</span>
                   </div>
                 </div>
-
-                {/* Smart Travel Advice */}
-                <div className="pt-1.5 border-t border-slate-800 text-[11px] text-amber-300 flex items-start gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-amber-400" />
-                  <span className="line-clamp-2">{weather.advice}</span>
+              ) : (
+                <div className="text-[11px] text-muted-foreground text-center py-2">
+                  Chưa thể tải dữ liệu thời tiết
                 </div>
-              </div>
-            ) : (
-              <div className="text-[11px] text-slate-500 text-center py-2">
-                Không thể tải dữ liệu thời tiết lúc này
-              </div>
-            )}
-          </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Leaflet Routing Map Canvas */}
-        <div className="relative flex-1 min-h-[350px] md:min-h-[420px] bg-slate-950">
+        {/* Map canvas */}
+        <div className="relative flex-1 min-h-[350px] md:min-h-[420px] bg-[#F5F5F4]">
           <div ref={mapContainerRef} className="w-full h-full min-h-[350px] md:min-h-[420px]" />
 
-          {/* Floating Badges */}
-          <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1.5 max-w-[60%]">
-            <div className="bg-slate-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 text-[11px] text-slate-200 flex items-center gap-2 shadow-lg">
-              <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse flex-shrink-0" />
-              <span>Chấm xanh: Vị trí của bạn (Kéo thả hoặc bấm map để đổi)</span>
-            </div>
-
-            <div className="bg-slate-950/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 text-[11px] text-slate-200 flex items-center gap-2 shadow-lg truncate">
-              <span className="truncate">📍 Ghim đến: {place.name}</span>
+          {/* Floating instructions */}
+          <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1.5 max-w-[65%] pointer-events-none">
+            <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] text-[11px] text-[#1A1A1A] flex items-center gap-2 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#1A1A1A] flex-shrink-0" />
+              <span>Kéo chấm hoặc bấm map để đổi điểm đi</span>
             </div>
           </div>
 
-          {/* Map Layer Switcher */}
-          <div className="absolute top-3 right-3 z-[400] flex items-center gap-1 bg-slate-950/90 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 shadow-lg text-[10px] font-semibold">
+          {/* Layer switcher */}
+          <div className="absolute top-3 right-3 z-[400] flex items-center gap-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl border border-[#E5E7EB] shadow-xs text-[11px]">
             <button
               type="button"
               onClick={() => handleSwitchMapStyle('osm')}
-              className={`px-2 py-1 rounded-lg transition ${
+              className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'osm'
-                  ? 'bg-emerald-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1A1A1A] text-white shadow-xs'
+                  : 'text-muted-foreground hover:text-[#1A1A1A]'
               }`}
             >
-              🗺️ OSM
+              OSM
             </button>
             <button
               type="button"
               onClick={() => handleSwitchMapStyle('google')}
-              className={`px-2 py-1 rounded-lg transition ${
+              className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'google'
-                  ? 'bg-emerald-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1A1A1A] text-white shadow-xs'
+                  : 'text-muted-foreground hover:text-[#1A1A1A]'
               }`}
             >
-              📍 Google
+              Google
             </button>
             <button
               type="button"
               onClick={() => handleSwitchMapStyle('satellite')}
-              className={`px-2 py-1 rounded-lg transition ${
+              className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'satellite'
-                  ? 'bg-emerald-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#1A1A1A] text-white shadow-xs'
+                  : 'text-muted-foreground hover:text-[#1A1A1A]'
               }`}
             >
-              🛰️ Vệ tinh
+              Vệ tinh
             </button>
           </div>
 
           {/* External Google Maps Button */}
           <div className="absolute bottom-4 right-4 z-[400]">
-            <a
-              href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${place.latitude},${place.longitude}&travelmode=${
-                transportMode === 'walking' ? 'walking' : transportMode === 'motorbike' ? 'two-wheeler' : 'driving'
-              }`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-950/90 hover:bg-slate-900 border border-slate-700 text-white text-xs font-semibold shadow-xl transition"
+            <Button
+              asChild
+              variant="default"
+              size="sm"
+              className="shadow-md gap-1.5"
             >
-              <ExternalLink className="w-3.5 h-3.5 text-teal-400" />
-              <span>Mở điều hướng Google Maps</span>
-            </a>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${place.latitude},${place.longitude}&travelmode=${
+                  transportMode === 'walking' ? 'walking' : transportMode === 'motorbike' ? 'two-wheeler' : 'driving'
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                Mở Google Maps
+              </a>
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
