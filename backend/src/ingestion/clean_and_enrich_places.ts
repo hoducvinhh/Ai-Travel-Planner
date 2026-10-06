@@ -258,7 +258,7 @@ async function cleanAndEnrichPlaces() {
 
   // 3. Xuất lại file mock_places.json đồng bộ cho recommendation-service
   const allPlaces = await prisma.place.findMany();
-  const mockPlacesPath = path.resolve(__dirname, '../../../recommendation-service/mock_places.json');
+  const datasetsMockPath = path.resolve(__dirname, '../../../datasets/mock_places.json');
   
   const formattedJson = allPlaces.map(p => ({
     name: p.name,
@@ -277,8 +277,13 @@ async function cleanAndEnrichPlaces() {
     longitude: p.longitude
   }));
 
-  fs.writeFileSync(mockPlacesPath, JSON.stringify(formattedJson, null, 2), 'utf-8');
-  console.log(`📁 Đã đồng bộ file recommendation-service/mock_places.json (${formattedJson.length} places).`);
+  fs.writeFileSync(datasetsMockPath, JSON.stringify(formattedJson, null, 2), 'utf-8');
+  console.log(`📁 Đã đồng bộ file datasets/mock_places.json (${formattedJson.length} places).`);
+
+  const recPlacesPath = path.resolve(__dirname, '../../../recommendation-service/mock_places.json');
+  if (fs.existsSync(recPlacesPath)) {
+    fs.writeFileSync(recPlacesPath, JSON.stringify(formattedJson, null, 2), 'utf-8');
+  }
 
   await prisma.$disconnect();
 }
