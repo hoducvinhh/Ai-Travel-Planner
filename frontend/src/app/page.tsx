@@ -104,38 +104,38 @@ export default function Home() {
 
           {/* Card 2: Lập Kế Hoạch Du Lịch */}
           <Link href="/trips/new" className="group block">
-            <Card className="h-full bg-[#1A1A1A] text-white border-[#1A1A1A] rounded-2xl p-7 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+            <Card className="h-full bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-2xl p-7 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 rounded-xl bg-white/10 text-white flex items-center justify-center mb-5">
+                <div className="w-12 h-12 rounded-xl bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center mb-5 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
                   <Calendar className="w-6 h-6" />
                 </div>
 
                 <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-xl font-bold">Lập lịch trình thông minh</h2>
+                  <h2 className="text-xl font-bold text-[#1A1A1A] group-hover:underline">Lập lịch trình thông minh</h2>
                   <Badge variant="lime" className="text-[10px] h-5">AI</Badge>
                 </div>
 
-                <p className="text-neutral-300 text-xs leading-relaxed mb-5">
+                <p className="text-muted-foreground text-xs leading-relaxed mb-5">
                   Lập kế hoạch du lịch chi tiết theo từng ngày. Chọn điểm đến, ngân sách và sở thích; AI sẽ tự động tối ưu cung đường và thời gian.
                 </p>
 
                 <div className="space-y-2 mb-6">
-                  <div className="flex items-center gap-2 text-xs text-neutral-300">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#D4F066]" />
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
                     <span>Gợi ý cá nhân hóa dựa trên học máy LightFM</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-neutral-300">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#D4F066]" />
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
                     <span>Sắp xếp lịch trình theo cung đường di chuyển tối ưu</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-neutral-300">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#D4F066]" />
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
                     <span>Bản đồ trực quan & tích hợp dự báo thời tiết</span>
                   </div>
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D4F066] pt-4 border-t border-white/10">
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A1A1A] pt-4 border-t border-[#E5E7EB]">
                 <span>Tạo lịch trình ngay</span>
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </div>
