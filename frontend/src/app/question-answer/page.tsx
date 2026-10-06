@@ -646,44 +646,202 @@ export default function QuestionAnswerPage() {
         {/* Message Content List */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
           {messages.length === 0 ? (
-            /* Welcome Empty State */
-            <div className="max-w-3xl mx-auto h-full flex flex-col items-center justify-center py-6 text-center">
-              <div className="relative mb-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-2xl shadow-emerald-500/30">
-                  <Compass className="w-8 h-8 sm:w-10 sm:h-10 text-white animate-pulse" />
+            /* Welcome Empty State: Bộ Khám Phá 10 Chủ Đề RAG Toàn Diện */
+            <div className="max-w-4xl mx-auto py-4 sm:py-6 flex flex-col items-center">
+              {/* Header Chào Mừng */}
+              <div className="text-center mb-6 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold mb-3 shadow-inner">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin" style={{ animationDuration: '6s' }} />
+                  <span>KHO TRI THỨC RAG: 10.856 CHUNKS • 63 TỈNH THÀNH • 10 CHỦ ĐỀ</span>
                 </div>
-                <Sparkles className="w-5 h-5 text-amber-300 absolute -top-1.5 -right-1.5 animate-bounce" />
-              </div>
+                <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight text-white mb-2.5">
+                  Bạn muốn khám phá du lịch Việt Nam thế nào?
+                </h2>
+                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                  Chọn một trong 10 chủ đề chuyên sâu dưới đây để xem gợi ý câu hỏi thực tế hoặc tự đặt câu hỏi bất kỳ cho AI!
+                </p>
 
-              <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white mb-2">
-                Hỏi Đáp Du Lịch Việt Nam
-              </h2>
-              <p className="text-slate-400 text-xs sm:text-sm max-w-lg mb-6 leading-relaxed">
-                Hệ thống RAG AI phân tích hàng ngàn bài viết và dữ liệu văn hóa, ẩm thực, lịch trình để giải đáp thắc mắc của bạn một cách chính xác nhất.
-              </p>
-
-              {/* Suggested Questions */}
-              <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-left">
-                {SUGGESTED_QUESTIONS.map((item, idx) => (
+                {/* View Mode Toggle */}
+                <div className="mt-4 inline-flex items-center p-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs">
                   <button
-                    key={idx}
-                    onClick={() => handleSendMessage(item.question)}
-                    className="group p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/90 border border-slate-800 hover:border-emerald-500/40 transition-all text-left flex flex-col gap-1 shadow-sm hover:-translate-y-0.5"
+                    onClick={() => setTopicViewMode('tabs')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition ${
+                      topicViewMode === 'tabs'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">{item.icon}</span>
-                      <span className="text-[10px] font-semibold text-emerald-400 uppercase tracking-wider">
-                        {item.category}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-300 group-hover:text-white line-clamp-2">
-                      {item.question}
-                    </p>
+                    <ListFilter className="w-3.5 h-3.5" />
+                    <span>Chi tiết theo chủ đề</span>
                   </button>
-                ))}
+                  <button
+                    onClick={() => setTopicViewMode('grid')}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition ${
+                      topicViewMode === 'grid'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Grid className="w-3.5 h-3.5" />
+                    <span>Lưới 10 chủ đề</span>
+                  </button>
+                </div>
               </div>
+
+              {topicViewMode === 'tabs' ? (
+                /* CHẾ ĐỘ 1: TABS CHỦ ĐỀ + DANH SÁCH CÂU HỎI MẪU */
+                <div className="w-full space-y-4">
+                  {/* Thanh Cuộn Ngang 10 Chủ Đề (Horizontal Pills Carousel) */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent">
+                    {RAG_TOPICS.map((topic) => {
+                      const isSelected = topic.id === selectedTopicId;
+                      return (
+                        <button
+                          key={topic.id}
+                          onClick={() => setSelectedTopicId(topic.id)}
+                          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all shrink-0 ${
+                            isSelected
+                              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950/50 scale-[1.02] border border-emerald-400/30'
+                              : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800/80'
+                          }`}
+                        >
+                          <span className="text-sm">{topic.icon}</span>
+                          <span>{topic.shortName}</span>
+                          {topic.badge && (
+                            <span
+                              className={`text-[9px] px-1.5 py-0.2 rounded-full font-bold ${
+                                isSelected
+                                  ? 'bg-white/20 text-white'
+                                  : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                              }`}
+                            >
+                              {topic.badge}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Chi Tiết Chủ Đề Đang Chọn & Các Câu Hỏi Gợi Ý */}
+                  {(() => {
+                    const currentTopic =
+                      RAG_TOPICS.find((t) => t.id === selectedTopicId) || RAG_TOPICS[0];
+                    return (
+                      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-emerald-900/30 backdrop-blur-md shadow-xl space-y-4 animate-in fade-in duration-300">
+                        {/* Header của Topic */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl p-2 rounded-xl bg-slate-800/80 border border-slate-700/60 shadow-sm">
+                              {currentTopic.icon}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h3 className="text-sm sm:text-base font-bold text-white">
+                                  {currentTopic.name}
+                                </h3>
+                                {currentTopic.badge && (
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-semibold">
+                                    {currentTopic.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-400 mt-0.5">
+                                {currentTopic.description}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-left sm:text-right shrink-0">
+                            <span className="text-[11px] font-medium text-emerald-400 bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-800/40">
+                              Dữ liệu: {currentTopic.chunkCountEstimate}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Danh Sách Câu Hỏi Gợi Ý Tiêu Biểu */}
+                        <div>
+                          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+                            <HelpCircle className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Bấm vào câu hỏi để hỏi AI ngay lập tức:</span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {currentTopic.sampleQuestions.map((qItem, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleSendMessage(qItem.question)}
+                                className="group relative p-3.5 rounded-xl bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800/90 hover:border-emerald-500/50 transition-all text-left flex items-start justify-between gap-2.5 shadow-sm hover:shadow-emerald-950/40 hover:-translate-y-0.5"
+                              >
+                                <div className="space-y-1.5 flex-1">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:scale-125 transition-transform" />
+                                    {qItem.badge && (
+                                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                                        {qItem.badge}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-slate-200 group-hover:text-emerald-100 font-medium leading-relaxed">
+                                    {qItem.question}
+                                  </p>
+                                </div>
+                                <div className="p-1.5 rounded-lg bg-slate-800/80 group-hover:bg-emerald-600 text-slate-400 group-hover:text-white transition-all shrink-0 mt-0.5 shadow-sm">
+                                  <ArrowUpRight className="w-3.5 h-3.5" />
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                /* CHẾ ĐỘ 2: LƯỚI CARD TẤT CẢ 10 CHỦ ĐỀ CỦA RAG */
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {RAG_TOPICS.map((topic) => (
+                    <div
+                      key={topic.id}
+                      onClick={() => {
+                        setSelectedTopicId(topic.id);
+                        setTopicViewMode('tabs');
+                      }}
+                      className="group cursor-pointer p-4 rounded-2xl bg-slate-900/70 hover:bg-slate-900 border border-slate-800/90 hover:border-emerald-500/40 transition-all flex flex-col justify-between gap-3 shadow-md hover:shadow-emerald-950/40 hover:-translate-y-0.5"
+                    >
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-2xl p-2 rounded-xl bg-slate-800/60 group-hover:bg-emerald-950/40 border border-slate-800 group-hover:border-emerald-700/40 transition-colors">
+                            {topic.icon}
+                          </span>
+                          {topic.badge && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold">
+                              {topic.badge}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors line-clamp-1">
+                          {topic.name}
+                        </h4>
+                        <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                          {topic.description}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
+                        <span className="text-emerald-400 font-medium">
+                          {topic.chunkCountEstimate}
+                        </span>
+                        <span className="flex items-center gap-1 group-hover:text-emerald-300 transition-colors">
+                          Khám phá <ChevronRight className="w-3.5 h-3.5" />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
+
             /* Tin nhắn trò chuyện */
             <div className="max-w-4xl mx-auto space-y-6 pb-4">
               {messages.map((msg) => (
