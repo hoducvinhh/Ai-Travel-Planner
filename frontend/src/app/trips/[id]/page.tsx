@@ -13,24 +13,29 @@ import {
   ArrowLeft,
   Loader2,
   CheckCircle2,
-  MapIcon,
+  Map as MapIcon,
+  Sparkles,
 } from 'lucide-react';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api';
 import PlaceWeatherPill from '@/components/PlaceWeatherPill';
 
-// Dynamically import Leaflet map (client-side only)
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+
+// Dynamically import Leaflet map
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] bg-slate-900 rounded-xl flex items-center justify-center">
-      <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
+    <div className="w-full h-[400px] bg-[#F5F5F4] rounded-xl flex items-center justify-center">
+      <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
     </div>
   ),
 });
 
-// Dynamically import Directions & Weather Modal (client-side only)
+// Dynamically import Directions & Weather Modal
 const PlaceDirectionsModal = dynamic(
   () => import('@/components/PlaceDirectionsModal'),
   { ssr: false }
@@ -55,7 +60,7 @@ function TripDetailContent() {
         const data = await api.get<Trip>(`/trips/${tripId}`);
         setTrip(data);
       } catch (err: any) {
-        setError(err.message || 'Trip not found');
+        setError(err.message || 'Không tìm thấy lịch trình');
       } finally {
         setLoading(false);
       }
@@ -68,10 +73,10 @@ function TripDetailContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center">
+      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-emerald-400 mx-auto mb-4" />
-          <p className="text-slate-300">Đang tải lịch trình...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-neutral-400 mx-auto mb-3" />
+          <p className="text-muted-foreground text-xs">Đang tải chi tiết lịch trình...</p>
         </div>
       </div>
     );
@@ -79,16 +84,19 @@ function TripDetailContent() {
 
   if (error || !trip) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-400 mb-4">❌ {error || 'Không tìm thấy lịch trình'}</p>
-          <button
-            onClick={() => router.push('/')}
-            className="px-6 py-2 bg-emerald-500 rounded-xl hover:bg-emerald-600 transition"
-          >
-            Về trang chủ
-          </button>
-        </div>
+      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center p-6 bg-white border-[#E5E7EB]">
+          <CardContent className="p-0">
+            <p className="text-destructive text-sm font-medium mb-4">{error || 'Không tìm thấy lịch trình'}</p>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => router.push('/trips')}
+            >
+              Về danh sách chuyến đi
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -97,204 +105,223 @@ function TripDetailContent() {
   const allPlaces = trip.itinerary.days.flatMap((d) => d.places);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 text-white">
+    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
       {/* Header */}
-      <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+      <header className="border-b border-[#E5E7EB] bg-white sticky top-0 z-30">
+        <div className="container mx-auto px-4 py-3 max-w-6xl">
           <div className="flex items-center justify-between">
-            <button
-              onClick={() => router.push('/')}
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition"
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/trips')}
+              className="gap-1.5 text-xs text-muted-foreground hover:text-[#1A1A1A]"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
               <span>Quay lại</span>
-            </button>
+            </Button>
 
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-emerald-400" />
-              <div>
-                <h1 className="text-lg font-bold">{trip.destination}</h1>
-                <p className="text-xs text-slate-400">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div className="text-left">
+                <h1 className="text-sm font-bold text-[#1A1A1A] line-clamp-1">{trip.destination}</h1>
+                <p className="text-[11px] text-muted-foreground">
                   {new Date(trip.startDate).toLocaleDateString('vi-VN')} -{' '}
                   {new Date(trip.endDate).toLocaleDateString('vi-VN')}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2 text-slate-400">
-                <Users className="w-4 h-4" />
+            <div className="hidden sm:flex items-center gap-3 text-xs">
+              <Badge variant="secondary" className="gap-1 font-normal">
+                <Users className="w-3 h-3 text-muted-foreground" />
                 <span>{trip.groupSize} người</span>
-              </div>
-              <div className="flex items-center gap-2 text-emerald-400">
-                <DollarSign className="w-4 h-4" />
-                <span>{trip.budgetPerPerson.toLocaleString()} VNĐ</span>
-              </div>
+              </Badge>
+              <Badge variant="secondary" className="gap-1 font-mono font-medium">
+                <DollarSign className="w-3 h-3 text-muted-foreground" />
+                <span>{trip.budgetPerPerson.toLocaleString('vi-VN')} đ / người</span>
+              </Badge>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 max-w-6xl">
         {/* Summary Card */}
-        <div className="mb-8 p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">{trip.itinerary.summary}</h2>
-              <p className="text-slate-400">
-                Lịch trình {trip.itinerary.days.length} ngày được tạo bởi AI
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-slate-400 mb-1">Tổng chi phí dự kiến</div>
-              <div className="text-2xl font-bold text-emerald-400">
-                {trip.itinerary.totalEstimatedCost.toLocaleString()} VNĐ
+        <Card className="mb-6 bg-white border-[#E5E7EB] shadow-2xs">
+          <CardContent className="p-5">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-[11px] font-medium mb-2">
+                  <Sparkles className="w-3 h-3" />
+                  Lịch trình tạo bởi AI ({trip.itinerary.days.length} ngày)
+                </div>
+                <h2 className="text-xl font-bold text-[#1A1A1A] mb-1">{trip.itinerary.summary}</h2>
+              </div>
+              <div className="text-left sm:text-right">
+                <div className="text-[11px] text-muted-foreground">Tổng chi phí dự kiến</div>
+                <div className="text-xl font-bold font-mono text-[#1A1A1A]">
+                  {trip.itinerary.totalEstimatedCost.toLocaleString('vi-VN')} đ
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 text-sm">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-300">
-              Bao gồm {allPlaces.length} địa điểm được AI gợi ý dựa trên sở thích của bạn
-            </span>
-          </div>
-        </div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground pt-3 border-t border-[#E5E7EB]">
+              <CheckCircle2 className="w-4 h-4 text-[#365314] flex-shrink-0" />
+              <span>
+                Bao gồm {allPlaces.length} địa điểm được cá nhân hoá theo tiêu chí và sở thích của bạn
+              </span>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Timeline Sidebar */}
-          <div className="lg:col-span-1 space-y-4">
-            <h3 className="text-lg font-bold flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-emerald-400" />
-              Lịch trình theo ngày
-            </h3>
+          {/* Timeline Sidebar (Day Selector) */}
+          <div className="lg:col-span-1 space-y-3">
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 px-1">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>Lịch trình theo ngày</span>
+            </div>
 
             <div className="space-y-2">
-              {trip.itinerary.days.map((day) => (
-                <button
-                  key={day.dayNumber}
-                  onClick={() => setSelectedDay(day.dayNumber)}
-                  className={`w-full p-4 rounded-xl text-left transition-all ${
-                    selectedDay === day.dayNumber
-                      ? 'bg-emerald-500/20 border-2 border-emerald-500'
-                      : 'bg-slate-900/50 border-2 border-slate-800 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold">Ngày {day.dayNumber}</span>
-                    <span className="text-xs text-slate-400">{day.places.length} địa điểm</span>
-                  </div>
-                  <div className="text-sm text-slate-400">{day.date}</div>
-                </button>
-              ))}
+              {trip.itinerary.days.map((day) => {
+                const isSelected = selectedDay === day.dayNumber;
+                return (
+                  <button
+                    key={day.dayNumber}
+                    onClick={() => setSelectedDay(day.dayNumber)}
+                    className={`w-full p-3.5 rounded-xl border text-left transition cursor-pointer flex items-center justify-between ${
+                      isSelected
+                        ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
+                        : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                    }`}
+                  >
+                    <div>
+                      <div className="font-semibold text-sm">Ngày {day.dayNumber}</div>
+                      <div className={`text-xs mt-0.5 ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
+                        {day.date}
+                      </div>
+                    </div>
+                    <Badge
+                      variant={isSelected ? 'lime' : 'secondary'}
+                      className="text-[10px] h-5"
+                    >
+                      {day.places.length} điểm
+                    </Badge>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Main Content: Map & Day Places */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Map */}
-            <div className="rounded-2xl overflow-hidden border border-slate-800">
-              <div className="bg-slate-900/50 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <MapIcon className="w-5 h-5 text-emerald-400" />
-                  <span className="font-semibold">Bản đồ địa điểm</span>
+            {/* Map Canvas */}
+            <Card className="rounded-2xl overflow-hidden border-[#E5E7EB] bg-white shadow-2xs">
+              <div className="px-4 py-2.5 bg-[#FAFAFA] border-b border-[#E5E7EB] flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-[#1A1A1A]">
+                  <MapIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span>Bản đồ hành trình Ngày {selectedDay}</span>
                 </div>
-                <span className="text-xs text-slate-400">
-                  Bấm ghim trên bản đồ để xem chỉ đường
+                <span className="text-[11px] text-muted-foreground">
+                  Bấm ghim trên bản đồ để xem chi tiết
                 </span>
               </div>
               <MapComponent
                 places={currentDay?.places || []}
                 onSelectPlace={(p) => setDirectionsPlace(p)}
               />
-            </div>
+            </Card>
 
             {/* Day Details */}
             {currentDay && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold">
-                    Ngày {currentDay.dayNumber} - {currentDay.date}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-base font-bold text-[#1A1A1A]">
+                    Ngày {currentDay.dayNumber} • {currentDay.date}
                   </h3>
                   {currentDay.notes && (
-                    <p className="text-sm text-slate-400 italic">{currentDay.notes}</p>
+                    <p className="text-xs text-muted-foreground italic">{currentDay.notes}</p>
                   )}
                 </div>
 
                 {/* Places Timeline */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {currentDay.places.map((place, index) => (
-                    <div
+                    <Card
                       key={place.placeId}
-                      className="relative p-5 rounded-xl bg-slate-900/50 border border-slate-800 hover:border-emerald-500/50 transition group"
+                      className="relative bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-xl p-4 shadow-2xs transition group"
                     >
-                      {/* Order Badge */}
-                      <div className="absolute -left-3 top-5 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-sm border-4 border-slate-950 shadow-md">
-                        {index + 1}
-                      </div>
+                      <div className="flex items-start gap-3">
+                        {/* Order pill */}
+                        <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                          {index + 1}
+                        </div>
 
-                      <div className="ml-6">
-                        <div className="flex items-start justify-between mb-3 gap-3">
-                          <div>
-                            <h4
-                              onClick={() => setDirectionsPlace(place)}
-                              className="text-lg font-bold mb-1 hover:text-emerald-400 cursor-pointer transition flex items-center gap-2 group/title"
-                              title="Bấm để xem chỉ đường và thời tiết"
-                            >
-                              <span>{place.name}</span>
-                              <span className="text-xs text-emerald-400/80 font-normal opacity-0 group-hover/title:opacity-100 transition flex items-center gap-1">
-                                <Navigation className="w-3 h-3" /> Chỉ đường
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3 mb-1">
+                            <div>
+                              <h4
+                                onClick={() => setDirectionsPlace(place)}
+                                className="text-sm font-semibold text-[#1A1A1A] hover:underline cursor-pointer flex items-center gap-1.5"
+                                title="Bấm để xem chỉ đường và thời tiết"
+                              >
+                                <span>{place.name}</span>
+                              </h4>
+                              <div className="flex flex-wrap items-center gap-1.5 mt-1 mb-2">
+                                {place.categories.map((cat) => (
+                                  <Badge
+                                    key={cat}
+                                    variant="outline"
+                                    className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                                  >
+                                    {cat}
+                                  </Badge>
+                                ))}
+
+                                <PlaceWeatherPill latitude={place.latitude} longitude={place.longitude} />
+                              </div>
+                            </div>
+
+                            <div className="text-right flex-shrink-0">
+                              <div className="text-[10px] text-muted-foreground">Chi phí ước tính</div>
+                              <div className="font-semibold text-xs font-mono text-[#1A1A1A]">
+                                {place.priceEstimate > 0
+                                  ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
+                                  : 'Miễn phí'}
+                              </div>
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                            {place.description}
+                          </p>
+
+                          <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs">
+                            <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {place.estimatedTime}
                               </span>
-                            </h4>
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              {place.categories.map((cat) => (
-                                <span
-                                  key={cat}
-                                  className="px-2 py-1 text-xs rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
-                                >
-                                  {cat}
-                                </span>
-                              ))}
-
-                              {/* Thời tiết thực tế tại địa điểm này */}
-                              <PlaceWeatherPill latitude={place.latitude} longitude={place.longitude} />
+                              <span>
+                                {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
+                              </span>
                             </div>
-                          </div>
 
-                          <div className="text-right flex-shrink-0">
-                            <div className="text-sm text-slate-400 mb-1">Chi phí</div>
-                            <div className="font-bold text-emerald-400">
-                              {place.priceEstimate.toLocaleString()} VNĐ
-                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDirectionsPlace(place)}
+                              className="h-6 px-2 text-[11px] gap-1 font-medium"
+                            >
+                              <Navigation className="w-3 h-3" />
+                              <span>Chỉ đường</span>
+                            </Button>
                           </div>
-                        </div>
-
-                        <p className="text-slate-300 mb-3 text-sm leading-relaxed">{place.description}</p>
-
-                        <div className="flex items-center gap-4 text-sm text-slate-400">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4 text-slate-500" />
-                            <span>{place.estimatedTime}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Navigation className="w-4 h-4 text-slate-500" />
-                            <span>
-                              {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
-                            </span>
-                          </div>
-                          
-                          <button
-                            type="button"
-                            onClick={() => setDirectionsPlace(place)}
-                            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-400 rounded-lg transition-colors border border-emerald-500/30 font-medium text-xs cursor-pointer shadow-sm"
-                            title="Chỉ đường từ vị trí của bạn đến địa điểm này"
-                          >
-                            <Navigation className="w-4 h-4" />
-                            <span>Chỉ đường</span>
-                          </button>
                         </div>
                       </div>
-                    </div>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -321,4 +348,3 @@ export default function TripDetailPage() {
     </ProtectedRoute>
   );
 }
-
