@@ -26,9 +26,14 @@ async function main() {
     longitude: p.longitude,
   }));
 
-  const targetPath = path.resolve(__dirname, '../../recommendation-service/mock_places.json');
+  const targetPath = path.resolve(__dirname, '../../datasets/mock_places.json');
   fs.writeFileSync(targetPath, JSON.stringify(formatted, null, 2), 'utf-8');
-  console.log(`✅ Đã đồng bộ thành công ${formatted.length} địa điểm vào recommendation-service/mock_places.json!`);
+  console.log(`✅ Đã đồng bộ thành công ${formatted.length} địa điểm vào datasets/mock_places.json!`);
+
+  const recPath = path.resolve(__dirname, '../../recommendation-service/mock_places.json');
+  if (fs.existsSync(recPath)) {
+    fs.writeFileSync(recPath, JSON.stringify(formatted, null, 2), 'utf-8');
+  }
 }
 
 main()
