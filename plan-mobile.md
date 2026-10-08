@@ -9,31 +9,26 @@ Dự án AI Travel Planner hiện tại đang có:
 - **Database**: PostgreSQL + pgvector
 - **Features**: Trip planning, ML recommendations, RAG chatbot, interactive maps, community posts
 
-Mục tiêu là xây dựng ứng dụng di động (iOS/Android) để mở rộng phạm vi tiếp cận người dùng, tận dụng hoàn toàn backend và ML infrastructure hiện có.
+Mục tiêu là xây dựng ứng dụng di động (iOS/Android) **cho end users** để mở rộng phạm vi tiếp cận người dùng, tận dụng hoàn toàn backend và ML infrastructure hiện có. **Mobile app chỉ focus vào user features, không bao gồm admin functions** (admin sẽ tiếp tục sử dụng web interface).
 
 ## Công Nghệ Đề Xuất
 
-### Flutter (Selected)
+### Flutter
 
 **Lý do chọn:**
 - **Performance tuyệt vời**: Compile thành native code (ARM), 60fps animations mượt mà
 - **Single codebase**: iOS + Android từ cùng một codebase Dart
 - **Rich UI framework**: Material Design 3 + Cupertino widgets built-in, custom animations dễ dàng
-- **Hot reload**: Instant UI updates trong development (giống React hot reload)
+- **Hot reload**: Instant UI updates trong development
 - **Strong typing**: Dart language với null safety, DX tốt với IDE support (VS Code, Android Studio)
 - **Ecosystem mature**: Pub.dev có 40,000+ packages (http, maps, state management, etc.)
-- **Deployment dễ dàng**: Flutter build tools tích hợp sẵn, không cần Expo/third-party service
+- **Deployment dễ dàng**: Flutter build tools tích hợp sẵn
+- **UI consistency**: Flutter render UI riêng (Skia engine) → consistent cross-platform
 
-**Trade-offs:**
-- Học Dart từ đầu (nhưng syntax tương tự TypeScript/JavaScript, learning curve ngắn)
-- Không tái sử dụng được React components từ web (nhưng tái sử dụng được business logic/types)
-- Bundle size ~15-20MB (lớn hơn native nhưng nhỏ hơn React Native)
-
-**So sánh với React Native:**
-- **Performance**: Flutter nhanh hơn (compiled code vs JS bridge)
-- **UI consistency**: Flutter render UI riêng (Skia engine) → consistent cross-platform, React Native dùng native widgets → có thể khác biệt iOS/Android
-- **Learning curve**: React Native dễ hơn nếu đã biết React, nhưng Dart học nhanh (~1 tuần)
-- **Community**: React Native lớn hơn, nhưng Flutter đang grow rất nhanh (Google backing)
+**Considerations:**
+- Dart syntax tương tự TypeScript/JavaScript, learning curve ngắn (~3-5 ngày)
+- Tái sử dụng được business logic và data models từ web (convert sang Dart)
+- Bundle size ~15-20MB cho release build
 
 ## Kiến Trúc Mobile App
 
@@ -162,10 +157,10 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
 ### Phase 1: Core Features (Sprint 1-2, 2 tuần)
 
 #### 1.1 Authentication
-- **Screens**: Login, Register, Profile
+- **Screens**: Login, Register, Profile (user profile chỉnh sửa preferences)
 - **API Integration**: 
   - `POST /auth/login` → Lưu JWT vào SharedPreferences/SecureStorage
-  - `POST /auth/register`
+  - `POST /auth/register` (chỉ register với role USER)
   - `GET /auth/profile`
 - **Widgets**: 
   - Form inputs với validation (TextFormField)
@@ -173,6 +168,7 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
   - Loading states (CircularProgressIndicator)
 - **Native Features**: 
   - Biometric authentication (Face ID/Touch ID) cho login nhanh (sử dụng `local_auth` package)
+- **Note**: Không có admin authentication, mobile app chỉ cho end users
 
 #### 1.2 Trip Management
 - **Trip List Screen**:
@@ -208,7 +204,9 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
   - Filter by province, category, budget
   - Search functionality
   - Image gallery
-  - Reviews and ratings (track interaction: `POST /interactions`)
+  - Save favorite places
+  - Track interactions cho ML model: `POST /interactions` (VIEW, LIKE, SAVE, RATE)
+- **Note**: Không có admin functions (create/edit/delete places), chỉ view và interact
 
 #### 2.2 RAG Chatbot
 - **Chat Screen**: 
@@ -230,13 +228,15 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
 
 #### 3.1 Community Features
 - **Screens**: 
-  - Community feed: `GET /community/posts`
-  - Create post: `POST /community/posts`
+  - Community feed: `GET /community/posts` (view all users' posts)
+  - Create post: `POST /community/posts` (users share their trips)
   - Comments: `POST /community/posts/:id/comments`
 - **Features**:
   - Image upload (use `image_picker` package)
   - Like/share posts
-  - Push notifications cho comments mới
+  - Comment on posts
+  - View other users' shared trips
+- **Note**: Không có admin moderation features trong mobile app, chỉ có user interactions
 
 #### 3.2 Push Notifications
 - **Use Case**:
@@ -698,17 +698,21 @@ jobs:
 | Phase | Duration | Deliverables |
 |-------|----------|--------------|
 | **Setup & Infra** | 3-4 days | Flutter project init, API client setup, navigation structure, theme |
-| **Phase 1** | 2 weeks | Auth (login/register/profile), Trip list/detail, Map integration |
-| **Phase 2** | 2 weeks | Places discovery, RAG chat với streaming, Offline support |
-| **Phase 3** | 2 weeks | Community feed/posts, Local notifications, Polish UI/UX |
+| **Phase 1** | 2 weeks | Auth (login/register/profile), Trip list/detail/create, Map integration |
+| **Phase 2** | 2 weeks | Places discovery (browse/search/detail), RAG chat với streaming, Offline support |
+| **Phase 3** | 2 weeks | Community feed/posts/comments, Local notifications, Polish UI/UX |
 | **Testing & Debug** | 1 week | Fix bugs, performance optimization, test trên real devices |
 | **App Store Prep** | 3-4 days | Screenshots, descriptions, privacy policy, submission |
-| **Total** | **7-8 weeks** | Full-featured Flutter mobile app |
+| **Total** | **7-8 weeks** | Full-featured Flutter mobile app (user-facing only) |
 
 **Note về learning curve:**
 - Nếu chưa biết Dart: Thêm 3-5 ngày để học basics (syntax, null safety, async/await)
 - Dart tương tự TypeScript/JavaScript → learning curve ngắn
 - Resources: [dart.dev/guides](https://dart.dev/guides), [flutter.dev/docs](https://flutter.dev/docs)
+
+**Scope exclusions:**
+- Không có admin features (place management, user management, content moderation)
+- Admin functions tiếp tục sử dụng web interface
 
 ## Success Metrics
 
@@ -829,6 +833,7 @@ class Trip with _$Trip {
 6. **Dart Experience**: Team có ai đã biết Dart/Flutter chưa?
    - Nếu chưa: allocate thêm 3-5 ngày học
    - Nếu rồi: có thể bắt đầu ngay
+7. **User Roles**: Xác nhận rằng mobile app chỉ cho end users (role USER), không có admin access?
 
 ## Learning Resources
 
