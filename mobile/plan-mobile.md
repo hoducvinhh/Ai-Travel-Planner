@@ -240,39 +240,58 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
 
 #### 2.2 RAG Chatbot
 
-**FINAL DECISION: WebSocket với `web_socket_channel` package** ✅
+**FINAL DECISION: Server-Sent Events (SSE) với `http` package** ✅
 
 - **Chat Screen**: 
-  - Stream chat: `POST /chat/message` with WebSocket streaming
+  - Stream chat: `POST /api/chat` with SSE (Server-Sent Events)
   - Message bubbles (user vs AI) với ListView
   - Citation links trong responses với flutter_markdown
   - Typing indicator
   
 - **Implementation**:
   ```dart
-  // Use web_socket_channel for WebSocket connection
-  final channel = WebSocketChannel.connect(
-    Uri.parse('ws://localhost:3002/chat'),
-  );
-  
-  // Send message
-  channel.sink.add(json.encode({
+  // Use http package for SSE streaming (matches web)
+  final request = http.Request('POST', Uri.parse('$apiUrl/api/chat'));
+  request.headers['Content-Type'] = 'application/json';
+  request.headers['Authorization'] = 'Bearer $token';
+  request.body = json.encode({
     'message': userMessage,
-    'conversationId': conversationId,
-  }));
-  
-  // Listen to streaming response
-  channel.stream.listen((message) {
-    final data = json.decode(message);
-    // Update UI with streamed chunk
+    'sessionId': currentSessionId,
   });
+  
+  final response = await request.send();
+  final stream = response.stream.transform(utf8.decoder);
+  
+  String buffer = '';
+  await for (String chunk in stream) {
+    buffer += chunk;
+    final lines = buffer.split('\n\n');
+    buffer = lines.last;
+    
+    for (final line in lines.take(lines.length - 1)) {
+      if (line.startsWith('data: ')) {
+        final event = json.decode(line.substring(6));
+        
+        if (event['type'] == 'session_info') {
+          // New session created
+        } else if (event['type'] == 'sources') {
+          // Update sources
+        } else if (event['type'] == 'token') {
+          // Append token to message
+        } else if (event['type'] == 'done') {
+          // Stream complete
+        }
+      }
+    }
+  }
   ```
 
 **Rationale:**
-- ✅ **Matches web implementation** - Frontend đang dùng WebSocket cho real-time chat
-- ✅ **Bidirectional** - có thể gửi và nhận messages
-- ✅ **Real-time** - instant message delivery, typing indicators
-- ✅ **Proven** - web_socket_channel là package stable, maintained by Dart team
+- ✅ **Matches web exactly** - Web dùng `fetch` với `ReadableStream` cho SSE
+- ✅ **Backend already supports SSE** - Endpoint `/api/chat` returns SSE stream
+- ✅ **Simpler than WebSocket** - Unidirectional (server→client), no handshake needed
+- ✅ **Standard HTTP** - Works over existing HTTP infrastructure
+- ✅ **Event types**: `session_info`, `sources`, `token`, `done`, `error`
 
 #### 2.3 Offline Support
 
@@ -432,7 +451,7 @@ class HomeScreen extends ConsumerWidget {
 ### Chat & Markdown
 ```yaml
   flutter_markdown: ^0.6.0          # Markdown rendering cho chat
-  web_socket_channel: ^2.4.0        # WebSocket cho streaming chat (FINAL CHOICE)
+  http: ^1.2.0                      # SSE với StreamedResponse (FINAL CHOICE)
 ```
 
 ### Utilities
@@ -1423,10 +1442,10 @@ Xem chi tiết đầy đủ về design system tại file riêng: [DESIGN_SYSTEM
    - 100% consistent với web (Leaflet equivalent)
    - Category-colored markers với Sunset theme
 
-10. **Chat Implementation**: **WebSocket với web_socket_channel package** ✅
-    - Match web frontend implementation
-    - Bidirectional real-time communication
-    - Typing indicators, instant delivery
+10. **Chat Implementation**: **Server-Sent Events (SSE) với http package** ✅
+    - Match web frontend implementation (ReadableStream + SSE)
+    - Unidirectional streaming (server→client)
+    - Event types: session_info, sources, token, done, error
 
 11. **Offline Storage**: **sqflite 2.3+ (SQLite)** ✅
     - SQL standard, relational data support
