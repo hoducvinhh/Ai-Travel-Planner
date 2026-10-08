@@ -187,13 +187,43 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
   - Form persistence (save draft locally)
 
 #### 1.3 Map Integration
-- **Library**: `google_maps_flutter` (Google Maps native) hoặc `mapbox_gl` (Mapbox rich features)
+
+**Solution: flutter_map + Google Maps Tiles** (Consistent với web, không cần API key)
+
+- **Library**: `flutter_map: ^7.0.2` + `latlong2: ^0.9.0`
+- **Tile Provider**: Google Maps tiles (giống web, miễn phí)
+  ```dart
+  // GIỐNG WEB - Không cần API key!
+  urlTemplate: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+  subdomains: ['0', '1', '2', '3']
+  ```
 - **Features**:
-  - Display place markers
-  - Custom marker icons theo category
-  - Clustering khi zoom out
-  - Directions/routing giữa các địa điểm
+  - Display place markers với Sunset theme category colors
+  - Custom numbered markers (gradient emerald giống web)
+  - Polyline routes với dashed line style
   - Current location tracking với `geolocator` package
+  - Marker clustering với `flutter_map_marker_cluster`
+  
+**Geocoding & Search** (miễn phí, giống web):
+- Primary: Photon API (`https://photon.komoot.io/api/`)
+- Fallback: Nominatim OSM (`https://nominatim.openstreetmap.org/`)
+- Local: Search trong database `/places`
+
+**Routing** (miễn phí):
+- OSRM API: `https://router.project-osrm.org/route/v1/driving/`
+- Polyline decoding cho route visualization
+
+**Map Styles** (user có thể switch):
+- Google Maps Streets (default)
+- Google Satellite Hybrid (`lyrs=y`)
+- OpenStreetMap France (optional)
+
+**Why flutter_map + Google Tiles:**
+- ✅ 100% consistent với web (Leaflet dùng Google tiles)
+- ✅ Miễn phí hoàn toàn, không cần API key
+- ✅ Category colors từ Sunset theme (colorful hơn web)
+- ✅ Performance tốt, cache tiles tự động
+- ✅ Proven solution (web đang chạy ổn định)
 
 ### Phase 2: Enhanced Features (Sprint 3-4, 2 tuần)
 
@@ -209,20 +239,62 @@ mobile/                              # Thư mục gốc Flutter app (tạo mới
 - **Note**: Không có admin functions (create/edit/delete places), chỉ view và interact
 
 #### 2.2 RAG Chatbot
+
+**FINAL DECISION: WebSocket với `web_socket_channel` package** ✅
+
 - **Chat Screen**: 
-  - Stream chat: `POST /chat/message` with SSE (Server-Sent Events)
+  - Stream chat: `POST /chat/message` with WebSocket streaming
   - Message bubbles (user vs AI) với ListView
   - Citation links trong responses với flutter_markdown
   - Typing indicator
-- **Challenges**:
-  - Streaming response handling: use `http` package với StreamedResponse hoặc `web_socket_channel`
+  
+- **Implementation**:
+  ```dart
+  // Use web_socket_channel for WebSocket connection
+  final channel = WebSocketChannel.connect(
+    Uri.parse('ws://localhost:3002/chat'),
+  );
+  
+  // Send message
+  channel.sink.add(json.encode({
+    'message': userMessage,
+    'conversationId': conversationId,
+  }));
+  
+  // Listen to streaming response
+  channel.stream.listen((message) {
+    final data = json.decode(message);
+    // Update UI with streamed chunk
+  });
+  ```
+
+**Rationale:**
+- ✅ **Matches web implementation** - Frontend đang dùng WebSocket cho real-time chat
+- ✅ **Bidirectional** - có thể gửi và nhận messages
+- ✅ **Real-time** - instant message delivery, typing indicators
+- ✅ **Proven** - web_socket_channel là package stable, maintained by Dart team
 
 #### 2.3 Offline Support
+
+**FINAL DECISION: sqflite (SQLite)** ✅
+
 - **Strategy**:
-  - Cache trips locally với Hive (NoSQL database) hoặc sqflite (SQLite)
+  - Cache trips locally với **sqflite** (SQLite database)
   - Sync khi online (optimistic updates)
   - Offline indicator UI
-- **Packages**: `hive`, `connectivity_plus` (detect online/offline), `cached_network_image` (cache images)
+  
+- **Packages**: 
+  - `sqflite: ^2.3.0` (SQL database for Flutter)
+  - `connectivity_plus: ^5.0.0` (detect online/offline)
+  - `cached_network_image: ^3.3.0` (cache images)
+
+**Rationale:**
+- ✅ **SQL standard** - familiar syntax, powerful queries
+- ✅ **Relational data** - trips có relationships với places, users
+- ✅ **Proven & stable** - sqflite is the standard SQL solution for Flutter
+- ✅ **Better for complex queries** - JOIN, WHERE, ORDER BY support
+- ✅ **Migration support** - schema versioning built-in
+- ❌ Hive: NoSQL không phù hợp với relational data structure của backend
 
 ### Phase 3: Social & Advanced (Sprint 5-6, 2 tuần)
 
@@ -280,12 +352,38 @@ dependencies:
 ```
 
 ### State Management
+
+**FINAL DECISION: Riverpod** ✅
+
 ```yaml
-  flutter_riverpod: ^2.5.0          # Recommended: reactive, simple
-  # OR
-  flutter_bloc: ^8.1.0              # Alternative: event-driven pattern
-  # OR
-  provider: ^6.1.0                  # Alternative: simple, built by Flutter team
+  flutter_riverpod: ^2.5.0          # Production choice
+  hooks_riverpod: ^2.5.0            # Optional: for hooks support
+```
+
+**Rationale:**
+- ✅ **Modern & reactive** - compile-safe providers, no BuildContext needed
+- ✅ **Best DX** - auto-disposal, dev tools, less boilerplate than BLoC
+- ✅ **Performance** - fine-grained reactivity, only rebuilds what changed
+- ✅ **Growing ecosystem** - strong community, maintained by Flutter team member
+- ✅ **Learning curve** - similar concepts to React hooks, easier than BLoC
+- ❌ BLoC: more verbose, event-driven adds complexity for simple cases
+- ❌ Provider: older API, Riverpod is its successor with better features
+
+**Implementation Pattern:**
+```dart
+// Example: Auth state với Riverpod
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  return AuthNotifier(ref.watch(authRepositoryProvider));
+});
+
+// Usage in widgets
+class HomeScreen extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    // ...
+  }
+}
 ```
 
 ### Networking & API
@@ -298,20 +396,19 @@ dependencies:
 
 ### Maps
 ```yaml
-  google_maps_flutter: ^2.5.0       # Google Maps native
-  # OR
-  mapbox_gl: ^0.16.0                # Mapbox (richer features)
+  flutter_map: ^7.0.2               # Leaflet-like maps (giống web)
+  latlong2: ^0.9.0                  # Coordinate handling
+  flutter_map_marker_cluster: ^1.3.0  # Marker clustering
   
   geolocator: ^11.0.0               # Location services
-  geocoding: ^3.0.0                 # Address <-> coordinates
+  http: ^1.2.0                      # For geocoding APIs (Photon, Nominatim)
 ```
 
 ### Storage & Cache
 ```yaml
   shared_preferences: ^2.2.0        # Key-value storage (như AsyncStorage)
   flutter_secure_storage: ^9.0.0    # Encrypted storage for JWT
-  hive: ^2.2.0                      # NoSQL database (offline support)
-  hive_flutter: ^1.1.0
+  sqflite: ^2.3.0                   # SQL database for offline support (FINAL CHOICE)
   cached_network_image: ^3.3.0      # Image caching
 ```
 
@@ -335,9 +432,7 @@ dependencies:
 ### Chat & Markdown
 ```yaml
   flutter_markdown: ^0.6.0          # Markdown rendering cho chat
-  web_socket_channel: ^2.4.0        # WebSocket cho streaming chat
-  # OR
-  http: ^1.2.0                      # SSE với StreamedResponse
+  web_socket_channel: ^2.4.0        # WebSocket cho streaming chat (FINAL CHOICE)
 ```
 
 ### Utilities
@@ -361,6 +456,189 @@ dev_dependencies:
   freezed_annotation: ^2.4.0
   retrofit_generator: ^8.0.0
 ```
+
+## Map Integration Details
+
+### Implementation với flutter_map
+
+```dart
+// lib/widgets/trip_map.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+
+class TripMap extends StatelessWidget {
+  final List<Place> places;
+  final Function(Place)? onPlaceTap;
+
+  const TripMap({required this.places, this.onPlaceTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      options: MapOptions(
+        initialCenter: LatLng(places[0].latitude, places[0].longitude),
+        initialZoom: 13,
+        minZoom: 5,
+        maxZoom: 20,
+      ),
+      children: [
+        // Google Maps tiles (GIỐNG WEB - no API key needed!)
+        TileLayer(
+          urlTemplate: 'https://mt{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
+          subdomains: const ['0', '1', '2', '3'],
+          maxZoom: 20,
+          userAgentPackageName: 'com.example.ai_travel_planner',
+        ),
+        
+        // Numbered markers với gradient (giống web)
+        MarkerLayer(
+          markers: places.asMap().entries.map((entry) {
+            int index = entry.key;
+            Place place = entry.value;
+            
+            return Marker(
+              point: LatLng(place.latitude, place.longitude),
+              width: 36,
+              height: 36,
+              child: GestureDetector(
+                onTap: () => onPlaceTap?.call(place),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF10B981), Color(0xFF14B8A6)],
+                    ),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${index + 1}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+        
+        // Route polyline (dashed line)
+        PolylineLayer(
+          polylines: [
+            Polyline(
+              points: places.map((p) => LatLng(p.latitude, p.longitude)).toList(),
+              color: Color(0xFF10B981),
+              strokeWidth: 4,
+              dashArray: [10, 10],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Geocoding Search (Photon + Nominatim)
+
+```dart
+// lib/services/geocoding_service.dart
+class GeocodingService {
+  // Primary: Photon API (fast, reliable)
+  Future<List<SearchResult>> searchPhoton(String query) async {
+    final url = 'https://photon.komoot.io/api/?q=${Uri.encodeComponent(query)}&limit=6';
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+    
+    return (data['features'] as List).map((f) {
+      final coords = f['geometry']['coordinates']; // [lng, lat]
+      final props = f['properties'];
+      return SearchResult(
+        name: props['name'] ?? query,
+        lat: coords[1],
+        lng: coords[0],
+        province: props['city'] ?? props['state'] ?? '',
+        district: props['district'] ?? '',
+      );
+    }).toList();
+  }
+  
+  // Fallback: Nominatim
+  Future<List<SearchResult>> searchNominatim(String query) async {
+    final url = 'https://nominatim.openstreetmap.org/search?'
+        'format=json&q=${Uri.encodeComponent(query)}&countrycodes=vn&limit=5';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {'Accept-Language': 'vi,en;q=0.9'},
+    );
+    final data = json.decode(response.body);
+    
+    return (data as List).map((item) {
+      return SearchResult(
+        name: item['display_name'].split(',')[0],
+        lat: double.parse(item['lat']),
+        lng: double.parse(item['lon']),
+        province: item['address']?['state'] ?? '',
+        district: item['address']?['suburb'] ?? '',
+      );
+    }).toList();
+  }
+}
+```
+
+### Category Markers với Sunset Colors
+
+```dart
+// lib/widgets/place_marker.dart
+Marker createCategoryMarker(Place place) {
+  return Marker(
+    point: LatLng(place.latitude, place.longitude),
+    width: 40,
+    height: 40,
+    child: Container(
+      decoration: BoxDecoration(
+        color: getCategoryColor(place.category),
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [
+          BoxShadow(color: Colors.black26, blurRadius: 4, offset: Offset(0, 2)),
+        ],
+      ),
+      child: Icon(
+        getCategoryIcon(place.category),
+        color: Colors.white,
+        size: 20,
+      ),
+    ),
+  );
+}
+
+Color getCategoryColor(String category) {
+  switch (category) {
+    case 'beach': return Color(0xFF4ECDC4);     // Turquoise
+    case 'mountain': return Color(0xFF95E1D3);  // Mint green
+    case 'culture': return Color(0xFFFFAA85);   // Peach
+    case 'food': return Color(0xFFFFA500);      // Orange
+    case 'nature': return Color(0xFF7DCE82);    // Green
+    case 'city': return Color(0xFF9C88FF);      // Purple
+    default: return Color(0xFFFF6B6B);          // Coral
+  }
+}
+```
+
+---
 
 ## API Integration Strategy
 
@@ -695,24 +973,26 @@ jobs:
 
 ## Timeline Estimate
 
-| Phase | Duration | Deliverables |
-|-------|----------|--------------|
-| **Setup & Infra** | 3-4 days | Flutter project init, API client setup, navigation structure, theme |
-| **Phase 1** | 2 weeks | Auth (login/register/profile), Trip list/detail/create, Map integration |
-| **Phase 2** | 2 weeks | Places discovery (browse/search/detail), RAG chat với streaming, Offline support |
-| **Phase 3** | 2 weeks | Community feed/posts/comments, Local notifications, Polish UI/UX |
-| **Testing & Debug** | 1 week | Fix bugs, performance optimization, test trên real devices |
-| **App Store Prep** | 3-4 days | Screenshots, descriptions, privacy policy, submission |
-| **Total** | **7-8 weeks** | Full-featured Flutter mobile app (user-facing only) |
+**FINAL TIMELINE: 7-8 weeks (1 developer)** ✅
 
-**Note về learning curve:**
-- Nếu chưa biết Dart: Thêm 3-5 ngày để học basics (syntax, null safety, async/await)
-- Dart tương tự TypeScript/JavaScript → learning curve ngắn
-- Resources: [dart.dev/guides](https://dart.dev/guides), [flutter.dev/docs](https://flutter.dev/docs)
+| Phase | Duration | Start | Deliverables |
+|-------|----------|-------|--------------|
+| **Setup & Infra** | 3-4 days | Week 1 | Flutter project init, API client setup, navigation structure, Sunset theme config |
+| **Phase 1: Core** | 2 weeks | Week 1-2 | Auth (login/register/profile), Trip list/detail/create, flutter_map integration |
+| **Phase 2: Enhanced** | 2 weeks | Week 3-4 | Places discovery (browse/search/detail), RAG chat với SSE streaming, Offline Hive cache |
+| **Phase 3: Social** | 2 weeks | Week 5-6 | Community feed/posts/comments, Local notifications, Polish UI/UX with Coral theme |
+| **Testing & Debug** | 1 week | Week 7 | Fix bugs, performance optimization, test trên real devices (Android + iOS) |
+| **App Store Prep** | 3-4 days | Week 8 | Screenshots, descriptions, privacy policy, Google Play submission |
+| **Total** | **7-8 weeks** | Oct-Dec 2026 | Full-featured Flutter mobile app (user-facing only) |
 
-**Scope exclusions:**
-- Không có admin features (place management, user management, content moderation)
-- Admin functions tiếp tục sử dụng web interface
+**Learning Curve (if needed):**
+- **Dart basics**: 3-5 ngày (syntax, null safety, async/await) - Dart tương tự TypeScript/JavaScript
+- **Flutter fundamentals**: Included in Week 1 setup phase
+- **Resources**: [dart.dev/guides](https://dart.dev/guides), [flutter.dev/docs](https://flutter.dev/docs)
+
+**Scope:**
+- ✅ **Included**: All user-facing features (auth, trips, places, chat, community, maps)
+- ❌ **Excluded**: Admin features (place management, user management, content moderation) - admin stays on web interface
 
 ## Success Metrics
 
@@ -803,9 +1083,284 @@ class Trip with _$Trip {
 
 ---
 
+---
+
+# UI/UX Design System cho Mobile App
+
+## Context
+
+Web app hiện tại chỉ có màu trắng đen (#F9F9F8 background, #1A1A1A text). Mobile app nên có thêm màu sắc để tạo cảm giác sống động, trẻ trung và phân biệt rõ các features.
+
+## Đề Xuất Color Palette
+
+### **Sunset Gradient Theme** (Recommended - Warm & Inviting) 🌅
+
+Theme này lấy cảm hứng từ hoàng hôn biển Việt Nam - ấm áp, thân thiện, phù hợp với du lịch.
+
+```dart
+class AppColors {
+  // Base Colors (giữ từ web)
+  static const Color background = Color(0xFFFAFAFA);      // Very light gray
+  static const Color surface = Color(0xFFFFFFFF);         // Pure white cards
+  static const Color textPrimary = Color(0xFF1A1A1A);     // Near-black text
+  static const Color textSecondary = Color(0xFF6B7280);   // Gray-600
+  
+  // Primary Brand Color - Coral Orange (màu san hô)
+  static const Color primary = Color(0xFFFF6B6B);         // Vibrant coral
+  static const Color primaryLight = Color(0xFFFF8787);    // Lighter coral
+  static const Color primaryDark = Color(0xFFE85555);     // Darker coral
+  static const Color primarySurface = Color(0xFFFFE8E8);  // Very light coral background
+  
+  // Secondary Color - Turquoise Blue (màu biển)
+  static const Color secondary = Color(0xFF4ECDC4);       // Turquoise
+  static const Color secondaryLight = Color(0xFF7DD9D1);  // Light turquoise
+  static const Color secondaryDark = Color(0xFF3BA89F);   // Dark turquoise
+  static const Color secondarySurface = Color(0xFFE0F7F5); // Very light turquoise
+  
+  // Accent Color - Golden Yellow (màu vàng hoàng hôn)
+  static const Color accent = Color(0xFFFFA500);          // Golden orange
+  static const Color accentLight = Color(0xFFFFB733);     
+  static const Color accentSurface = Color(0xFFFFF4E0);   // Light cream
+  
+  // Category Colors (phân biệt loại địa điểm)
+  static const Color categoryBeach = Color(0xFF4ECDC4);   // Turquoise - Biển
+  static const Color categoryMountain = Color(0xFF95E1D3); // Mint green - Núi
+  static const Color categoryCulture = Color(0xFFFFAA85); // Peach - Văn hóa
+  static const Color categoryFood = Color(0xFFFFA500);    // Orange - Ẩm thực
+  static const Color categoryNature = Color(0xFF7DCE82);  // Green - Thiên nhiên
+  static const Color categoryCity = Color(0xFF9C88FF);    // Purple - Đô thị
+  
+  // Semantic Colors
+  static const Color success = Color(0xFF4ADE80);         // Green
+  static const Color warning = Color(0xFFFBBF24);         // Amber
+  static const Color error = Color(0xFFEF4444);           // Red
+  static const Color info = Color(0xFF60A5FA);            // Blue
+  
+  // Interactive Colors
+  static const Color likeRed = Color(0xFFFF6B6B);         // Coral (matches primary)
+  static const Color bookmarkGold = Color(0xFFFFA500);    // Golden
+  static const Color rating = Color(0xFFFFA500);          // Golden star
+  
+  // UI Element Colors
+  static const Color border = Color(0xFFE5E7EB);          
+  static const Color divider = Color(0xFFF3F4F6);         
+}
+```
+
+**Rationale:**
+- **Coral (#FF6B6B)**: Màu san hô ấm áp, gợi cảm giác vacation, beach, relaxing
+- **Turquoise (#4ECDC4)**: Màu biển trong xanh, fresh, peaceful
+- **Golden (#FFA500)**: Màu hoàng hôn, premium, rewarding (cho rating, bookmark)
+- Kết hợp tạo cảm giác tropical paradise, phù hợp với du lịch Việt Nam (biển, vịnh, đảo)
+- Màu sắc nổi bật nhưng không quá chói, vẫn professional
+
+### Category Badge Color System
+```
+Biển     🏖️  → Turquoise (#4ECDC4)
+Núi      ⛰️  → Mint Green (#95E1D3)
+Văn hóa  🏛️  → Peach (#FFAA85)
+Ẩm thực  🍜  → Orange (#FFA500)
+Thiên nhiên 🌳 → Green (#7DCE82)
+Đô thị   🏙️  → Purple (#9C88FF)
+```
+
+### Alternative Color Options
+
+#### Option 2: **Ocean Blue Theme** (Modern & Trustworthy) 🌊
+- Primary: Sky blue (#0EA5E9)
+- Secondary: Teal (#14B8A6)
+- Accent: Orange (#FF9800)
+- Professional, đáng tin cậy cho booking/payment
+
+#### Option 3: **Green Nature Theme** (Eco-Friendly & Fresh) 🌿
+- Primary: Emerald (#10B981)
+- Secondary: Lime (#84CC16)
+- Accent: Amber (#F59E0B)
+- Phù hợp với trend du lịch xanh
+
+## Typography System
+
+### Font Family
+
+**FINAL DECISION: System Fonts** ✅
+
+```dart
+class AppFonts {
+  static const String primaryFont = 'SF Pro Display';  // iOS default
+  static const String secondaryFont = 'Roboto';        // Android default
+  
+  static String get systemFont => Platform.isIOS ? primaryFont : secondaryFont;
+}
+```
+
+**Rationale:**
+- ✅ **Zero loading time** - no font download delay
+- ✅ **Native feel** - users familiar with system fonts
+- ✅ **Better performance** - smaller app bundle size (no embedded fonts)
+- ✅ **Accessibility** - system fonts support dynamic type/font scaling
+- ❌ Custom fonts (Inter/Manrope) would add 200-400KB and slight load delay
+
+**Note:** Nếu sau này muốn custom font để match web 100%, có thể thêm `google_fonts: ^6.1.0` package.
+
+### Text Styles
+```dart
+class AppTextStyles {
+  // Display (Headings)
+  static const TextStyle displayLarge = TextStyle(
+    fontSize: 32, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.5,
+  );
+  static const TextStyle displayMedium = TextStyle(
+    fontSize: 24, fontWeight: FontWeight.w700, height: 1.3, letterSpacing: -0.3,
+  );
+  
+  // Body Text
+  static const TextStyle bodyLarge = TextStyle(
+    fontSize: 16, fontWeight: FontWeight.w400, height: 1.6,
+  );
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: 14, fontWeight: FontWeight.w400, height: 1.5,
+  );
+  
+  // Labels & Buttons
+  static const TextStyle labelLarge = TextStyle(
+    fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1,
+  );
+}
+```
+
+## Spacing & Layout
+
+### Spacing Scale (4px base unit)
+```dart
+class AppSpacing {
+  static const double xs = 4.0;    static const double sm = 8.0;
+  static const double md = 12.0;   static const double lg = 16.0;
+  static const double xl = 24.0;   static const double xxl = 32.0;
+  static const double xxxl = 48.0;
+}
+```
+
+### Border Radius
+```dart
+class AppRadius {
+  static const double sm = 8.0;    // Badges, chips
+  static const double md = 12.0;   // Buttons, inputs
+  static const double lg = 16.0;   // Cards
+  static const double xl = 20.0;   // Modals, bottom sheets
+  static const double full = 999.0; // Fully rounded pills
+}
+```
+
+## Component Design
+
+### Button Styles
+```
+Primary Button (Coral gradient):
+┌─────────────────────┐
+│   Tạo chuyến đi     │  ← White text on Coral gradient (#FF6B6B → #FF8787)
+└─────────────────────┘
+
+Secondary Button (Outline):
+┌─────────────────────┐
+│   Xem thêm          │  ← Coral border & text, white bg
+└─────────────────────┘
+```
+
+### Place Card Example
+```
+┌─────────────────────────────────┐
+│ ┌─────────────────────────────┐ │
+│ │     [Beach Photo]           │ │
+│ │  ┌────┐         [☀️ 28°C]  │ │
+│ │  │🏖️  │                    │ │  ← Category badge (Turquoise)
+│ │  │Biển│                    │ │
+│ │  └────┘                    │ │
+│ └─────────────────────────────┘ │
+│ Bãi Trường Beach               │  ← Title
+│ Phú Quốc, Kiên Giang           │  ← Location
+│ ⭐ 4.8 (245)  💰💰  🏖️        │  ← Rating (Golden)
+│ [❤️ Thích] [🔖 Save] [➡️ More]│  ← Coral & Golden buttons
+└─────────────────────────────────┘
+```
+
+### Home Screen Mockup
+```
+┌─────────────────────────────────┐
+│ [Avatar] AI Travel 🌅 [🔔]     │  ← Coral notification badge
+├─────────────────────────────────┤
+│  ╔═══════════════════════════╗  │
+│  ║ Gradient Background       ║  │  ← Sunset gradient (coral→cream→turquoise)
+│  ║ Chào buổi sáng, Vinh 👋   ║  │
+│  ║ Khám phá điểm đến mới     ║  │
+│  ╚═══════════════════════════╝  │
+│                                 │
+│  🎯 Dành cho bạn               │
+│  ┌──────┐ ┌──────┐ ┌──────┐   │
+│  │ IMG  │ │ IMG  │ │ IMG  │   │  ← Horizontal scrolling cards
+│  │ Hạ   │ │ Đà   │ │ Phú  │   │
+│  │ Long │ │ Lạt  │ │ Quốc │   │
+│  │ ⭐4.8│ │ ⭐4.9│ │ ⭐4.7│   │  ← Golden stars
+│  │ ❤️128│ │ ❤️256│ │ ❤️512│   │  ← Coral hearts
+│  └──────┘ └──────┘ └──────┘   │
+└─────────────────────────────────┘
+│ [🏠] [📅] [👥] [👤]            │  ← Bottom nav (Coral active state)
+└─────────────────────────────────┘
+```
+
+## Animations & Microinteractions
+
+```dart
+class AppDurations {
+  static const Duration fast = Duration(milliseconds: 150);
+  static const Duration normal = Duration(milliseconds: 250);
+  static const Duration slow = Duration(milliseconds: 350);
+}
+```
+
+**Like Animation:**
+- Scale: 0.8 → 1.2 → 1.0 (bounce)
+- Color: gray → Coral red
+- Icon: Outline → Filled
+- Duration: 350ms
+
+**Pull-to-Refresh:**
+- iOS spinner: Coral color
+- Android spinner: Turquoise color
+- Threshold: 80dp
+
+## Design System Summary
+
+**Why Sunset Theme:**
+1. **Emotional Connection**: Coral + Turquoise = beach vacation vibes (80% du lịch VN liên quan biển)
+2. **Differentiation**: Khác biệt rõ so với web (web = đen trắng, mobile = colorful)
+3. **Category Clarity**: 6 category colors giúp user phân biệt nhanh loại địa điểm
+4. **Gender-Neutral**: Không quá feminine (pink) hay masculine (blue), balanced
+5. **Instagram-Worthy**: Màu sắc photogenic, user muốn chụp screenshot share
+
+**Implementation:**
+- Primary buttons: Coral gradient
+- Category badges: Respective colors (biển=turquoise, núi=mint, etc.)
+- Bottom nav active: Coral
+- Like button: Coral
+- Bookmark button: Golden
+- Loading indicators: Coral
+
+**Flutter Packages:**
+```yaml
+dependencies:
+  flutter_animate: ^4.5.0           # Animations
+  shimmer: ^3.0.0                   # Loading skeletons
+  cached_network_image: ^3.3.0      # Image caching
+  lucide_icons_flutter: ^1.1.0      # Icon library (matches web)
+```
+
+Xem chi tiết đầy đủ về design system tại file riêng: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+
+---
+
 ## Next Steps
 
-1. **User Approval**: Review plan này, xác nhận chọn Flutter
+1. **User Approval**: Review plan này, xác nhận chọn Flutter và Sunset Theme
 2. **Environment Setup**: 
    - Cài đặt Flutter SDK: [flutter.dev/docs/get-started/install](https://flutter.dev/docs/get-started/install)
    - Android Studio (cho Android development + emulator)
@@ -818,22 +1373,87 @@ class Trip with _$Trip {
 4. **Repository Structure**: Tạo folder `mobile/` trong monorepo hoặc separate repo
 5. **Kickoff Sprint 1**: 
    - Init Flutter project: `flutter create mobile`
+   - Setup theme configuration với Sunset colors
    - Setup API client với Dio
    - Implement authentication flow
 
-## Questions to Clarify
+## Final Decisions Summary
 
-1. **Target Platforms**: iOS only, Android only, hay cả hai?
-   - **Recommendation**: Start với Android (dễ test hơn, không cần Mac), add iOS sau
-2. **Budget**: Có ngân sách cho Apple Developer ($99/year) + Google Play ($25 one-time) accounts không?
-3. **Timeline**: Có deadline cứng không? (ví dụ: demo cho đồ án vào tháng 12/2026)
-4. **Resources**: Có bao nhiêu developers làm mobile? (1 person có thể làm được trong 7-8 weeks với Flutter)
-5. **Design**: Có design mockups sẵn hay tự design trong lúc code?
-   - **Recommendation**: Reuse web design, adapt cho mobile (bottom nav, cards, etc.)
-6. **Dart Experience**: Team có ai đã biết Dart/Flutter chưa?
-   - Nếu chưa: allocate thêm 3-5 ngày học
-   - Nếu rồi: có thể bắt đầu ngay
-7. **User Roles**: Xác nhận rằng mobile app chỉ cho end users (role USER), không có admin access?
+### ✅ All Key Decisions Made - Ready to Start Implementation
+
+**Technology Stack:**
+1. **Framework**: **Flutter 3.24+ with Dart 3.5+** ✅
+2. **Target Platforms**: **Android + iOS (cả hai)** ✅
+   - Flutter cross-platform advantage → build cả 2 từ đầu
+   - Test trên Android emulator trước (dễ hơn), iOS sau
+   - Deploy: Android first (Google Play $25 one-time), iOS later (nếu có Apple Developer account)
+
+**UI/UX:**
+3. **Color Theme**: **Sunset Gradient Theme (Coral + Turquoise)** ✅
+   - Primary: Coral #FF6B6B
+   - Secondary: Turquoise #4ECDC4
+   - Accent: Golden #FFA500
+   - Category colors: 6 màu phân biệt rõ ràng (Beach, Mountain, Culture, Food, Nature, City)
+
+4. **Font**: **System Fonts (SF Pro iOS / Roboto Android)** ✅
+   - Zero loading time, better performance
+   - Native feel, accessibility support
+
+5. **Design Approach**: **Reuse web design patterns, adapt to mobile** ✅
+   - Bottom navigation thay navbar
+   - Native gestures (pull-to-refresh, swipe)
+   - Touch-friendly (48dp minimum targets)
+   - Material Design 3 + Cupertino widgets
+
+**Architecture:**
+6. **State Management**: **Riverpod 2.5+** ✅
+   - Modern, reactive, compile-safe providers
+   - Best DX, auto-disposal, fine-grained reactivity
+
+7. **API Client**: **Dio 5.4+ with interceptors** ✅
+   - JWT auto-attach, error handling
+   - Retrofit for type-safe endpoints
+
+8. **Navigation**: **go_router 14.2+** ✅
+   - Declarative routing, deep linking support
+
+**Features Implementation:**
+9. **Map Solution**: **flutter_map 7.0+ + Google Maps Tiles** ✅
+   - Miễn phí, không cần API key
+   - 100% consistent với web (Leaflet equivalent)
+   - Category-colored markers với Sunset theme
+
+10. **Chat Implementation**: **WebSocket với web_socket_channel package** ✅
+    - Match web frontend implementation
+    - Bidirectional real-time communication
+    - Typing indicators, instant delivery
+
+11. **Offline Storage**: **sqflite 2.3+ (SQLite)** ✅
+    - SQL standard, relational data support
+    - Powerful queries (JOIN, WHERE, ORDER BY)
+    - Migration support for schema versioning
+
+12. **Image Caching**: **cached_network_image 3.3+** ✅
+    - Auto-cache, placeholder support
+
+**Scope:**
+13. **User Role**: **End users only (no admin features)** ✅
+    - Mobile app chỉ cho USER role
+    - Admin functions stay on web
+
+14. **Dark Mode**: **Defer to Phase 2** ✅
+    - Start with light mode only
+    - Add dark mode later if users request
+
+**Timeline:**
+15. **Development Duration**: **7-8 weeks (Oct-Dec 2026)** ✅
+    - Phase 1 (2 weeks): Auth, Trips, Maps
+    - Phase 2 (2 weeks): Places, Chat, Offline
+    - Phase 3 (2 weeks): Community, Notifications, Polish
+    - Testing (1 week): Bug fixes, optimization
+    - App Store Prep (3-4 days): Submission
+
+**Status: Plan Complete - No Remaining Undecided Options** 🎉
 
 ## Learning Resources
 
