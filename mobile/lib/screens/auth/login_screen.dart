@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/spacing.dart';
-import '../../config/radius.dart';
-import '../../providers/auth_provider.dart';
-import '../../utils/validators.dart';
-import '../../widgets/common/custom_button.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
+import 'package:travel_planner/utils/validators.dart';
+import 'package:travel_planner/widgets/common/custom_button.dart';
 
 /// Login screen
 class LoginScreen extends ConsumerStatefulWidget {
@@ -66,7 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.xxl),
 
                 // Logo/Icon
-                Icon(
+                const Icon(
                   LucideIcons.mapPin,
                   size: 64,
                   color: AppColors.primary,
@@ -74,13 +74,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Title
-                Text(
+                const Text(
                   'AI Travel Planner',
                   style: AppTextStyles.displayMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                Text(
+                const Text(
                   'Đăng nhập để bắt đầu lên kế hoạch',
                   style: AppTextStyles.bodyMedium,
                   textAlign: TextAlign.center,
@@ -93,7 +93,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                     hintText: 'example@email.com',
                     prefixIcon: Icon(
@@ -119,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   decoration: InputDecoration(
                     labelText: 'Mật khẩu',
                     hintText: '••••••••',
-                    prefixIcon: Icon(
+                    prefixIcon: const Icon(
                       LucideIcons.lock,
                       size: 20,
                       color: AppColors.textSecondary,
@@ -173,16 +173,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   error: (message) => Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.error.withOpacity(0.3),
+                        color: AppColors.error.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
                       children: [
-                        Icon(
-                          LucideIcons.alertCircle,
+                        const Icon(
+                          LucideIcons.circleAlert,
                           size: 20,
                           color: AppColors.error,
                         ),
@@ -213,7 +213,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     loading: () => true,
                     orElse: () => false,
                   ),
-                  icon: Icon(
+                  icon: const Icon(
                     LucideIcons.logIn,
                     size: 20,
                     color: Colors.white,
@@ -226,7 +226,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Chưa có tài khoản? ',
                       style: AppTextStyles.bodyMedium,
                     ),

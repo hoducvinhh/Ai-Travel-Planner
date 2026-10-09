@@ -1,16 +1,15 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/user.dart';
-import '../repositories/auth_repository.dart';
-import '../services/api_service.dart';
-import '../services/storage_service.dart';
-import '../services/providers.dart';
+import 'package:travel_planner/models/user.dart';
+import 'package:travel_planner/repositories/auth_repository.dart';
+import 'package:travel_planner/services/storage_service.dart';
+import 'package:travel_planner/services/providers.dart';
 
 part 'auth_provider.freezed.dart';
 
 /// Auth state
-@freezed
-class AuthState with _$AuthState {
+@Freezed(when: FreezedWhenOptions.all)
+abstract class AuthState with _$AuthState {
   const factory AuthState.initial() = _Initial;
   const factory AuthState.loading() = _Loading;
   const factory AuthState.authenticated(User user) = _Authenticated;

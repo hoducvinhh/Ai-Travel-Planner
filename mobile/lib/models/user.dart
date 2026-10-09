@@ -5,7 +5,7 @@ part 'user.g.dart';
 
 /// User model
 @freezed
-class User with _$User {
+abstract class User with _$User {
   const factory User({
     required String id,
     required String email,
@@ -19,7 +19,7 @@ class User with _$User {
 
 /// Login request DTO
 @freezed
-class LoginDto with _$LoginDto {
+abstract class LoginDto with _$LoginDto {
   const factory LoginDto({
     required String email,
     required String password,
@@ -31,7 +31,7 @@ class LoginDto with _$LoginDto {
 
 /// Login response
 @freezed
-class LoginResponse with _$LoginResponse {
+abstract class LoginResponse with _$LoginResponse {
   const factory LoginResponse({
     required String token,
     required User user,

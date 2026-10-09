@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/trip.dart';
-import '../repositories/trips_repository.dart';
-import '../services/providers.dart';
+import 'package:travel_planner/models/trip.dart';
+import 'package:travel_planner/repositories/trips_repository.dart';
+import 'package:travel_planner/services/providers.dart';
 
 /// Trips repository provider
 final tripsRepositoryProvider = Provider<TripsRepository>((ref) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'colors.dart';
+import 'package:travel_planner/config/colors.dart';
 
 /// Typography styles
 class AppTextStyles {
@@ -35,6 +35,13 @@ class AppTextStyles {
 
   static const TextStyle headlineMedium = TextStyle(
     fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+    height: 1.5,
+  );
+
+  static const TextStyle headlineSmall = TextStyle(
+    fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
     height: 1.5,

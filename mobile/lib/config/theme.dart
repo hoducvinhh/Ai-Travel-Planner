@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'colors.dart';
-import 'text_styles.dart';
-import 'radius.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/radius.dart';
 
 /// App theme configuration
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         tertiary: AppColors.accent,
@@ -27,7 +27,7 @@ class AppTheme {
       ),
 
       // Card theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(

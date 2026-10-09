@@ -1,6 +1,6 @@
-import '../models/trip.dart';
-import '../services/api_service.dart';
-import '../utils/constants.dart';
+import 'package:travel_planner/models/trip.dart';
+import 'package:travel_planner/services/api_service.dart';
+import 'package:travel_planner/utils/constants.dart';
 
 /// Trips repository
 class TripsRepository {

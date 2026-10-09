@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
 
 /// Loading indicator widget
 class LoadingIndicator extends StatelessWidget {

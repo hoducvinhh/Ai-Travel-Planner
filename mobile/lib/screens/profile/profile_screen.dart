@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/spacing.dart';
-import '../../config/radius.dart';
-import '../../providers/auth_provider.dart';
-import '../../widgets/common/loading_indicator.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
+import 'package:travel_planner/widgets/common/loading_indicator.dart';
 
 /// Profile screen
 class ProfileScreen extends ConsumerWidget {
@@ -39,13 +39,13 @@ class ProfileScreen extends ConsumerWidget {
                 height: 100,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   border: Border.all(
                     color: AppColors.primary,
                     width: 2,
                   ),
                 ),
-                child: Icon(
+                child: const Icon(
                   LucideIcons.user,
                   size: 48,
                   color: AppColors.primary,
@@ -137,7 +137,7 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildProfileOption(
-                      icon: LucideIcons.helpCircle,
+                      icon: LucideIcons.circleHelp,
                       title: 'Trợ giúp & Hỗ trợ',
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -153,7 +153,7 @@ class ProfileScreen extends ConsumerWidget {
                       title: 'Về ứng dụng',
                       subtitle: 'Phiên bản 1.0.0',
                       onTap: () {
-                        showDialog(
+                        showDialog<void>(
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text('AI Travel Planner'),
@@ -214,13 +214,13 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 LucideIcons.userX,
                 size: 64,
                 color: AppColors.textSecondary,
               ),
               const SizedBox(height: AppSpacing.md),
-              Text(
+              const Text(
                 'Chưa đăng nhập',
                 style: AppTextStyles.headlineMedium,
               ),
@@ -243,13 +243,13 @@ class ProfileScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                LucideIcons.alertCircle,
+              const Icon(
+                LucideIcons.circleAlert,
                 size: 64,
                 color: AppColors.error,
               ),
               const SizedBox(height: AppSpacing.md),
-              Text(
+              const Text(
                 'Đã có lỗi xảy ra',
                 style: AppTextStyles.headlineMedium,
               ),
@@ -288,7 +288,7 @@ class ProfileScreen extends ConsumerWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(
@@ -321,7 +321,7 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               LucideIcons.chevronRight,
               size: 20,
               color: AppColors.textSecondary,
@@ -333,7 +333,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildDivider() {
-    return Divider(
+    return const Divider(
       height: 1,
       thickness: 1,
       color: AppColors.border,
@@ -342,7 +342,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Đăng xuất'),
@@ -353,7 +353,7 @@ class ProfileScreen extends ConsumerWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'Hủy',
               style: TextStyle(color: AppColors.textSecondary),
             ),
@@ -366,7 +366,7 @@ class ProfileScreen extends ConsumerWidget {
                 context.go('/login');
               }
             },
-            child: Text(
+            child: const Text(
               'Đăng xuất',
               style: TextStyle(color: AppColors.error),
             ),

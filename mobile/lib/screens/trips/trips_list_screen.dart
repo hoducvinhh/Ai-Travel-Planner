@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/spacing.dart';
-import '../../config/radius.dart';
-import '../../providers/trips_provider.dart';
-import '../../widgets/trip/trip_card.dart';
-import '../../widgets/common/loading_indicator.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/providers/trips_provider.dart';
+import 'package:travel_planner/widgets/trip/trip_card.dart';
+import 'package:travel_planner/widgets/common/loading_indicator.dart';
 
 /// Trips list screen
 class TripsListScreen extends ConsumerWidget {
@@ -43,13 +43,13 @@ class TripsListScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  LucideIcons.alertCircle,
+                const Icon(
+                  LucideIcons.circleAlert,
                   size: 64,
                   color: AppColors.error,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text(
+                const Text(
                   'Đã có lỗi xảy ra',
                   style: AppTextStyles.headlineMedium,
                 ),
@@ -119,7 +119,7 @@ class TripsListScreen extends ConsumerWidget {
             Icon(
               LucideIcons.plane,
               size: 80,
-              color: AppColors.textSecondary.withOpacity(0.5),
+              color: AppColors.textSecondary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(

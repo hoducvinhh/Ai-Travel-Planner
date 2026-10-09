@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/spacing.dart';
-import '../../config/radius.dart';
-import '../../providers/auth_provider.dart';
-import '../../utils/validators.dart';
-import '../../widgets/common/custom_button.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
+import 'package:travel_planner/utils/validators.dart';
+import 'package:travel_planner/widgets/common/custom_button.dart';
 
 /// Register screen
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -83,7 +83,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Icon
-                Icon(
+                const Icon(
                   LucideIcons.userPlus,
                   size: 48,
                   color: AppColors.primary,
@@ -91,7 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Subtitle
-                Text(
+                const Text(
                   'Tạo tài khoản mới để bắt đầu lên kế hoạch du lịch',
                   style: AppTextStyles.bodyMedium,
                   textAlign: TextAlign.center,
@@ -104,10 +104,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _nameController,
                   textInputAction: TextInputAction.next,
                   textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Họ và tên',
                     hintText: 'Nguyễn Văn A',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       LucideIcons.user,
                       size: 20,
                       color: AppColors.textSecondary,
@@ -128,10 +128,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Email',
                     hintText: 'example@email.com',
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       LucideIcons.mail,
                       size: 20,
                       color: AppColors.textSecondary,
@@ -225,7 +225,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: AppColors.secondary.withOpacity(0.1),
+                    color: AppColors.secondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Column(
@@ -252,16 +252,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   error: (message) => Container(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.error.withOpacity(0.3),
+                        color: AppColors.error.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Row(
                       children: [
                         const Icon(
-                          LucideIcons.alertCircle,
+                          LucideIcons.circleAlert,
                           size: 20,
                           color: AppColors.error,
                         ),
@@ -305,7 +305,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Đã có tài khoản? ',
                       style: AppTextStyles.bodyMedium,
                     ),

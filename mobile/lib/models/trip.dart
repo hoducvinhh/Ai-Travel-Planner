@@ -5,7 +5,7 @@ part 'trip.g.dart';
 
 /// Trip model
 @freezed
-class Trip with _$Trip {
+abstract class Trip with _$Trip {
   const factory Trip({
     required String id,
     required String destination,

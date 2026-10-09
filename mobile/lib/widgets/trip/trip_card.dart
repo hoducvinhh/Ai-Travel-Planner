@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/spacing.dart';
-import '../../config/radius.dart';
-import '../../models/trip.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/models/trip.dart';
 
 /// Trip card widget
 class TripCard extends StatelessWidget {
@@ -74,7 +74,7 @@ class TripCard extends StatelessWidget {
                   // Dates
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         LucideIcons.calendar,
                         size: 16,
                         color: AppColors.textSecondary,
@@ -94,7 +94,7 @@ class TripCard extends StatelessWidget {
                   // Budget
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         LucideIcons.dollarSign,
                         size: 16,
                         color: AppColors.textSecondary,
@@ -113,7 +113,7 @@ class TripCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           LucideIcons.users,
                           size: 16,
                           color: AppColors.textSecondary,
@@ -141,11 +141,11 @@ class TripCard extends StatelessWidget {
     return Container(
       height: 180,
       width: double.infinity,
-      color: AppColors.primary.withOpacity(0.1),
+      color: AppColors.primary.withValues(alpha: 0.1),
       child: Icon(
         LucideIcons.image,
         size: 48,
-        color: AppColors.primary.withOpacity(0.3),
+        color: AppColors.primary.withValues(alpha: 0.3),
       ),
     );
   }

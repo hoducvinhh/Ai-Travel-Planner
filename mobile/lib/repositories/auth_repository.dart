@@ -1,7 +1,7 @@
-import '../models/user.dart';
-import '../services/api_service.dart';
-import '../services/storage_service.dart';
-import '../utils/constants.dart';
+import 'package:travel_planner/models/user.dart';
+import 'package:travel_planner/services/api_service.dart';
+import 'package:travel_planner/services/storage_service.dart';
+import 'package:travel_planner/utils/constants.dart';
 
 /// Authentication repository
 class AuthRepository {
@@ -28,7 +28,7 @@ class AuthRepository {
     // Save user info
     await _storage.saveString(AppConstants.keyUserId, loginResponse.user.id);
     await _storage.saveString(
-        AppConstants.keyUserEmail, loginResponse.user.email);
+        AppConstants.keyUserEmail, loginResponse.user.email,);
 
     return loginResponse.user;
   }
@@ -52,7 +52,7 @@ class AuthRepository {
     // Save user info
     await _storage.saveString(AppConstants.keyUserId, loginResponse.user.id);
     await _storage.saveString(
-        AppConstants.keyUserEmail, loginResponse.user.email);
+        AppConstants.keyUserEmail, loginResponse.user.email,);
 
     return loginResponse.user;
   }

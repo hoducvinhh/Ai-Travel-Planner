@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../services/biometric_service.dart';
+import 'package:travel_planner/services/biometric_service.dart';
 
 /// Biometric service provider
 final biometricServiceProvider = Provider<BiometricService>((ref) {

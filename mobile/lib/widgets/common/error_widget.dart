@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
-import '../../config/colors.dart';
-import '../../config/text_styles.dart';
-import '../../config/radius.dart';
+import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/config/radius.dart';
 
 /// Error widget with retry button
 class ErrorWidget extends StatelessWidget {
@@ -23,13 +23,13 @@ class ErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              LucideIcons.alertCircle,
+            const Icon(
+              LucideIcons.circleAlert,
               size: 48,
               color: AppColors.error,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Đã có lỗi xảy ra',
               style: AppTextStyles.headlineMedium,
               textAlign: TextAlign.center,

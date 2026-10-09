@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'config/routes.dart';
-import 'config/theme.dart';
+import 'package:travel_planner/config/routes.dart';
+import 'package:travel_planner/config/theme.dart';
 
 class TravelPlannerApp extends ConsumerWidget {
   const TravelPlannerApp({super.key});

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../config/env.dart';
+import 'package:travel_planner/config/env.dart';
 
 /// HTTP client service using Dio
 class ApiService {
@@ -47,24 +47,25 @@ class ApiService {
 
   /// GET request
   Future<T> get<T>(String path, {Map<String, dynamic>? queryParams}) async {
-    final response = await _dio.get(path, queryParameters: queryParams);
+    final response =
+        await _dio.get<dynamic>(path, queryParameters: queryParams);
     return response.data as T;
   }
 
   /// POST request
   Future<T> post<T>(String path, {dynamic data}) async {
-    final response = await _dio.post(path, data: data);
+    final response = await _dio.post<dynamic>(path, data: data);
     return response.data as T;
   }
 
   /// PUT request
   Future<T> put<T>(String path, {dynamic data}) async {
-    final response = await _dio.put(path, data: data);
+    final response = await _dio.put<dynamic>(path, data: data);
     return response.data as T;
   }
 
   /// DELETE request
   Future<void> delete(String path) async {
-    await _dio.delete(path);
+    await _dio.delete<dynamic>(path);
   }
 }
