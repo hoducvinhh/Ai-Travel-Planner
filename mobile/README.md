@@ -2,6 +2,17 @@
 
 Flutter mobile application for AI Travel Planner - iOS and Android end-user experience.
 
+## 📚 Documentation
+
+- **[CLAUDE.md](CLAUDE.md)** - Rules for AI agents (auto-loaded)
+- **[TASKS.md](TASKS.md)** - 471 tasks breakdown with checkboxes
+- **[plan-mobile.md](plan-mobile.md)** - Complete development plan
+- **[mobile-tech-stack.md](mobile-tech-stack.md)** - Technology decisions
+- **Skills** (in `.claude/skills/`):
+  - `mobile-ui-guidelines.md` - UI/UX design rules
+  - `mobile-architecture.md` - Architecture patterns
+  - `mobile-development-rules.md` - Development constraints
+
 ## 🎯 Project Overview
 
 **Platform:** Flutter 3.24+ (iOS & Android)  
