@@ -11,6 +11,46 @@ Dự án AI Travel Planner hiện tại đang có:
 
 Mục tiêu là xây dựng ứng dụng di động (iOS/Android) **cho end users** để mở rộng phạm vi tiếp cận người dùng, tận dụng hoàn toàn backend và ML infrastructure hiện có. **Mobile app chỉ focus vào user features, không bao gồm admin functions** (admin sẽ tiếp tục sử dụng web interface).
 
+## 🚨 Mobile Development Constraints
+
+**CRITICAL: Scope Boundaries**
+
+Mobile development team chỉ được phép làm việc trong `mobile/` folder:
+
+```
+✅ ALLOWED (Mobile team có toàn quyền):
+mobile/                    # Flutter app code
+├── lib/                   # Dart source code
+├── android/               # Android native config
+├── ios/                   # iOS native config
+├── assets/                # Static assets (images, fonts)
+├── test/                  # Mobile app tests
+├── pubspec.yaml           # Flutter dependencies
+├── .env.example           # Mobile environment variables
+└── *.md                   # Mobile documentation
+
+❌ FORBIDDEN (Không được động đến):
+backend/                   # NestJS backend code
+frontend/                  # Next.js web app
+ml-service/                # Python ML service
+database/                  # Database migrations
+docker-compose.yml         # Infrastructure config
+.github/workflows/         # CI/CD pipelines (ngoại trừ mobile-specific workflows)
+```
+
+**Communication Protocol:**
+- **Backend API**: Consume existing endpoints only, không modify backend code
+- **Bug reports**: Tạo issue với label `backend-needed` hoặc `frontend-needed`
+- **New endpoints**: Request via ticket, chờ backend team implement
+- **Database**: Không được access trực tiếp, chỉ qua backend API
+- **Shared resources**: Nếu cần thay đổi infrastructure (Docker, CI/CD), thảo luận với team lead trước
+
+**Approval Required For:**
+- Thêm dependencies vào root `package.json` (nếu dùng monorepo)
+- Thay đổi `.env` files ngoài `mobile/`
+- Modify CI/CD workflows (trừ khi tạo workflow riêng cho mobile trong `.github/workflows/mobile-*.yml`)
+- Deploy scripts ảnh hưởng đến services khác
+
 ## Công Nghệ Đề Xuất
 
 ### Flutter
@@ -803,83 +843,422 @@ flutter build apk --dart-define=API_URL=https://api.travel-planner.com
 
 ## UI/UX Considerations
 
+### Design Principles
+
+**Core Principles cho Mobile App:**
+1. **Dễ nhìn, dễ dùng** - Minimalist, clean interface với hierarchy rõ ràng
+2. **Thân thiện với người dùng** - Intuitive navigation, familiar patterns
+3. **Phù hợp với đề tài du lịch** - Màu sắc warm, inviting, liên tưởng đến vacation
+4. **Rounded corners** - Tất cả components đều bo góc tròn (soft, friendly feel)
+5. **Icon consistency** - Sử dụng icons trắng/đen với style thống nhất
+
 ### Design System
 
-Tái sử dụng design tokens từ web:
-- **Colors**: Neutral palette (F9F9F8 background, 262626 text)
-- **Typography**: Custom fonts hoặc system fonts (SF Pro iOS, Roboto Android)
-- **Spacing**: 4.0 base unit (matches Tailwind, use SizedBox/Padding)
-- **Components**: Rebuild từ `frontend/src/components/ui/*` với Flutter widgets
+Tái sử dụng design tokens từ web nhưng enhance cho mobile:
+- **Colors**: Sunset theme với neutral base (xem chi tiết dưới)
+- **Typography**: System fonts (SF Pro iOS, Roboto Android) cho native feel
+- **Spacing**: 4.0 base unit (8, 12, 16, 24, 32, 48)
+- **Border Radius**: Toàn bộ components đều có rounded corners
+  - Small (8dp): Badges, chips, tags
+  - Medium (12dp): Buttons, input fields
+  - Large (16dp): Cards, containers
+  - Extra Large (20dp): Modals, bottom sheets
+  - Full rounded (999dp): Avatar, pills, floating buttons
+
+### Icon System
+
+**FINAL DECISION: Lucide Icons (Black & White)** ✅
+
+```yaml
+dependencies:
+  lucide_icons_flutter: ^1.1.0   # Matches web (frontend uses lucide-react)
+```
+
+**Icon Guidelines:**
+- ✅ **Primary color: White on colored backgrounds** (buttons, app bar)
+- ✅ **Primary color: Black/Gray on light backgrounds** (cards, inputs)
+- ✅ **Consistent stroke width**: 2dp (lucide default)
+- ✅ **Size scale**: 20dp (small), 24dp (default), 28dp (large), 32dp (extra large)
+- ✅ **States**: Default (black #1A1A1A), Disabled (gray #9CA3AF), Active (colored)
+
+**Icon Usage Examples:**
+```dart
+// Bottom navigation icons (active state có màu)
+Icon(LucideIcons.home, color: isActive ? AppColors.primary : AppColors.textSecondary)
+Icon(LucideIcons.mapPin, color: isActive ? AppColors.primary : AppColors.textSecondary)
+Icon(LucideIcons.users, color: isActive ? AppColors.primary : AppColors.textSecondary)
+Icon(LucideIcons.user, color: isActive ? AppColors.primary : AppColors.textSecondary)
+
+// Action buttons (white trên background màu)
+Icon(LucideIcons.heart, color: Colors.white)      // On coral button
+Icon(LucideIcons.bookmark, color: Colors.white)   // On golden button
+
+// List items (black/gray trên white background)
+Icon(LucideIcons.calendar, color: AppColors.textSecondary, size: 20)
+Icon(LucideIcons.dollarSign, color: AppColors.textSecondary, size: 20)
+```
 
 ### Flutter Theme Setup
 
 ```dart
 // lib/config/theme.dart
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppTheme {
-  static const Color background = Color(0xFFF9F9F8);
-  static const Color textPrimary = Color(0xFF262626);
-  static const Color textSecondary = Color(0xFF737373);
-  static const Color accent = Color(0xFF3B82F6);
+  // Base colors (neutral, clean)
+  static const Color background = Color(0xFFFAFAFA);      // Very light gray
+  static const Color surface = Color(0xFFFFFFFF);         // Pure white
+  static const Color textPrimary = Color(0xFF1A1A1A);     // Near-black
+  static const Color textSecondary = Color(0xFF6B7280);   // Gray-600
+  static const Color border = Color(0xFFE5E7EB);          // Gray-200
+  static const Color divider = Color(0xFFF3F4F6);         // Gray-100
+  
+  // Primary: Warm coral (travel, vacation vibes)
+  static const Color primary = Color(0xFFFF6B6B);         // Coral
+  static const Color primaryLight = Color(0xFFFF8787);    
+  static const Color primaryDark = Color(0xFFE85555);     
+  static const Color primarySurface = Color(0xFFFFE8E8);  // Tinted background
+  
+  // Secondary: Turquoise (beach, ocean)
+  static const Color secondary = Color(0xFF4ECDC4);       // Turquoise
+  static const Color secondaryLight = Color(0xFF7DD9D1);  
+  static const Color secondaryDark = Color(0xFF3BA89F);   
+  static const Color secondarySurface = Color(0xFFE0F7F5);
+  
+  // Accent: Golden (sunset, premium)
+  static const Color accent = Color(0xFFFFA500);          
+  static const Color accentLight = Color(0xFFFFB733);     
+  static const Color accentSurface = Color(0xFFFFF4E0);   
+  
+  // Semantic colors
+  static const Color success = Color(0xFF10B981);         // Emerald
+  static const Color warning = Color(0xFFFBBF24);         // Amber
+  static const Color error = Color(0xFFEF4444);           // Red
+  static const Color info = Color(0xFF3B82F6);            // Blue
   
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
+    
     colorScheme: ColorScheme.fromSeed(
-      seedColor: accent,
+      seedColor: primary,
       brightness: Brightness.light,
-      surface: background,
+      surface: surface,
+      background: background,
     ),
+    
     scaffoldBackgroundColor: background,
+    
+    // Typography (system fonts)
     textTheme: const TextTheme(
-      displayLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textPrimary),
-      bodyLarge: TextStyle(fontSize: 16, color: textPrimary),
-      bodyMedium: TextStyle(fontSize: 14, color: textSecondary),
+      displayLarge: TextStyle(
+        fontSize: 32, 
+        fontWeight: FontWeight.w700, 
+        color: textPrimary,
+        height: 1.2,
+        letterSpacing: -0.5,
+      ),
+      displayMedium: TextStyle(
+        fontSize: 24, 
+        fontWeight: FontWeight.w700, 
+        color: textPrimary,
+        height: 1.3,
+        letterSpacing: -0.3,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 20, 
+        fontWeight: FontWeight.w600, 
+        color: textPrimary,
+        height: 1.4,
+      ),
+      bodyLarge: TextStyle(
+        fontSize: 16, 
+        fontWeight: FontWeight.w400, 
+        color: textPrimary,
+        height: 1.6,
+      ),
+      bodyMedium: TextStyle(
+        fontSize: 14, 
+        fontWeight: FontWeight.w400, 
+        color: textSecondary,
+        height: 1.5,
+      ),
+      labelLarge: TextStyle(
+        fontSize: 14, 
+        fontWeight: FontWeight.w600, 
+        color: textPrimary,
+        letterSpacing: 0.1,
+      ),
     ),
-  );
-  
-  static ThemeData darkTheme = ThemeData(
-    useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: accent,
-      brightness: Brightness.dark,
+    
+    // Rounded corners for ALL components
+    cardTheme: CardTheme(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: border, width: 1),
+      ),
+      color: surface,
+    ),
+    
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        elevation: 0,
+        backgroundColor: primary,
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      ),
+    ),
+    
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        side: BorderSide(color: primary, width: 1.5),
+        foregroundColor: primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+      ),
+    ),
+    
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: surface,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: border),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: primary, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    ),
+    
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: surface,
+      selectedItemColor: primary,
+      unselectedItemColor: textSecondary,
+      type: BottomNavigationBarType.fixed,
+      elevation: 0,
+    ),
+    
+    appBarTheme: AppBarTheme(
+      backgroundColor: surface,
+      foregroundColor: textPrimary,
+      elevation: 0,
+      centerTitle: false,
+      iconTheme: IconThemeData(color: textPrimary),
     ),
   );
 }
 ```
 
+### Color Application Strategy
+
+**Phân bổ màu sắc hợp lý theo đề tài du lịch:**
+
+1. **Primary Coral (#FF6B6B)** - Warm, inviting, vacation feeling
+   - Call-to-action buttons (Tạo chuyến đi, Đặt ngay)
+   - Active states (selected bottom nav, focused inputs)
+   - Like/favorite actions
+   - Loading indicators
+
+2. **Secondary Turquoise (#4ECDC4)** - Fresh, beach/ocean association
+   - Category badge: Beach destinations
+   - Secondary actions
+   - Success messages
+   - Map markers cho địa điểm biển
+
+3. **Accent Golden (#FFA500)** - Sunset, premium, rewarding
+   - Rating stars
+   - Bookmark/save actions
+   - Premium features highlight
+   - Category badge: Food/restaurant
+
+4. **Neutral Base (White/Black/Gray)** - Clean, readable
+   - Text content (black #1A1A1A on white)
+   - Icons (black/gray trên light background)
+   - Cards, surfaces (white #FFFFFF)
+   - Background (very light gray #FAFAFA)
+   - Borders (light gray #E5E7EB)
+
+5. **Category-Specific Colors** - Visual distinction
+   ```dart
+   static const Map<String, Color> categoryColors = {
+     'beach': Color(0xFF4ECDC4),      // Turquoise - Biển
+     'mountain': Color(0xFF95E1D3),   // Mint - Núi
+     'culture': Color(0xFFFFAA85),    // Peach - Văn hóa
+     'food': Color(0xFFFFA500),       // Orange - Ẩm thực
+     'nature': Color(0xFF7DCE82),     // Green - Thiên nhiên
+     'city': Color(0xFF9C88FF),       // Purple - Đô thị
+   };
+   ```
+
+**Color Usage Rules:**
+- ❌ Không dùng quá 2-3 màu trong cùng 1 screen
+- ✅ Background luôn neutral (white/light gray)
+- ✅ Text luôn high contrast (black on light, white on dark)
+- ✅ Colored elements phải có mục đích (call-to-action, category, status)
+- ✅ Icons default là black/gray, chỉ dùng màu cho active states
+
 ### Mobile-Specific Patterns
 
-1. **Bottom Navigation Bar**: Thay vì navbar trên web (BottomNavigationBar widget)
-2. **Pull-to-Refresh**: Cho lists (RefreshIndicator widget)
-3. **Swipe Gestures**: Dismissible widget cho swipe to delete
-4. **Native Pickers**: showDatePicker, showModalBottomSheet cho filters
-5. **Haptic Feedback**: HapticFeedback.lightImpact() cho actions quan trọng
+1. **Bottom Navigation Bar**: 
+   - 4 tabs: Home, Trips, Community, Profile
+   - Icons: lucide_icons với consistent stroke
+   - Active state: Coral color + bold text
+   - Rounded top corners (borderRadius: 20dp top only)
+
+2. **Pull-to-Refresh**: 
+   - RefreshIndicator với coral color
+   - Haptic feedback on trigger
+
+3. **Swipe Gestures**: 
+   - Dismissible widget cho swipe-to-delete
+   - Background reveal với red color + trash icon
+
+4. **Cards with Rounded Corners**:
+   ```dart
+   Container(
+     decoration: BoxDecoration(
+       color: Colors.white,
+       borderRadius: BorderRadius.circular(16),
+       boxShadow: [
+         BoxShadow(
+           color: Colors.black.withOpacity(0.04),
+           blurRadius: 8,
+           offset: Offset(0, 2),
+         ),
+       ],
+     ),
+     // ...
+   )
+   ```
+
+5. **Buttons với Rounded Corners**:
+   - Primary: Coral background, white text/icon, 12dp radius
+   - Secondary: Coral border + text, white background, 12dp radius
+   - Icon buttons: Circular (full rounded)
+
+6. **Input Fields với Rounded Corners**:
+   - Border radius: 12dp
+   - Focused state: Coral border (2dp width)
+   - Prefix/suffix icons: Gray, 20dp size
 
 ### Accessibility
 
-- **Semantics**: Wrap widgets với Semantics() cho screen readers
-- **Color Contrast**: WCAG AA standard (tương tự web)
-- **Touch Targets**: Minimum 48x48 logical pixels (Material Design)
-- **Dark Mode**: ThemeMode.system để theo system preference
+- **Color Contrast**: WCAG AA standard minimum
+  - Text on background: 4.5:1 ratio
+  - Large text (18pt+): 3:1 ratio
+  - Icons: 3:1 ratio
+- **Touch Targets**: Minimum 48x48 logical pixels
+- **Semantics**: Screen reader labels cho tất cả interactive elements
+- **Dark Mode**: Defer to Phase 2 (start with light mode only)
+- **Font Scaling**: Support dynamic type (user font size preferences)
 
 ## Backend Changes Required
 
-**TL;DR: Backend KHÔNG CẦN sửa gì**, tất cả endpoints đã sẵn sàng cho mobile app.
+**⚠️ IMPORTANT: Mobile Development Scope**
 
-### Optional Enhancements (Không bắt buộc)
+**Backend Integration Approach: READ-ONLY từ Mobile Team Perspective**
+
+Mobile app sẽ:
+- ✅ **Consume existing backend APIs** - Sử dụng tất cả endpoints hiện có
+- ✅ **Test API integration** - Kiểm tra kết nối và data flow
+- ✅ **Report issues** - Nếu phát hiện bug hoặc thiếu endpoint, báo cáo cho backend team
+- ❌ **KHÔNG tự ý modify backend code** - Không được sửa NestJS, database schema, hoặc bất kỳ code nào ngoài folder `mobile/`
+
+### Backend API Dependencies (Current State)
+
+Mobile app phụ thuộc vào các endpoints sau (ĐÃ TỒN TẠI):
+
+**Authentication:**
+- `POST /auth/login` - User login
+- `POST /auth/register` - User registration (role: USER only)
+- `GET /auth/profile` - Get current user profile
+
+**Trips:**
+- `GET /trips` - List all trips
+- `GET /trips/:id` - Get trip details
+- `POST /trips` - Create new trip
+
+**Places:**
+- `GET /places` - Browse places (with filters: province, category, budget)
+- `GET /places/:id` - Get place details
+
+**Recommendations:**
+- `POST /recommendations` - Get ML-based recommendations
+
+**Chat (RAG):**
+- `POST /api/chat` - SSE streaming chat (Server-Sent Events)
+
+**Community:**
+- `GET /community/posts` - Get community feed
+- `POST /community/posts` - Create new post
+- `POST /community/posts/:id/comments` - Add comment
+
+**Interactions (ML tracking):**
+- `POST /interactions` - Track user interactions (VIEW, LIKE, SAVE, RATE)
+
+### Optional Backend Enhancements (Không bắt buộc - Backend team quyết định)
+
+**Nếu backend team muốn enhance cho mobile experience:**
 
 1. **Image Upload** (cho community posts từ mobile):
    - Add endpoint: `POST /uploads` (S3 hoặc local storage)
-   - Hoặc client-side: resize image với Flutter's `image` package → upload base64
+   - Alternative: Mobile tự resize image với `image` package → upload base64 qua existing endpoints
 
 2. **Rate Limiting** (protect API khỏi abuse):
-   - Dùng `@nestjs/throttler`
-   - Limit: 100 requests/minute per user
+   - Implement `@nestjs/throttler`
+   - Suggest limit: 100 requests/minute per user
 
-3. **API Versioning** (tương lai khi mobile app cần maintain backward compatibility):
+3. **API Versioning** (tương lai khi mobile app cần backward compatibility):
    - Add header: `API-Version: v1`
    - Cho phép mobile app cũ hoạt động khi backend update
+
+**⚠️ CHÚ Ý:** Mobile team sẽ KHÔNG tự implement các enhancements này. Nếu cần, mobile team sẽ:
+1. Tạo issue/ticket mô tả requirement
+2. Thảo luận với backend team
+3. Chờ backend team implement
+4. Test integration sau khi backend deploy
+
+### Backend Communication Protocol
+
+**Khi phát hiện vấn đề:**
+- ❌ **KHÔNG tự sửa backend code**
+- ✅ Document issue rõ ràng (endpoint, request, response, expected vs actual)
+- ✅ Tạo ticket với label `backend-needed`
+- ✅ Implement workaround tạm thời trong mobile nếu có thể
+- ✅ Chờ backend team review và fix
+
+**Khi cần endpoint mới:**
+- ❌ **KHÔNG tự thêm route vào NestJS**
+- ✅ Viết API spec rõ ràng (method, path, request body, response format)
+- ✅ Giải thích use case và tại sao cần
+- ✅ Thảo luận với backend team trước khi code
+- ✅ Backend team implement → Mobile team integrate
+
+### Testing Backend Integration
+
+Mobile team chịu trách nhiệm:
+- ✅ Test API calls từ mobile app (Postman/Insomnia for manual testing)
+- ✅ Handle API errors gracefully (network errors, 4xx, 5xx)
+- ✅ Mock API responses cho unit tests (không call backend thật trong tests)
+- ✅ Report performance issues (slow responses, timeouts)
+
+Mobile team KHÔNG:
+- ❌ Debug backend code khi có lỗi server-side
+- ❌ Modify database schema
+- ❌ Change API response structure
+- ❌ Deploy backend changes
 
 ## Testing Strategy
 
@@ -1108,40 +1487,55 @@ class Trip with _$Trip {
 
 ## Context
 
-Web app hiện tại chỉ có màu trắng đen (#F9F9F8 background, #1A1A1A text). Mobile app nên có thêm màu sắc để tạo cảm giác sống động, trẻ trung và phân biệt rõ các features.
+Mobile app cần thiết kế giao diện:
+- ✅ **Dễ nhìn, dễ dùng** - Clean, minimalist với visual hierarchy rõ ràng
+- ✅ **Thân thiện với người dùng** - Intuitive navigation, familiar patterns, low learning curve
+- ✅ **Icons trắng đen** - Consistent black/white icon system, không dùng colored icons
+- ✅ **Màu sắc hợp lý** - Color palette phù hợp với đề tài du lịch (warm, inviting, vacation vibes)
+- ✅ **Components bo góc tròn** - Tất cả elements đều rounded corners (soft, friendly, modern feel)
 
 ## Đề Xuất Color Palette
 
-### **Sunset Gradient Theme** (Recommended - Warm & Inviting) 🌅
+### **Sunset Travel Theme** (Warm, Inviting, Travel-Focused) 🌅
 
-Theme này lấy cảm hứng từ hoàng hôn biển Việt Nam - ấm áp, thân thiện, phù hợp với du lịch.
+Theme lấy cảm hứng từ du lịch Việt Nam - biển xanh, hoàng hôn ấm áp, thiên nhiên tươi mát.
 
 ```dart
 class AppColors {
-  // Base Colors (giữ từ web)
-  static const Color background = Color(0xFFFAFAFA);      // Very light gray
-  static const Color surface = Color(0xFFFFFFFF);         // Pure white cards
-  static const Color textPrimary = Color(0xFF1A1A1A);     // Near-black text
-  static const Color textSecondary = Color(0xFF6B7280);   // Gray-600
+  // ============ NEUTRAL BASE (Clean & Readable) ============
+  // Background & Surface
+  static const Color background = Color(0xFFFAFAFA);      // Very light gray (main background)
+  static const Color surface = Color(0xFFFFFFFF);         // Pure white (cards, modals)
+  static const Color surfaceTint = Color(0xFFF5F5F5);     // Light gray (subtle sections)
   
-  // Primary Brand Color - Coral Orange (màu san hô)
+  // Text
+  static const Color textPrimary = Color(0xFF1A1A1A);     // Near-black (headings, body)
+  static const Color textSecondary = Color(0xFF6B7280);   // Gray-600 (descriptions, labels)
+  static const Color textTertiary = Color(0xFF9CA3AF);    // Gray-400 (placeholders, disabled)
+  
+  // Borders & Dividers
+  static const Color border = Color(0xFFE5E7EB);          // Gray-200 (input borders, card borders)
+  static const Color divider = Color(0xFFF3F4F6);         // Gray-100 (list dividers, subtle lines)
+  
+  // ============ BRAND COLORS (Travel Theme) ============
+  // Primary: Warm Coral (Vacation, Beach, Relaxing)
   static const Color primary = Color(0xFFFF6B6B);         // Vibrant coral
-  static const Color primaryLight = Color(0xFFFF8787);    // Lighter coral
-  static const Color primaryDark = Color(0xFFE85555);     // Darker coral
-  static const Color primarySurface = Color(0xFFFFE8E8);  // Very light coral background
+  static const Color primaryLight = Color(0xFFFF8787);    // Lighter coral (hover states)
+  static const Color primaryDark = Color(0xFFE85555);     // Darker coral (pressed states)
+  static const Color primarySurface = Color(0xFFFFE8E8);  // Very light coral (backgrounds, badges)
   
-  // Secondary Color - Turquoise Blue (màu biển)
+  // Secondary: Turquoise (Ocean, Fresh, Peaceful)
   static const Color secondary = Color(0xFF4ECDC4);       // Turquoise
-  static const Color secondaryLight = Color(0xFF7DD9D1);  // Light turquoise
-  static const Color secondaryDark = Color(0xFF3BA89F);   // Dark turquoise
-  static const Color secondarySurface = Color(0xFFE0F7F5); // Very light turquoise
+  static const Color secondaryLight = Color(0xFF7DD9D1);  
+  static const Color secondaryDark = Color(0xFF3BA89F);   
+  static const Color secondarySurface = Color(0xFFE0F7F5); // Light turquoise tint
   
-  // Accent Color - Golden Yellow (màu vàng hoàng hôn)
+  // Accent: Golden (Sunset, Premium, Rewarding)
   static const Color accent = Color(0xFFFFA500);          // Golden orange
   static const Color accentLight = Color(0xFFFFB733);     
   static const Color accentSurface = Color(0xFFFFF4E0);   // Light cream
   
-  // Category Colors (phân biệt loại địa điểm)
+  // ============ CATEGORY COLORS (Visual Distinction) ============
   static const Color categoryBeach = Color(0xFF4ECDC4);   // Turquoise - Biển
   static const Color categoryMountain = Color(0xFF95E1D3); // Mint green - Núi
   static const Color categoryCulture = Color(0xFFFFAA85); // Peach - Văn hóa
@@ -1149,100 +1543,207 @@ class AppColors {
   static const Color categoryNature = Color(0xFF7DCE82);  // Green - Thiên nhiên
   static const Color categoryCity = Color(0xFF9C88FF);    // Purple - Đô thị
   
-  // Semantic Colors
-  static const Color success = Color(0xFF4ADE80);         // Green
+  // ============ SEMANTIC COLORS (Status) ============
+  static const Color success = Color(0xFF10B981);         // Emerald green
+  static const Color successSurface = Color(0xFFD1FAE5);  
   static const Color warning = Color(0xFFFBBF24);         // Amber
+  static const Color warningSurface = Color(0xFFFEF3C7);  
   static const Color error = Color(0xFFEF4444);           // Red
-  static const Color info = Color(0xFF60A5FA);            // Blue
+  static const Color errorSurface = Color(0xFFFEE2E2);    
+  static const Color info = Color(0xFF3B82F6);            // Blue
+  static const Color infoSurface = Color(0xFFDBEAFE);     
   
-  // Interactive Colors
+  // ============ INTERACTIVE COLORS ============
   static const Color likeRed = Color(0xFFFF6B6B);         // Coral (matches primary)
   static const Color bookmarkGold = Color(0xFFFFA500);    // Golden
   static const Color rating = Color(0xFFFFA500);          // Golden star
   
-  // UI Element Colors
-  static const Color border = Color(0xFFE5E7EB);          
-  static const Color divider = Color(0xFFF3F4F6);         
+  // Helper method
+  static Color getCategoryColor(String category) {
+    switch (category.toLowerCase()) {
+      case 'beach': return categoryBeach;
+      case 'mountain': return categoryMountain;
+      case 'culture': return categoryCulture;
+      case 'food': return categoryFood;
+      case 'nature': return categoryNature;
+      case 'city': return categoryCity;
+      default: return primary;
+    }
+  }
 }
 ```
 
-**Rationale:**
-- **Coral (#FF6B6B)**: Màu san hô ấm áp, gợi cảm giác vacation, beach, relaxing
-- **Turquoise (#4ECDC4)**: Màu biển trong xanh, fresh, peaceful
-- **Golden (#FFA500)**: Màu hoàng hôn, premium, rewarding (cho rating, bookmark)
-- Kết hợp tạo cảm giác tropical paradise, phù hợp với du lịch Việt Nam (biển, vịnh, đảo)
-- Màu sắc nổi bật nhưng không quá chói, vẫn professional
+**Rationale - Tại sao chọn màu này:**
+- **Coral (#FF6B6B)**: Ấm áp, gợi cảm giác vacation/beach/relaxing, không quá chói
+- **Turquoise (#4ECDC4)**: Màu biển trong xanh, fresh, peaceful - phù hợp với 80% du lịch VN liên quan biển
+- **Golden (#FFA500)**: Màu hoàng hôn, premium feel, rewarding (ratings, bookmarks)
+- **Neutral base**: White/black/gray giữ app clean, readable, professional
+- **Category colors**: Giúp user phân biệt nhanh loại địa điểm (biển=turquoise, núi=mint, ẩm thực=orange, v.v.)
 
-### Category Badge Color System
+**Color Usage Guidelines:**
 ```
-Biển     🏖️  → Turquoise (#4ECDC4)
-Núi      ⛰️  → Mint Green (#95E1D3)
-Văn hóa  🏛️  → Peach (#FFAA85)
-Ẩm thực  🍜  → Orange (#FFA500)
-Thiên nhiên 🌳 → Green (#7DCE82)
-Đô thị   🏙️  → Purple (#9C88FF)
+✅ DO:
+- Background chính: #FAFAFA (neutral light gray)
+- Cards/surfaces: #FFFFFF (pure white)
+- Text: #1A1A1A on light backgrounds (high contrast)
+- Primary actions: Coral gradient buttons với white text/icons
+- Icons: Black (#1A1A1A) hoặc Gray (#6B7280) trên light backgrounds
+- Icons: White (#FFFFFF) trên colored buttons/backgrounds
+- Active states: Coral color cho selected items
+- Category badges: Respective colors (beach=turquoise, food=orange, etc.)
+
+❌ DON'T:
+- Dùng quá 2-3 màu trong cùng 1 screen (overwhelming)
+- Colored icons trên light backgrounds (chỉ dùng black/white/gray)
+- Low contrast text (đảm bảo WCAG AA: 4.5:1 ratio minimum)
+- Colored backgrounds cho toàn bộ screen (chỉ dùng cho accents)
 ```
 
-### Alternative Color Options
+## Icon System
 
-#### Option 2: **Ocean Blue Theme** (Modern & Trustworthy) 🌊
-- Primary: Sky blue (#0EA5E9)
-- Secondary: Teal (#14B8A6)
-- Accent: Orange (#FF9800)
-- Professional, đáng tin cậy cho booking/payment
+### **Lucide Icons - Black & White Only** ✅
 
-#### Option 3: **Green Nature Theme** (Eco-Friendly & Fresh) 🌿
-- Primary: Emerald (#10B981)
-- Secondary: Lime (#84CC16)
-- Accent: Amber (#F59E0B)
-- Phù hợp với trend du lịch xanh
+```yaml
+# pubspec.yaml
+dependencies:
+  lucide_icons_flutter: ^1.1.0   # Matches web (lucide-react)
+```
+
+**Icon Design Specs:**
+- ✅ **Stroke width**: 2dp (lucide default, consistent across all icons)
+- ✅ **Colors**: Black (#1A1A1A), Gray (#6B7280), hoặc White (#FFFFFF) only
+- ✅ **Sizes**: 20dp (small), 24dp (default), 28dp (medium), 32dp (large)
+- ❌ **NO colored icons** - Chỉ dùng màu cho backgrounds/badges xung quanh icon
+
+**Icon Color Usage:**
+
+```dart
+// 1. Icons trên light backgrounds (cards, screens) → BLACK or GRAY
+Icon(LucideIcons.mapPin, color: AppColors.textPrimary, size: 24)    // Black
+Icon(LucideIcons.calendar, color: AppColors.textSecondary, size: 20) // Gray (less important)
+
+// 2. Icons trên colored backgrounds (buttons) → WHITE
+ElevatedButton.icon(
+  icon: Icon(LucideIcons.plus, color: Colors.white),   // White on coral button
+  label: Text('Tạo chuyến đi'),
+  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+)
+
+// 3. Bottom navigation → GRAY (inactive) / CORAL (active state only)
+BottomNavigationBarItem(
+  icon: Icon(LucideIcons.home, color: AppColors.textSecondary),  // Gray when inactive
+  activeIcon: Icon(LucideIcons.home, color: AppColors.primary),  // Coral when active
+  label: 'Trang chủ',
+)
+
+// 4. Interactive icons (like, bookmark) → Color changes on interaction
+Icon(
+  isLiked ? LucideIcons.heart : LucideIcons.heartOff,
+  color: isLiked ? AppColors.likeRed : AppColors.textSecondary,  // Red when liked, gray when not
+  size: 24,
+)
+```
+
+**Common Icons:**
+```dart
+// Navigation
+LucideIcons.home, LucideIcons.mapPin, LucideIcons.users, LucideIcons.user
+
+// Actions
+LucideIcons.plus, LucideIcons.search, LucideIcons.filter, LucideIcons.moreVertical
+
+// Interactions
+LucideIcons.heart, LucideIcons.bookmark, LucideIcons.share2, LucideIcons.messageCircle
+
+// Info
+LucideIcons.calendar, LucideIcons.clock, LucideIcons.dollarSign, LucideIcons.star
+
+// Navigation/Controls
+LucideIcons.chevronRight, LucideIcons.chevronLeft, LucideIcons.x, LucideIcons.check
+```
 
 ## Typography System
 
-### Font Family
-
-**FINAL DECISION: System Fonts** ✅
+### Font Family: **System Fonts (Native Feel)** ✅
 
 ```dart
 class AppFonts {
-  static const String primaryFont = 'SF Pro Display';  // iOS default
-  static const String secondaryFont = 'Roboto';        // Android default
+  static const String ios = 'SF Pro Display';     // iOS default
+  static const String android = 'Roboto';         // Android default
   
-  static String get systemFont => Platform.isIOS ? primaryFont : secondaryFont;
+  static String get system => Platform.isIOS ? ios : android;
 }
 ```
 
 **Rationale:**
-- ✅ **Zero loading time** - no font download delay
-- ✅ **Native feel** - users familiar with system fonts
-- ✅ **Better performance** - smaller app bundle size (no embedded fonts)
-- ✅ **Accessibility** - system fonts support dynamic type/font scaling
-- ❌ Custom fonts (Inter/Manrope) would add 200-400KB and slight load delay
-
-**Note:** Nếu sau này muốn custom font để match web 100%, có thể thêm `google_fonts: ^6.1.0` package.
+- ✅ Zero loading time (no font download)
+- ✅ Native feel (users familiar with system fonts)
+- ✅ Better performance (smaller bundle size)
+- ✅ Accessibility (support dynamic type/font scaling)
 
 ### Text Styles
+
 ```dart
 class AppTextStyles {
-  // Display (Headings)
+  // ============ DISPLAY (Headings) ============
   static const TextStyle displayLarge = TextStyle(
-    fontSize: 32, fontWeight: FontWeight.w700, height: 1.2, letterSpacing: -0.5,
+    fontSize: 32,
+    fontWeight: FontWeight.w700,  // Bold
+    height: 1.2,
+    letterSpacing: -0.5,
+    color: AppColors.textPrimary,
   );
+  
   static const TextStyle displayMedium = TextStyle(
-    fontSize: 24, fontWeight: FontWeight.w700, height: 1.3, letterSpacing: -0.3,
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
+    height: 1.3,
+    letterSpacing: -0.3,
+    color: AppColors.textPrimary,
   );
   
-  // Body Text
+  static const TextStyle headlineMedium = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,  // Semibold
+    height: 1.4,
+    color: AppColors.textPrimary,
+  );
+  
+  // ============ BODY TEXT ============
   static const TextStyle bodyLarge = TextStyle(
-    fontSize: 16, fontWeight: FontWeight.w400, height: 1.6,
-  );
-  static const TextStyle bodyMedium = TextStyle(
-    fontSize: 14, fontWeight: FontWeight.w400, height: 1.5,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,  // Regular
+    height: 1.6,
+    color: AppColors.textPrimary,
   );
   
-  // Labels & Buttons
+  static const TextStyle bodyMedium = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    height: 1.5,
+    color: AppColors.textSecondary,
+  );
+  
+  static const TextStyle bodySmall = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 1.4,
+    color: AppColors.textTertiary,
+  );
+  
+  // ============ LABELS & BUTTONS ============
   static const TextStyle labelLarge = TextStyle(
-    fontSize: 14, fontWeight: FontWeight.w600, letterSpacing: 0.1,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,  // Semibold
+    letterSpacing: 0.1,
+    color: AppColors.textPrimary,
+  );
+  
+  static const TextStyle labelMedium = TextStyle(
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.1,
+    color: AppColors.textSecondary,
   );
 }
 ```
@@ -1250,130 +1751,793 @@ class AppTextStyles {
 ## Spacing & Layout
 
 ### Spacing Scale (4px base unit)
+
 ```dart
 class AppSpacing {
-  static const double xs = 4.0;    static const double sm = 8.0;
-  static const double md = 12.0;   static const double lg = 16.0;
-  static const double xl = 24.0;   static const double xxl = 32.0;
-  static const double xxxl = 48.0;
+  static const double xxs = 2.0;   // Minimal gap
+  static const double xs = 4.0;    // Very tight spacing
+  static const double sm = 8.0;    // Tight spacing
+  static const double md = 12.0;   // Default spacing
+  static const double lg = 16.0;   // Comfortable spacing
+  static const double xl = 24.0;   // Generous spacing
+  static const double xxl = 32.0;  // Large gaps
+  static const double xxxl = 48.0; // Extra large gaps
 }
 ```
 
-### Border Radius
+### Border Radius (Rounded Corners - All Components)
+
 ```dart
 class AppRadius {
-  static const double sm = 8.0;    // Badges, chips
-  static const double md = 12.0;   // Buttons, inputs
-  static const double lg = 16.0;   // Cards
+  static const double sm = 8.0;    // Badges, chips, tags
+  static const double md = 12.0;   // Buttons, input fields
+  static const double lg = 16.0;   // Cards, containers
   static const double xl = 20.0;   // Modals, bottom sheets
-  static const double full = 999.0; // Fully rounded pills
+  static const double xxl = 24.0;  // Large cards
+  static const double full = 999.0; // Fully rounded (avatar, pills, FAB)
 }
+```
+
+**Usage Examples:**
+```dart
+// Card - Large radius
+Container(
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(AppRadius.lg),  // 16dp
+    color: AppColors.surface,
+  ),
+)
+
+// Button - Medium radius
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.md),  // 12dp
+    ),
+  ),
+)
+
+// Input field - Medium radius
+TextField(
+  decoration: InputDecoration(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(AppRadius.md),  // 12dp
+    ),
+  ),
+)
+
+// Badge - Small radius
+Container(
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(AppRadius.sm),  // 8dp
+    color: AppColors.categoryBeach,
+  ),
+)
+
+// Avatar - Full rounded
+CircleAvatar(
+  radius: 20,  // Automatically fully rounded
+)
 ```
 
 ## Component Design
 
-### Button Styles
-```
-Primary Button (Coral gradient):
-┌─────────────────────┐
-│   Tạo chuyến đi     │  ← White text on Coral gradient (#FF6B6B → #FF8787)
-└─────────────────────┘
+### ⚠️ Avoiding "AI Slop" UI
 
-Secondary Button (Outline):
-┌─────────────────────┐
-│   Xem thêm          │  ← Coral border & text, white bg
-└─────────────────────┘
-```
+**"AI Slop" là gì?** Generic, soulless UI không có character, trông giống hàng nghìn app AI-generated khác:
+- ❌ Glass morphism everywhere (blur effects không cần thiết)
+- ❌ Gradient overload (gradients ở mọi nơi)
+- ❌ Over-rounded corners (quá tròn trông như bubble gum)
+- ❌ Generic placeholder images (abstract shapes, pastel blobs)
+- ❌ Empty states với emoji lớn + generic text "Nothing here yet! 🎉"
+- ❌ Unnecessary animations (fade/scale/rotate mọi thứ)
 
-### Place Card Example
-```
-┌─────────────────────────────────┐
-│ ┌─────────────────────────────┐ │
-│ │     [Beach Photo]           │ │
-│ │  ┌────┐         [☀️ 28°C]  │ │
-│ │  │🏖️  │                    │ │  ← Category badge (Turquoise)
-│ │  │Biển│                    │ │
-│ │  └────┘                    │ │
-│ └─────────────────────────────┘ │
-│ Bãi Trường Beach               │  ← Title
-│ Phú Quốc, Kiên Giang           │  ← Location
-│ ⭐ 4.8 (245)  💰💰  🏖️        │  ← Rating (Golden)
-│ [❤️ Thích] [🔖 Save] [➡️ More]│  ← Coral & Golden buttons
-└─────────────────────────────────┘
-```
+**Cách tránh "AI Slop" trong Travel App:**
 
-### Home Screen Mockup
 ```
-┌─────────────────────────────────┐
-│ [Avatar] AI Travel 🌅 [🔔]     │  ← Coral notification badge
-├─────────────────────────────────┤
-│  ╔═══════════════════════════╗  │
-│  ║ Gradient Background       ║  │  ← Sunset gradient (coral→cream→turquoise)
-│  ║ Chào buổi sáng, Vinh 👋   ║  │
-│  ║ Khám phá điểm đến mới     ║  │
-│  ╚═══════════════════════════╝  │
-│                                 │
-│  🎯 Dành cho bạn               │
-│  ┌──────┐ ┌──────┐ ┌──────┐   │
-│  │ IMG  │ │ IMG  │ │ IMG  │   │  ← Horizontal scrolling cards
-│  │ Hạ   │ │ Đà   │ │ Phú  │   │
-│  │ Long │ │ Lạt  │ │ Quốc │   │
-│  │ ⭐4.8│ │ ⭐4.9│ │ ⭐4.7│   │  ← Golden stars
-│  │ ❤️128│ │ ❤️256│ │ ❤️512│   │  ← Coral hearts
-│  └──────┘ └──────┘ └──────┘   │
-└─────────────────────────────────┘
-│ [🏠] [📅] [👥] [👤]            │  ← Bottom nav (Coral active state)
-└─────────────────────────────────┘
+✅ DO - Purposeful, Travel-Specific Design:
+1. Real travel photography (actual Vietnam destinations, not stock photos)
+2. Purposeful color usage (coral cho actions, turquoise cho beach categories)
+3. Balanced rounded corners (12-16dp, not 24dp+ everywhere)
+4. Meaningful empty states ("Chưa có chuyến đi nào. Bắt đầu khám phá!" với destination suggestions)
+5. Subtle animations chỉ cho feedback (like button bounce, pull-to-refresh)
+6. Clear information hierarchy (text sizes, weights, spacing có mục đích)
+7. Functional white space (không cố nhồi nhét quá nhiều elements)
+
+❌ DON'T - Generic AI Slop:
+1. Abstract geometric patterns làm background
+2. Gradients trên mọi card/button/surface
+3. Glass morphism/frosted glass effects không cần thiết
+4. Over-animated (mọi thứ fade in/scale/bounce)
+5. Generic illustrations (cartoon characters, abstract shapes)
+6. Emoji abuse (3-4 emojis trong 1 câu text)
+7. Rounded corners quá mức (24dp+ everywhere = looks childish)
 ```
 
-## Animations & Microinteractions
+### Button Styles (Purposeful, Not Flashy)
+
+```dart
+// ============ PRIMARY BUTTON ============
+// Solid coral, white text/icon, subtle shadow
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    backgroundColor: AppColors.primary,        // Coral
+    foregroundColor: Colors.white,
+    elevation: 0,                              // No shadow (flat design)
+    shadowColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12), // Medium rounded, not excessive
+    ),
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+  ),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(LucideIcons.plus, size: 20, color: Colors.white),  // White icon
+      SizedBox(width: 8),
+      Text('Tạo chuyến đi', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+    ],
+  ),
+)
+
+// ============ SECONDARY BUTTON ============
+// Outline style, coral border, no background
+OutlinedButton(
+  style: OutlinedButton.styleFrom(
+    foregroundColor: AppColors.primary,
+    side: BorderSide(color: AppColors.primary, width: 1.5),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+  ),
+  child: Text('Xem thêm'),
+)
+
+// ============ TEXT BUTTON (Minimal) ============
+TextButton(
+  style: TextButton.styleFrom(
+    foregroundColor: AppColors.primary,
+    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  ),
+  child: Text('Bỏ qua'),
+)
+
+// ============ ICON BUTTON (Circle, not square) ============
+IconButton(
+  icon: Icon(LucideIcons.heart, color: AppColors.textSecondary),
+  onPressed: () {},
+  style: IconButton.styleFrom(
+    shape: CircleBorder(),  // Fully rounded (appropriate for icon buttons)
+  ),
+)
+```
+
+### Card Design (Clean, Not Cluttered)
+
+```dart
+// ============ PLACE CARD - Clean Travel Focus ============
+Container(
+  decoration: BoxDecoration(
+    color: AppColors.surface,
+    borderRadius: BorderRadius.circular(16),  // Large radius for cards
+    border: Border.all(color: AppColors.border, width: 1),
+    // NO shadow (flat design) or very subtle shadow
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.04),  // Very subtle
+        blurRadius: 8,
+        offset: Offset(0, 2),
+      ),
+    ],
+  ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Image with category badge overlay
+      Stack(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            child: CachedNetworkImage(
+              imageUrl: place.imageUrl,
+              height: 180,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Category badge - small, subtle
+          Positioned(
+            top: 12,
+            left: 12,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.getCategoryColor(place.category),
+                borderRadius: BorderRadius.circular(8),  // Small radius
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(getCategoryIcon(place.category), size: 14, color: Colors.white),
+                  SizedBox(width: 4),
+                  Text(
+                    place.category,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+      
+      // Content area - well-spaced
+      Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            Text(
+              place.name,
+              style: AppTextStyles.headlineMedium,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            SizedBox(height: 8),
+            
+            // Location
+            Row(
+              children: [
+                Icon(LucideIcons.mapPin, size: 16, color: AppColors.textSecondary),
+                SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    '${place.district}, ${place.province}',
+                    style: AppTextStyles.bodyMedium,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12),
+            
+            // Meta info row
+            Row(
+              children: [
+                // Rating
+                Icon(LucideIcons.star, size: 16, color: AppColors.rating),
+                SizedBox(width: 4),
+                Text('${place.rating}', style: AppTextStyles.labelMedium),
+                SizedBox(width: 4),
+                Text('(${place.reviewCount})', style: AppTextStyles.bodySmall),
+                
+                SizedBox(width: 16),
+                
+                // Budget
+                Icon(LucideIcons.dollarSign, size: 16, color: AppColors.textSecondary),
+                Text(getBudgetLabel(place.budgetLevel), style: AppTextStyles.bodyMedium),
+                
+                Spacer(),
+                
+                // Like button (subtle, no badge)
+                IconButton(
+                  icon: Icon(
+                    place.isLiked ? LucideIcons.heart : LucideIcons.heartOff,
+                    size: 20,
+                    color: place.isLiked ? AppColors.likeRed : AppColors.textSecondary,
+                  ),
+                  onPressed: () {},
+                  constraints: BoxConstraints(),
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  ),
+)
+```
+
+### Input Fields (Functional, Not Decorative)
+
+```dart
+// ============ TEXT INPUT - Clean & Functional ============
+TextField(
+  decoration: InputDecoration(
+    labelText: 'Điểm đến',
+    hintText: 'Ví dụ: Đà Nẵng, Phú Quốc',
+    
+    // Prefix icon (gray on light background)
+    prefixIcon: Icon(LucideIcons.mapPin, size: 20, color: AppColors.textSecondary),
+    
+    // Border styling
+    filled: true,
+    fillColor: AppColors.surface,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),  // Medium rounded
+      borderSide: BorderSide(color: AppColors.border, width: 1),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColors.border, width: 1),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColors.primary, width: 2),  // Coral when focused
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: AppColors.error, width: 1),
+    ),
+    
+    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  ),
+)
+```
+
+### Empty States (Meaningful, Not Generic)
+
+```dart
+// ❌ BAD - Generic AI Slop
+Column(
+  children: [
+    Text('🎉', style: TextStyle(fontSize: 64)),  // Giant emoji
+    SizedBox(height: 16),
+    Text('Nothing here yet!'),                  // Generic message
+    Text('Start exploring'),                     // Vague CTA
+  ],
+)
+
+// ✅ GOOD - Travel-Specific, Helpful
+Column(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    // Simple, relevant icon (not giant emoji)
+    Icon(LucideIcons.mapPin, size: 48, color: AppColors.textTertiary),
+    SizedBox(height: 16),
+    
+    // Clear, specific message
+    Text(
+      'Chưa có chuyến đi nào',
+      style: AppTextStyles.headlineMedium,
+    ),
+    SizedBox(height: 8),
+    Text(
+      'Bắt đầu lên kế hoạch cho chuyến du lịch đầu tiên của bạn',
+      style: AppTextStyles.bodyMedium,
+      textAlign: TextAlign.center,
+    ),
+    SizedBox(height: 24),
+    
+    // Clear action
+    ElevatedButton.icon(
+      icon: Icon(LucideIcons.plus, size: 20),
+      label: Text('Tạo chuyến đi mới'),
+      onPressed: () {},
+    ),
+    
+    SizedBox(height: 16),
+    
+    // Helpful suggestions (optional)
+    Text('Gợi ý điểm đến:', style: AppTextStyles.labelMedium),
+    SizedBox(height: 8),
+    Wrap(
+      spacing: 8,
+      children: ['Đà Nẵng', 'Phú Quốc', 'Hạ Long'].map((dest) =>
+        Chip(
+          label: Text(dest),
+          onPressed: () {},
+        ),
+      ).toList(),
+    ),
+  ],
+)
+```
+
+### Bottom Navigation Bar (Clean Icons, Clear Labels)
+
+```dart
+// ============ BOTTOM NAV - Simple & Functional ============
+BottomNavigationBar(
+  type: BottomNavigationBarType.fixed,
+  backgroundColor: AppColors.surface,
+  selectedItemColor: AppColors.primary,      // Coral when selected
+  unselectedItemColor: AppColors.textSecondary,  // Gray when not selected
+  selectedFontSize: 12,
+  unselectedFontSize: 12,
+  showUnselectedLabels: true,
+  elevation: 0,  // Flat, with top border instead
+  
+  items: [
+    BottomNavigationBarItem(
+      icon: Icon(LucideIcons.home, size: 24),
+      activeIcon: Icon(LucideIcons.home, size: 24),  // Same icon, just color changes
+      label: 'Trang chủ',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(LucideIcons.mapPin, size: 24),
+      activeIcon: Icon(LucideIcons.mapPin, size: 24),
+      label: 'Chuyến đi',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(LucideIcons.users, size: 24),
+      activeIcon: Icon(LucideIcons.users, size: 24),
+      label: 'Cộng đồng',
+    ),
+    BottomNavigationBarItem(
+      icon: Icon(LucideIcons.user, size: 24),
+      activeIcon: Icon(LucideIcons.user, size: 24),
+      label: 'Tài khoản',
+    ),
+  ],
+  currentIndex: _currentIndex,
+  onTap: (index) => setState(() => _currentIndex = index),
+)
+```
+
+### Loading States (Simple, Not Distracting)
+
+```dart
+// ❌ BAD - Distracting skeleton loaders everywhere
+Shimmer.fromColors(
+  baseColor: Colors.grey[300]!,
+  highlightColor: Colors.grey[100]!,
+  child: ComplexShimmerLayout(),  // Shimmer on everything
+)
+
+// ✅ GOOD - Simple, unobtrusive loading
+// For list items
+CircularProgressIndicator(
+  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+  strokeWidth: 2,
+)
+
+// For pull-to-refresh
+RefreshIndicator(
+  color: AppColors.primary,
+  onRefresh: () async {},
+  child: ListView(...),
+)
+
+// For initial screen load (optional shimmer, but simple)
+ListView.separated(
+  itemCount: 3,
+  separatorBuilder: (_, __) => SizedBox(height: 16),
+  itemBuilder: (_, __) => Container(
+    height: 200,
+    decoration: BoxDecoration(
+      color: AppColors.surfaceTint,  // Simple gray placeholder
+      borderRadius: BorderRadius.circular(16),
+    ),
+  ),
+)
+```
+
+### Animations & Microinteractions (Subtle, Purposeful Only)
 
 ```dart
 class AppDurations {
-  static const Duration fast = Duration(milliseconds: 150);
-  static const Duration normal = Duration(milliseconds: 250);
-  static const Duration slow = Duration(milliseconds: 350);
+  static const Duration fast = Duration(milliseconds: 150);    // Quick feedback
+  static const Duration normal = Duration(milliseconds: 250);  // Default transitions
+  static const Duration slow = Duration(milliseconds: 350);    // Emphasis animations
 }
 ```
 
-**Like Animation:**
-- Scale: 0.8 → 1.2 → 1.0 (bounce)
-- Color: gray → Coral red
-- Icon: Outline → Filled
-- Duration: 350ms
+**Animation Guidelines - Avoid Over-Animation:**
 
-**Pull-to-Refresh:**
-- iOS spinner: Coral color
-- Android spinner: Turquoise color
-- Threshold: 80dp
+```dart
+// ✅ GOOD - Subtle, purposeful animations
 
-## Design System Summary
+// 1. Like button bounce (feedback only)
+void _onLikeTap() {
+  setState(() => isLiked = !isLiked);
+  HapticFeedback.lightImpact();  // Haptic feedback
+  
+  // Simple scale animation
+  _controller.forward().then((_) => _controller.reverse());
+}
 
-**Why Sunset Theme:**
-1. **Emotional Connection**: Coral + Turquoise = beach vacation vibes (80% du lịch VN liên quan biển)
-2. **Differentiation**: Khác biệt rõ so với web (web = đen trắng, mobile = colorful)
-3. **Category Clarity**: 6 category colors giúp user phân biệt nhanh loại địa điểm
-4. **Gender-Neutral**: Không quá feminine (pink) hay masculine (blue), balanced
-5. **Instagram-Worthy**: Màu sắc photogenic, user muốn chụp screenshot share
+AnimatedScale(
+  scale: isAnimating ? 1.2 : 1.0,
+  duration: AppDurations.fast,
+  child: Icon(isLiked ? LucideIcons.heart : LucideIcons.heartOff),
+)
 
-**Implementation:**
-- Primary buttons: Coral gradient
-- Category badges: Respective colors (biển=turquoise, núi=mint, etc.)
-- Bottom nav active: Coral
-- Like button: Coral
-- Bookmark button: Golden
-- Loading indicators: Coral
+// 2. Page transitions (simple slide)
+PageRouteBuilder(
+  transitionDuration: AppDurations.normal,
+  pageBuilder: (context, animation, secondaryAnimation) => NextScreen(),
+  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    return SlideTransition(
+      position: Tween<Offset>(
+        begin: Offset(1.0, 0.0),  // Slide from right
+        end: Offset.zero,
+      ).animate(animation),
+      child: child,
+    );
+  },
+)
 
-**Flutter Packages:**
-```yaml
-dependencies:
-  flutter_animate: ^4.5.0           # Animations
-  shimmer: ^3.0.0                   # Loading skeletons
-  cached_network_image: ^3.3.0      # Image caching
-  lucide_icons_flutter: ^1.1.0      # Icon library (matches web)
+// 3. Pull-to-refresh (built-in, no custom animation needed)
+RefreshIndicator(
+  color: AppColors.primary,
+  onRefresh: _handleRefresh,
+  child: ListView(...),
+)
+
+// ❌ BAD - Unnecessary animations
+// Don't animate everything on screen load
+AnimatedOpacity(opacity: _visible ? 1.0 : 0.0, child: EveryWidget())  // NO
+AnimatedContainer(duration: Duration(seconds: 1), ...)  // Too slow
+Hero(tag: 'random-element', child: NormalWidget())  // Hero everywhere is distracting
 ```
 
-Xem chi tiết đầy đủ về design system tại file riêng: [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)
+**What NOT to animate:**
+- ❌ Text appearing (just show it)
+- ❌ List items staggered fade-in (distracting on scroll)
+- ❌ Every button hover/press (subtle opacity change is enough)
+- ❌ Page transitions longer than 250ms (feels sluggish)
+- ❌ Loading spinners with custom animations (use standard CircularProgressIndicator)
+
+### Screen Examples (Clean Layouts, Not Cluttered)
+
+#### Home Screen - Travel-Focused, Not Generic
+
+```dart
+// ✅ GOOD HOME SCREEN LAYOUT
+Scaffold(
+  backgroundColor: AppColors.background,
+  body: SafeArea(
+    child: CustomScrollView(
+      slivers: [
+        // App bar - simple, functional
+        SliverAppBar(
+          backgroundColor: AppColors.background,
+          elevation: 0,
+          floating: true,
+          title: Row(
+            children: [
+              Text('AI Travel', style: AppTextStyles.headlineMedium),
+              SizedBox(width: 8),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primarySurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Beta',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(LucideIcons.bell, color: AppColors.textPrimary),
+              onPressed: () {},
+            ),
+          ],
+        ),
+        
+        // Greeting section - simple, not over-designed
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Xin chào, ${user.firstName} 👋',
+                  style: AppTextStyles.displayMedium,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Khám phá điểm đến mới cho chuyến đi tiếp theo',
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        // Search bar - functional, not decorative
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm địa điểm, chuyến đi...',
+                prefixIcon: Icon(LucideIcons.search, size: 20),
+                suffixIcon: IconButton(
+                  icon: Icon(LucideIcons.sliders, size: 20),
+                  onPressed: () {},
+                ),
+              ),
+              onTap: () => Navigator.push(context, SearchScreen()),
+            ),
+          ),
+        ),
+        
+        // Section: Dành cho bạn
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Dành cho bạn', style: AppTextStyles.headlineMedium),
+                TextButton(
+                  child: Text('Xem tất cả'),
+                  onPressed: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+        
+        // Horizontal scroll - recommended places
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 280,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              itemCount: recommendedPlaces.length,
+              separatorBuilder: (_, __) => SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                final place = recommendedPlaces[index];
+                return PlaceCard(place: place, width: 200);
+              },
+            ),
+          ),
+        ),
+        
+        // Section: Danh mục phổ biến
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Text('Danh mục phổ biến', style: AppTextStyles.headlineMedium),
+          ),
+        ),
+        
+        // Category grid - simple, clear
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 1.5,
+            ),
+            delegate: SliverChildListDelegate([
+              CategoryCard(category: 'beach', label: 'Biển', icon: LucideIcons.waves),
+              CategoryCard(category: 'mountain', label: 'Núi', icon: LucideIcons.mountain),
+              CategoryCard(category: 'culture', label: 'Văn hóa', icon: LucideIcons.landmark),
+              CategoryCard(category: 'food', label: 'Ẩm thực', icon: LucideIcons.utensils),
+            ]),
+          ),
+        ),
+        
+        SliverToBoxAdapter(child: SizedBox(height: 24)),
+      ],
+    ),
+  ),
+)
+
+// Category Card - clean, not over-designed
+Widget CategoryCard({
+  required String category,
+  required String label,
+  required IconData icon,
+}) {
+  return InkWell(
+    onTap: () {},
+    borderRadius: BorderRadius.circular(12),
+    child: Container(
+      decoration: BoxDecoration(
+        color: AppColors.getCategoryColor(category).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.getCategoryColor(category).withOpacity(0.3),
+        ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            size: 32,
+            color: AppColors.getCategoryColor(category),
+          ),
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: AppTextStyles.labelLarge.copyWith(
+              color: AppColors.textPrimary,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+```
+
+### Design System Summary
+
+**Key Principles to Avoid "AI Slop":**
+
+1. **Purpose over decoration**
+   - Every color, animation, rounded corner has a reason
+   - Not "this looks cool" but "this helps user understand/complete action"
+
+2. **Content-first design**
+   - Real travel photos, not abstract illustrations
+   - Clear text hierarchy, not decorative typography
+   - Functional layouts, not trendy grid experiments
+
+3. **Subtle over flashy**
+   - Flat design with minimal shadows (0-4% opacity)
+   - Animations only for feedback/transitions (150-250ms)
+   - Rounded corners balanced (8-16dp), not excessive (24dp+)
+
+4. **Consistent system**
+   - Black/white/gray icons only (colored backgrounds OK)
+   - Coral for primary actions, Turquoise/Golden for accents
+   - System fonts for native feel and performance
+
+5. **Travel-specific, not generic**
+   - Empty states with destination suggestions
+   - Category colors match actual categories (beach=turquoise, food=orange)
+   - Weather, ratings, budget info always visible
+   - Map-centric features (location is core to travel)
+
+**Anti-Patterns to Avoid:**
+```
+❌ Glass morphism everywhere
+❌ Gradient backgrounds on all cards
+❌ Giant emojis (64px+) as primary UI elements
+❌ Abstract blob illustrations
+❌ Staggered fade-in animations on every scroll
+❌ Over-rounded corners (24dp+ on everything)
+❌ Colored icons on light backgrounds (use black/gray)
+❌ Empty white space filled with decorative elements
+❌ Generic motivational text ("Let's go!", "You got this!")
+❌ Unnecessary loading animations (spinners with custom animations)
+```
+
+**Flutter Packages for Clean UI:**
+```yaml
+dependencies:
+  # Icons - black/white system
+  lucide_icons_flutter: ^1.1.0
+  
+  # Images - caching, not decorative placeholders
+  cached_network_image: ^3.3.0
+  
+  # Animations - use sparingly
+  flutter_animate: ^4.5.0          # For purposeful animations only
+  
+  # Loading - simple shimmer if needed
+  shimmer: ^3.0.0                  # Use minimally, prefer CircularProgressIndicator
+```
 
 ---
 
@@ -1389,12 +2553,121 @@ Xem chi tiết đầy đủ về design system tại file riêng: [DESIGN_SYSTEM
    - Dart basics: [dart.dev/guides/language/language-tour](https://dart.dev/guides/language/language-tour)
    - Flutter fundamentals: [flutter.dev/docs/get-started/codelab](https://flutter.dev/docs/get-started/codelab)
    - Estimate: 3-5 ngày
-4. **Repository Structure**: Tạo folder `mobile/` trong monorepo hoặc separate repo
+4. **Repository Structure**: 
+   - ⚠️ **Work exclusively in `mobile/` folder**
+   - Không tạo files/folders ngoài `mobile/` directory
+   - Nếu cần shared utilities (constants, types), duplicate vào `mobile/lib/utils/` thay vì reference từ `frontend/` hoặc `backend/`
 5. **Kickoff Sprint 1**: 
-   - Init Flutter project: `flutter create mobile`
+   - Init Flutter project: `cd mobile && flutter create .` (trong folder mobile hiện có)
    - Setup theme configuration với Sunset colors
-   - Setup API client với Dio
+   - Setup API client với Dio (pointing to existing backend)
    - Implement authentication flow
+   - **Test backend integration** - verify endpoints work as expected, report any issues
+
+## Mobile Development Workflow
+
+### Daily Development
+```bash
+# Chỉ làm việc trong mobile folder
+cd mobile/
+
+# Install dependencies
+flutter pub get
+
+# Run on emulator/device
+flutter run
+
+# Hot reload (trong terminal đang chạy app)
+# Press 'r' for hot reload
+# Press 'R' for hot restart
+
+# Build for testing
+flutter build apk --debug         # Android debug build
+flutter build ios --debug         # iOS debug build (Mac only)
+```
+
+### Git Workflow
+```bash
+# Create feature branch (mobile-specific)
+git checkout -b mobile/feature-auth
+
+# Only stage files in mobile/ folder
+git add mobile/
+
+# Commit (prefix with "mobile:")
+git commit -m "mobile: implement login screen with biometric auth"
+
+# Before PR, verify no changes outside mobile/
+git status
+# Should only show files under mobile/
+
+# Push and create PR
+git push origin mobile/feature-auth
+```
+
+### Testing Backend Integration
+```bash
+# Set backend API URL for local testing
+export API_URL=http://localhost:3002
+
+# Run app pointing to local backend
+flutter run --dart-define=API_URL=http://localhost:3002
+
+# Or use .env file (inside mobile/)
+# mobile/.env:
+# API_URL=http://localhost:3002
+```
+
+### Reporting Issues to Backend Team
+```markdown
+<!-- Template for backend-related issues -->
+**Issue Type**: Backend Integration
+
+**Endpoint**: POST /auth/login
+
+**Expected Behavior**: 
+Login with valid credentials should return JWT token
+
+**Actual Behavior**:
+Returns 500 Internal Server Error
+
+**Request**:
+```json
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+```
+
+**Response**:
+```json
+{
+  "statusCode": 500,
+  "message": "Internal server error"
+}
+```
+
+**Mobile App Version**: v0.1.0-dev
+**Backend Endpoint**: http://localhost:3002
+**Testing Date**: 2026-10-09
+
+**Action Needed**: Backend team to investigate and fix
+**Workaround**: Using mock auth for now in mobile app
+```
+
+### Code Review Checklist (Mobile Team)
+
+Before submitting PR, verify:
+- [ ] All changes are within `mobile/` folder only
+- [ ] No imports from `../backend/` or `../frontend/`
+- [ ] API calls use environment variables for backend URL
+- [ ] Error handling for network failures implemented
+- [ ] No hardcoded secrets (API keys, passwords)
+- [ ] Tests pass: `flutter test`
+- [ ] Linting passes: `flutter analyze`
+- [ ] Build succeeds: `flutter build apk --debug`
+- [ ] Tested on at least one Android emulator
+- [ ] PR title prefixed with "mobile:"
 
 ## Final Decisions Summary
 

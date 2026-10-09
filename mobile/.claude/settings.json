@@ -1,0 +1,130 @@
+{
+  "$schema": "https://openrouter.ai/api/v1/schemas/app_settings.json",
+  "capabilities": {
+    "mcp": {
+      "enabled": true
+    }
+  },
+  "rules": [
+    {
+      "name": "Mobile Scope Enforcement",
+      "glob": "**/*",
+      "allowed": false,
+      "message": "❌ You are working on MOBILE app. Only files in mobile/ folder are allowed."
+    },
+    {
+      "name": "Mobile Development Zone",
+      "glob": "mobile/**/*",
+      "allowed": true
+    },
+    {
+      "name": "Backend Forbidden",
+      "glob": "backend/**/*",
+      "allowed": false,
+      "message": "❌ FORBIDDEN: Backend code cannot be modified by mobile team. Create issue with label 'backend-needed' instead."
+    },
+    {
+      "name": "Frontend Forbidden",
+      "glob": "frontend/**/*",
+      "allowed": false,
+      "message": "❌ FORBIDDEN: Frontend code cannot be modified by mobile team."
+    },
+    {
+      "name": "ML Service Forbidden",
+      "glob": "ml-service/**/*",
+      "allowed": false,
+      "message": "❌ FORBIDDEN: ML service code cannot be modified by mobile team."
+    },
+    {
+      "name": "Database Forbidden",
+      "glob": "database/**/*",
+      "allowed": false,
+      "message": "❌ FORBIDDEN: Database migrations cannot be created by mobile team."
+    },
+    {
+      "name": "Infrastructure Forbidden",
+      "glob": "{docker-compose.yml,package.json,tsconfig.json}",
+      "allowed": false,
+      "message": "❌ FORBIDDEN: Infrastructure files require team lead approval."
+    }
+  ],
+  "allowedPrompts": {
+    "bash": [
+      {
+        "prompt": "cd mobile",
+        "description": "Navigate to mobile folder"
+      },
+      {
+        "prompt": "flutter pub get",
+        "description": "Install Flutter dependencies"
+      },
+      {
+        "prompt": "flutter run",
+        "description": "Run mobile app"
+      },
+      {
+        "prompt": "flutter analyze",
+        "description": "Run Flutter linter"
+      },
+      {
+        "prompt": "flutter test",
+        "description": "Run mobile tests"
+      },
+      {
+        "prompt": "flutter build apk --debug",
+        "description": "Build Android debug APK"
+      },
+      {
+        "prompt": "flutter build ios --debug",
+        "description": "Build iOS debug app"
+      },
+      {
+        "prompt": "git status",
+        "description": "Check git status"
+      },
+      {
+        "prompt": "git diff --name-only origin/main | grep -v \"^mobile/\"",
+        "description": "Verify no changes outside mobile/"
+      }
+    ]
+  },
+  "autoloadSkills": [
+    "mobile-ui-guidelines",
+    "mobile-architecture",
+    "mobile-development-rules"
+  ],
+  "preCommitChecks": [
+    {
+      "command": "flutter analyze",
+      "cwd": "mobile",
+      "message": "Running Flutter linter..."
+    },
+    {
+      "command": "flutter test",
+      "cwd": "mobile",
+      "message": "Running tests..."
+    },
+    {
+      "command": "git diff --cached --name-only | grep -v '^mobile/'",
+      "expectEmpty": true,
+      "message": "Verifying only mobile/ files are staged...",
+      "errorMessage": "❌ Files outside mobile/ are staged. Only mobile/ files allowed."
+    }
+  ],
+  "guidelines": {
+    "colorConstants": "Always use AppColors.* constants, never raw hex colors",
+    "iconPackage": "Always use LucideIcons, never Material Icons",
+    "borderRadius": "All components must have rounded corners (AppRadius.sm/md/lg)",
+    "architecture": "Follow Screen → Provider → Repository → Service pattern",
+    "imports": "Never import from backend/, frontend/, or ml-service/",
+    "commitPrefix": "All commits must start with 'mobile:'",
+    "branchPrefix": "All branches must start with 'mobile/'"
+  },
+  "warnings": {
+    "backendEndpointMissing": "If backend endpoint is missing, create issue with label 'backend-needed' and implement workaround in mobile",
+    "crossServiceImport": "Detected import from other service. Duplicate types in mobile/lib/models/ instead",
+    "hardcodedColors": "Detected hardcoded color. Use AppColors constants",
+    "materialIcons": "Detected Material Icons. Use LucideIcons instead",
+    "noRoundedCorners": "Component without rounded corners. Add borderRadius using AppRadius constants"
+  }
+}
