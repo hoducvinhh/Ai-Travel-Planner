@@ -52,6 +52,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Register
+  Future<void> register(String name, String email, String password) async {
+    state = const AuthState.loading();
+    try {
+      final user = await _repository.register(name, email, password);
+      state = AuthState.authenticated(user);
+    } catch (e) {
+      state = AuthState.error(e.toString());
+    }
+  }
+
   /// Logout
   Future<void> logout() async {
     await _repository.logout();

@@ -33,6 +33,30 @@ class AuthRepository {
     return loginResponse.user;
   }
 
+  /// Register new user
+  Future<User> register(String name, String email, String password) async {
+    final response = await _api.post<Map<String, dynamic>>(
+      AppConstants.authRegister,
+      data: {
+        'name': name,
+        'email': email,
+        'password': password,
+      },
+    );
+
+    final loginResponse = LoginResponse.fromJson(response);
+
+    // Save token
+    await _storage.saveToken(loginResponse.token);
+
+    // Save user info
+    await _storage.saveString(AppConstants.keyUserId, loginResponse.user.id);
+    await _storage.saveString(
+        AppConstants.keyUserEmail, loginResponse.user.email);
+
+    return loginResponse.user;
+  }
+
   /// Get current user profile
   Future<User> getProfile() async {
     final response = await _api.get<Map<String, dynamic>>(

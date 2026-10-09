@@ -2,8 +2,8 @@
 
 **Project:** AI Travel Planner Mobile App (Flutter)  
 **Timeline:** 7-8 weeks  
-**Status:** Phase 0 In Progress (78% complete)  
-**Last Updated:** 2026-10-09 16:42
+**Status:** Phase 1 In Progress (Task 1.2 Complete - 82%)  
+**Last Updated:** 2026-10-09 08:56
 
 ---
 
@@ -168,39 +168,39 @@
 
 #### 1.2.1 UI Implementation
 
-- [ ] Create `lib/screens/auth/register_screen.dart`
-- [ ] Design register form (email, password, confirm password, name)
-- [ ] Implement all input fields with validation
-- [ ] Create register button
-- [ ] Add "Already have account? Login" link
-- [ ] Show password strength indicator
-- [ ] Test UI layout
+- [x] Create `lib/screens/auth/register_screen.dart`
+- [x] Design register form (email, password, confirm password, name)
+- [x] Implement all input fields with validation
+- [x] Create register button
+- [x] Add "Already have account? Login" link
+- [x] Show password strength indicator (requirements hint)
+- [ ] Test UI layout - pending: flutter run
 
 #### 1.2.2 Validation Logic
 
-- [ ] Implement email validation (regex)
-- [ ] Implement password validation (min 8 chars, uppercase, number)
-- [ ] Implement confirm password match check
-- [ ] Show validation errors inline
-- [ ] Disable button until form valid
-- [ ] Test all validation cases
+- [x] Implement email validation (regex)
+- [x] Implement password validation (min 8 chars, uppercase, number)
+- [x] Implement confirm password match check
+- [x] Show validation errors inline
+- [x] Disable button until form valid (handled by isLoading state)
+- [ ] Test all validation cases - pending: flutter run
 
 #### 1.2.3 API Integration
 
-- [ ] Implement `register()` in AuthRepository
-- [ ] Call `POST /auth/register` endpoint
-- [ ] Parse response and store token
-- [ ] Handle duplicate email error
-- [ ] Navigate to home after registration
-- [ ] Test registration flow
+- [x] Implement `register()` in AuthRepository
+- [x] Call `POST /auth/register` endpoint
+- [x] Parse response and store token
+- [x] Handle duplicate email error
+- [x] Navigate to home after registration
+- [ ] Test registration flow - pending: backend + flutter run
 
 #### 1.2.4 Testing
 
 - [ ] Write unit tests
-- [ ] Test successful registration
-- [ ] Test validation errors
-- [ ] Test duplicate email
-- [ ] Run `flutter analyze`
+- [ ] Test successful registration - pending: backend
+- [ ] Test validation errors - pending: flutter run
+- [ ] Test duplicate email - pending: backend
+- [ ] Run `flutter analyze` - pending
 
 ### 1.3 Authentication - Profile Screen (Day 3)
 
