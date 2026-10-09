@@ -135,3 +135,5 @@ gradlew.bat
 # Keep settings.json but ignore local overrides
 !.claude/settings.json
 .claude/settings.local.json
+# Widget Preview related
+.widget_preview/
