@@ -7,7 +7,6 @@ import '../../config/text_styles.dart';
 import '../../config/spacing.dart';
 import '../../config/radius.dart';
 import '../../providers/auth_provider.dart';
-import '../../providers/biometric_provider.dart';
 import '../../widgets/common/loading_indicator.dart';
 
 /// Profile screen
@@ -87,10 +86,9 @@ class ProfileScreen extends ConsumerWidget {
                 child: Column(
                   children: [
                     _buildProfileOption(
-                      icon: LucideIcons.edit,
+                      icon: LucideIcons.pencil,
                       title: 'Chỉnh sửa hồ sơ',
                       onTap: () {
-                        // TODO: Navigate to edit profile screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Chức năng đang phát triển'),
@@ -100,84 +98,9 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     _buildDivider(),
                     _buildProfileOption(
-                      icon: LucideIcons.fingerprint,
-                      title: 'Xác thực sinh trắc học',
-                      trailing: Consumer(
-                        builder: (context, ref, child) {
-                          final biometricEnabled = ref.watch(biometricEnabledProvider);
-                          final biometricAvailable = ref.watch(biometricAvailableProvider);
-
-                          return biometricAvailable.when(
-                            data: (isAvailable) {
-                              if (!isAvailable) {
-                                return Text(
-                                  'Không khả dụng',
-                                  style: AppTextStyles.bodySmall.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
-                                );
-                              }
-
-                              return biometricEnabled.when(
-                                data: (isEnabled) => Switch(
-                                  value: isEnabled,
-                                  onChanged: (value) async {
-                                    final service = ref.read(biometricServiceProvider);
-                                    if (value) {
-                                      // Try to authenticate before enabling
-                                      final authenticated = await service.authenticate(
-                                        localizedReason: 'Xác thực để bật sinh trắc học',
-                                      );
-                                      if (authenticated) {
-                                        await service.enableBiometric();
-                                        ref.invalidate(biometricEnabledProvider);
-                                      } else if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Xác thực thất bại'),
-                                          ),
-                                        );
-                                      }
-                                    } else {
-                                      await service.disableBiometric();
-                                      ref.invalidate(biometricEnabledProvider);
-                                    }
-                                  },
-                                  activeColor: AppColors.primary,
-                                ),
-                                loading: () => const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                ),
-                                error: (_, __) => const Icon(
-                                  LucideIcons.alertCircle,
-                                  size: 20,
-                                  color: Colors.red,
-                                ),
-                              );
-                            },
-                            loading: () => const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                            error: (_, __) => const Icon(
-                              LucideIcons.alertCircle,
-                              size: 20,
-                              color: Colors.red,
-                            ),
-                          );
-                        },
-                      ),
-                      showArrow: false,
-                    ),
-                    _buildDivider(),
-                    _buildProfileOption(
                       icon: LucideIcons.bell,
                       title: 'Thông báo',
                       onTap: () {
-                        // TODO: Navigate to notifications settings
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Chức năng đang phát triển'),
@@ -190,7 +113,6 @@ class ProfileScreen extends ConsumerWidget {
                       icon: LucideIcons.shield,
                       title: 'Bảo mật',
                       onTap: () {
-                        // TODO: Navigate to security settings
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Chức năng đang phát triển'),
@@ -218,7 +140,6 @@ class ProfileScreen extends ConsumerWidget {
                       icon: LucideIcons.helpCircle,
                       title: 'Trợ giúp & Hỗ trợ',
                       onTap: () {
-                        // TODO: Navigate to help screen
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Chức năng đang phát triển'),
@@ -232,7 +153,6 @@ class ProfileScreen extends ConsumerWidget {
                       title: 'Về ứng dụng',
                       subtitle: 'Phiên bản 1.0.0',
                       onTap: () {
-                        // TODO: Show about dialog
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -353,8 +273,6 @@ class ProfileScreen extends ConsumerWidget {
     required String title,
     String? subtitle,
     VoidCallback? onTap,
-    Widget? trailing,
-    bool showArrow = true,
   }) {
     return InkWell(
       onTap: onTap,
@@ -403,14 +321,11 @@ class ProfileScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            if (trailing != null)
-              trailing
-            else if (showArrow)
-              Icon(
-                LucideIcons.chevronRight,
-                size: 20,
-                color: AppColors.textSecondary,
-              ),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 20,
+              color: AppColors.textSecondary,
+            ),
           ],
         ),
       ),
