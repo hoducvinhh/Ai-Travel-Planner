@@ -206,38 +206,38 @@
 
 #### 1.3.1 UI Implementation
 
-- [ ] Create `lib/screens/profile/profile_screen.dart`
-- [ ] Show user avatar (circular, placeholder)
-- [ ] Display user name and email
-- [ ] Add "Edit Profile" button
-- [ ] Add "Logout" button
-- [ ] Add app version info
-- [ ] Test UI
+- [x] Create `lib/screens/profile/profile_screen.dart`
+- [x] Show user avatar (circular, placeholder)
+- [x] Display user name and email
+- [x] Add "Edit Profile" button
+- [x] Add "Logout" button
+- [x] Add app version info
+- [x] Test UI
 
 #### 1.3.2 Biometric Auth Setup
 
-- [ ] Add `local_auth: ^2.2.0` dependency
-- [ ] Create `lib/services/biometric_service.dart`
-- [ ] Check device biometric availability
-- [ ] Implement biometric enable/disable toggle
-- [ ] Store biometric preference
-- [ ] Test on device with Face ID/Touch ID
+- [x] Add `local_auth: ^2.2.0` dependency
+- [x] Create `lib/services/biometric_service.dart`
+- [x] Check device biometric availability
+- [x] Implement biometric enable/disable toggle
+- [x] Store biometric preference
+- [ ] Test on device with Face ID/Touch ID (pending physical device)
 
 #### 1.3.3 Profile API Integration
 
-- [ ] Implement `getProfile()` in AuthRepository
-- [ ] Call `GET /auth/profile` endpoint
-- [ ] Display fetched user data
-- [ ] Handle 401 (expired token)
-- [ ] Test profile fetch
+- [x] Implement `getProfile()` in AuthRepository
+- [x] Call `GET /auth/profile` endpoint
+- [x] Display fetched user data
+- [x] Handle 401 (expired token)
+- [ ] Test profile fetch with backend
 
 #### 1.3.4 Logout Implementation
 
-- [ ] Implement logout in AuthNotifier
-- [ ] Clear JWT token from storage
-- [ ] Reset app state
-- [ ] Navigate to login screen
-- [ ] Test logout flow
+- [x] Implement logout in AuthNotifier
+- [x] Clear JWT token from storage
+- [x] Reset app state
+- [x] Navigate to login screen
+- [x] Test logout flow
 
 ### 1.4 Trip Management - List Screen (Days 4-5)
 

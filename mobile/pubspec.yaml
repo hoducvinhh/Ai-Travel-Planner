@@ -37,6 +37,9 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   shared_preferences: ^2.2.0
 
+  # Biometric Authentication
+  local_auth: ^2.2.0
+
   # Chat & Markdown
   flutter_markdown: ^0.6.0
 
