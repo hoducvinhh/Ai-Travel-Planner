@@ -2,6 +2,23 @@
 
 This file configures Claude's behavior when working on the mobile app.
 
+## 🚨 MANDATORY: Load Skills Before ANY Code Changes
+
+**CRITICAL: Before making ANY code changes in mobile/, you MUST load these skills:**
+
+```
+1. Skill("mobile-ui-guidelines")      - For ANY UI work
+2. Skill("mobile-architecture")       - For ANY feature implementation
+3. Skill("mobile-development-rules")  - For ANY code changes
+```
+
+**How to verify skills are loaded:**
+- Check if you have context about AppColors, LucideIcons, AppRadius
+- Check if you know the Screen → Provider → Repository → Service pattern
+- Check if you understand scope constraints (mobile/ only)
+
+**If you don't remember these, STOP and load the skills first.**
+
 ## Scope Constraints
 
 **CRITICAL: Mobile team works ONLY in `mobile/` folder.**
@@ -436,12 +453,32 @@ class HomeScreen extends StatefulWidget {
 
 **When working on mobile app:**
 
-1. **Load skills first**: mobile-ui-guidelines, mobile-architecture, mobile-development-rules
+1. **FIRST: Load skills** - mobile-ui-guidelines, mobile-architecture, mobile-development-rules
 2. **Stay in scope**: Only modify mobile/
 3. **Follow architecture**: Screen → Provider → Repository → Service
 4. **Use design system**: AppColors, LucideIcons, AppRadius
 5. **Quality gates**: flutter analyze + flutter test + flutter build must pass
 6. **Git discipline**: mobile/ prefix in branch/commit, only mobile/ files staged
 7. **Backend integration**: Consume API only, never modify backend code
+
+**Workflow for every task:**
+```
+Step 1: Load 3 skills (if not already loaded)
+Step 2: Read relevant code (if modifying existing)
+Step 3: Implement following architecture + design system
+Step 4: Test (analyze + test + build)
+Step 5: Verify scope (only mobile/ files)
+Step 6: Commit with mobile: prefix
+```
+
+**Before ANY code change, ask yourself:**
+- [ ] Have I loaded all 3 skills? (ui-guidelines, architecture, development-rules)
+- [ ] Am I only modifying mobile/ files?
+- [ ] Am I using AppColors (not raw hex)?
+- [ ] Am I using LucideIcons (not Material Icons)?
+- [ ] Do all components have rounded corners?
+- [ ] Am I following Screen → Provider → Repository → Service pattern?
+
+If answer to ANY of these is NO, STOP and fix it first.
 
 **Remember:** Mobile team owns `mobile/` folder exclusively. Everything else requires permission or is forbidden.
