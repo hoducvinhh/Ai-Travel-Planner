@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../config/colors.dart';
 import '../../config/text_styles.dart';
-import '../../config/radius.dart';
 import '../../config/spacing.dart';
+import '../../config/radius.dart';
 import '../../providers/trips_provider.dart';
 import '../../widgets/trip/trip_card.dart';
 import '../../widgets/common/loading_indicator.dart';
@@ -16,89 +16,121 @@ class TripsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tripsAsync = ref.watch(tripsNotifierProvider);
+    final tripsAsync = ref.watch(tripsProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chuyến đi của tôi'),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.search),
-            onPressed: () {
-              // TODO: Implement search
-            },
+            icon: const Icon(LucideIcons.user),
+            onPressed: () => context.push('/profile'),
+            tooltip: 'Hồ sơ',
           ),
         ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(tripsNotifierProvider.notifier).refresh();
+          ref.invalidate(tripsProvider);
         },
         child: tripsAsync.when(
           loading: () => const LoadingIndicator(),
-          error: (error, stack) => _buildError(context, error.toString(), ref),
-          data: (trips) => trips.isEmpty
-              ? _buildEmptyState(context)
-              : _buildTripsList(context, trips),
+          error: (error, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  LucideIcons.alertCircle,
+                  size: 64,
+                  color: AppColors.error,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  'Đã có lỗi xảy ra',
+                  style: AppTextStyles.headlineMedium,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  error.toString(),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  onPressed: () => ref.invalidate(tripsProvider),
+                  icon: const Icon(LucideIcons.refreshCw, size: 20),
+                  label: const Text('Thử lại'),
+                ),
+              ],
+            ),
+          ),
+          data: (trips) {
+            if (trips.isEmpty) {
+              return _buildEmptyState(context);
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+              itemCount: trips.length,
+              itemBuilder: (context, index) {
+                final trip = trips[index];
+                return TripCard(
+                  trip: trip,
+                  onTap: () {
+                    // TODO: Navigate to trip detail
+                    context.push('/trips/${trip.id}');
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          context.push('/trips/create');
+          // TODO: Navigate to create trip screen
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Chức năng tạo chuyến đi đang phát triển'),
+            ),
+          );
         },
-        icon: const Icon(LucideIcons.plus, color: Colors.white),
-        label: const Text(
-          'Tạo chuyến đi',
-          style: TextStyle(color: Colors.white),
-        ),
         backgroundColor: AppColors.primary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
-        ),
+        foregroundColor: Colors.white,
+        icon: const Icon(LucideIcons.plus),
+        label: const Text('Tạo chuyến đi'),
       ),
     );
   }
 
-  /// Build trips list
-  Widget _buildTripsList(BuildContext context, List trips) {
-    return ListView.separated(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      itemCount: trips.length,
-      separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.md),
-      itemBuilder: (context, index) {
-        final trip = trips[index];
-        return TripCard(
-          trip: trip,
-          onTap: () {
-            context.push('/trips/${trip.id}');
-          },
-        );
-      },
-    );
-  }
-
-  /// Build empty state
   Widget _buildEmptyState(BuildContext context) {
     return Center(
-      child: SingleChildScrollView(
+      child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              LucideIcons.mapPin,
+              LucideIcons.plane,
               size: 80,
-              color: AppColors.textSecondary,
+              color: AppColors.textSecondary.withOpacity(0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
               'Chưa có chuyến đi nào',
-              style: AppTextStyles.headlineMedium,
-              textAlign: TextAlign.center,
+              style: AppTextStyles.headlineMedium.copyWith(
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Tạo chuyến đi đầu tiên của bạn\nvà khám phá những điểm đến tuyệt vời!',
+              'Hãy bắt đầu lên kế hoạch cho chuyến đi đầu tiên của bạn',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -107,75 +139,30 @@ class TripsListScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xl),
             ElevatedButton.icon(
               onPressed: () {
-                context.push('/trips/create');
+                // TODO: Navigate to create trip
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Chức năng tạo chuyến đi đang phát triển'),
+                  ),
+                );
               },
-              icon: const Icon(LucideIcons.plus, size: 20, color: Colors.white),
-              label: const Text(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+              ),
+              icon: const Icon(LucideIcons.plus, size: 20),
+              label: Text(
                 'Tạo chuyến đi mới',
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// Build error state
-  Widget _buildError(BuildContext context, String message, WidgetRef ref) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.alertCircle,
-              size: 64,
-              color: AppColors.error,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Đã có lỗi xảy ra',
-              style: AppTextStyles.headlineMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              message,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            ElevatedButton.icon(
-              onPressed: () {
-                ref.read(tripsNotifierProvider.notifier).refresh();
-              },
-              icon: const Icon(LucideIcons.refreshCw, size: 20, color: Colors.white),
-              label: const Text(
-                'Thử lại',
-                style: TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),

@@ -1,7 +1,6 @@
-import 'package:dio/dio.dart';
 import '../models/trip.dart';
 import '../services/api_service.dart';
-import '../utils/error_handler.dart';
+import '../utils/constants.dart';
 
 /// Trips repository
 class TripsRepository {
@@ -9,91 +8,50 @@ class TripsRepository {
 
   TripsRepository(this._api);
 
-  /// Get all trips for current user
+  /// Get all trips
   Future<List<Trip>> getTrips() async {
-    try {
-      final response = await _api.get<List>('/trips');
+    final response = await _api.get<List<dynamic>>(
+      AppConstants.trips,
+    );
 
-      if (response == null) {
-        return [];
-      }
-
-      return (response as List)
-          .map((json) => Trip.fromJson(json as Map<String, dynamic>))
-          .toList();
-    } on DioException catch (e) {
-      throw ErrorHandler.getErrorMessage(e);
-    }
+    return response.map((json) => Trip.fromJson(json as Map<String, dynamic>)).toList();
   }
 
   /// Get trip by ID
   Future<Trip> getTripById(String id) async {
-    try {
-      final response = await _api.get<Map<String, dynamic>>('/trips/$id');
+    final response = await _api.get<Map<String, dynamic>>(
+      '${AppConstants.trips}/$id',
+    );
 
-      if (response == null) {
-        throw 'Không tìm thấy chuyến đi';
-      }
-
-      return Trip.fromJson(response);
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 404) {
-        throw 'Không tìm thấy chuyến đi';
-      }
-      throw ErrorHandler.getErrorMessage(e);
-    }
+    return Trip.fromJson(response);
   }
 
   /// Create new trip
   Future<Trip> createTrip({
     required String destination,
-    required DateTime startDate,
-    required DateTime endDate,
+    required String startDate,
+    required String endDate,
     required double budget,
-    required int travelers,
-    List<String>? categories,
+    int? travelersCount,
+    List<String>? preferences,
   }) async {
-    try {
-      final response = await _api.post<Map<String, dynamic>>('/trips', data: {
+    final response = await _api.post<Map<String, dynamic>>(
+      AppConstants.trips,
+      data: {
         'destination': destination,
-        'startDate': startDate.toIso8601String(),
-        'endDate': endDate.toIso8601String(),
+        'startDate': startDate,
+        'endDate': endDate,
         'budget': budget,
-        'travelers': travelers,
-        'categories': categories ?? [],
-      });
+        if (travelersCount != null) 'travelersCount': travelersCount,
+        if (preferences != null) 'preferences': preferences,
+      },
+    );
 
-      if (response == null) {
-        throw 'Không thể tạo chuyến đi';
-      }
-
-      return Trip.fromJson(response);
-    } on DioException catch (e) {
-      throw ErrorHandler.getErrorMessage(e);
-    }
-  }
-
-  /// Update trip
-  Future<Trip> updateTrip(String id, Map<String, dynamic> data) async {
-    try {
-      final response = await _api.patch<Map<String, dynamic>>('/trips/$id', data: data);
-
-      if (response == null) {
-        throw 'Không thể cập nhật chuyến đi';
-      }
-
-      return Trip.fromJson(response);
-    } on DioException catch (e) {
-      throw ErrorHandler.getErrorMessage(e);
-    }
+    return Trip.fromJson(response);
   }
 
   /// Delete trip
   Future<void> deleteTrip(String id) async {
-    try {
-      await _api.delete('/trips/$id');
-    } on DioException catch (e) {
-      throw ErrorHandler.getErrorMessage(e);
-    }
+    await _api.delete('${AppConstants.trips}/$id');
   }
 }
