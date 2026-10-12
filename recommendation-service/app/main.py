@@ -113,29 +113,57 @@ async def recommend_places(
         if recommendation_model.model is None:
             logger.warning("Recommendation model not pre-trained yet. Using cold-start popularity ranking.")
 
-        # Query candidate places for destination
-        query = text("""
-            SELECT id, name, categories, price_estimate, popularity_score,
-                   latitude, longitude
-            FROM places
-            WHERE province = :destination
-            LIMIT 300
-        """)
+        # Step 1: Parse destinations (support multi-province tour planning)
+        dest_list = [d.strip() for d in request.destination.split(',') if d.strip()]
+        if not dest_list:
+            dest_list = [request.destination.strip()]
 
-        result = db.execute(query, {"destination": request.destination})
-        candidates = result.fetchall()
+        candidates = []
+        seen_candidate_ids = set()
 
-        # If exact province match is empty, try case-insensitive partial match
-        if not candidates:
-            query_broad = text("""
+        if len(dest_list) > 1:
+            quota_per_dest = max(50, 400 // len(dest_list))
+            for dest in dest_list:
+                query_dest = text("""
+                    SELECT id, name, categories, price_estimate, popularity_score,
+                           latitude, longitude, province
+                    FROM places
+                    WHERE province ILIKE :dest_pattern OR district ILIKE :dest_pattern
+                    ORDER BY popularity_score DESC
+                    LIMIT :quota
+                """)
+                rows = db.execute(query_dest, {
+                    "dest_pattern": f"%{dest}%",
+                    "quota": quota_per_dest,
+                }).fetchall()
+
+                for row in rows:
+                    if row[0] not in seen_candidate_ids:
+                        seen_candidate_ids.add(row[0])
+                        candidates.append(row)
+        else:
+            dest = dest_list[0]
+            query = text("""
                 SELECT id, name, categories, price_estimate, popularity_score,
-                       latitude, longitude
+                       latitude, longitude, province
                 FROM places
-                WHERE province ILIKE :dest_pattern
+                WHERE province = :destination
                 LIMIT 300
             """)
-            result = db.execute(query_broad, {"dest_pattern": f"%{request.destination}%"})
+            result = db.execute(query, {"destination": dest})
             candidates = result.fetchall()
+
+            # If exact province match is empty, try case-insensitive partial match
+            if not candidates:
+                query_broad = text("""
+                    SELECT id, name, categories, price_estimate, popularity_score,
+                           latitude, longitude, province
+                    FROM places
+                    WHERE province ILIKE :dest_pattern OR district ILIKE :dest_pattern
+                    LIMIT 300
+                """)
+                result = db.execute(query_broad, {"dest_pattern": f"%{dest}%"})
+                candidates = result.fetchall()
 
         if not candidates:
             logger.warning(f"No candidate places found in database for destination: {request.destination}")
@@ -195,8 +223,43 @@ async def recommend_places(
             filtered_predictions, candidates
         )
 
-        # Step 6: Get top K
-        top_k = diverse_predictions[:settings.top_k]
+        # Step 6: Multi-province fair representation in Top K
+        if len(dest_list) > 1:
+            place_to_dest = {}
+            for c in candidates:
+                p_prov = (c[7] or '').lower() if len(c) > 7 and c[7] else ''
+                matched_dest = dest_list[0]
+                for d in dest_list:
+                    if d.lower() in p_prov:
+                        matched_dest = d
+                        break
+                place_to_dest[c[0]] = matched_dest
+
+            per_dest_preds = {d: [] for d in dest_list}
+            for pid, score in diverse_predictions:
+                d_key = place_to_dest.get(pid, dest_list[0])
+                per_dest_preds[d_key].append((pid, score))
+
+            quota = max(15, settings.top_k // len(dest_list))
+            top_k_selected = []
+            selected_ids = set()
+
+            for d in dest_list:
+                for item in per_dest_preds[d][:quota]:
+                    if item[0] not in selected_ids:
+                        top_k_selected.append(item)
+                        selected_ids.add(item[0])
+
+            for item in diverse_predictions:
+                if len(top_k_selected) >= settings.top_k:
+                    break
+                if item[0] not in selected_ids:
+                    top_k_selected.append(item)
+                    selected_ids.add(item[0])
+
+            top_k = top_k_selected
+        else:
+            top_k = diverse_predictions[:settings.top_k]
 
         place_ids = [p[0] for p in top_k]
         scores = [float(p[1]) for p in top_k]

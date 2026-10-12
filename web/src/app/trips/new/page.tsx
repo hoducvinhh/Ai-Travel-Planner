@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
 type FormData = {
-  destination: string;
+  destinations: string[];
   startDate: string;
   endDate: string;
   budgetPerPerson: number;
@@ -44,6 +44,7 @@ type FormData = {
 const DESTINATIONS = VIETNAM_PROVINCES.map((p) => ({
   id: p.key,
   label: p.label,
+  shortLabel: p.shortLabel,
 }));
 
 const PREFERENCES = [
@@ -64,7 +65,7 @@ function NewTripContent() {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    destination: '',
+    destinations: [],
     startDate: '',
     endDate: '',
     budgetPerPerson: 0,
@@ -74,6 +75,23 @@ function NewTripContent() {
 
   const updateFormData = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleDestination = (destId: string) => {
+    setFormData((prev) => {
+      const exists = prev.destinations.includes(destId);
+      const updated = exists
+        ? prev.destinations.filter((d) => d !== destId)
+        : [...prev.destinations, destId];
+      return { ...prev, destinations: updated };
+    });
+  };
+
+  const removeDestination = (destId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      destinations: prev.destinations.filter((d) => d !== destId),
+    }));
   };
 
   const togglePreference = (prefId: string) => {
@@ -90,7 +108,7 @@ function NewTripContent() {
 
     try {
       const trip = await api.post('/trips', {
-        destination: formData.destination,
+        destination: formData.destinations.join(', '),
         startDate: new Date(formData.startDate).toISOString(),
         endDate: new Date(formData.endDate).toISOString(),
         budgetPerPerson: formData.budgetPerPerson,
@@ -110,7 +128,7 @@ function NewTripContent() {
   const canProceed = () => {
     switch (step) {
       case 1:
-        return formData.destination && formData.startDate && formData.endDate;
+        return formData.destinations.length > 0 && formData.startDate && formData.endDate;
       case 2:
         return formData.budgetPerPerson > 0 && formData.groupSize > 0;
       case 3:
@@ -170,25 +188,82 @@ function NewTripContent() {
 
             {/* Destination Selection */}
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-                Điểm đến tại Việt Nam
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Điểm đến tại Việt Nam (Có thể chọn nhiều tỉnh cho Tour liên tỉnh)
+                </label>
+                {formData.destinations.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, destinations: [] }))}
+                    className="text-xs text-muted-foreground hover:text-[#1A1A1A] underline transition cursor-pointer"
+                  >
+                    Bỏ chọn tất cả
+                  </button>
+                )}
+              </div>
+
+              {/* Selected Destination Badges */}
+              {formData.destinations.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-xl bg-white border border-[#E5E7EB]">
+                  <span className="text-xs text-muted-foreground mr-1">Đã chọn ({formData.destinations.length}):</span>
+                  {formData.destinations.map((destId, idx) => {
+                    const destObj = DESTINATIONS.find((d) => d.id === destId);
+                    return (
+                      <span
+                        key={destId}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-[#1A1A1A] text-white"
+                      >
+                        <span className="text-[#D4F066] font-mono text-[11px]">{idx + 1}.</span>
+                        {destObj?.label || destId}
+                        <button
+                          type="button"
+                          onClick={() => removeDestination(destId)}
+                          className="hover:text-red-300 ml-0.5 text-neutral-400 cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Multi-Province Tour Banner */}
+              {formData.destinations.length >= 2 && (
+                <div className="mb-4 p-3.5 rounded-xl bg-[#F4FCE3] border border-[#D9F99D] flex items-start gap-2.5 text-xs text-[#365314]">
+                  <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#365314]" />
+                  <div>
+                    <span className="font-bold">✨ Đã kích hoạt chế độ Tour Liên Tỉnh ({formData.destinations.length} địa phương): </span>
+                    Thuật toán Gom cụm Không Gian (Spatial Clustering) và Tối ưu hóa 2-Opt TSPTW sẽ tự động nhóm các ngày theo từng tỉnh thành liền kề, loại bỏ hoàn toàn việc di chuyển zíc-zắc qua lại.
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                 {DESTINATIONS.map((dest) => {
-                  const isSelected = formData.destination === dest.id;
+                  const isSelected = formData.destinations.includes(dest.id);
+                  const selectedIndex = formData.destinations.indexOf(dest.id);
                   return (
                     <button
                       key={dest.id}
                       type="button"
-                      onClick={() => updateFormData('destination', dest.id)}
+                      onClick={() => toggleDestination(dest.id)}
                       className={`p-3.5 rounded-xl border text-left transition cursor-pointer flex items-center justify-between ${
                         isSelected
                           ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
                           : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#FAFAFA]'
                       }`}
                     >
-                      <span className="text-sm font-medium">{dest.label}</span>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#D4F066]" />}
+                      <div className="flex items-center gap-2">
+                        {isSelected && (
+                          <span className="w-5 h-5 rounded-full bg-[#D4F066] text-[#1A1A1A] text-[11px] font-bold flex items-center justify-center flex-shrink-0">
+                            {selectedIndex + 1}
+                          </span>
+                        )}
+                        <span className="text-sm font-medium">{dest.label}</span>
+                      </div>
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-[#D4F066] flex-shrink-0" />}
                     </button>
                   );
                 })}
