@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
@@ -15,6 +15,10 @@ import {
   CheckCircle2,
   Map as MapIcon,
   Sparkles,
+  Sunrise,
+  Sun,
+  Moon,
+  Compass,
 } from 'lucide-react';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -29,7 +33,7 @@ import { Badge } from '@/components/ui/badge';
 const MapComponent = dynamic(() => import('./MapComponent'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[400px] bg-[#F5F5F4] rounded-xl flex items-center justify-center">
+    <div className="w-full h-[400px] md:h-[480px] bg-[#F5F5F4] rounded-xl flex items-center justify-center">
       <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
     </div>
   ),
@@ -41,7 +45,71 @@ const PlaceDirectionsModal = dynamic(
   { ssr: false }
 );
 
-import { ItineraryPlace as Place, DayPlan, TripItinerary, Trip } from '@/types';
+import { ItineraryPlace as Place, DayPlan, TripItinerary, Trip, TimeSlot } from '@/types';
+
+// Helper to normalize timeSlot if missing or from older trip records
+function normalizePlaceSlot(place: Place, index: number, total: number): TimeSlot {
+  if (place.timeSlot && ['morning', 'afternoon', 'evening'].includes(place.timeSlot)) {
+    return place.timeSlot;
+  }
+  const time = (place.estimatedTime || '').toLowerCase();
+  if (time.includes('sáng') || time.includes('morn') || /0[6-9]:|1[0-1]:/.test(time)) return 'morning';
+  if (time.includes('tối') || time.includes('even') || time.includes('night') || /1[8-9]:|2[0-3]:/.test(time)) return 'evening';
+  if (time.includes('chiều') || time.includes('trưa') || time.includes('after') || /1[2-7]:/.test(time)) return 'afternoon';
+
+  if (total <= 2) return index === 0 ? 'morning' : 'afternoon';
+  if (index === 0) return 'morning';
+  if (index >= total - 1) return 'evening';
+  return 'afternoon';
+}
+
+interface SessionConfig {
+  slot: TimeSlot;
+  label: string;
+  icon: typeof Sunrise;
+  timeRange: string;
+  theme: string;
+  accentBg: string;
+  accentText: string;
+  accentBorder: string;
+  emptyNote: string;
+}
+
+const SESSION_DEFINITIONS: SessionConfig[] = [
+  {
+    slot: 'morning',
+    label: 'Buổi Sáng',
+    icon: Sunrise,
+    timeRange: '08:00 - 11:30',
+    theme: 'Tham quan văn hoá, di tích & Khởi đầu ngày mới',
+    accentBg: 'bg-amber-50/70',
+    accentText: 'text-amber-800',
+    accentBorder: 'border-amber-200/80',
+    emptyNote: 'Buổi sáng tự do: Thưởng thức bữa sáng, cà phê hoặc nghỉ ngơi chuẩn bị cho chuyến đi.',
+  },
+  {
+    slot: 'afternoon',
+    label: 'Buổi Chiều',
+    icon: Sun,
+    timeRange: '13:30 - 17:30',
+    theme: 'Vui chơi, trải nghiệm khám phá & Ẩm thực địa phương',
+    accentBg: 'bg-sky-50/70',
+    accentText: 'text-sky-800',
+    accentBorder: 'border-sky-200/80',
+    emptyNote: 'Buổi chiều tự do: Tự do tham quan các điểm lân cận hoặc mua sắm.',
+  },
+  {
+    slot: 'evening',
+    label: 'Buổi Tối',
+    icon: Moon,
+    timeRange: '18:30 - 21:30',
+    theme: 'Ẩm thực đêm, phố đi bộ, chợ đêm & Ngắm cảnh',
+    accentBg: 'bg-indigo-50/70',
+    accentText: 'text-indigo-800',
+    accentBorder: 'border-indigo-200/80',
+    emptyNote: 'Buổi tối tự do: Dạo mát, thưởng thức ẩm thực đường phố hoặc nghỉ ngơi tại khách sạn.',
+  },
+];
 
 function TripDetailContent() {
   const params = useParams();
@@ -52,6 +120,8 @@ function TripDetailContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedSession, setSelectedSession] = useState<'all' | TimeSlot>('all');
+  const [focusedPlaceId, setFocusedPlaceId] = useState<string | null>(null);
   const [directionsPlace, setDirectionsPlace] = useState<Place | null>(null);
 
   useEffect(() => {
@@ -70,6 +140,52 @@ function TripDetailContent() {
       fetchTrip();
     }
   }, [tripId]);
+
+  const currentDay = useMemo(() => {
+    return trip?.itinerary?.days?.find((d) => d.dayNumber === selectedDay);
+  }, [trip, selectedDay]);
+
+  const allPlaces = useMemo(() => {
+    return trip?.itinerary?.days?.flatMap((d) => d.places) || [];
+  }, [trip]);
+
+  // Group current day's places by session
+  const groupedSessions = useMemo(() => {
+    if (!currentDay || !currentDay.places) return [];
+
+    const totalInDay = currentDay.places.length;
+    return SESSION_DEFINITIONS.map((def) => {
+      const placesInSlot = currentDay.places.filter(
+        (p, idx) => normalizePlaceSlot(p, idx, totalInDay) === def.slot
+      );
+      return {
+        ...def,
+        places: placesInSlot,
+      };
+    });
+  }, [currentDay]);
+
+  // Places currently rendered on the map based on session filter
+  const displayedPlaces = useMemo(() => {
+    if (!currentDay) return [];
+    if (selectedSession === 'all') return currentDay.places;
+    const sessionGroup = groupedSessions.find((s) => s.slot === selectedSession);
+    return sessionGroup ? sessionGroup.places : currentDay.places;
+  }, [currentDay, selectedSession, groupedSessions]);
+
+  const handleSelectDay = (dayNum: number) => {
+    setSelectedDay(dayNum);
+    setSelectedSession('all');
+    setFocusedPlaceId(null);
+  };
+
+  const handleFocusOnMap = (place: Place) => {
+    setFocusedPlaceId(place.placeId);
+    const mapEl = document.getElementById('map-container-card');
+    if (mapEl) {
+      mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
 
   if (loading) {
     return (
@@ -101,13 +217,10 @@ function TripDetailContent() {
     );
   }
 
-  const currentDay = trip.itinerary.days.find((d) => d.dayNumber === selectedDay);
-  const allPlaces = trip.itinerary.days.flatMap((d) => d.places);
-
   return (
     <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
-      {/* Header */}
-      <header className="border-b border-[#E5E7EB] bg-white/95 backdrop-blur-md sticky top-[57px] z-30">
+      {/* Top Header */}
+      <header className="border-b border-[#E5E7EB] bg-white/95 backdrop-blur-md sticky top-[57px] z-30 shadow-2xs">
         <div className="container mx-auto px-4 py-3 max-w-6xl">
           <div className="flex items-center justify-between">
             <Button
@@ -134,11 +247,11 @@ function TripDetailContent() {
             </div>
 
             <div className="hidden sm:flex items-center gap-3 text-xs">
-              <Badge variant="secondary" className="gap-1 font-normal">
+              <Badge variant="secondary" className="gap-1 font-normal bg-[#F5F5F4] text-[#1A1A1A]">
                 <Users className="w-3 h-3 text-muted-foreground" />
                 <span>{trip.groupSize} người</span>
               </Badge>
-              <Badge variant="secondary" className="gap-1 font-mono font-medium">
+              <Badge variant="secondary" className="gap-1 font-mono font-medium bg-[#F5F5F4] text-[#1A1A1A]">
                 <DollarSign className="w-3 h-3 text-muted-foreground" />
                 <span>{trip.budgetPerPerson.toLocaleString('vi-VN')} đ / người</span>
               </Badge>
@@ -155,7 +268,7 @@ function TripDetailContent() {
               <div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-[11px] font-medium mb-2">
                   <Sparkles className="w-3 h-3" />
-                  Lịch trình tạo bởi AI ({trip.itinerary.days.length} ngày)
+                  Lịch trình tạo bởi AI ({trip.itinerary.days.length} ngày • 3 buổi mỗi ngày)
                 </div>
                 <h2 className="text-xl font-bold text-[#1A1A1A] mb-1">{trip.itinerary.summary}</h2>
               </div>
@@ -167,162 +280,349 @@ function TripDetailContent() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground pt-3 border-t border-[#E5E7EB]">
-              <CheckCircle2 className="w-4 h-4 text-[#365314] flex-shrink-0" />
-              <span>
-                Bao gồm {allPlaces.length} địa điểm được cá nhân hoá theo tiêu chí và sở thích của bạn
-              </span>
+            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-muted-foreground pt-3 border-t border-[#E5E7EB]">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-[#365314] flex-shrink-0" />
+                <span>
+                  Bao gồm {allPlaces.length} địa điểm tối ưu theo các buổi Sáng, Chiều, Tối
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-[11px] text-neutral-500 ml-auto">
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span> Sáng
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-sky-500"></span> Chiều
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Tối
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Timeline Sidebar (Day Selector) */}
+          {/* Day Selector Sidebar */}
           <div className="lg:col-span-1 space-y-3">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 px-1">
-              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Lịch trình theo ngày</span>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between px-1">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Lịch trình theo ngày</span>
+              </div>
+              <span className="text-[11px] font-normal lowercase">
+                {trip.itinerary.days.length} ngày
+              </span>
             </div>
 
             <div className="space-y-2">
               {trip.itinerary.days.map((day) => {
                 const isSelected = selectedDay === day.dayNumber;
+                const totalInThisDay = day.places?.length || 0;
+                
+                // Count per session for quick overview
+                const mCount = day.places?.filter((p, i) => normalizePlaceSlot(p, i, totalInThisDay) === 'morning').length || 0;
+                const aCount = day.places?.filter((p, i) => normalizePlaceSlot(p, i, totalInThisDay) === 'afternoon').length || 0;
+                const eCount = day.places?.filter((p, i) => normalizePlaceSlot(p, i, totalInThisDay) === 'evening').length || 0;
+
                 return (
                   <button
                     key={day.dayNumber}
-                    onClick={() => setSelectedDay(day.dayNumber)}
-                    className={`w-full p-3.5 rounded-xl border text-left transition cursor-pointer flex items-center justify-between ${
+                    onClick={() => handleSelectDay(day.dayNumber)}
+                    className={`w-full p-3.5 rounded-xl border text-left transition cursor-pointer flex flex-col gap-2 ${
                       isSelected
                         ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
                         : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#FAFAFA]'
                     }`}
                   >
-                    <div>
-                      <div className="font-semibold text-sm">Ngày {day.dayNumber}</div>
-                      <div className={`text-xs mt-0.5 ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
-                        {day.date}
+                    <div className="flex items-center justify-between w-full">
+                      <div>
+                        <div className="font-semibold text-sm">Ngày {day.dayNumber}</div>
+                        <div className={`text-xs mt-0.5 ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
+                          {day.date}
+                        </div>
                       </div>
+                      <Badge
+                        variant={isSelected ? 'lime' : 'secondary'}
+                        className="text-[10px] h-5"
+                      >
+                        {totalInThisDay} điểm
+                      </Badge>
                     </div>
-                    <Badge
-                      variant={isSelected ? 'lime' : 'secondary'}
-                      className="text-[10px] h-5"
-                    >
-                      {day.places.length} điểm
-                    </Badge>
+
+                    {/* Session rhythm indicator chips */}
+                    <div className="flex items-center gap-1.5 text-[10px] pt-1 border-t border-white/10 dark:border-neutral-800">
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isSelected
+                            ? 'bg-white/15 text-neutral-200'
+                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                        }`}
+                        title="Buổi sáng"
+                      >
+                        🌅 {mCount}
+                      </span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isSelected
+                            ? 'bg-white/15 text-neutral-200'
+                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                        }`}
+                        title="Buổi chiều"
+                      >
+                        ☀️ {aCount}
+                      </span>
+                      <span
+                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                          isSelected
+                            ? 'bg-white/15 text-neutral-200'
+                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                        }`}
+                        title="Buổi tối"
+                      >
+                        🌙 {eCount}
+                      </span>
+                    </div>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Main Content: Map & Day Places */}
+          {/* Main Content: Map & Itinerary Sessions */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Map Canvas */}
-            <Card className="rounded-2xl overflow-hidden border-[#E5E7EB] bg-white shadow-2xs">
+            {/* Interactive Map Canvas */}
+            <Card id="map-container-card" className="rounded-2xl overflow-hidden border-[#E5E7EB] bg-white shadow-2xs">
               <div className="px-4 py-2.5 bg-[#FAFAFA] border-b border-[#E5E7EB] flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-[#1A1A1A]">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#1A1A1A]">
                   <MapIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                  <span>Bản đồ hành trình Ngày {selectedDay}</span>
+                  <span>
+                    Bản đồ hành trình Ngày {selectedDay}
+                    {selectedSession !== 'all' && (
+                      <span className="font-normal text-muted-foreground">
+                        {' '}• {SESSION_DEFINITIONS.find((s) => s.slot === selectedSession)?.label}
+                      </span>
+                    )}
+                  </span>
                 </div>
-                <span className="text-[11px] text-muted-foreground">
-                  Bấm ghim trên bản đồ để xem chi tiết
-                </span>
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  <Compass className="w-3 h-3" />
+                  <span>{displayedPlaces.length} điểm hiển thị</span>
+                </div>
               </div>
               <MapComponent
-                places={currentDay?.places || []}
+                places={displayedPlaces}
                 onSelectPlace={(p) => setDirectionsPlace(p)}
+                selectedPlaceId={focusedPlaceId}
               />
             </Card>
 
-            {/* Day Details */}
+            {/* Day Details & Sessions Section */}
             {currentDay && (
-              <div className="space-y-3">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="text-base font-bold text-[#1A1A1A]">
-                    Ngày {currentDay.dayNumber} • {currentDay.date}
-                  </h3>
-                  {currentDay.notes && (
-                    <p className="text-xs text-muted-foreground italic">{currentDay.notes}</p>
-                  )}
+              <div className="space-y-5">
+                {/* Day Header Info */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#1A1A1A] flex items-center gap-2">
+                      <span>Ngày {currentDay.dayNumber}</span>
+                      <span className="text-muted-foreground font-normal text-sm">({currentDay.date})</span>
+                    </h3>
+                    {currentDay.notes && (
+                      <p className="text-xs text-muted-foreground mt-0.5">{currentDay.notes}</p>
+                    )}
+                  </div>
                 </div>
 
-                {/* Places Timeline */}
-                <div className="space-y-3">
-                  {currentDay.places.map((place, index) => (
-                    <Card
-                      key={place.placeId}
-                      className="relative bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-xl p-4 shadow-2xs transition group"
-                    >
-                      <div className="flex items-start gap-3">
-                        {/* Order pill */}
-                        <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
-                          {index + 1}
-                        </div>
+                {/* Session Filter / Tabs */}
+                <div className="flex items-center gap-1.5 p-1 bg-[#F0F0EF] rounded-xl border border-[#E5E7EB] overflow-x-auto">
+                  <button
+                    onClick={() => setSelectedSession('all')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+                      selectedSession === 'all'
+                        ? 'bg-[#1A1A1A] text-white shadow-xs'
+                        : 'text-[#6B7280] hover:text-[#1A1A1A] hover:bg-white/60'
+                    }`}
+                  >
+                    <span>Tất cả các buổi</span>
+                    <span className="text-[10px] opacity-80">({currentDay.places.length})</span>
+                  </button>
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3 mb-1">
-                            <div>
-                              <h4
-                                onClick={() => setDirectionsPlace(place)}
-                                className="text-sm font-semibold text-[#1A1A1A] hover:underline cursor-pointer flex items-center gap-1.5"
-                                title="Bấm để xem chỉ đường và thời tiết"
-                              >
-                                <span>{place.name}</span>
-                              </h4>
-                              <div className="flex flex-wrap items-center gap-1.5 mt-1 mb-2">
-                                {place.categories.map((cat) => (
+                  {groupedSessions.map((session) => {
+                    const Icon = session.icon;
+                    const isActive = selectedSession === session.slot;
+                    return (
+                      <button
+                        key={session.slot}
+                        onClick={() => setSelectedSession(session.slot)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+                          isActive
+                            ? 'bg-[#1A1A1A] text-white shadow-xs'
+                            : 'text-[#6B7280] hover:text-[#1A1A1A] hover:bg-white/60'
+                        }`}
+                      >
+                        <Icon className="w-3.5 h-3.5" />
+                        <span>{session.label}</span>
+                        <span className="text-[10px] opacity-80">({session.places.length})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Sessions Timeline List */}
+                <div className="space-y-6">
+                  {groupedSessions
+                    .filter((session) => selectedSession === 'all' || selectedSession === session.slot)
+                    .map((session) => {
+                      const Icon = session.icon;
+                      const hasPlaces = session.places.length > 0;
+
+                      return (
+                        <div key={session.slot} className="space-y-3">
+                          {/* Session Header Card */}
+                          <div className={`flex items-center justify-between p-3 rounded-xl border ${session.accentBg} ${session.accentBorder}`}>
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-lg bg-white border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center flex-shrink-0 shadow-2xs">
+                                <Icon className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide">
+                                    {session.label}
+                                  </span>
                                   <Badge
-                                    key={cat}
                                     variant="outline"
-                                    className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                                    className="text-[10px] px-1.5 py-0 h-4 bg-white border-[#E5E7EB] text-[#1A1A1A]"
                                   >
-                                    {cat}
+                                    {session.timeRange}
                                   </Badge>
-                                ))}
-
-                                <PlaceWeatherPill latitude={place.latitude} longitude={place.longitude} />
+                                </div>
+                                <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                                  {session.theme}
+                                </p>
                               </div>
                             </div>
 
-                            <div className="text-right flex-shrink-0">
-                              <div className="text-[10px] text-muted-foreground">Chi phí ước tính</div>
-                              <div className="font-semibold text-xs font-mono text-[#1A1A1A]">
-                                {place.priceEstimate > 0
-                                  ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
-                                  : 'Miễn phí'}
-                              </div>
-                            </div>
-                          </div>
-
-                          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                            {place.description}
-                          </p>
-
-                          <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs">
-                            <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {place.estimatedTime}
-                              </span>
-                              <span>
-                                {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
-                              </span>
-                            </div>
-
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setDirectionsPlace(place)}
-                              className="h-6 px-2 text-[11px] gap-1 font-medium"
+                            <Badge
+                              variant="secondary"
+                              className="text-[11px] font-semibold bg-white border border-[#E5E7EB] text-[#1A1A1A] h-6 px-2"
                             >
-                              <Navigation className="w-3 h-3" />
-                              <span>Chỉ đường</span>
-                            </Button>
+                              {session.places.length} địa điểm
+                            </Badge>
                           </div>
+
+                          {/* Session Places */}
+                          {hasPlaces ? (
+                            <div className="space-y-3 relative pl-2 sm:pl-3">
+                              {/* Vertical connector line */}
+                              <div className="absolute left-5 sm:left-6 top-3 bottom-3 w-0.5 bg-[#E5E7EB] -z-0" />
+
+                              {session.places.map((place) => (
+                                <Card
+                                  key={place.placeId}
+                                  className="relative z-10 bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-xl p-4 shadow-2xs transition group"
+                                >
+                                  <div className="flex items-start gap-3">
+                                    {/* Order Pill */}
+                                    <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                                      {place.orderInDay}
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-1.5">
+                                        <div>
+                                          <h4
+                                            onClick={() => setDirectionsPlace(place)}
+                                            className="text-sm font-bold text-[#1A1A1A] hover:underline cursor-pointer flex items-center gap-1.5"
+                                            title="Bấm để xem chỉ đường và thời tiết"
+                                          >
+                                            <span>{place.name}</span>
+                                          </h4>
+
+                                          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                                            {/* Session time slot indicator */}
+                                            <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${session.accentBg} ${session.accentText} ${session.accentBorder}`}>
+                                              <Icon className="w-2.5 h-2.5" />
+                                              {place.estimatedTime || session.timeRange}
+                                            </span>
+
+                                            {place.categories.map((cat) => (
+                                              <Badge
+                                                key={cat}
+                                                variant="outline"
+                                                className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                                              >
+                                                {cat}
+                                              </Badge>
+                                            ))}
+
+                                            <PlaceWeatherPill
+                                              latitude={place.latitude}
+                                              longitude={place.longitude}
+                                            />
+                                          </div>
+                                        </div>
+
+                                        <div className="text-left sm:text-right flex-shrink-0">
+                                          <div className="text-[10px] text-muted-foreground">Chi phí ước tính</div>
+                                          <div className="font-semibold text-xs font-mono text-[#1A1A1A]">
+                                            {place.priceEstimate > 0
+                                              ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
+                                              : 'Miễn phí'}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                                        {place.description}
+                                      </p>
+
+                                      <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs">
+                                        <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
+                                          <span className="flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            {place.estimatedTime}
+                                          </span>
+                                          <span className="hidden sm:inline">
+                                            {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
+                                          </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                          <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => handleFocusOnMap(place)}
+                                            className="h-6 px-2 text-[11px] gap-1 text-muted-foreground hover:text-[#1A1A1A]"
+                                            title="Xem vị trí trên bản đồ"
+                                          >
+                                            <MapPin className="w-3 h-3" />
+                                            <span>Xem trên bản đồ</span>
+                                          </Button>
+
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setDirectionsPlace(place)}
+                                            className="h-6 px-2.5 text-[11px] gap-1 font-medium bg-white hover:bg-[#F5F5F4] border-[#E5E7EB]"
+                                          >
+                                            <Navigation className="w-3 h-3" />
+                                            <span>Chỉ đường</span>
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </Card>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="p-4 rounded-xl border border-dashed border-[#E5E7EB] bg-[#FAFAFA] text-center text-xs text-muted-foreground">
+                              {session.emptyNote}
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      );
+                    })}
                 </div>
               </div>
             )}

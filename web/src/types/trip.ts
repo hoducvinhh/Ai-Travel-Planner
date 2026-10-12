@@ -1,3 +1,5 @@
+export type TimeSlot = 'morning' | 'afternoon' | 'evening';
+
 export interface ItineraryPlace {
   placeId: string;
   name: string;
@@ -8,6 +10,7 @@ export interface ItineraryPlace {
   latitude: number;
   longitude: number;
   priceEstimate: number;
+  timeSlot?: TimeSlot;
 }
 
 export interface DayPlan {
@@ -38,4 +41,5 @@ export interface Trip {
 export interface MapComponentProps {
   places: ItineraryPlace[];
   onSelectPlace?: (place: ItineraryPlace) => void;
+  selectedPlaceId?: string | null;
 }
