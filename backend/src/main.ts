@@ -8,19 +8,18 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  // Cho phép CORS cho frontend Next.js (port 3000 & 3001)
-  const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:3001',
-  ];
-  if (process.env.CORS_ORIGIN && !allowedOrigins.includes(process.env.CORS_ORIGIN)) {
-    allowedOrigins.push(process.env.CORS_ORIGIN);
-  }
-
+  // Cho phép CORS cho frontend Next.js (hỗ trợ linh hoạt các port localhost: 3000, 3001, 3002, 3003...)
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Cho phép requests không có origin (curl, mobile app) hoặc bất kỳ origin localhost / 127.0.0.1 nào
+      if (!origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      if (process.env.CORS_ORIGIN && origin === process.env.CORS_ORIGIN) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
   });
