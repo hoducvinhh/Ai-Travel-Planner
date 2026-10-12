@@ -36,6 +36,7 @@ services:
         condition: service_healthy
     volumes:
       - ./recommendation-service/models:/app/models
+      - ./recommendation-service/app:/app/app
 
   backend:
     build:
