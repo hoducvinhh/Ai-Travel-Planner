@@ -115,14 +115,23 @@ export class TripsService {
 
     const startDate = new Date(dto.startDate);
     const monthOfYear = startDate.getMonth() + 1;
-    const neededCandidates = Math.max(30, days * 6);
+
+    // Parse and normalize multi-province destinations
+    const rawProvinces = dto.destination
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const provinces = rawProvinces.map((p) => this.normalizeProvince(p));
+
+    // Dynamic candidate quota: ensure sufficient candidates across all provinces
+    const neededCandidates = Math.max(45, days * 8, provinces.length * 15);
 
     // Step 1: Get recommendations (with automatic fallback to database popularity)
     let placeIds: string[] = [];
     try {
       const recommendations = await this.recommendation.getRecommendations({
         userId: dto.userId,
-        destination: dto.destination,
+        destination: provinces.join(', '),
         budgetPerPerson: dto.budgetPerPerson,
         days,
         groupSize: dto.groupSize,
@@ -139,76 +148,88 @@ export class TripsService {
     // Step 2: Fetch place details from database
     let places: any[] = [];
     if (placeIds.length > 0) {
+      const targetIds = placeIds.slice(0, Math.max(neededCandidates, placeIds.length));
       const fetchedPlaces = await this.prisma.place.findMany({
         where: {
           id: {
-            in: placeIds.slice(0, neededCandidates),
+            in: targetIds,
           },
         },
       });
 
       // Preserve the ranked order from recommendations
       const placeMap = new Map(fetchedPlaces.map((p) => [p.id, p]));
-      places = placeIds
-        .slice(0, neededCandidates)
+      places = targetIds
         .map((id) => placeMap.get(id))
         .filter((p): p is NonNullable<typeof p> => Boolean(p));
     }
 
-    // Parse multi-province destinations if applicable
-    const provinces = dto.destination
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
+    // Ensure every selected province has at least 6 candidate places
+    if (provinces.length > 1) {
+      for (const prov of provinces) {
+        const provLower = prov.toLowerCase();
+        const countForProv = places.filter(
+          (p) =>
+            (p.province && p.province.toLowerCase().includes(provLower)) ||
+            (p.district && p.district.toLowerCase().includes(provLower)),
+        ).length;
+
+        if (countForProv < 6) {
+          this.logger.log(
+            `Province "${prov}" has only ${countForProv} places in candidate pool. Fetching directly from DB...`,
+          );
+          const extraPlaces = await this.prisma.place.findMany({
+            where: {
+              province: { contains: prov, mode: 'insensitive' },
+              id: { notIn: places.map((p) => p.id) },
+            },
+            orderBy: {
+              popularityScore: 'desc',
+            },
+            take: 12 - countForProv,
+          });
+          places.push(...extraPlaces);
+        }
+      }
+    }
 
     // Fallback: If recommendation returned insufficient places, query database directly
     const minRequiredPlaces = Math.min(25, days * 3);
     if (places.length < minRequiredPlaces) {
       this.logger.warn(
-        `Insufficient candidate places (${places.length}). Querying popular places from database for destination: ${dto.destination}`,
+        `Insufficient candidate places (${places.length}). Querying popular places from database for destinations: ${provinces.join(', ')}`,
       );
 
-      let fallbackPlaces = await this.prisma.place.findMany({
-        where: {
-          OR: provinces.map((p) => ({
-            province: { contains: p, mode: 'insensitive' as const },
-          })),
-        },
-        orderBy: {
-          popularityScore: 'desc',
-        },
-        take: neededCandidates,
-      });
-
-      if (fallbackPlaces.length === 0) {
-        fallbackPlaces = await this.prisma.place.findMany({
+      const quotaPerProv = Math.max(8, Math.ceil(neededCandidates / Math.max(1, provinces.length)));
+      const fallbackList: any[] = [];
+      for (const prov of provinces) {
+        const pPlaces = await this.prisma.place.findMany({
           where: {
-            OR: provinces.flatMap((p) => [
-              { province: { contains: p, mode: 'insensitive' as const } },
-              { district: { contains: p, mode: 'insensitive' as const } },
-              { name: { contains: p, mode: 'insensitive' as const } },
-            ]),
+            province: { contains: prov, mode: 'insensitive' },
           },
           orderBy: {
             popularityScore: 'desc',
           },
-          take: neededCandidates,
+          take: quotaPerProv,
         });
+        fallbackList.push(...pPlaces);
       }
 
-      if (fallbackPlaces.length === 0) {
-        fallbackPlaces = await this.prisma.place.findMany({
-          orderBy: {
-            popularityScore: 'desc',
-          },
-          take: neededCandidates,
-        });
+      if (fallbackList.length === 0) {
+        fallbackList.push(
+          ...(await this.prisma.place.findMany({
+            orderBy: {
+              popularityScore: 'desc',
+            },
+            take: neededCandidates,
+          })),
+        );
       }
 
       // Prioritize places matching preferences if provided
-      if (dto.preferences && dto.preferences.length > 0 && fallbackPlaces.length > 0) {
+      if (dto.preferences && dto.preferences.length > 0 && fallbackList.length > 0) {
         const prefLower = dto.preferences.map((p) => p.toLowerCase().trim());
-        fallbackPlaces.sort((a, b) => {
+        fallbackList.sort((a, b) => {
           const aMatches = a.categories.filter((c) =>
             prefLower.some((p) => c.toLowerCase().includes(p) || p.includes(c.toLowerCase())),
           ).length;
@@ -223,7 +244,7 @@ export class TripsService {
         });
       }
 
-      places = fallbackPlaces;
+      places = fallbackList;
     }
 
     if (places.length === 0) {
@@ -247,6 +268,51 @@ export class TripsService {
     await this.saveTripPlaces(tripId, itinerary);
 
     return itinerary;
+  }
+
+  private normalizeProvince(input: string): string {
+    if (!input) return input;
+    const raw = input.trim();
+    const noDiacritics = raw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .toLowerCase()
+      .trim();
+
+    const PROVINCE_MAP: Record<string, string> = {
+      'ha noi': 'Hanoi',
+      'hanoi': 'Hanoi',
+      'ho chi minh': 'Ho Chi Minh',
+      'tp ho chi minh': 'Ho Chi Minh',
+      'tp. ho chi minh': 'Ho Chi Minh',
+      'tphcm': 'Ho Chi Minh',
+      'sai gon': 'Ho Chi Minh',
+      'saigon': 'Ho Chi Minh',
+      'da nang': 'Da Nang',
+      'danang': 'Da Nang',
+      'ninh binh': 'Ninh Binh',
+      'ninhbinh': 'Ninh Binh',
+      'lam dong': 'Lam Dong',
+      'da lat': 'Lam Dong',
+      'dalat': 'Lam Dong',
+      'lao cai': 'Lao Cai',
+      'sa pa': 'Lao Cai',
+      'sapa': 'Lao Cai',
+      'khanh hoa': 'Khanh Hoa',
+      'nha trang': 'Khanh Hoa',
+      'quang nam': 'Quang Nam',
+      'hoi an': 'Quang Nam',
+      'thua thien hue': 'Thua Thien Hue',
+      'hue': 'Thua Thien Hue',
+      'kien giang': 'Kien Giang',
+      'phu quoc': 'Kien Giang',
+      'quang ninh': 'Quang Ninh',
+      'ha long': 'Quang Ninh',
+    };
+
+    return PROVINCE_MAP[noDiacritics] || raw;
   }
 
   private normalizeTimeSlot(
@@ -295,8 +361,10 @@ export class TripsService {
         ? `\n**ĐẶC BIỆT - TOUR DU LỊCH LIÊN TỈNH (${destinationProvinces.join(' & ')} - ${days} ngày)**:
 Chuyến đi này kết hợp ${destinationProvinces.length} địa phương: ${destinationProvinces.join(', ')}.
 YÊU CẦU BẮT BUỘC VỀ PHÂN BỔ KHÔNG GIAN:
+- BẮT BUỘC 100%: TẤT CẢ các tỉnh/thành phố [${destinationProvinces.join(', ')}] ĐỀU PHẢI CÓ MẶT trong lịch trình! Tuyệt đối không được bỏ sót bất kỳ tỉnh nào.
+- Phân bổ số ngày cho từng tỉnh công bằng: với ${days} ngày và ${destinationProvinces.length} địa phương, mỗi tỉnh/thành phố phải có ít nhất 1 ngày tham quan trọn vẹn (hoặc chia đều các ngày theo tỉ lệ).
 - Gom cụm các ngày theo từng địa phương một cách liền mạch, KHÔNG ĐƯỢC đi zíc-zắc qua lại giữa 2 tỉnh trong cùng 1 ngày hoặc giữa các ngày xen kẽ.
-- Ví dụ tour 4 ngày Hà Nội & Ninh Bình: Ngày 1 & 2 tập trung trọn vẹn tại Hà Nội; Ngày 3 & 4 di chuyển và tham quan trọn vẹn tại Ninh Bình. Chặng di chuyển liên tỉnh chỉ diễn ra DUY NHẤT 1 lần giữa các cụm ngày!\n`
+- Ví dụ tour 3 ngày [Hà Nội, TP. Hồ Chí Minh, Đà Nẵng]: Ngày 1 ở Hà Nội; Ngày 2 ở Đà Nẵng; Ngày 3 ở TP. Hồ Chí Minh. Các địa điểm trong mỗi ngày phải thuộc đúng tỉnh/thành phố của ngày đó!\n`
         : '';
 
     const prompt = `Bạn là một chuyên gia lên lịch trình du lịch người Việt Nam. Hãy tạo một lịch trình chi tiết ${days} ngày bằng cách sử dụng các địa điểm sau.
@@ -306,10 +374,10 @@ YÊU CẦU BẮT BUỘC VỀ PHÂN BỔ KHÔNG GIAN:
 **Sở thích**: ${preferences.join(', ') || 'Không chỉ định'}
 ${multiProvinceInstruction}
 **Danh sách địa điểm khả dụng** (đã sắp xếp theo độ phù hợp):
-${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(', ')} (${p.priceEstimate.toLocaleString()} VND) tại tọa độ (${p.latitude}, ${p.longitude})`).join('\n')}
+${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.province || 'Chưa rõ'}) - ${p.categories.join(', ')} (${p.priceEstimate.toLocaleString()} VND) tại tọa độ (${p.latitude}, ${p.longitude})`).join('\n')}
 
 **Yêu cầu bắt buộc**:
-1. Chọn khoảng ${minPlaces}-${maxPlaces} địa điểm từ danh sách trên sao cho phù hợp với ${days} ngày.
+1. Chọn khoảng ${minPlaces}-${maxPlaces} địa điểm từ danh sách trên sao cho phù hợp với ${days} ngày. ĐẢM BẢO mọi tỉnh/thành phố đã chọn [${destinationProvinces?.join(', ') || ''}] đều phải có các địa điểm tương ứng xuất hiện trong lịch trình.
 2. TUYỆT ĐỐI KHÔNG ĐƯỢC LẶP LẠI ĐỊA ĐIỂM: Mỗi địa điểm chỉ được xuất hiện DUY NHẤT 1 LẦN trong toàn bộ chuyến đi ${days} ngày. Không được lặp lại bất kỳ địa điểm nào giữa các ngày hoặc trong cùng 1 ngày.
 3. PHÂN BỔ MỖI NGÀY TỪ 3 ĐẾN 5 ĐỊA ĐIỂM (TỐI THIỂU 3 ĐỊA ĐIỂM/NGÀY):
    - Mỗi ngày BẮT BUỘC phải chia theo 3 buổi: Sáng (morning), Chiều (afternoon), Tối (evening).

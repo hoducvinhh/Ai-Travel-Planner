@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 import logging
+import unicodedata
 
 from app.database import get_db
 from app.schemas import RecommendationRequest, RecommendationResponse
@@ -51,6 +52,47 @@ PREFERENCE_KEYWORDS = {
     'nightlife': {'nightlife', 'bar', 'pub', 'club', 'night market', 'chợ đêm'},
     'historical': {'historical', 'lịch sử', 'history', 'di tích', 'monument', 'museum', 'palace', 'dinh', 'citadel'},
 }
+
+PROVINCE_ALIAS_MAP = {
+    "ha noi": "Hanoi",
+    "hanoi": "Hanoi",
+    "ho chi minh": "Ho Chi Minh",
+    "tp ho chi minh": "Ho Chi Minh",
+    "tp. ho chi minh": "Ho Chi Minh",
+    "tphcm": "Ho Chi Minh",
+    "sai gon": "Ho Chi Minh",
+    "saigon": "Ho Chi Minh",
+    "da nang": "Da Nang",
+    "danang": "Da Nang",
+    "ninh binh": "Ninh Binh",
+    "ninhbinh": "Ninh Binh",
+    "lam dong": "Lam Dong",
+    "da lat": "Lam Dong",
+    "dalat": "Lam Dong",
+    "lao cai": "Lao Cai",
+    "sa pa": "Lao Cai",
+    "sapa": "Lao Cai",
+    "khanh hoa": "Khanh Hoa",
+    "nha trang": "Khanh Hoa",
+    "quang nam": "Quang Nam",
+    "hoi an": "Quang Nam",
+    "thua thien hue": "Thua Thien Hue",
+    "hue": "Thua Thien Hue",
+    "kien giang": "Kien Giang",
+    "phu quoc": "Kien Giang",
+    "quang ninh": "Quang Ninh",
+    "ha long": "Quang Ninh",
+}
+
+def _normalize_dest_name(name: str) -> str:
+    """Normalize destination name, removing diacritics and matching aliases to database province names"""
+    if not name:
+        return name
+    n = name.strip()
+    n_decomposed = unicodedata.normalize('NFD', n)
+    n_clean = ''.join(c for c in n_decomposed if unicodedata.category(c) != 'Mn')
+    n_clean = n_clean.replace('đ', 'd').replace('Đ', 'D').lower().strip()
+    return PROVINCE_ALIAS_MAP.get(n_clean, n)
 
 def _normalize_categories(categories_val) -> List[str]:
     """Normalize place categories from database formats"""
@@ -114,9 +156,9 @@ async def recommend_places(
             logger.warning("Recommendation model not pre-trained yet. Using cold-start popularity ranking.")
 
         # Step 1: Parse destinations (support multi-province tour planning)
-        dest_list = [d.strip() for d in request.destination.split(',') if d.strip()]
+        dest_list = [_normalize_dest_name(d) for d in request.destination.split(',') if d.strip()]
         if not dest_list:
-            dest_list = [request.destination.strip()]
+            dest_list = [_normalize_dest_name(request.destination.strip())]
 
         candidates = []
         seen_candidate_ids = set()
@@ -223,7 +265,7 @@ async def recommend_places(
             filtered_predictions, candidates
         )
 
-        # Step 6: Multi-province fair representation in Top K
+        # Step 6: Multi-province fair representation in Top K (interleaved round-robin)
         if len(dest_list) > 1:
             place_to_dest = {}
             for c in candidates:
@@ -240,16 +282,21 @@ async def recommend_places(
                 d_key = place_to_dest.get(pid, dest_list[0])
                 per_dest_preds[d_key].append((pid, score))
 
-            quota = max(15, settings.top_k // len(dest_list))
+            quota = max(20, settings.top_k // len(dest_list))
             top_k_selected = []
             selected_ids = set()
 
-            for d in dest_list:
-                for item in per_dest_preds[d][:quota]:
-                    if item[0] not in selected_ids:
-                        top_k_selected.append(item)
-                        selected_ids.add(item[0])
+            # Interleave round-robin across destinations so that any prefix slice
+            # contains a balanced distribution from every selected destination
+            for idx in range(quota):
+                for d in dest_list:
+                    if idx < len(per_dest_preds[d]):
+                        item = per_dest_preds[d][idx]
+                        if item[0] not in selected_ids:
+                            top_k_selected.append(item)
+                            selected_ids.add(item[0])
 
+            # Fill any remaining slots to reach top_k
             for item in diverse_predictions:
                 if len(top_k_selected) >= settings.top_k:
                     break
