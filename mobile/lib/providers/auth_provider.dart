@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:dio/dio.dart';
 import 'package:travel_planner/models/user.dart';
 import 'package:travel_planner/repositories/auth_repository.dart';
 import 'package:travel_planner/services/storage_service.dart';
@@ -40,6 +41,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  String _parseError(dynamic e) {
+    if (e is DioException) {
+      final res = e.response?.data;
+      if (res is Map && res['message'] != null) {
+        final msg = res['message'];
+        if (msg is List) return msg.join(', ');
+        return msg.toString();
+      }
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.connectionTimeout) {
+        return 'Không thể kết nối tới server. Vui lòng kiểm tra lại kết nối!';
+      }
+    }
+    return e.toString();
+  }
+
   /// Login
   Future<void> login(String email, String password) async {
     state = const AuthState.loading();
@@ -47,7 +64,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = await _repository.login(email, password);
       state = AuthState.authenticated(user);
     } catch (e) {
-      state = AuthState.error(e.toString());
+      state = AuthState.error(_parseError(e));
     }
   }
 
@@ -58,9 +75,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = await _repository.register(name, email, password);
       state = AuthState.authenticated(user);
     } catch (e) {
-      state = AuthState.error(e.toString());
+      state = AuthState.error(_parseError(e));
     }
   }
+
 
   /// Logout
   Future<void> logout() async {
