@@ -21,8 +21,6 @@ import {
   Loader2,
   Sparkles,
   LocateFixed,
-  Map as MapIcon,
-  Layers,
 } from 'lucide-react';
 import {
   Dialog,
@@ -98,33 +96,74 @@ function interpretWeatherCode(code: number, temp: number): {
   } else if ([95, 96, 99].includes(code)) {
     description = 'Giông bão sét';
     isRain = true;
-    advice = 'Thời tiết có giông bão, nên hạn chế hoạt động ngoài trời lúc này!';
+    advice = 'Thời tiết xấu có giông bão, hãy hạn chế ra ngoài trời!';
   }
 
-  if (!isRain && temp >= 34) {
-    advice = 'Trời nắng gắt, hãy mang theo nón mũ, kem chống nắng và uống đủ nước!';
-  } else if (!isRain && temp <= 16) {
-    advice = 'Trời se lạnh, bạn nên mặc thêm áo ấm khi ra ngoài!';
+  if (temp >= 35) {
+    advice += ' Trời khá nắng nóng, nhớ bổ sung nước và kem chống nắng!';
   }
 
   return { description, code, isRain, advice };
 }
 
 function getWeatherIconComponent(code: number) {
-  if (code === 0) return <Sun className="w-5 h-5 text-amber-500" />;
-  if (code === 1 || code === 2) return <CloudSun className="w-5 h-5 text-amber-500" />;
-  if (code === 3) return <Cloud className="w-5 h-5 text-neutral-500" />;
-  if (code === 45 || code === 48) return <CloudFog className="w-5 h-5 text-neutral-500" />;
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return <CloudRain className="w-5 h-5 text-sky-500" />;
-  if ([95, 96, 99].includes(code)) return <CloudLightning className="w-5 h-5 text-amber-600" />;
+  if ([95, 96, 99].includes(code)) {
+    return <CloudLightning className="w-5 h-5 text-amber-500" />;
+  }
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) {
+    return <CloudRain className="w-5 h-5 text-blue-500" />;
+  }
+  if (code === 45 || code === 48) {
+    return <CloudFog className="w-5 h-5 text-neutral-400" />;
+  }
+  if (code === 3) {
+    return <Cloud className="w-5 h-5 text-neutral-500" />;
+  }
+  if (code === 1 || code === 2) {
+    return <CloudSun className="w-5 h-5 text-amber-500" />;
+  }
   return <Sun className="w-5 h-5 text-amber-500" />;
+}
+
+// Calculate instant road distance & duration using Haversine formula
+function calcInstantEstimates(fromLat: number, fromLng: number, toLat: number, toLng: number) {
+  const R = 6371; // Earth radius in km
+  const dLat = ((toLat - fromLat) * Math.PI) / 180;
+  const dLon = ((toLng - fromLng) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((fromLat * Math.PI) / 180) *
+      Math.cos((toLat * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const straightLineKm = R * c;
+  // Estimate road winding factor (~1.3x)
+  const estRoadKm = Math.round(straightLineKm * 1.3 * 10) / 10;
+
+  const bikeSpeed = estRoadKm < 10 ? 28 : estRoadKm < 50 ? 35 : 40;
+  const carSpeed = estRoadKm < 15 ? 30 : estRoadKm < 50 ? 45 : 60;
+
+  const motorbikeMins = Math.max(1, Math.round((estRoadKm / bikeSpeed) * 60));
+  const drivingMins = Math.max(1, Math.round((estRoadKm / carSpeed) * 60));
+  const walkingMins = Math.max(2, Math.round((estRoadKm / 4.8) * 60));
+
+  return {
+    distanceKm: estRoadKm,
+    durations: {
+      motorbike: motorbikeMins,
+      driving: drivingMins,
+      walking: walkingMins,
+    },
+  };
 }
 
 export default function PlaceDirectionsModal({
   place,
   onClose,
 }: PlaceDirectionsModalProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+  // Use state node instead of useRef so React triggers useEffect reliably when Dialog Portal mounts
+  const [mapContainerNode, setMapContainerNode] = useState<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const routeLayerRef = useRef<L.Polyline | null>(null);
   const userMarkerRef = useRef<L.Marker | null>(null);
@@ -132,8 +171,19 @@ export default function PlaceDirectionsModal({
 
   const [mapStyle, setMapStyle] = useState<'google' | 'osm' | 'satellite'>('google');
 
-  const defaultStartLat = place.latitude ? place.latitude + 0.025 : 21.0285;
-  const defaultStartLng = place.longitude ? place.longitude + 0.025 : 105.8542;
+  // Ensure numeric coordinates
+  const destLat = Number(place.latitude) || 20.2506;
+  const destLng = Number(place.longitude) || 105.9744;
+
+  const defaultStartLat = destLat + 0.025;
+  const defaultStartLng = destLng + 0.025;
+
+  const initialEstimates = calcInstantEstimates(
+    defaultStartLat,
+    defaultStartLng,
+    destLat,
+    destLng
+  );
 
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number }>({
     lat: defaultStartLat,
@@ -148,16 +198,14 @@ export default function PlaceDirectionsModal({
   );
 
   const [transportMode, setTransportMode] = useState<TransportMode>('motorbike');
-  const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(null);
+  const [routeDistanceKm, setRouteDistanceKm] = useState<number | null>(
+    initialEstimates.distanceKm
+  );
   const [modeDurations, setModeDurations] = useState<{
     motorbike: number | null;
     driving: number | null;
     walking: number | null;
-  }>({
-    motorbike: null,
-    driving: null,
-    walking: null,
-  });
+  }>(initialEstimates.durations);
   const [isRouting, setIsRouting] = useState(false);
 
   const [weather, setWeather] = useState<WeatherData | null>(null);
@@ -170,15 +218,10 @@ export default function PlaceDirectionsModal({
 
     let layer: L.TileLayer;
     if (style === 'osm') {
-      layer = L.tileLayer(
-        'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
-        {
-          subdomains: ['a', 'b', 'c'],
-          maxZoom: 20,
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        }
-      );
+      layer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors',
+      });
     } else if (style === 'satellite') {
       layer = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
         subdomains: ['0', '1', '2', '3'],
@@ -197,11 +240,12 @@ export default function PlaceDirectionsModal({
     tileLayerRef.current = layer;
   }, []);
 
+  // Weather fetch
   useEffect(() => {
     async function fetchWeather() {
       setWeatherLoading(true);
       try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${destLat}&longitude=${destLng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FBangkok`;
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
@@ -231,8 +275,9 @@ export default function PlaceDirectionsModal({
     }
 
     fetchWeather();
-  }, [place.latitude, place.longitude]);
+  }, [destLat, destLng]);
 
+  // Geolocation request
   const requestLocation = useCallback(() => {
     setLocationStatus('requesting');
     if (!navigator.geolocation) {
@@ -243,13 +288,22 @@ export default function PlaceDirectionsModal({
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setUserCoords({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
+        const realLat = Number(pos.coords.latitude);
+        const realLng = Number(pos.coords.longitude);
+        setUserCoords({ lat: realLat, lng: realLng });
         setIsRealGps(true);
         setLocationStatus('granted');
         setLocationMessage('Đã nhận diện vị trí GPS thực tế của bạn!');
+
+        // Immediately update instant estimates for real GPS
+        const instant = calcInstantEstimates(
+          realLat,
+          realLng,
+          destLat,
+          destLng
+        );
+        setRouteDistanceKm(instant.distanceKm);
+        setModeDurations(instant.durations);
       },
       (err) => {
         console.warn('Geolocation error:', err);
@@ -262,67 +316,96 @@ export default function PlaceDirectionsModal({
       },
       {
         enableHighAccuracy: false,
-        timeout: 8000,
+        timeout: 6000,
         maximumAge: 60000,
       }
     );
-  }, []);
+  }, [destLat, destLng]);
 
   useEffect(() => {
     requestLocation();
   }, [requestLocation]);
 
+  // Initialize Leaflet Map guaranteed on node mount with ResizeObserver
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerNode) return;
 
-    if (!mapRef.current) {
-      const map = L.map(mapContainerRef.current, {
-        center: [place.latitude, place.longitude],
-        zoom: 13,
-      });
-
-      applyTileLayer(mapStyle, map);
-
-      const placeIcon = L.divIcon({
-        className: 'dest-marker',
-        html: `
-          <div style="display:flex; flex-direction:column; align-items:center;">
-            <div style="background: #1A1A1A; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-top: 4px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-              ${place.name}
-            </div>
-          </div>
-        `,
-        iconSize: [120, 60],
-        iconAnchor: [60, 18],
-      });
-
-      L.marker([place.latitude, place.longitude], { icon: placeIcon }).addTo(map);
-
-      map.on('click', (e: L.LeafletMouseEvent) => {
-        setUserCoords({
-          lat: e.latlng.lat,
-          lng: e.latlng.lng,
-        });
-        setIsRealGps(false);
-        setLocationMessage('Đã đặt vị trí xuất phát theo điểm bạn bấm trên bản đồ.');
-      });
-
-      mapRef.current = map;
-
-      const timer1 = setTimeout(() => map.invalidateSize(), 150);
-      const timer2 = setTimeout(() => map.invalidateSize(), 450);
-      const timer3 = setTimeout(() => map.invalidateSize(), 800);
-
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        clearTimeout(timer3);
-      };
+    // Remove old leaflet instance on this node if any
+    if ((mapContainerNode as any)._leaflet_id) {
+      (mapContainerNode as any)._leaflet_id = null;
     }
-  }, [applyTileLayer, mapStyle, place]);
+    if (mapRef.current) {
+      mapRef.current.remove();
+      mapRef.current = null;
+      userMarkerRef.current = null;
+      routeLayerRef.current = null;
+    }
+
+    const map = L.map(mapContainerNode, {
+      center: [destLat, destLng],
+      zoom: 13,
+    });
+
+    applyTileLayer(mapStyle, map);
+
+    const placeIcon = L.divIcon({
+      className: 'dest-marker',
+      html: `
+        <div style="display:flex; flex-direction:column; align-items:center;">
+          <div style="background: #1A1A1A; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-top: 4px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            ${place.name}
+          </div>
+        </div>
+      `,
+      iconSize: [120, 60],
+      iconAnchor: [60, 18],
+    });
+
+    L.marker([destLat, destLng], { icon: placeIcon }).addTo(map);
+
+    map.on('click', (e: L.LeafletMouseEvent) => {
+      setUserCoords({
+        lat: e.latlng.lat,
+        lng: e.latlng.lng,
+      });
+      setIsRealGps(false);
+      setLocationMessage('Đã đặt vị trí xuất phát theo điểm bạn bấm trên bản đồ.');
+    });
+
+    mapRef.current = map;
+
+    // Immediately trigger invalidateSize and observe container resizing
+    map.invalidateSize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      if (mapRef.current) {
+        mapRef.current.invalidateSize();
+      }
+    });
+    resizeObserver.observe(mapContainerNode);
+
+    const timers = [
+      setTimeout(() => map.invalidateSize(), 50),
+      setTimeout(() => map.invalidateSize(), 150),
+      setTimeout(() => map.invalidateSize(), 300),
+      setTimeout(() => map.invalidateSize(), 600),
+      setTimeout(() => map.invalidateSize(), 1000),
+    ];
+
+    return () => {
+      resizeObserver.disconnect();
+      timers.forEach((t) => clearTimeout(t));
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        userMarkerRef.current = null;
+        routeLayerRef.current = null;
+      }
+    };
+  }, [mapContainerNode, destLat, destLng, place.name, applyTileLayer]);
 
   const handleSwitchMapStyle = (newStyle: 'osm' | 'google' | 'satellite') => {
     setMapStyle(newStyle);
@@ -331,11 +414,13 @@ export default function PlaceDirectionsModal({
     }
   };
 
+  // User Marker & Route Calculation
   useEffect(() => {
     if (!mapRef.current || !userCoords) return;
 
     const map = mapRef.current;
 
+    // 1. Create or update user marker
     if (!userMarkerRef.current) {
       const userIcon = L.divIcon({
         className: 'user-radar-marker',
@@ -375,14 +460,51 @@ export default function PlaceDirectionsModal({
       userMarkerRef.current.setLatLng([userCoords.lat, userCoords.lng]);
     }
 
-    async function calculateRoute() {
-      if (!userCoords) return;
+    // 2. Instant estimates so user never sees empty dashes
+    const instant = calcInstantEstimates(
+      userCoords.lat,
+      userCoords.lng,
+      destLat,
+      destLng
+    );
+    setRouteDistanceKm(instant.distanceKm);
+    setModeDurations(instant.durations);
+
+    // Draw initial direct dashed route immediately
+    if (routeLayerRef.current) {
+      map.removeLayer(routeLayerRef.current);
+    }
+    const initialLine = L.polyline(
+      [
+        [userCoords.lat, userCoords.lng],
+        [destLat, destLng],
+      ],
+      {
+        color: '#1A1A1A',
+        weight: 3.5,
+        opacity: 0.6,
+        dashArray: '6, 8',
+      }
+    ).addTo(map);
+    routeLayerRef.current = initialLine;
+
+    // Fit map bounds to show both start and end point
+    const bounds = L.latLngBounds([
+      [userCoords.lat, userCoords.lng],
+      [destLat, destLng],
+    ]);
+    map.fitBounds(bounds, { padding: [50, 50] });
+
+    // 3. Asynchronously fetch detailed driving route via OSRM
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s timeout
+
+    async function calculateDetailedRoute() {
       setIsRouting(true);
-
       try {
-        const url = `https://router.project-osrm.org/route/v1/driving/${userCoords.lng},${userCoords.lat};${place.longitude},${place.latitude}?overview=full&geometries=geojson`;
+        const url = `https://router.project-osrm.org/route/v1/driving/${userCoords.lng},${userCoords.lat};${destLng},${destLat}?overview=full&geometries=geojson`;
+        const res = await fetch(url, { signal: controller.signal });
 
-        const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
           if (data.routes && data.routes.length > 0) {
@@ -405,70 +527,46 @@ export default function PlaceDirectionsModal({
               walking: walkingMins,
             });
 
-            if (routeLayerRef.current) {
-              map.removeLayer(routeLayerRef.current);
+            // Replace line with exact road geometry
+            if (routeLayerRef.current && mapRef.current) {
+              mapRef.current.removeLayer(routeLayerRef.current);
             }
 
             const coordinates = primaryRoute.geometry.coordinates.map(
               (coord: [number, number]) => [coord[1], coord[0]] as [number, number]
             );
 
-            const routeLine = L.polyline(coordinates, {
-              color: '#1A1A1A',
-              weight: 4.5,
-              opacity: 0.85,
-              dashArray: transportMode === 'walking' ? '6, 6' : undefined,
-            }).addTo(map);
+            if (mapRef.current) {
+              const routeLine = L.polyline(coordinates, {
+                color: '#1A1A1A',
+                weight: 4.5,
+                opacity: 0.85,
+                dashArray: transportMode === 'walking' ? '6, 6' : undefined,
+              }).addTo(mapRef.current);
 
-            routeLayerRef.current = routeLine;
-
-            const bounds = L.latLngBounds([
-              [userCoords.lat, userCoords.lng],
-              [place.latitude, place.longitude],
-            ]);
-            map.fitBounds(bounds, { padding: [50, 50] });
+              routeLayerRef.current = routeLine;
+              mapRef.current.fitBounds(routeLine.getBounds().pad(0.12));
+            }
           }
         }
-      } catch (err) {
-        console.error('Lỗi khi tính toán tuyến đường OSRM:', err);
-        const R = 6371;
-        const dLat = ((place.latitude - userCoords.lat) * Math.PI) / 180;
-        const dLon = ((place.longitude - userCoords.lng) * Math.PI) / 180;
-        const a =
-          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-          Math.cos((userCoords.lat * Math.PI) / 180) *
-            Math.cos((place.latitude * Math.PI) / 180) *
-            Math.sin(dLon / 2) *
-            Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const estRoadKm = Math.round(R * c * 1.25 * 10) / 10;
-        setRouteDistanceKm(estRoadKm);
-
-        const drivingMins = Math.max(1, Math.round((estRoadKm / (estRoadKm < 15 ? 30 : 60)) * 60));
-        const bikeSpeed = estRoadKm < 10 ? 28 : estRoadKm < 50 ? 35 : 40;
-        const motorbikeMins = Math.max(1, Math.round((estRoadKm / bikeSpeed) * 60));
-        const walkingMins = Math.max(2, Math.round((estRoadKm / 4.8) * 60));
-
-        setModeDurations({
-          motorbike: motorbikeMins,
-          driving: drivingMins,
-          walking: walkingMins,
-        });
+      } catch (err: any) {
+        // Fallback already in place from instant estimates!
+        if (err.name !== 'AbortError') {
+          console.warn('OSRM routing fell back to geometric estimate:', err.message);
+        }
       } finally {
+        clearTimeout(timeoutId);
         setIsRouting(false);
       }
     }
 
-    calculateRoute();
-  }, [userCoords, place.latitude, place.longitude, place.name, transportMode]);
+    calculateDetailedRoute();
 
-  useEffect(() => {
-    if (!routeLayerRef.current) return;
-    routeLayerRef.current.setStyle({
-      color: '#1A1A1A',
-      dashArray: transportMode === 'walking' ? '6, 6' : undefined,
-    });
-  }, [transportMode]);
+    return () => {
+      controller.abort();
+      clearTimeout(timeoutId);
+    };
+  }, [userCoords, destLat, destLng, transportMode]);
 
   const formatDuration = (mins: number | null) => {
     if (mins === null) return '—';
@@ -615,7 +713,7 @@ export default function PlaceDirectionsModal({
               </span>
               {isRouting && (
                 <span className="flex items-center gap-1 text-muted-foreground text-[10px]">
-                  <Loader2 className="w-3 h-3 animate-spin" /> Đang tính toán...
+                  <Loader2 className="w-3 h-3 animate-spin" /> Đang tối ưu lộ trình...
                 </span>
               )}
             </div>
@@ -686,8 +784,16 @@ export default function PlaceDirectionsModal({
         </div>
 
         {/* Map canvas */}
-        <div className="relative flex-1 min-h-[350px] md:min-h-[420px] bg-[#F5F5F4]">
-          <div ref={mapContainerRef} className="w-full h-full min-h-[350px] md:min-h-[420px]" />
+        <div className="relative flex-1 min-h-[380px] md:min-h-[440px] bg-[#F5F5F4]">
+          <div
+            ref={(node) => {
+              if (node && node !== mapContainerNode) {
+                setMapContainerNode(node);
+              }
+            }}
+            className="w-full h-full min-h-[380px] md:min-h-[440px]"
+            style={{ zIndex: 0 }}
+          />
 
           {/* Floating instructions */}
           <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1.5 max-w-[65%] pointer-events-none">
@@ -740,10 +846,10 @@ export default function PlaceDirectionsModal({
               asChild
               variant="default"
               size="sm"
-              className="shadow-md gap-1.5"
+              className="shadow-md gap-1.5 bg-[#1A1A1A] text-white hover:bg-neutral-800"
             >
               <a
-                href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${place.latitude},${place.longitude}&travelmode=${
+                href={`https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${destLat},${destLng}&travelmode=${
                   transportMode === 'walking' ? 'walking' : transportMode === 'motorbike' ? 'two-wheeler' : 'driving'
                 }`}
                 target="_blank"

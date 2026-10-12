@@ -225,6 +225,7 @@ export class TripsService {
       dto.budgetPerPerson,
       dto.groupSize,
       dto.preferences || [],
+      startDate,
     );
 
     // Step 4: Save trip places to database
@@ -268,6 +269,7 @@ export class TripsService {
     budgetPerPerson: number,
     groupSize: number,
     preferences: string[],
+    startDate?: Date,
   ): Promise<TripItinerary> {
     const minPlaces = Math.min(places.length, days * 3);
     const maxPlaces = Math.min(places.length, days * 5);
@@ -373,7 +375,18 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
         evening: 3,
       };
 
-      for (const day of itinerary.days) {
+      for (let dIdx = 0; dIdx < itinerary.days.length; dIdx++) {
+        const day = itinerary.days[dIdx];
+        if (startDate) {
+          const d = new Date(startDate);
+          d.setDate(d.getDate() + dIdx);
+          day.date = d.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          });
+        }
+
         day.places = (day.places || []).filter((p) => {
           if (!p.placeId || seenPlaceIds.has(p.placeId)) {
             return false;
@@ -457,10 +470,21 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} - ${p.categories.join(
             currentPlaceIndex++;
           }
         }
+        let dateStr = 'Ngày ' + day;
+        if (startDate) {
+          const d = new Date(startDate);
+          d.setDate(d.getDate() + (day - 1));
+          dateStr = d.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+          });
+        }
+
         if (dayPlaces.length > 0) {
           mockDays.push({
             dayNumber: day,
-            date: 'Ngày ' + day,
+            date: dateStr,
             places: dayPlaces,
             notes: 'Ngày ' + day + ' trải nghiệm các địa điểm gợi ý theo 3 buổi sáng, chiều và tối.',
           });

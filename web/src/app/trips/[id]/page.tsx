@@ -63,6 +63,34 @@ function normalizePlaceSlot(place: Place, index: number, total: number): TimeSlo
   return 'afternoon';
 }
 
+// Helper to format actual calendar date for each day to avoid duplicate "Ngày 1 / Ngày 1"
+function formatDayDate(startDateStr?: string, dayNumber: number = 1, rawDate?: string): string {
+  if (startDateStr) {
+    const start = new Date(startDateStr);
+    if (!isNaN(start.getTime())) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + (dayNumber - 1));
+
+      const weekday = d.toLocaleDateString('vi-VN', { weekday: 'long' });
+      const dayFormatted = d.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      });
+      return `${weekday}, ${dayFormatted}`;
+    }
+  }
+
+  if (rawDate) {
+    const clean = rawDate.trim();
+    if (!/^ngày\s*\d+$/i.test(clean) && clean !== `${dayNumber}`) {
+      return clean;
+    }
+  }
+
+  return `Lịch trình ngày ${dayNumber}`;
+}
+
 interface SessionConfig {
   slot: TimeSlot;
   label: string;
@@ -338,8 +366,8 @@ function TripDetailContent() {
                     <div className="flex items-center justify-between w-full">
                       <div>
                         <div className="font-semibold text-sm">Ngày {day.dayNumber}</div>
-                        <div className={`text-xs mt-0.5 ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
-                          {day.date}
+                        <div className={`text-xs mt-0.5 capitalize ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
+                          {formatDayDate(trip.startDate, day.dayNumber, day.date)}
                         </div>
                       </div>
                       <Badge
@@ -423,9 +451,11 @@ function TripDetailContent() {
                 {/* Day Header Info */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
                   <div>
-                    <h3 className="text-lg font-bold text-[#1A1A1A] flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-[#1A1A1A] flex flex-wrap items-center gap-2">
                       <span>Ngày {currentDay.dayNumber}</span>
-                      <span className="text-muted-foreground font-normal text-sm">({currentDay.date})</span>
+                      <span className="text-muted-foreground font-normal text-sm capitalize">
+                        • {formatDayDate(trip.startDate, currentDay.dayNumber, currentDay.date)}
+                      </span>
                     </h3>
                     {currentDay.notes && (
                       <p className="text-xs text-muted-foreground mt-0.5">{currentDay.notes}</p>
