@@ -14,6 +14,7 @@ export interface PlaceForOptimization {
   priceEstimate?: number;
   timeSlot: TimeSlot;
   province?: string;
+  imageUrl?: string | null;
 }
 
 export interface DayOptimizationStats {

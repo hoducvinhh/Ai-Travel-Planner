@@ -11,6 +11,7 @@ export interface ItineraryPlace {
   longitude: number;
   priceEstimate: number;
   timeSlot?: TimeSlot;
+  imageUrl?: string;
 }
 
 export interface DayOptimizationStats {
@@ -54,6 +55,22 @@ export interface Trip {
   status: string;
   createdAt: string;
   itinerary: TripItinerary;
+  places?: Array<{
+    id: string;
+    tripId: string;
+    placeId: string;
+    dayNumber: number;
+    orderInDay: number;
+    place?: {
+      id: string;
+      name: string;
+      description?: string;
+      imageUrl?: string;
+      latitude?: number;
+      longitude?: number;
+      categories?: string[];
+    };
+  }>;
 }
 
 export interface MapComponentProps {

@@ -47,6 +47,7 @@ export interface PlaceInItinerary {
   priceEstimate: number;
   timeSlot: TimeSlot;
   province?: string;
+  imageUrl?: string | null;
 }
 
 @Injectable()
@@ -507,6 +508,20 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
         });
       }
 
+      // Nạp imageUrl và thông tin chính xác từ cơ sở dữ liệu địa điểm
+      const placeDbMap = new Map(places.map((p) => [p.id, p]));
+      for (const day of itinerary.days) {
+        for (const p of day.places || []) {
+          const dbPlace = placeDbMap.get(p.placeId);
+          if (dbPlace) {
+            p.imageUrl = dbPlace.imageUrl || null;
+            if (dbPlace.latitude) p.latitude = dbPlace.latitude;
+            if (dbPlace.longitude) p.longitude = dbPlace.longitude;
+            if (dbPlace.province) p.province = dbPlace.province;
+          }
+        }
+      }
+
       if (calculatedTotalCost > 0) {
         itinerary.totalEstimatedCost = calculatedTotalCost;
       }
@@ -578,6 +593,7 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
             longitude: p.longitude,
             priceEstimate: p.priceEstimate || 0,
             province: p.province,
+            imageUrl: (p as any).imageUrl || null,
           });
           totalCost += p.priceEstimate || 0;
         }
@@ -718,6 +734,23 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
 
     if (!trip) {
       throw new NotFoundException(`Trip with ID ${tripId} not found`);
+    }
+
+    // Tự động bổ sung imageUrl cho các địa điểm trong itinerary nếu chưa có
+    if (trip.itinerary && Array.isArray((trip.itinerary as any).days)) {
+      const placeLookup = new Map(trip.places.map((tp) => [tp.placeId, tp.place]));
+      for (const day of (trip.itinerary as any).days) {
+        for (const p of day.places || []) {
+          const dbPlace = placeLookup.get(p.placeId);
+          if (dbPlace) {
+            if (dbPlace.imageUrl && !p.imageUrl) {
+              p.imageUrl = dbPlace.imageUrl;
+            }
+            if (dbPlace.latitude && !p.latitude) p.latitude = dbPlace.latitude;
+            if (dbPlace.longitude && !p.longitude) p.longitude = dbPlace.longitude;
+          }
+        }
+      }
     }
 
     return trip;

@@ -163,6 +163,17 @@ function TripDetailContent() {
     setOptimizationNotice(null);
     try {
       const updated = await api.post<Trip>(`/trips/${tripId}/optimize`);
+      if (updated && updated.itinerary && updated.itinerary.days && trip?.places) {
+        const placeMap = new Map(trip.places.map((tp) => [tp.placeId, tp.place]));
+        updated.itinerary.days.forEach((day) => {
+          day.places?.forEach((p) => {
+            const matched = placeMap.get(p.placeId);
+            if (matched?.imageUrl && !p.imageUrl) {
+              p.imageUrl = matched.imageUrl;
+            }
+          });
+        });
+      }
       setTrip(updated);
       const stats = updated.itinerary?.optimizationStats;
       if (stats && stats.totalSavedDistanceKm > 0) {
@@ -186,6 +197,18 @@ function TripDetailContent() {
     const fetchTrip = async () => {
       try {
         const data = await api.get<Trip>(`/trips/${tripId}`);
+        // Tự động bổ sung imageUrl cho từng địa điểm từ trip.places nếu chưa có
+        if (data && data.itinerary && data.itinerary.days && data.places) {
+          const placeMap = new Map(data.places.map((tp) => [tp.placeId, tp.place]));
+          data.itinerary.days.forEach((day) => {
+            day.places?.forEach((p) => {
+              const matched = placeMap.get(p.placeId);
+              if (matched?.imageUrl && !p.imageUrl) {
+                p.imageUrl = matched.imageUrl;
+              }
+            });
+          });
+        }
         setTrip(data);
       } catch (err: any) {
         setError(err.message || 'Không tìm thấy lịch trình');
@@ -706,6 +729,21 @@ function TripDetailContent() {
                                     <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                                       {place.orderInDay}
                                     </div>
+
+                                    {/* Thumbnail ảnh địa điểm */}
+                                    {place.imageUrl && (
+                                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border border-[#E5E7EB] flex-shrink-0 bg-neutral-100 hidden xs:block">
+                                        <img
+                                          src={place.imageUrl}
+                                          alt={place.name}
+                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                          loading="lazy"
+                                          onError={(e) => {
+                                            (e.currentTarget.parentElement as HTMLElement).style.display = 'none';
+                                          }}
+                                        />
+                                      </div>
+                                    )}
 
                                     <div className="flex-1 min-w-0">
                                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-1.5">
