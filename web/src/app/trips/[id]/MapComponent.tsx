@@ -13,9 +13,13 @@ L.Icon.Default.mergeOptions({
 
 import { ItineraryPlace as Place, MapComponentProps } from '@/types';
 
-export default function MapComponent({ places, onSelectPlace }: MapComponentProps) {
+const FALLBACK_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`;
+const DEFAULT_BANNER = 'https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80';
+
+export default function MapComponent({ places, onSelectPlace, selectedPlaceId }: MapComponentProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const markersMapRef = useRef<Map<string, L.Marker>>(new Map());
 
   useEffect(() => {
     if (!mapContainerRef.current || places.length === 0) return;
@@ -41,6 +45,7 @@ export default function MapComponent({ places, onSelectPlace }: MapComponentProp
     }
 
     const map = mapRef.current;
+    markersMapRef.current.clear();
 
     // Clear existing markers and routes
     map.eachLayer((layer) => {
@@ -49,63 +54,113 @@ export default function MapComponent({ places, onSelectPlace }: MapComponentProp
       }
     });
 
-    // Add markers with custom numbered icons
+    // Add markers with custom photo thumbnail icons
     const markers: L.Marker[] = [];
     places.forEach((place, index) => {
-      const numberIcon = L.divIcon({
-        className: 'custom-marker',
-        html: `<div style="
-          background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: bold;
-          font-size: 16px;
-          border: 3px solid white;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        ">${index + 1}</div>`,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18],
+      const imgUrl = place.imageUrl || FALLBACK_SVG;
+
+      // Custom Pin Marker: Circular photo avatar with number badge and pointer
+      const photoMarkerIcon = L.divIcon({
+        className: 'custom-photo-marker-wrapper',
+        html: `
+          <div class="custom-photo-pin" style="position: relative; width: 44px; height: 50px; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+            <!-- Number badge on top-right -->
+            <div style="position: absolute; top: -4px; right: -2px; z-index: 10; background: #10b981; color: #ffffff; font-size: 11px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.35);">
+              ${index + 1}
+            </div>
+            <!-- Circular Photo Avatar -->
+            <div style="width: 40px; height: 40px; border-radius: 50%; border: 3px solid #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.3); overflow: hidden; background: #f1f5f9; display: flex; align-items: center; justify-content: center;">
+              <img src="${imgUrl}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='${FALLBACK_SVG}';" />
+            </div>
+            <!-- Triangular Pointer Tip -->
+            <div style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 7px solid #ffffff; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25)); margin-top: -2px;"></div>
+          </div>
+        `,
+        iconSize: [44, 50],
+        iconAnchor: [22, 48],
+        popupAnchor: [0, -48],
       });
 
       const marker = L.marker([place.latitude, place.longitude], {
-        icon: numberIcon,
+        icon: photoMarkerIcon,
       }).addTo(map);
 
+      // Save marker for quick lookup when focusing
+      markersMapRef.current.set(place.placeId, marker);
+
+      // Rich Card Popup with Place Cover Image
       const popupHtml = `
-        <div style="min-width: 200px; font-family: inherit;">
-          <div style="font-weight: bold; margin-bottom: 4px; font-size: 14px; color: #0f172a;">
-            ${index + 1}. ${place.name}
+        <div style="width: 250px; font-family: inherit; overflow: hidden; border-radius: 14px; background: #ffffff;">
+          <!-- Cover Image Banner -->
+          <div style="position: relative; width: 100%; height: 115px; background: #f1f5f9; overflow: hidden;">
+            <img src="${imgUrl}" alt="${place.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;" onerror="this.onerror=null; this.src='${DEFAULT_BANNER}';" />
+            
+            <!-- Top-left pill: Step number + Session -->
+            <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); color: #ffffff; font-size: 10px; font-weight: 600; padding: 2.5px 8px; border-radius: 9999px; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+              <span>#${index + 1}</span>
+              ${place.timeSlot ? `<span>• ${place.timeSlot === 'morning' ? 'Sáng' : place.timeSlot === 'evening' ? 'Tối' : 'Chiều'}</span>` : ''}
+            </div>
+
+            <!-- Bottom-right pill: Price / Free -->
+            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+              ${place.priceEstimate > 0 
+                ? `<span style="color: #D4F066; font-family: monospace;">${place.priceEstimate.toLocaleString('vi-VN')} đ</span>`
+                : `<span style="color: #34d399;">Miễn phí</span>`
+              }
+            </div>
           </div>
-          <div style="font-size: 12px; color: #64748b; margin-bottom: 10px;">
-            ${place.latitude.toFixed(4)}, ${place.longitude.toFixed(4)}
+
+          <!-- Body Content -->
+          <div style="padding: 10px 12px 12px;">
+            <!-- Place Title -->
+            <div style="font-weight: 700; font-size: 13px; color: #1a1a1a; line-height: 1.35; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${place.name}">
+              ${index + 1}. ${place.name}
+            </div>
+
+            <!-- Categories / Time metadata -->
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 10px;">
+              ${(place.categories || []).slice(0, 2).map((cat) => `
+                <span style="font-size: 10px; background: #f5f5f4; color: #525252; border: 1px solid #e5e7eb; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
+                  ${cat}
+                </span>
+              `).join('')}
+              ${place.estimatedTime ? `
+                <span style="font-size: 10px; background: #f4fce3; color: #365314; border: 1px solid #d9f99d; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
+                  ⏱️ ${place.estimatedTime}
+                </span>
+              ` : ''}
+            </div>
+
+            <!-- Action Button -->
+            <button id="btn-map-dir-${place.placeId}" style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 6px;
+              width: 100%;
+              padding: 7px 12px;
+              background: #1A1A1A;
+              color: #ffffff;
+              border-radius: 8px;
+              border: none;
+              font-size: 11px;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+              transition: all 0.15s ease;
+            " onmouseover="this.style.background='#2e2e2e'" onmouseout="this.style.background='#1A1A1A'">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+              <span>Chỉ đường & Thời tiết</span>
+            </button>
           </div>
-          <button id="btn-map-dir-${place.placeId}" style="
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: 100%;
-            padding: 7px 12px;
-            background: #10b981;
-            color: #ffffff;
-            border-radius: 8px;
-            border: none;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-          ">
-            🧭 Chỉ đường & Thời tiết
-          </button>
         </div>
       `;
 
-      marker.bindPopup(popupHtml);
+      marker.bindPopup(popupHtml, {
+        minWidth: 250,
+        maxWidth: 260,
+        className: 'custom-map-popup',
+      });
 
       marker.on('popupopen', () => {
         const btn = document.getElementById(`btn-map-dir-${place.placeId}`);
@@ -127,15 +182,15 @@ export default function MapComponent({ places, onSelectPlace }: MapComponentProp
       L.polyline(routeCoordinates, {
         color: '#10b981',
         weight: 4,
-        opacity: 0.7,
-        dashArray: '10, 10',
+        opacity: 0.75,
+        dashArray: '8, 8',
       }).addTo(map);
     }
 
     // Fit map to show all markers
     if (markers.length > 0) {
       const group = L.featureGroup(markers);
-      map.fitBounds(group.getBounds().pad(0.1));
+      map.fitBounds(group.getBounds().pad(0.12));
     }
 
     // Cleanup
@@ -147,11 +202,72 @@ export default function MapComponent({ places, onSelectPlace }: MapComponentProp
     };
   }, [places]);
 
+  // Automatically focus and open popup if selectedPlaceId changes
+  useEffect(() => {
+    if (!selectedPlaceId || !mapRef.current) return;
+    const marker = markersMapRef.current.get(selectedPlaceId);
+    if (marker) {
+      marker.openPopup();
+      const latLng = marker.getLatLng();
+      mapRef.current.setView([latLng.lat, latLng.lng], 15, { animate: true });
+    }
+  }, [selectedPlaceId]);
+
   return (
-    <div
-      ref={mapContainerRef}
-      className="w-full h-[400px] md:h-[500px] bg-slate-900"
-      style={{ zIndex: 0 }}
-    />
+    <div className="relative w-full h-[400px] md:h-[500px] bg-slate-900 overflow-hidden">
+      <div
+        ref={mapContainerRef}
+        className="w-full h-full"
+        style={{ zIndex: 0 }}
+      />
+      <style>{`
+        .custom-photo-marker-wrapper {
+          background: transparent !important;
+          border: none !important;
+        }
+        .custom-photo-pin {
+          transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .custom-photo-pin:hover {
+          transform: scale(1.15);
+          z-index: 1000 !important;
+        }
+        .custom-map-popup .leaflet-popup-content-wrapper {
+          padding: 0 !important;
+          border-radius: 14px !important;
+          overflow: hidden !important;
+          box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.25), 0 4px 10px -2px rgba(0, 0, 0, 0.1) !important;
+          border: 1px solid #E5E7EB !important;
+        }
+        .custom-map-popup .leaflet-popup-content {
+          margin: 0 !important;
+          line-height: 1.4 !important;
+          width: 250px !important;
+        }
+        .custom-map-popup .leaflet-popup-tip-container {
+          margin-top: -1px;
+        }
+        .custom-map-popup a.leaflet-popup-close-button {
+          top: 7px !important;
+          right: 7px !important;
+          width: 22px !important;
+          height: 22px !important;
+          background: rgba(0, 0, 0, 0.6) !important;
+          color: #ffffff !important;
+          border-radius: 50% !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 13px !important;
+          padding: 0 !important;
+          border: none !important;
+          transition: background 0.2s !important;
+          z-index: 30 !important;
+        }
+        .custom-map-popup a.leaflet-popup-close-button:hover {
+          background: rgba(0, 0, 0, 0.85) !important;
+        }
+      `}</style>
+    </div>
   );
 }

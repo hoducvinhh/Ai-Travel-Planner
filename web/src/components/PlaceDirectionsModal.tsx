@@ -283,20 +283,25 @@ export default function PlaceDirectionsModal({
 
       applyTileLayer(mapStyle, map);
 
+      const placeImg = (place as any).imageUrl;
       const placeIcon = L.divIcon({
         className: 'dest-marker',
         html: `
           <div style="display:flex; flex-direction:column; align-items:center;">
-            <div style="background: #1A1A1A; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.25);">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            <div style="background: #1A1A1A; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow: hidden;">
+              ${placeImg 
+                ? `<img src="${placeImg}" alt="${place.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />` 
+                : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`
+              }
             </div>
-            <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; margin-top: 4px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #1A1A1A; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); margin-top: -1px;"></div>
+            <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2.5px 8px; border-radius: 6px; margin-top: 3px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
               ${place.name}
             </div>
           </div>
         `,
-        iconSize: [120, 60],
-        iconAnchor: [60, 18],
+        iconSize: [140, 70],
+        iconAnchor: [70, 44],
       });
 
       L.marker([place.latitude, place.longitude], { icon: placeIcon }).addTo(map);
