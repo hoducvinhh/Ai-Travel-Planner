@@ -46,7 +46,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
   SwaggerModule.setup('docs', app, document);
 
-  const port = process.env.PORT || 3001;
+  const port = process.env.PORT || 3002;
   await app.listen(port);
   logger.log(`🚀 NestJS RAG Backend đang chạy tại http://localhost:${port}`);
   logger.log(`📑 Swagger Documentation: http://localhost:${port}/api/docs (hoặc /docs)`);
