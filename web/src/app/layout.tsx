@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { SocketProvider } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
 
 const geistSans = Geist({
@@ -33,8 +34,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Navbar />
-          {children}
+          <SocketProvider>
+            <Navbar />
+            {children}
+          </SocketProvider>
         </AuthProvider>
       </body>
     </html>

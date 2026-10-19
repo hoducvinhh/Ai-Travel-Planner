@@ -145,3 +145,34 @@ export const chatApi = {
     return api.delete(`/api/chat/sessions/${id}`);
   },
 };
+
+export { API_BASE_URL };
+
+export const formatImageUrl = (url?: string | null): string => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${API_BASE_URL}${cleanUrl}`;
+};
+
+export const uploadImageApi = async (file: File): Promise<{ url: string; filename: string }> => {
+  const token = getStoredToken();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API_BASE_URL}/upload/image`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => null);
+    throw new Error(errorData?.message || 'Tải ảnh lên thất bại');
+  }
+
+  return res.json();
+};
+

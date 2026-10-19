@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useSocket } from '@/context/SocketContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -12,6 +13,7 @@ import {
   Calendar,
   Sparkles,
   MessageSquare,
+  MessageCircle,
   LogOut,
   LogIn,
   UserPlus,
@@ -24,6 +26,7 @@ import {
 
 export default function Navbar() {
   const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { unreadCount } = useSocket();
   const pathname = usePathname();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -111,6 +114,23 @@ export default function Navbar() {
             <div className="w-24 h-8 animate-pulse rounded-lg bg-[#F0F0EF]" />
           ) : isAuthenticated && user ? (
             <div className="flex items-center gap-2">
+              <Link
+                href="/messages"
+                className={`relative flex items-center justify-center h-8 w-8 rounded-xl border transition ${
+                  pathname === '/messages'
+                    ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]'
+                    : 'bg-white border-[#E5E7EB] hover:bg-[#F5F5F4] text-[#1A1A1A]'
+                }`}
+                title="Tin nhắn trực tiếp"
+              >
+                <MessageCircle className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-xs animate-in zoom-in-50">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </Link>
+
               <Link
                 href="/profile"
                 className={`flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition ${
@@ -204,20 +224,42 @@ export default function Navbar() {
               );
             })}
             {isAuthenticated && (
-              <Link
-                href="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold ${
-                  isProfilePage
-                    ? 'bg-[#1A1A1A] text-white'
-                    : 'text-[#6B7280] hover:bg-[#F5F5F4] hover:text-[#1A1A1A]'
-                }`}
-              >
-                <Avatar className="w-4 h-4">
-                  <AvatarFallback className="text-[9px]">U</AvatarFallback>
-                </Avatar>
-                <span>Hồ sơ cá nhân & Wishlist</span>
-              </Link>
+              <>
+                <Link
+                  href="/messages"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold ${
+                    pathname === '/messages'
+                      ? 'bg-[#1A1A1A] text-white'
+                      : 'text-[#6B7280] hover:bg-[#F5F5F4] hover:text-[#1A1A1A]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <MessageCircle className="w-4 h-4" />
+                    <span>Tin nhắn 1-1</span>
+                  </div>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-[10px] font-bold text-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                </Link>
+
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold ${
+                    isProfilePage
+                      ? 'bg-[#1A1A1A] text-white'
+                      : 'text-[#6B7280] hover:bg-[#F5F5F4] hover:text-[#1A1A1A]'
+                  }`}
+                >
+                  <Avatar className="w-4 h-4">
+                    <AvatarFallback className="text-[9px]">U</AvatarFallback>
+                  </Avatar>
+                  <span>Hồ sơ cá nhân & Wishlist</span>
+                </Link>
+              </>
             )}
           </nav>
 
