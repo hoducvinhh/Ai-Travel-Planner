@@ -782,4 +782,44 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
       where: { id: tripId },
     });
   }
+
+  async cloneTrip(tripId: string, targetUserId: string) {
+    const originalTrip = await this.prisma.trip.findUnique({
+      where: { id: tripId },
+      include: {
+        places: true,
+      },
+    });
+
+    if (!originalTrip) {
+      throw new NotFoundException('Không tìm thấy chuyến đi để nhân bản');
+    }
+
+    const clonedTrip = await this.prisma.trip.create({
+      data: {
+        userId: targetUserId,
+        destination: originalTrip.destination,
+        startDate: originalTrip.startDate,
+        endDate: originalTrip.endDate,
+        budgetPerPerson: originalTrip.budgetPerPerson,
+        groupSize: originalTrip.groupSize,
+        status: 'CLONED',
+        itinerary: originalTrip.itinerary || undefined,
+      },
+    });
+
+    if (originalTrip.places && originalTrip.places.length > 0) {
+      await this.prisma.tripPlace.createMany({
+        data: originalTrip.places.map((p) => ({
+          tripId: clonedTrip.id,
+          placeId: p.placeId,
+          dayNumber: p.dayNumber,
+          orderInDay: p.orderInDay,
+          notes: p.notes,
+        })),
+      });
+    }
+
+    return this.getTripById(clonedTrip.id);
+  }
 }

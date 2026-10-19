@@ -36,6 +36,12 @@ export class TripsController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/clone')
+  async cloneTrip(@Param('id') id: string, @Request() req: any) {
+    return this.tripsService.cloneTrip(id, req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post(':id/optimize')
   async optimizeTrip(@Param('id') id: string) {
     return this.tripsService.optimizeTripItinerary(id);

@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface CreatePostDto {
@@ -6,6 +11,7 @@ export interface CreatePostDto {
   content: string;
   tags?: string[];
   images?: string[];
+  tripId?: string | null;
 }
 
 @Injectable()
@@ -56,6 +62,31 @@ export class CommunityService {
               budgetLevel: true,
             },
           },
+          trip: {
+            select: {
+              id: true,
+              destination: true,
+              startDate: true,
+              endDate: true,
+              budgetPerPerson: true,
+              groupSize: true,
+              status: true,
+              places: {
+                take: 6,
+                orderBy: [{ dayNumber: 'asc' }, { orderInDay: 'asc' }],
+                include: {
+                  place: {
+                    select: {
+                      id: true,
+                      name: true,
+                      imageUrl: true,
+                      province: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
           comments: {
             take: 3,
             orderBy: { createdAt: 'desc' },
@@ -100,6 +131,8 @@ export class CommunityService {
       content: p.content,
       images: p.images,
       tags: p.tags,
+      tripId: p.tripId,
+      trip: p.trip,
       likesCount: p._count.likes,
       commentsCount: p._count.comments,
       isLiked: userLikedPostIds.has(p.id),
@@ -132,6 +165,7 @@ export class CommunityService {
         content: dto.content.trim(),
         tags: dto.tags || [],
         images: dto.images || [],
+        tripId: dto.tripId || null,
       },
       include: {
         user: {
@@ -141,6 +175,31 @@ export class CommunityService {
             email: true,
             preferredStyles: true,
             budgetLevel: true,
+          },
+        },
+        trip: {
+          select: {
+            id: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            budgetPerPerson: true,
+            groupSize: true,
+            status: true,
+            places: {
+              take: 6,
+              orderBy: [{ dayNumber: 'asc' }, { orderInDay: 'asc' }],
+              include: {
+                place: {
+                  select: {
+                    id: true,
+                    name: true,
+                    imageUrl: true,
+                    province: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -321,12 +380,20 @@ export class CommunityService {
     return buddies;
   }
 
-  async updatePost(id: string, dto: Partial<CreatePostDto>) {
+  async updatePost(
+    id: string,
+    userId: string,
+    userRole: string,
+    dto: Partial<CreatePostDto>,
+  ) {
     const post = await this.prisma.communityPost.findUnique({
       where: { id },
     });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại');
+    }
+    if (post.userId !== userId && userRole !== 'ADMIN') {
+      throw new ForbiddenException('Bạn không có quyền chỉnh sửa bài viết này');
     }
 
     return this.prisma.communityPost.update({
@@ -336,6 +403,7 @@ export class CommunityService {
         ...(dto.content !== undefined && { content: dto.content.trim() }),
         ...(dto.tags !== undefined && { tags: dto.tags }),
         ...(dto.images !== undefined && { images: dto.images }),
+        ...(dto.tripId !== undefined && { tripId: dto.tripId || null }),
       },
       include: {
         user: {
@@ -347,16 +415,44 @@ export class CommunityService {
             budgetLevel: true,
           },
         },
+        trip: {
+          select: {
+            id: true,
+            destination: true,
+            startDate: true,
+            endDate: true,
+            budgetPerPerson: true,
+            groupSize: true,
+            status: true,
+            places: {
+              take: 6,
+              orderBy: [{ dayNumber: 'asc' }, { orderInDay: 'asc' }],
+              include: {
+                place: {
+                  select: {
+                    id: true,
+                    name: true,
+                    imageUrl: true,
+                    province: true,
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
   }
 
-  async deletePost(id: string) {
+  async deletePost(id: string, userId: string, userRole: string) {
     const post = await this.prisma.communityPost.findUnique({
       where: { id },
     });
     if (!post) {
       throw new NotFoundException('Bài viết không tồn tại');
+    }
+    if (post.userId !== userId && userRole !== 'ADMIN') {
+      throw new ForbiddenException('Bạn không có quyền xóa bài viết này');
     }
 
     return this.prisma.communityPost.delete({

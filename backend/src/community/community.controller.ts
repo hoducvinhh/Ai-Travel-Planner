@@ -11,6 +11,7 @@ import {
   HttpCode,
   HttpStatus,
   BadRequestException,
+  Request,
 } from '@nestjs/common';
 import { CommunityService, CreatePostDto } from './community.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -75,25 +76,26 @@ export class CommunityController {
     return this.communityService.getTravelBuddies(userId);
   }
 
-  // --- ADMIN ENDPOINTS ---
+  // --- POST MANAGEMENT (Tác giả hoặc ADMIN) ---
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Patch('posts/:id')
   async updatePost(
     @Param('id') id: string,
+    @Request() req: any,
     @Body() body: Partial<CreatePostDto>,
   ) {
-    return this.communityService.updatePost(id, body);
+    return this.communityService.updatePost(id, req.user.id, req.user.role, body);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Delete('posts/:id')
   @HttpCode(HttpStatus.OK)
-  async deletePost(@Param('id') id: string) {
-    return this.communityService.deletePost(id);
+  async deletePost(@Param('id') id: string, @Request() req: any) {
+    return this.communityService.deletePost(id, req.user.id, req.user.role);
   }
+
+  // --- ADMIN ONLY ENDPOINTS ---
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -103,3 +105,4 @@ export class CommunityController {
     return this.communityService.deleteComment(id);
   }
 }
+
