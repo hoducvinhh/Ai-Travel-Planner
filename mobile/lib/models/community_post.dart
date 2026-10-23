@@ -32,6 +32,8 @@ class Comment with _$Comment {
     required String userId,
     required String userName,
     required DateTime createdAt,
+    @Default(0) int likesCount,
+    @Default(false) bool isLiked,
   }) = _Comment;
 
   factory Comment.fromJson(Map<String, dynamic> json) =>

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
 import 'package:travel_planner/config/spacing.dart';
-import 'package:travel_planner/config/radius.dart';
 
 /// Animated like button
 class AnimatedLikeButton extends StatefulWidget {
@@ -149,7 +148,7 @@ class _AnimatedBookmarkButtonState extends State<AnimatedBookmarkButton>
 }
 
 /// Page transition animations
-class SlideUpPageRoute extends PageRouteBuilder {
+class SlideUpPageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
 
   SlideUpPageRoute({required this.page})
@@ -160,11 +159,11 @@ class SlideUpPageRoute extends PageRouteBuilder {
             const end = Offset.zero;
             const curve = Curves.easeInOut;
 
-            var tween = Tween(begin: begin, end: end).chain(
+            final tween = Tween(begin: begin, end: end).chain(
               CurveTween(curve: curve),
             );
 
-            var offsetAnimation = animation.drive(tween);
+            final offsetAnimation = animation.drive(tween);
 
             return SlideTransition(
               position: offsetAnimation,
@@ -175,7 +174,7 @@ class SlideUpPageRoute extends PageRouteBuilder {
 }
 
 /// Fade page transition
-class FadePageRoute extends PageRouteBuilder {
+class FadePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
 
   FadePageRoute({required this.page})
