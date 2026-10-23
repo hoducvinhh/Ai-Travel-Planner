@@ -9,6 +9,9 @@ import 'package:travel_planner/screens/trips/create_trip_screen.dart';
 import 'package:travel_planner/screens/places/places_screen.dart';
 import 'package:travel_planner/screens/places/place_detail_screen.dart';
 import 'package:travel_planner/screens/chat/chat_screen.dart';
+import 'package:travel_planner/screens/community/community_screen.dart';
+import 'package:travel_planner/screens/community/create_post_screen.dart';
+import 'package:travel_planner/screens/search/search_screen.dart';
 
 /// App routing configuration
 final GoRouter router = GoRouter(
@@ -59,6 +62,18 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/chat',
       builder: (context, state) => const ChatScreen(),
+    ),
+    GoRoute(
+      path: '/community',
+      builder: (context, state) => const CommunityScreen(),
+    ),
+    GoRoute(
+      path: '/community/create',
+      builder: (context, state) => const CreatePostScreen(),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const SearchScreen(),
     ),
   ],
 );

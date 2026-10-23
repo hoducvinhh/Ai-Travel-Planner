@@ -9,6 +9,7 @@ import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/providers/community_provider.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 import 'package:travel_planner/widgets/community/post_card.dart';
+import 'package:travel_planner/widgets/community/comments_bottom_sheet.dart';
 
 /// Community screen
 class CommunityScreen extends ConsumerWidget {
@@ -48,7 +49,14 @@ class CommunityScreen extends ConsumerWidget {
                     // TODO: Implement like functionality
                   },
                   onComment: () {
-                    // TODO: Show comments bottom sheet
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => CommentsBottomSheet(
+                        postId: posts[index].id,
+                      ),
+                    );
                   },
                   onShare: () {
                     // TODO: Share functionality
@@ -61,12 +69,7 @@ class CommunityScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Navigate to create post screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Chức năng tạo bài viết đang phát triển'),
-            ),
-          );
+          context.push('/community/create');
         },
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
