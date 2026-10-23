@@ -56,9 +56,9 @@ class Formatters {
   }
 
   /// Format currency: 1,000,000 ₫
-  static String formatCurrency(double amount, {String symbol = '₫'}) {
+  static String formatCurrency(num amount, {String symbol = '₫'}) {
     final formatter = NumberFormat('#,###', 'vi');
-    return '${formatter.format(amount)} $symbol';
+    return '${formatter.format(amount.round())} $symbol';
   }
 
   /// Format number: 1,000
@@ -93,6 +93,49 @@ class Formatters {
       return DateTime.parse(dateStr);
     } catch (e) {
       return null;
+    }
+  }
+
+  /// Format phone number: 0123456789 -> 0123 456 789
+  static String formatPhoneNumber(String phone) {
+    if (phone.length < 10) return phone;
+
+    if (phone.startsWith('+84')) {
+      // +84123456789 -> +84 123 456 789
+      return '+84 ${phone.substring(3, 6)} ${phone.substring(6, 9)} ${phone.substring(9)}';
+    } else if (phone.length == 10) {
+      // 0123456789 -> 0123 456 789
+      return '${phone.substring(0, 4)} ${phone.substring(4, 7)} ${phone.substring(7)}';
+    }
+
+    return phone;
+  }
+
+  /// Format time ago: "5 phút trước", "2 giờ trước"
+  static String formatTimeAgo(DateTime dateTime) {
+    return formatRelativeTime(dateTime);
+  }
+
+  /// Format budget level
+  static String formatBudgetLevel(String level) {
+    switch (level.toLowerCase()) {
+      case 'low':
+        return 'Tiết kiệm';
+      case 'medium':
+        return 'Trung bình';
+      case 'high':
+        return 'Cao cấp';
+      default:
+        return level[0].toUpperCase() + level.substring(1);
+    }
+  }
+
+  /// Format distance: 1500 -> 1.5 km, 500 -> 500 m
+  static String formatDistance(num meters) {
+    if (meters < 1000) {
+      return '${meters.toInt()} m';
+    } else {
+      return '${(meters / 1000).toStringAsFixed(1)} km';
     }
   }
 }

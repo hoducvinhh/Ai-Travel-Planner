@@ -11,6 +11,7 @@ import 'package:travel_planner/providers/trips_provider.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 import 'package:travel_planner/widgets/trip/trip_header.dart';
 import 'package:travel_planner/widgets/trip/itinerary_day_section.dart';
+import 'package:travel_planner/widgets/map/trip_map.dart';
 
 /// Trip detail screen
 class TripDetailScreen extends ConsumerWidget {
@@ -199,7 +200,35 @@ class TripDetailScreen extends ConsumerWidget {
                       ),
                     ],
 
-                    const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: AppSpacing.md),
+
+                    // Map Section
+                    if (trip.itinerary != null && trip.itinerary!.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Bản đồ',
+                            style: AppTextStyles.headlineMedium.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          SizedBox(
+                            height: 250,
+                            child: TripMap(
+                              places: trip.itinerary!,
+                              showRoute: true,
+                              initialZoom: 12.0,
+                              onMarkerTap: (place) {
+                                context.push('/places/${place.id}');
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+                        ],
+                      ),
 
                     // Itinerary Section
                     Text(

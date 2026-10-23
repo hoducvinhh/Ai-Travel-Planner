@@ -23,16 +23,8 @@ class Validators {
       return 'Mật khẩu không được để trống';
     }
 
-    if (value.length < 8) {
-      return 'Mật khẩu phải có ít nhất 8 ký tự';
-    }
-
-    if (!value.contains(RegExp(r'[A-Z]'))) {
-      return 'Mật khẩu phải có ít nhất 1 chữ hoa';
-    }
-
-    if (!value.contains(RegExp(r'[0-9]'))) {
-      return 'Mật khẩu phải có ít nhất 1 chữ số';
+    if (value.length < 6) {
+      return 'Mật khẩu phải có ít nhất 6 ký tự';
     }
 
     return null;
@@ -53,21 +45,21 @@ class Validators {
 
   /// Required field validation
   static String? required(String? value, {String? fieldName}) {
-    if (value == null || value.isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return '${fieldName ?? "Trường này"} không được để trống';
     }
     return null;
   }
 
-  /// Phone number validation (Vietnam)
-  static String? phoneNumber(String? value) {
+  /// Phone validation (simplified)
+  static String? phone(String? value) {
     if (value == null || value.isEmpty) {
       return 'Số điện thoại không được để trống';
     }
 
     final phoneRegex = RegExp(r'^(0|\+84)[3|5|7|8|9][0-9]{8}$');
 
-    if (!phoneRegex.hasMatch(value)) {
+    if (!phoneRegex.hasMatch(value.replaceAll(' ', ''))) {
       return 'Số điện thoại không hợp lệ';
     }
 
@@ -116,6 +108,23 @@ class Validators {
 
     if (double.parse(value!) <= 0) {
       return 'Giá trị phải lớn hơn 0';
+    }
+
+    return null;
+  }
+
+  /// URL validation
+  static String? url(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'URL không được để trống';
+    }
+
+    final urlRegex = RegExp(
+      r'^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$',
+    );
+
+    if (!urlRegex.hasMatch(value)) {
+      return 'URL không hợp lệ';
     }
 
     return null;
