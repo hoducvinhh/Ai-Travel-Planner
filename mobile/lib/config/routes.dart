@@ -6,6 +6,9 @@ import 'package:travel_planner/screens/profile/profile_screen.dart';
 import 'package:travel_planner/screens/trips/trips_list_screen.dart';
 import 'package:travel_planner/screens/trips/trip_detail_screen.dart';
 import 'package:travel_planner/screens/trips/create_trip_screen.dart';
+import 'package:travel_planner/screens/places/places_screen.dart';
+import 'package:travel_planner/screens/places/place_detail_screen.dart';
+import 'package:travel_planner/screens/chat/chat_screen.dart';
 
 /// App routing configuration
 final GoRouter router = GoRouter(
@@ -32,6 +35,10 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const TripsListScreen(),
     ),
     GoRoute(
+      path: '/trips/create',
+      builder: (context, state) => const CreateTripScreen(),
+    ),
+    GoRoute(
       path: '/trips/:id',
       builder: (context, state) {
         final id = state.pathParameters['id']!;
@@ -39,8 +46,19 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/trips/create',
-      builder: (context, state) => const CreateTripScreen(),
+      path: '/places',
+      builder: (context, state) => const PlacesScreen(),
+    ),
+    GoRoute(
+      path: '/places/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return PlaceDetailScreen(placeId: id);
+      },
+    ),
+    GoRoute(
+      path: '/chat',
+      builder: (context, state) => const ChatScreen(),
     ),
   ],
 );

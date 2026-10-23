@@ -59,4 +59,14 @@ class StorageService {
     await _prefs?.clear();
     await _secureStorage.deleteAll();
   }
+
+  // Generic read method for secure storage
+  Future<String?> read(String key) async {
+    return await _secureStorage.read(key: key);
+  }
+
+  // Generic write method for secure storage
+  Future<void> write(String key, String value) async {
+    await _secureStorage.write(key: key, value: value);
+  }
 }
