@@ -4,6 +4,8 @@ import 'package:travel_planner/screens/auth/login_screen.dart';
 import 'package:travel_planner/screens/auth/register_screen.dart';
 import 'package:travel_planner/screens/profile/profile_screen.dart';
 import 'package:travel_planner/screens/trips/trips_list_screen.dart';
+import 'package:travel_planner/screens/trips/trip_detail_screen.dart';
+import 'package:travel_planner/screens/trips/create_trip_screen.dart';
 
 /// App routing configuration
 final GoRouter router = GoRouter(
@@ -28,6 +30,17 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/trips',
       builder: (context, state) => const TripsListScreen(),
+    ),
+    GoRoute(
+      path: '/trips/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id']!;
+        return TripDetailScreen(tripId: id);
+      },
+    ),
+    GoRoute(
+      path: '/trips/create',
+      builder: (context, state) => const CreateTripScreen(),
     ),
   ],
 );

@@ -27,4 +27,10 @@ class AppColors {
   static const Color success = Color(0xFF10B981);
   static const Color warning = Color(0xFFFBBF24);
   static const Color error = Color(0xFFEF4444);
+  static const Color info = Color(0xFF60A5FA);
+
+  // Interactive colors
+  static const Color likeRed = Color(0xFFFF6B6B); // Coral
+  static const Color bookmarkGold = Color(0xFFFFA500); // Golden
+  static const Color rating = Color(0xFFFFA500); // Golden star
 }
