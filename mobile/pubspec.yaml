@@ -4,7 +4,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.5.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -40,11 +40,19 @@ dependencies:
   # Biometric Authentication
   local_auth: ^2.2.0
 
+  # Media & Camera
+  image_picker: ^1.1.2
+
+  # Notifications
+  flutter_local_notifications: ^17.2.4
+  timezone: ^0.9.4
+
   # Chat & Markdown
   flutter_markdown: ^0.6.0
 
   # Utilities
   intl: ^0.19.0
+  path: ^1.9.0
   freezed_annotation: 3.1.0
   json_annotation: ^4.8.0
 
@@ -62,6 +70,7 @@ dev_dependencies:
 
   # Testing
   mockito: ^5.4.0
+  sqflite_common_ffi: ^2.3.3
 
 flutter:
   uses-material-design: true

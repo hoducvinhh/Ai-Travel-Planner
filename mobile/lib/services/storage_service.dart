@@ -11,6 +11,10 @@ class StorageService {
     _prefs = await SharedPreferences.getInstance();
   }
 
+  Future<SharedPreferences> _getPrefs() async {
+    return _prefs ??= await SharedPreferences.getInstance();
+  }
+
   // Secure Storage (for tokens, sensitive data)
 
   Future<void> saveToken(String token) async {
@@ -28,7 +32,8 @@ class StorageService {
   // SharedPreferences (for non-sensitive data)
 
   Future<void> saveString(String key, String value) async {
-    await _prefs?.setString(key, value);
+    final prefs = await _getPrefs();
+    await prefs.setString(key, value);
   }
 
   String? getString(String key) {
@@ -36,7 +41,8 @@ class StorageService {
   }
 
   Future<void> saveBool(String key, bool value) async {
-    await _prefs?.setBool(key, value);
+    final prefs = await _getPrefs();
+    await prefs.setBool(key, value);
   }
 
   bool? getBool(String key) {
@@ -44,7 +50,8 @@ class StorageService {
   }
 
   Future<void> saveInt(String key, int value) async {
-    await _prefs?.setInt(key, value);
+    final prefs = await _getPrefs();
+    await prefs.setInt(key, value);
   }
 
   int? getInt(String key) {
@@ -52,11 +59,13 @@ class StorageService {
   }
 
   Future<void> remove(String key) async {
-    await _prefs?.remove(key);
+    final prefs = await _getPrefs();
+    await prefs.remove(key);
   }
 
   Future<void> clear() async {
-    await _prefs?.clear();
+    final prefs = await _getPrefs();
+    await prefs.clear();
     await _secureStorage.deleteAll();
   }
 

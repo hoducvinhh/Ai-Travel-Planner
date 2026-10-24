@@ -43,7 +43,7 @@ class PlacesRepository {
     required String placeId,
     required String interactionType,
   }) async {
-    await _api.post(
+    await _api.post<dynamic>(
       '/interactions',
       data: {
         'placeId': placeId,

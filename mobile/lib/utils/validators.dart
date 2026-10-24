@@ -57,7 +57,7 @@ class Validators {
       return 'Số điện thoại không được để trống';
     }
 
-    final phoneRegex = RegExp(r'^(0|\+84)[3|5|7|8|9][0-9]{8}$');
+    final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9}$');
 
     if (!phoneRegex.hasMatch(value.replaceAll(' ', ''))) {
       return 'Số điện thoại không hợp lệ';

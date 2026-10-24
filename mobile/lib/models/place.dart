@@ -5,7 +5,7 @@ part 'place.g.dart';
 
 /// Place model
 @freezed
-class Place with _$Place {
+abstract class Place with _$Place {
   const factory Place({
     required String id,
     required String name,

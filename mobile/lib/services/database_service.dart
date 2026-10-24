@@ -129,7 +129,7 @@ class DatabaseService {
         ...trip,
         'preferences': trip['preferences'] != null
             ? (trip['preferences'] as String).split(',')
-            : [],
+            : <String>[],
       };
     }).toList();
   }
@@ -150,7 +150,7 @@ class DatabaseService {
       ...trip,
       'preferences': trip['preferences'] != null
           ? (trip['preferences'] as String).split(',')
-          : [],
+          : <String>[],
     };
   }
 
@@ -187,7 +187,7 @@ class DatabaseService {
     final db = await database;
 
     String whereClause = '';
-    List<dynamic> whereArgs = [];
+    final List<dynamic> whereArgs = [];
 
     if (province != null) {
       whereClause = 'province = ?';
@@ -211,7 +211,7 @@ class DatabaseService {
         ...place,
         'amenities': place['amenities'] != null
             ? (place['amenities'] as String).split(',')
-            : [],
+            : <String>[],
       };
     }).toList();
   }
@@ -232,7 +232,7 @@ class DatabaseService {
       ...place,
       'amenities': place['amenities'] != null
           ? (place['amenities'] as String).split(',')
-          : [],
+          : <String>[],
     };
   }
 

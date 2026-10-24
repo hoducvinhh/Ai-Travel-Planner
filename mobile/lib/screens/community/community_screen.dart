@@ -5,7 +5,6 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
-import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/providers/community_provider.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 import 'package:travel_planner/widgets/community/post_card.dart';
@@ -49,7 +48,7 @@ class CommunityScreen extends ConsumerWidget {
                     // TODO: Implement like functionality
                   },
                   onComment: () {
-                    showModalBottomSheet(
+                    showModalBottomSheet<void>(
                       context: context,
                       isScrollControlled: true,
                       backgroundColor: Colors.transparent,

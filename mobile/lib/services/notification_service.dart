@@ -144,7 +144,10 @@ class NotificationService {
 
   /// Schedule trip reminder (1 day before)
   Future<void> scheduleTripReminder(Trip trip) async {
-    final reminderTime = trip.startDate.subtract(const Duration(days: 1));
+    final parsedStartDate = DateTime.tryParse(trip.startDate);
+    if (parsedStartDate == null) return;
+
+    final reminderTime = parsedStartDate.subtract(const Duration(days: 1));
 
     // Only schedule if reminder time is in the future
     if (reminderTime.isAfter(DateTime.now())) {
@@ -160,10 +163,13 @@ class NotificationService {
 
   /// Schedule trip start notification
   Future<void> scheduleTripStartNotification(Trip trip) async {
+    final parsedStartDate = DateTime.tryParse(trip.startDate);
+    if (parsedStartDate == null) return;
+
     final startTime = DateTime(
-      trip.startDate.year,
-      trip.startDate.month,
-      trip.startDate.day,
+      parsedStartDate.year,
+      parsedStartDate.month,
+      parsedStartDate.day,
       8, // 8 AM on start date
     );
 

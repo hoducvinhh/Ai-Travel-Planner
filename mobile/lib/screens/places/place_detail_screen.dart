@@ -8,7 +8,6 @@ import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/providers/places_provider.dart';
-import 'package:travel_planner/repositories/places_repository.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 
 /// Place detail screen
@@ -25,7 +24,6 @@ class PlaceDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
-  int _currentImageIndex = 0;
   bool _isSaved = false;
 
   @override
@@ -374,7 +372,7 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
         data: (place) => SafeArea(
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 top: BorderSide(color: AppColors.border, width: 1),

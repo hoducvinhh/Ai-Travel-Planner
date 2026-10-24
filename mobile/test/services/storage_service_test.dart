@@ -1,12 +1,19 @@
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:travel_planner/services/storage_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('StorageService', () {
     late StorageService storageService;
 
-    setUp(() {
+    setUp(() async {
+      FlutterSecureStorage.setMockInitialValues({});
+      SharedPreferences.setMockInitialValues({});
       storageService = StorageService();
+      await storageService.init();
     });
 
     test('should initialize successfully', () async {

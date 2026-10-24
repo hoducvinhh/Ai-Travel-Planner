@@ -51,7 +51,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
 
     try {
       // Check if location services are enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw Exception('Dịch vụ định vị chưa được bật');
       }
@@ -70,7 +70,7 @@ class _InteractiveMapScreenState extends State<InteractiveMapScreen> {
       }
 
       // Get current position
-      Position position = await Geolocator.getCurrentPosition(
+      final Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 

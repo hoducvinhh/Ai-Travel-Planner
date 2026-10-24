@@ -28,9 +28,9 @@ class TripCardShimmer extends StatelessWidget {
             highlightColor: AppColors.border.withValues(alpha: 0.1),
             child: Container(
               height: 160,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.vertical(
+                borderRadius: BorderRadius.vertical(
                   top: Radius.circular(AppRadius.lg),
                 ),
               ),
@@ -119,9 +119,9 @@ class PlaceCardShimmer extends StatelessWidget {
             Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: const BorderRadius.horizontal(
+                borderRadius: BorderRadius.horizontal(
                   left: Radius.circular(AppRadius.lg),
                 ),
               ),
@@ -191,9 +191,9 @@ class GridItemShimmer extends StatelessWidget {
             // Image shimmer
             Expanded(
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(
+                  borderRadius: BorderRadius.vertical(
                     top: Radius.circular(AppRadius.lg),
                   ),
                 ),

@@ -38,7 +38,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Đăng ký'), findsOneWidget);
+      expect(find.text('Đăng ký ngay'), findsOneWidget);
     });
 
     testWidgets('should show validation errors for empty fields', (WidgetTester tester) async {

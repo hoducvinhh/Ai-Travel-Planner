@@ -6,7 +6,6 @@ import 'package:travel_planner/config/colors.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
-import 'package:travel_planner/widgets/common/custom_button.dart';
 import 'dart:io';
 
 /// Create post screen for community
@@ -99,7 +98,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
 
     try {
       // TODO: Implement post creation with image upload
-      await Future.delayed(const Duration(seconds: 2));
+      await Future<void>.delayed(const Duration(seconds: 2));
 
       if (mounted) {
         Navigator.of(context).pop(true);

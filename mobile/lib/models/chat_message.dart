@@ -5,7 +5,7 @@ part 'chat_message.g.dart';
 
 /// Chat message model
 @freezed
-class ChatMessage with _$ChatMessage {
+abstract class ChatMessage with _$ChatMessage {
   const factory ChatMessage({
     required String id,
     required String content,
@@ -21,7 +21,7 @@ class ChatMessage with _$ChatMessage {
 
 /// Chat source/citation model
 @freezed
-class ChatSource with _$ChatSource {
+abstract class ChatSource with _$ChatSource {
   const factory ChatSource({
     required String id,
     required String title,

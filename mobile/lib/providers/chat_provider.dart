@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:travel_planner/models/chat_message.dart';
 import 'package:travel_planner/services/stream_service.dart';
 import 'package:travel_planner/services/storage_service.dart';
-import 'package:travel_planner/services/providers.dart';
 
 /// Chat state
 class ChatState {

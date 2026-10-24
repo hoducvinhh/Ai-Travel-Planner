@@ -6,6 +6,7 @@ import 'package:travel_planner/config/colors.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/models/place.dart';
 import 'package:travel_planner/providers/places_provider.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 import 'package:travel_planner/widgets/place/place_card.dart';
@@ -58,7 +59,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
           // Search and filter bar
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(color: AppColors.border, width: 1),

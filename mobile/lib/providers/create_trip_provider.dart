@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:travel_planner/models/trip.dart';
 import 'package:travel_planner/repositories/trips_repository.dart';
 import 'package:travel_planner/providers/trips_provider.dart';
 

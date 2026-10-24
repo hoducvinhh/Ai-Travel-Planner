@@ -5,7 +5,7 @@ part 'community_post.g.dart';
 
 /// Community post model
 @freezed
-class CommunityPost with _$CommunityPost {
+abstract class CommunityPost with _$CommunityPost {
   const factory CommunityPost({
     required String id,
     required String content,
@@ -25,7 +25,7 @@ class CommunityPost with _$CommunityPost {
 
 /// Comment model
 @freezed
-class Comment with _$Comment {
+abstract class Comment with _$Comment {
   const factory Comment({
     required String id,
     required String content,

@@ -6,8 +6,18 @@ Flutter mobile application for AI Travel Planner - iOS and Android end-user expe
 
 - **[CLAUDE.md](CLAUDE.md)** - Rules for AI agents (auto-loaded)
 - **[TASKS.md](TASKS.md)** - 471 tasks breakdown with checkboxes
-- **[plan-mobile.md](plan-mobile.md)** - Complete development plan
 - **[mobile-tech-stack.md](mobile-tech-stack.md)** - Technology decisions
+- **Guides & Specifications** (in docs/guides/):
+  - [SETUP.md](docs/guides/SETUP.md) & [SETUP_ADVANCED.md](docs/guides/SETUP_ADVANCED.md)
+  - [API_INTEGRATION.md](docs/guides/API_INTEGRATION.md)
+  - [TESTING_GUIDE.md](docs/guides/TESTING_GUIDE.md) & [QUICK_FIX_GUIDE.md](docs/guides/QUICK_FIX_GUIDE.md)
+  - [STRUCTURE.md](docs/guides/STRUCTURE.md)
+  - [FEATURE_SHOWCASE.md](docs/guides/FEATURE_SHOWCASE.md)
+- **Progress Reports** (in docs/reports/):
+  - [COMPLETION_REPORT.md](docs/reports/COMPLETION_REPORT.md)
+  - [FINAL_STATUS_REPORT.md](docs/reports/FINAL_STATUS_REPORT.md)
+  - [DEVELOPMENT_SUMMARY.md](docs/reports/DEVELOPMENT_SUMMARY.md)
+  - [IMPLEMENTATION_PROGRESS.md](docs/reports/IMPLEMENTATION_PROGRESS.md)
 - **Skills** (in `.claude/skills/`):
   - `mobile-ui-guidelines.md` - UI/UX design rules
   - `mobile-architecture.md` - Architecture patterns

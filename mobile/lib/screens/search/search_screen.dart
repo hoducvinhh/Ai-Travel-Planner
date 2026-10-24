@@ -20,7 +20,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
   List<String> _recentSearches = [];
-  List<String> _suggestions = [
+  final List<String> _suggestions = const [
     'Hạ Long',
     'Sapa',
     'Đà Nẵng',
@@ -202,7 +202,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         child: Row(
           children: [
-            Icon(
+            const Icon(
               LucideIcons.clock,
               size: 20,
               color: AppColors.textSecondary,

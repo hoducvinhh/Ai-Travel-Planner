@@ -225,7 +225,7 @@ class PlacesFilterSheet extends ConsumerWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: LucideIcons.check,
+                icon: const Icon(LucideIcons.check),
               ),
             ),
           ],

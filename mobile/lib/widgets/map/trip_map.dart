@@ -11,7 +11,7 @@ class TripMap extends StatefulWidget {
   final LatLng? currentLocation;
   final double initialZoom;
   final bool showRoute;
-  final Function(Place)? onMarkerTap;
+  final void Function(Place)? onMarkerTap;
 
   const TripMap({
     super.key,

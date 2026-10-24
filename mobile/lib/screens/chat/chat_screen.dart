@@ -7,7 +7,6 @@ import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/providers/chat_provider.dart';
 import 'package:travel_planner/widgets/chat/message_bubble.dart';
-import 'package:travel_planner/widgets/common/loading_indicator.dart';
 
 /// Chat screen with RAG chatbot
 class ChatScreen extends ConsumerStatefulWidget {
@@ -102,7 +101,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           // Input area
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 top: BorderSide(color: AppColors.border, width: 1),

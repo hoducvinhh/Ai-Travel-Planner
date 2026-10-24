@@ -38,25 +38,18 @@ class Formatters {
     } else if (difference.inDays < 30) {
       final weeks = (difference.inDays / 7).floor();
       return '$weeks tuần trước';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '$months tháng trước';
     } else {
-      final years = (difference.inDays / 365).floor();
-      return '$years năm trước';
+      return formatDate(date);
     }
   }
 
-  /// Format date range: "15/10 - 20/10/2026"
+  /// Format date range: "15/10/2026 - 20/10/2026"
   static String formatDateRange(DateTime start, DateTime end) {
-    if (start.year == end.year && start.month == end.month) {
-      return '${DateFormat('dd').format(start)} - ${formatDate(end)}';
-    }
     return '${formatDate(start)} - ${formatDate(end)}';
   }
 
-  /// Format currency: 1,000,000 ₫
-  static String formatCurrency(num amount, {String symbol = '₫'}) {
+  /// Format currency: 1,000,000 đ
+  static String formatCurrency(num amount, {String symbol = 'đ'}) {
     final formatter = NumberFormat('#,###', 'vi');
     return '${formatter.format(amount.round())} $symbol';
   }
@@ -72,9 +65,15 @@ class Formatters {
     if (number < 1000) {
       return number.toString();
     } else if (number < 1000000) {
-      return '${(number / 1000).toStringAsFixed(1)}K';
+      final value = number / 1000;
+      final formatted =
+          value % 1 == 0 ? value.toInt().toString() : value.toStringAsFixed(1);
+      return '${formatted}K';
     } else {
-      return '${(number / 1000000).toStringAsFixed(1)}M';
+      final value = number / 1000000;
+      final formatted =
+          value % 1 == 0 ? value.toInt().toString() : value.toStringAsFixed(1);
+      return '${formatted}M';
     }
   }
 

@@ -95,7 +95,7 @@ class MessageBubble extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 12,
                                       height: 12,
                                       child: CircularProgressIndicator(
@@ -191,7 +191,7 @@ class MessageBubble extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             LucideIcons.link,
             size: 12,
             color: AppColors.info,

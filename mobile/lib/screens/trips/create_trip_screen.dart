@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/providers/create_trip_provider.dart';
@@ -47,7 +46,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
           // Step indicator
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(
@@ -73,7 +72,7 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
           // Navigation buttons
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.white,
               border: Border(
                 top: BorderSide(
@@ -114,8 +113,8 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                       onPressed: _canProceed() ? _handleNext : null,
                       isLoading: createTripState.isLoading,
                       icon: _currentStep == _totalSteps - 1
-                          ? LucideIcons.check
-                          : LucideIcons.arrowRight,
+                          ? const Icon(LucideIcons.check)
+                          : const Icon(LucideIcons.arrowRight),
                     ),
                   ),
                 ],
