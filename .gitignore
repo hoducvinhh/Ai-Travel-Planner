@@ -85,6 +85,11 @@ temp_response.txt
 backend/dist/
 backend/.turbo/
 
+# Understand Anything
+.tools/understand-anything/
+.ua/
+.understand-anything/
+
 # Package manager
 package-lock.json
 yarn.lock
