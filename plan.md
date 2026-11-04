@@ -1,278 +1,262 @@
-# Kế Hoạch Triển Khai (Cập Nhật WebSocket): Nâng Cấp Cộng Đồng & Nhắn Tin Real-time 1-1
+# Kế Hoạch Hoàn Thiện Web Platform & Giải Trình Phản Biện Giảng Viên (ĐATN)
 
-Tài liệu thiết kế kỹ thuật này đã được cập nhật toàn diện theo yêu cầu chuyển sang kiến trúc **Real-time WebSocket (Socket.io)**:
-1. **Lưu trữ ảnh chuẩn URL**: Upload file ảnh lưu tại server `backend/uploads/` trả về URL tĩnh + Cho phép dán URL ảnh trực tiếp. Tối ưu hiệu năng, không làm nặng Database như Base64.
-2. **Đính kèm lịch trình thông minh theo 2 Kịch bản**:
-   - **Kịch bản A (Sắp đi - Tìm bạn đồng hành ghép đoàn)**: Nhận diện ngày đi trong tương lai / tag `#Tìm bạn đồng hành` -> Hiển thị badge **"🟢 Sắp khởi hành [dd/mm/yyyy]"**, số người, dự trù kinh phí -> Nút hành động ưu tiên: **"Nhắn tin tham gia"** (kết nối trực tiếp vào Chat Real-time với tin nhắn mồi thông minh).
-   - **Kịch bản B (Đã đi về - Chia sẻ kinh nghiệm / Review)**: Hiển thị tóm tắt điểm check-in -> Nút hành động: **"Xem chi tiết"** và **"Nhân bản chuyến đi" (1-click Clone Trip)** để người khác lưu về dùng.
-   - **Bảo mật quyền riêng tư**: Chuyến đi luôn ở chế độ Read-only với người khác, chuyến đi gốc của tác giả không bao giờ bị thay đổi.
-3. **Phân quyền Chỉnh sửa / Xóa bài viết của chính mình**: Tác giả bài viết hoặc Admin có toàn quyền sửa/xóa bài đăng của mình.
-4. **Hệ thống Nhắn tin Real-time 1-1 qua WebSocket (Socket.io)**: 
-   - Sử dụng **NestJS WebSocketGateway** (`@nestjs/websockets`, `@nestjs/platform-socket.io`, `socket.io`).
-   - Phía Web client dùng **`socket.io-client`**.
-   - Tin nhắn truyền đi **tức thì dưới 0.1 giây**, không cần đợi Polling.
-   - Live notification: Huy hiệu tin nhắn chưa đọc trên Navbar nhảy số ngay trong tích tắc khi có tin mới.
-   - Hỗ trợ thêm trạng thái phòng chat (Rooms), hiển thị "đang soạn tin nhắn..." (Typing indicator) và trạng thái online.
+Kế hoạch này được điều chỉnh theo định hướng: **Tập trung hoàn thiện 100% trên nền tảng Web Frontend (`web/`), Backend Core (`backend/`), ML Recommendation Service (`recommendation-service/`) và Tài liệu Báo cáo ĐATN (`docs/`)**. Tạm thời không can thiệp mã nguồn `mobile/` để dồn toàn lực tối ưu hóa trải nghiệm và chuẩn hóa thuật toán trên Web trước.
 
 ---
 
-## 1. Kiến Trúc Real-Time WebSocket & Luồng Hoạt Động
+## 1. Tổng Quan Mục Tiêu & Định Hướng Triển Khai
+
+| STT | Ý kiến của Giảng viên | Định hướng kỹ thuật & học thuật trên Web |
+| :---: | :--- | :--- |
+| **1** | Cần có mô-đun/phần App Mobile hỗ trợ lập kế hoạch | **Chiến lược giai đoạn (Phased Delivery)**: Hoàn thiện Web Platform làm bản quy chuẩn chuẩn mực (Web Reference Implementation), tối ưu Responsive chuẩn di động (Mobile-friendly PWA view), đóng gói toàn bộ API Contracts sẵn sàng cho Mobile App ở giai đoạn mở rộng tiếp theo. Tài liệu hóa luận chứng học thuật này vào báo cáo. |
+| **2** | Cần cơ chế/bước đánh giá tính hợp lý/khả thi của lịch trình sinh bởi LLM | Xây dựng bộ công cụ `ItineraryFeasibilityValidator` trên NestJS Backend lượng hóa 5 chỉ số ($S_{\text{geo}}, S_{\text{time}}, S_{\text{budget}}, S_{\text{pref}}, S_{\text{div}}$, $\text{OFS}$), tự động sửa lỗi vi phạm và hiển thị trực quan thẻ **Feasibility Score Card** trên trang chi tiết chuyến đi Web. |
+| **3** | Cơ chế Cold-start dựa trên độ phổ biến không thể hiện tính cá nhân hóa gợi ý | Xây dựng **Onboarding Preference Survey Modal** ngay trên Web khi người mới đăng nhập, kết hợp thuật toán **Multi-Attribute Content-Based Personalization** trên Python FastAPI (Khớp sở thích 50% + Ngân sách 25% + Nhóm đi 15% + Phổ biến 10%). |
+| **4** | RAG Chatbot: Thông tin tri thức không còn phù hợp (đóng cửa, giá vé đổi, nguồn không tin cậy) cần cơ chế kiểm chứng | Xây dựng **Quy trình Kiểm chứng Đa tầng (Multi-Tier Verification)**: Metadata cấp độ tin cậy nguồn + Real-time Entity Grounding với CSDL địa điểm + Disclaimer cảnh báo thời điểm + Nút báo cáo sai lệch/lỗi thời trên Web Chatbot. |
+
+---
+
+## 2. Kiến Trúc Hệ Thống Tập Trung Web Platform
 
 ```mermaid
-sequenceDiagram
-    autonumber
-    actor UserA as Người Dùng A (Web Client)
-    participant Gateway as NestJS WebSocket Gateway (Socket.io)
-    participant Service as Messages Service & DB
-    actor UserB as Người Dùng B (Web Client)
-
-    Note over UserA, Gateway: Kết nối WebSocket với JWT Token khi mở app
-    UserA->>Gateway: connect(token) -> Join room "user_A"
-    UserB->>Gateway: connect(token) -> Join room "user_B"
-
-    Note over UserA, Gateway: Khi mở hộp thoại chat giữa A và B
-    UserA->>Gateway: emit("join_conversation", { conversationId: "conv_1" })
-    UserB->>Gateway: emit("join_conversation", { conversationId: "conv_1" })
-
-    Note over UserA, Gateway: A gửi tin nhắn cho B
-    UserA->>Gateway: emit("send_message", { conversationId: "conv_1", content: "Chào bạn!" })
-    Gateway->>Service: Lưu tin nhắn vào DB (Prisma)
-    Service-->>Gateway: Tin nhắn đã lưu (kèm ID, createdAt, sender info)
-
-    par Phát sóng tin nhắn thời gian thực
-        Gateway-->>UserA: emit("new_message", messageData) -> Hiện ngay phía A
-        Gateway-->>UserB: emit("new_message", messageData) -> Hiện ngay phía B (< 0.1s)
-    and Thông báo Navbar nếu B đang ở trang khác
-        Gateway-->>UserB: emit("unread_notification", { unreadCount: N }) -> Badge Navbar nhảy số
+flowchart TD
+    subgraph WebFrontend["🌐 Web Frontend (Next.js 16 + Tailwind CSS)"]
+        UI_Onboarding["Onboarding Survey Modal (Bắt buộc)\n(Khảo sát sở thích cho người mới)"]
+        UI_Wizard["Wizard Lập Tour (trips/new)"]
+        UI_TripDetail["Trang Chi Tiết Lịch Trình (trips/[id])"]
+        UI_FeasCard["Thẻ Đánh Giá Tính Khả Thi (Feasibility Card)"]
+        UI_Chat["RAG Chatbot (question-answer)\n+ Disclaimer Giá Vé + Nút Báo Cáo Lỗi"]
     end
+
+    subgraph BackendNest["⚙️ NestJS Backend Core"]
+        TripService["Trips Service"]
+        Validator["Itinerary Feasibility Validator\n(Chấm điểm 5 chiều & Cảnh báo)"]
+        LocalRepair["Local Spatial Repair / 2-Opt TSP"]
+        RagService["RAG Service + Entity Grounding (Bảng places)"]
+        FeedbackController["Knowledge Feedback Endpoint"]
+    end
+
+    subgraph MLService["🐍 Python FastAPI (Recommendation)"]
+        PersonalizedColdStart["Personalized Cold-Start Engine\n(Multi-Attribute Content-Based + Persona Matching)"]
+        LightFMModel["LightFM Hybrid Model (Warm Users)"]
+    end
+
+    subgraph Database["🗄️ PostgreSQL 16 + pgvector"]
+        DB_Places["Bảng places (Giá vé niêm yết, Tọa độ, Trạng thái)"]
+        DB_Chunks["Bảng tourism_chunks (Vector BGE-M3 1024 dims)"]
+        DB_Feedback["Bảng knowledge_feedback (Phản hồi cộng đồng)"]
+        DB_Users["Bảng users (preferredStyles, budgetLevel)"]
+    end
+
+    UI_Onboarding -->|Lưu khảo sát ban đầu| DB_Users
+    UI_Wizard -->|Yêu cầu tạo tour| TripService
+    TripService -->|Lấy gợi ý ứng viên| PersonalizedColdStart
+    PersonalizedColdStart -->|Top 50 địa điểm cá nhân hóa| TripService
+    TripService -->|Prompt xếp ngày| GeminiLLM["Google Gemini LLM"]
+    GeminiLLM -->|Lịch trình thô| Validator
+    Validator -->|Kiểm định 5 chỉ số| LocalRepair
+    LocalRepair -->|Lịch trình tối ưu + OFS Score| UI_TripDetail
+    UI_TripDetail --> UI_FeasCard
+
+    UI_Chat -->|Hỏi thông tin du lịch| RagService
+    RagService -->|Vector Search| DB_Chunks
+    RagService -->|Đối soát giá vé/trạng thái| DB_Places
+    RagService -->|Câu trả lời + Cảnh báo thời vụ| UI_Chat
+    UI_Chat -->|Báo cáo giá vé/địa điểm đổi| FeedbackController
+    FeedbackController -->|Lưu báo cáo kiểm tra| DB_Feedback
 ```
 
 ---
 
-## 2. Chi Tiết Các Hạng Mục Kỹ Thuật
-
-### A. Cài Đặt Thư Viện WebSocket
-1. **Phía Backend (`backend/`)**:
-   ```powershell
-   cd "z:\Learn_Programming\DATN - AI Travel Planner\backend"
-   pnpm add @nestjs/websockets @nestjs/platform-socket.io socket.io
-   ```
-2. **Phía Frontend (`web/`)**:
-   ```powershell
-   cd "z:\Learn_Programming\DATN - AI Travel Planner\web"
-   pnpm add socket.io-client
-   ```
+## 3. Chi Tiết Phương Án Kỹ Thuật
 
 ---
 
-### B. Database Layer: Cập Nhật Prisma Schema
-**File:** [`backend/prisma/schema.prisma`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/prisma/schema.prisma)
+### 🎯 Điểm 1: Luận Chứng Học Thuật & Chiến Lược Phát Triển Web Trước (Mobile Phase 2)
 
-1. Cập nhật model `CommunityPost`:
+#### A. Định hướng giải trình với Giảng viên
+Trong đồ án tốt nghiệp kỹ thuật phần mềm / khoa học máy tính:
+1. **Trọng tâm đề tài**: Cốt lõi của đề tài là **Hệ thống Trí tuệ Nhân tạo Du lịch Thông minh** (kết hợp Machine Learning LightFM, Multi-Attribute Personalization, LLM Itinerary Planning với cơ chế kiểm định khả thi, và RAG Chatbot kiểm chứng nguồn).
+2. **Web-First Strategy**: Nền tảng Web (Next.js 16) được hoàn thiện toàn diện với thiết kế **Responsive Design 100% chuẩn di động** (hoạt động trơn tru trên mọi kích thước màn hình smartphone/tablet như một Web App di động).
+3. **Sẵn sàng cho Mobile**: Toàn bộ kiến trúc Backend (NestJS REST API, WebSocket Gateway, Data Contracts) đã được chuẩn hóa và kiểm thử nghiêm ngặt, cho phép module ứng dụng di động bản địa (Native/Flutter) cắm vào sử dụng ngay mà không cần thay đổi bất kỳ logic cốt lõi nào.
+
+---
+
+### 🎯 Điểm 2: Cơ Chế Đánh Giá Tính Hợp Lý & Khả Thi Của Lịch Trình Sinh Bởi LLM
+
+#### A. Công thức tính toán Bộ Đánh Giá Tính Khả Thi (`ItineraryFeasibilityValidator`)
+Hệ thống chấm điểm lịch trình theo thang điểm 100 dựa trên 5 chiều kích:
+
+1. **Chỉ số Khả thi Địa lý & Di chuyển ($S_{\text{geo}} \in [0, 100]$)**:
+   - Khoảng cách Haversine giữa 2 điểm liên tiếp $d_k = \text{haversine}(P_k, P_{k+1})$.
+   - Thời gian di chuyển trong đô thị: $t_{\text{transit}} = \frac{d_k}{25\text{ km/h}} + 0.15\text{h}$.
+   - Nếu $d_k \le 12\text{km}$: Điểm tối đa (100).
+   - Nếu $12\text{km} < d_k \le 25\text{km}$: $S_{\text{geo}} = 100 - (d_k - 12) \times 3$.
+   - Nếu $d_k > 25\text{km}$: Trừ 50 điểm; nếu $> 40\text{km}$ gắn cảnh báo nghiêm trọng (*Critical Warning: Quãng đường di chuyển quá lớn*).
+
+2. **Chỉ số Khả thi Khung giờ & Nhịp độ ($S_{\text{time}} \in [0, 100]$)**:
+   - Số điểm lý tưởng mỗi ngày $N \in [2, 4]$. Nếu $N > 5$: Trừ 15 điểm/điểm thừa.
+   - Kiểm tra logic buổi: Điểm nightlife (bar, chợ đêm, phố đi bộ) bắt buộc ở `evening`; điểm thiên nhiên/trekking ưu tiên `morning` hoặc `afternoon`.
+
+3. **Chỉ số Phù hợp Ngân sách ($S_{\text{budget}} \in [0, 100]$)**:
+   - Ngân sách ngày cho phép: $B_{\text{day}} = \frac{B_{\text{total}}}{\text{days}}$.
+   - Tổng chi phí các điểm trong ngày: $C_{\text{day}} = \sum \text{priceEstimate}$.
+   - Nếu $C_{\text{day}} \le B_{\text{day}}$: $S_{\text{budget}} = 100$. Nếu vượt $> 30\%$: Phạt điểm và kèm cảnh báo.
+
+4. **Chỉ số Khớp Sở thích Cá nhân ($S_{\text{pref}} \in [0, 100]$)**:
+   - Tỷ lệ các điểm trong chuyến đi trùng khớp với `explicitPreferences` của người dùng:
+     $$S_{\text{pref}} = \frac{|\{p \in \text{Trip} \mid \text{categories}(p) \cap \text{Preferences} \neq \emptyset\}|}{|\text{Trip}|} \times 100$$
+
+5. **Chỉ số Đa dạng Trải nghiệm ($S_{\text{div}} \in [0, 100]$)**:
+   - Tránh việc trong 1 ngày xếp liên tiếp $> 2$ điểm cùng thể loại (ví dụ 3 bảo tàng liên tiếp).
+
+**Điểm Khả Thi Tổng Thể (Overall Feasibility Score - OFS)**:
+$$\text{OFS} = 0.30 \cdot S_{\text{geo}} + 0.25 \cdot S_{\text{time}} + 0.20 \cdot S_{\text{budget}} + 0.15 \cdot S_{\text{pref}} + 0.10 \cdot S_{\text{div}}$$
+
+#### B. Hiển thị trên Web (`web/src/app/trips/[id]/page.tsx`)
+- Thêm khối **`TripFeasibilityCard`** (Bảng đánh giá tính khả thi lịch trình):
+  - Điểm số tổng thể $\text{OFS}$ (thang điểm 100).
+  - Thanh tiến trình phân tích 4 tiêu chuẩn kỹ thuật: Khoảng cách di chuyển, Phù hợp ngân sách, Khung giờ hoạt động, Đúng sở thích yêu cầu.
+  - Danh sách cảnh báo/lưu ý di chuyển thực tế (ví dụ: *"Ngày 2: Chặng di chuyển giữa Điểm A và Điểm B cách nhau 28km, dự kiến mất ~45 phút di chuyển"*).
+
+---
+
+### 🎯 Điểm 3: Cơ Chế Gợi Ý Cold-Start Cá Nhân Hóa Đa Thuộc Tính (Web Onboarding)
+
+#### A. Khảo sát Khởi tạo Bắt Buộc trên Web (`OnboardingModal.tsx`)
+Khi người dùng mới đăng ký thành công (hoặc đăng nhập mà `preferredStyles` rỗng):
+- **Bật Modal Khảo Sát Bắt Buộc (Mandatory Blocking Modal)**:
+  - **Không giới hạn thời gian**: Người dùng thoải mái suy nghĩ và lựa chọn kỹ lưỡng.
+  - **Không cho tắt**: Không có nút đóng (X), khóa click ra ngoài backdrop, không cho chuyển trang nếu chưa hoàn tất khảo sát (đảm bảo 100% người dùng trên hệ thống đều có vector sở thích ban đầu, xóa bỏ hoàn toàn trạng thái cold-start trống).
+  - Nội dung khảo sát gồm 3 phần bắt buộc:
+    1. **Phong cách yêu thích (chọn $\ge 3$)**: Ẩm thực, Thiên nhiên & Sinh thái, Di tích Lịch sử, Nghỉ dưỡng & Spa, Biển đảo, Check-in sống ảo, Mạo hiểm.
+    2. **Nhóm đồng hành**: Đi một mình (Solo), Cặp đôi (Couple), Gia đình có trẻ nhỏ/người cao tuổi (Family), Nhóm bạn bè (Friends).
+    3. **Mức chi tiêu**: Tiết kiệm (Budget), Tiêu chuẩn (Standard), Cao cấp (Luxury).
+- Bấm "Hoàn tất & Khám phá" $\rightarrow$ Lưu vào CSDL qua `PATCH /api/users/profile` và kích hoạt ngay danh sách gợi ý cá nhân hóa.
+
+#### B. Thuật toán xếp hạng Cold-Start trong Python Service & Backend Fallback
+Thay thế logic sắp xếp thuần theo popularity bằng công thức:
+$$\text{Score}_{\text{cold}}(u, p) = 0.50 \cdot \text{Sim}_{\text{content}}(u_{\text{styles}}, p_{\text{cats}}) + 0.25 \cdot \text{Fit}_{\text{budget}}(u_{\text{budget}}, p_{\text{price}}) + 0.15 \cdot \text{Fit}_{\text{group}}(u_{\text{group}}, p_{\text{attr}}) + 0.10 \cdot \text{NormPop}(p)$$
+
+- **SimContent**: Tính độ khớp giữa thẻ sở thích của user và danh mục địa điểm.
+- **FitBudget**: Điểm tương thích giữa giá vé và phân khúc ngân sách của user.
+- **FitGroup**: Tính phù hợp theo nhóm đồng hành (ví dụ: gia đình có trẻ em sẽ ưu tiên điểm an toàn, không leo núi mạo hiểm; nhóm bạn ưu tiên điểm sôi động).
+- **NormPop**: Độ phổ biến chỉ chiếm **10%** đóng vai trò tiền nghiệm (Prior) đảm bảo chất lượng điểm đến. **90% trọng số còn lại hoàn toàn là cá nhân hóa**!
+
+---
+
+### 🎯 Điểm 4: Cơ Chế Kiểm Chứng & Đảm Bảo Tính Tin Cậy Của Tri Thức RAG Chatbot
+
+#### A. Kiến trúc Kiểm chứng Đa tầng trên Backend & Web
+1. **Phân cấp Độ Tin Cậy Nguồn (Source Provenance Tiering)**:
+   - **Tier 1 (Official)**: Cổng thông tin Du lịch Việt Nam, Sở Du Lịch các tỉnh, Website chính thức ban quản lý.
+   - **Tier 2 (Reputable Media)**: VnExpress Du lịch, Tuổi Trẻ, Báo Du lịch.
+   - **Tier 3 (Community Travel Reviews)**: Bài viết review cộng đồng.
+2. **Đối soát Thực thể Thời gian thực với CSDL (Real-time DB Entity Grounding)**:
+   - Khi câu hỏi chứa từ khóa nhạy cảm về giá vé ("giá vé", "chi phí vào cổng", "bao nhiêu tiền", "giờ mở cửa"):
+   - Hệ thống trích xuất tên địa điểm, truy vấn trực tiếp bảng `places` trong PostgreSQL để lấy `price_estimate` và trạng thái hoạt động mới nhất năm 2026.
+   - Tiêm thông tin xác thực vào prompt với quyền ưu tiên cao nhất:  
+     *`[DỮ LIỆU ĐÃ XÁC THỰC TỪ CƠ SỞ DỮ LIỆU ĐỊA ĐIỂM]: Địa điểm "X" có giá vé niêm yết: ... VNĐ. Hãy ưu tiên số liệu này nếu các bài viết tham khảo ghi số liệu khác.`*
+3. **Cảnh báo Rủi ro Lỗi thời (Temporal Disclaimer)**:
+   - Chatbot tự động kèm chú thích chân trang:  
+     *`⚠️ Lưu ý: Thông tin về giá vé và thời gian mở cửa có thể thay đổi tùy theo mùa cao điểm và quy định mới nhất của ban quản lý. Bạn nên liên hệ trực tiếp trước khi đến.`*
+4. **Cơ chế Báo cáo từ Người dùng trên Web (`web/src/app/question-answer/page.tsx`)**:
+   - Dưới mỗi câu trả lời của AI có nút cờ báo cáo: 🚩 *"Báo cáo thông tin sai / giá vé đã đổi"*.
+   - Mở Dialog cho phép chọn lý do (`Giá vé đã đổi`, `Địa điểm đã đóng cửa`, `Sai giờ mở cửa`) và gửi về endpoint `POST /api/chat/feedback` lưu vào bảng `knowledge_feedback`.
+
+---
+
+## 4. Kế Hoạch Thay Đổi Chi Tiết Theo Từng Thành Phần
+
+### Thành phần 1: Backend (`backend/`)
+
+#### [NEW] `backend/src/trips/optimizer/feasibility-validator.service.ts`
+- Triển khai thuật toán tính toán 5 chỉ số $S_{\text{geo}}, S_{\text{time}}, S_{\text{budget}}, S_{\text{pref}}, S_{\text{div}}$, tổng hợp điểm $\text{OFS}$ và tạo danh sách khuyến cáo.
+
+#### [MODIFY] `backend/src/trips/trips.service.ts`
+- Tích hợp `FeasibilityValidatorService`.
+- Sau khi LLM sinh lịch trình: Chạy kiểm định tính khả thi, áp dụng sửa lỗi cục bộ nếu vi phạm nghiêm trọng và lưu `feasibilityReport` vào đối tượng `TripItinerary`.
+
+#### [MODIFY] `backend/src/recommendation/recommendation.service.ts`
+- Cập nhật hàm fallback cold-start sử dụng công thức kết hợp đa thuộc tính (Sở thích 50% + Ngân sách 25% + Nhóm đi 15% + Phổ biến 10%).
+
+#### [MODIFY] `backend/src/rag/rag.service.ts`
+- Thêm Entity Grounding đối soát với bảng `places`.
+- Nhận diện câu hỏi giá vé / giờ mở cửa và bổ sung thông tin xác thực cùng Disclaimer.
+
+#### [NEW] `backend/src/chat/dto/feedback.dto.ts` & [MODIFY] `backend/src/chat/chat.controller.ts`
+- Endpoint `POST /api/chat/feedback` tiếp nhận báo cáo từ người dùng.
+
+#### [MODIFY] `backend/prisma/schema.prisma`
+- Thêm bảng `KnowledgeFeedback`:
 ```prisma
-model CommunityPost {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  title      String
-  content    String   @db.Text
-  images     String[] @default([])
-  tags       String[] @default([])
-  tripId     String?  @map("trip_id")
-  likesCount Int      @default(0) @map("likes_count")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+model KnowledgeFeedback {
+  id           String   @id @default(uuid())
+  sessionId    String?  @map("session_id")
+  userQuestion String   @map("user_question") @db.Text
+  botAnswer    String   @map("bot_answer") @db.Text
+  reason       String   // "OUTDATED_PRICE", "CLOSED", "INCORRECT_INFO"
+  userNote     String?  @map("user_note") @db.Text
+  status       String   @default("PENDING") // PENDING, VERIFIED, RESOLVED
+  createdAt    DateTime @default(now()) @map("created_at")
 
-  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  trip     Trip?              @relation(fields: [tripId], references: [id], onDelete: SetNull)
-  comments CommunityComment[]
-  likes    PostLike[]
-
-  @@index([userId])
-  @@index([tripId])
-  @@index([createdAt])
-  @@map("community_posts")
-}
-```
-
-2. Cập nhật model `Trip`:
-```prisma
-model Trip {
-  // ... các trường hiện tại
-  communityPosts CommunityPost[]
-}
-```
-
-3. Thêm model `Conversation` và `DirectMessage` cho Chat:
-```prisma
-model Conversation {
-  id            String    @id @default(uuid())
-  user1Id       String    @map("user1_id")
-  user2Id       String    @map("user2_id")
-  lastMessageAt DateTime  @default(now()) @map("last_message_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
-
-  user1         User      @relation("User1Conversations", fields: [user1Id], references: [id], onDelete: Cascade)
-  user2         User      @relation("User2Conversations", fields: [user2Id], references: [id], onDelete: Cascade)
-  messages      DirectMessage[]
-
-  @@unique([user1Id, user2Id])
-  @@index([user1Id])
-  @@index([user2Id])
-  @@index([lastMessageAt])
-  @@map("conversations")
-}
-
-model DirectMessage {
-  id             String       @id @default(uuid())
-  conversationId String       @map("conversation_id")
-  senderId       String       @map("sender_id")
-  content        String       @db.Text
-  isRead         Boolean      @default(false) @map("is_read")
-  createdAt      DateTime     @default(now()) @map("created_at")
-
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId])
-  @@index([senderId])
-  @@index([createdAt])
-  @@map("direct_messages")
+  @@map("knowledge_feedback")
 }
 ```
 
 ---
 
-### C. Backend: Module WebSocket Gateway & Messages Service
-**Thư mục mới:** `backend/src/messages/`
-- [NEW] [`backend/src/messages/messages.gateway.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/messages/messages.gateway.ts):
-  - Định nghĩa `@WebSocketGateway({ cors: { origin: '*' } })`.
-  - Quản lý sự kiện:
-    - `handleConnection(client)`: Giải mã JWT token từ client handshake để xác định `userId`, tự động đưa socket vào phòng riêng `user_${userId}`.
-    - `@SubscribeMessage('join_conversation')`: Đưa socket vào phòng `conversation_${conversationId}`.
-    - `@SubscribeMessage('leave_conversation')`: Rời khỏi phòng `conversation_${conversationId}`.
-    - `@SubscribeMessage('send_message')`: 
-      1. Lưu tin nhắn vào DB qua `MessagesService`.
-      2. Phát sóng sự kiện `new_message` đến phòng `conversation_${conversationId}` (tất cả ai đang mở khung chat đều thấy ngay).
-      3. Phát sóng sự kiện `unread_notification` đến phòng cá nhân của người nhận `user_${recipientId}` để cập nhật badge số tin nhắn trên Navbar.
-    - `@SubscribeMessage('typing')`: Gửi tín hiệu người kia "đang soạn tin nhắn..." đến phòng chat.
-- [NEW] [`backend/src/messages/messages.service.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/messages/messages.service.ts):
-  - Hàm lưu tin nhắn, lấy lịch sử hội thoại, đếm số tin nhắn chưa đọc, tạo/lấy conversation giữa 2 người.
-- [NEW] [`backend/src/messages/messages.controller.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/messages/messages.controller.ts):
-  - Hỗ trợ REST API bổ trợ (Lấy danh sách các cuộc hội thoại cũ khi mới vào trang, lấy thông tin ban đầu).
-- [NEW] [`backend/src/messages/messages.module.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/messages/messages.module.ts)
+### Thành phần 2: Recommendation Service (`recommendation-service/`)
+
+#### [MODIFY] `recommendation-service/app/model.py`
+- Nâng cấp `_cold_start_recommend` nhận diện các thuộc tính cá nhân của user thay vì chỉ dùng popularity.
+
+#### [MODIFY] `recommendation-service/app/main.py`
+- Tiếp nhận payload đầy đủ từ backend và gọi logic cold-start cá nhân hóa mới.
 
 ---
 
-### D. Backend: Module Upload File Ảnh (Lưu URL)
-**Thư mục mới:** `backend/src/upload/`
-- [NEW] [`backend/src/upload/upload.module.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/upload/upload.module.ts)
-- [NEW] [`backend/src/upload/upload.controller.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/upload/upload.controller.ts):
-  - Endpoint `POST /upload/image`: Sử dụng `FileInterceptor('file')` với NestJS Multer `diskStorage`. Lưu vào `backend/uploads/` với tên file duy nhất. Giới hạn 5MB, chấp nhận định dạng ảnh. Trả về `{ url: '/uploads/filename.jpg' }`.
-- [MODIFY] [`backend/src/main.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/main.ts):
-  - Cấu hình phục vụ file tĩnh:
-    ```ts
-    app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-    ```
+### Thành phần 3: Web Frontend (`web/`)
+
+#### [NEW] `web/src/components/onboarding/OnboardingModal.tsx`
+- Dialog Modal khảo sát bắt buộc (Mandatory Blocking Dialog - Không giới hạn thời gian, không có nút đóng X, không cho click backdrop thoát) hiển thị cho người dùng mới khi đăng ký hoặc đăng nhập mà chưa có `preferredStyles`.
+- Giao diện chip tags hiện đại: Chọn $\ge 3$ phong cách, đối tượng đi cùng và mức chi tiêu.
+- Chỉ khi chọn đủ và bấm "Hoàn tất & Khám phá" thì Modal mới đóng, đồng thời cập nhật CSDL và nạp lại gợi ý trang chủ.
+
+#### [NEW] `web/src/components/trips/TripFeasibilityCard.tsx`
+- Component hiển thị phân tích tính khả thi lịch trình:
+  - Điểm số tổng thể OFS (thang điểm 100).
+  - Thanh tiến trình phân tích 4 tiêu chuẩn kỹ thuật (Khoảng cách, Ngân sách, Khung giờ, Sở thích).
+  - Khối danh sách cảnh báo/lưu ý di chuyển và chi phí thực tế nếu có.
+
+#### [MODIFY] `web/src/app/trips/[id]/page.tsx`
+- Tích hợp `TripFeasibilityCard` vào trang chi tiết lịch trình.
+
+#### [MODIFY] `web/src/app/question-answer/page.tsx`
+- Thêm Disclaimer hiển thị dưới câu trả lời RAG.
+- Thêm nút cờ 🚩 *"Báo cáo thông tin chưa chính xác / lỗi thời"* và Dialog gửi phản hồi.
 
 ---
 
-### E. Backend: Đính Kèm Lịch Trình, Clone Trip & Phân Quyền Sửa/Xóa Bài
-**File:** [`backend/src/trips/trips.controller.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/trips/trips.controller.ts), [`trips.service.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/trips/trips.service.ts), [`community.controller.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/backend/src/community/community.controller.ts)
+### Thành phần 4: Tài Liệu Luận Văn & Báo Cáo ĐATN (`docs/`)
 
-- **Clone Trip**: `POST /trips/:id/clone` -> Sao chép toàn bộ thông tin chuyến đi sang tài khoản người bấm, giữ nguyên chuyến đi gốc.
-- **Phân quyền Sửa / Xóa bài viết**: Mở quyền cho chính tác giả bài viết (`post.userId === req.user.id`) hoặc `ADMIN`.
-- **Query Community Posts**: Trả về kèm thông tin chi tiết của `trip` đính kèm.
-
----
-
-### F. Frontend: Socket Context / Hook Quản Lý Kết Nối Thời Gian Thực
-**Thư mục mới:** `web/src/context/SocketContext.tsx`
-- Tạo `SocketProvider` kết nối tới Backend `http://localhost:3002` qua `io(SOCKET_URL, { auth: { token } })`.
-- Tự động kết nối lại khi rớt mạng (`reconnection: true`).
-- Cung cấp hàm tiện ích cho toàn bộ ứng dụng:
-  - `socket.emit('send_message', ...)`
-  - `socket.on('new_message', ...)`
-  - `socket.on('unread_notification', ...)`
-  - Trạng thái `unreadCount` dùng chung cho toàn bộ app (Navbar, trang chat).
+#### [NEW] `docs/lecturer-feedback-resolution.md`
+- Bản tổng hợp học thuật đầy đủ:
+  1. **Luận chứng chiến lược Web-First**: Lý giải học thuật về việc hoàn thiện nền tảng Web quy chuẩn, đáp ứng chuẩn di động responsive và chuẩn hóa API contract trước khi mở rộng Native Mobile.
+  2. **Mô hình định lượng Tính Khả thi Lịch trình LLM**: Công thức toán học 5 chiều, cơ chế tự sửa lỗi và bảng kết quả thực nghiệm.
+  3. **Mô hình Cold-Start Cá Nhân Hóa Đa Thuộc Tính**: So sánh với baseline chỉ dùng độ phổ biến, phân tích độ đa dạng gợi ý (Diversity & Novelty).
+  4. **Khung Kiểm Chứng Tri Thức RAG Chatbot**: Sơ đồ kiểm chứng thực thể CSDL thời gian thực và quản lý tri thức lỗi thời.
+  5. **Kịch bản Trả lời Vấn đáp (Q&A Defense Script)**: Hướng dẫn chi tiết cách trả lời tự tin từng câu hỏi của giảng viên khi bảo vệ.
 
 ---
 
-### G. Frontend: Giao Diện Tạo/Sửa Bài Viết & Feed Cộng Đồng
-**File:** [`web/src/app/community/page.tsx`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/web/src/app/community/page.tsx) & [`web/src/types/community.ts`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/web/src/types/community.ts)
+## 5. Kế Hoạch Kiểm Thử & Xác Minh (Verification Plan)
 
-1. **Bộ chọn ảnh (Upload File & URL)**:
-   - Nút "Tải ảnh từ máy" + Ô "Dán link ảnh URL".
-   - Preview thumbnail có nút "X" xóa ảnh trước khi đăng.
-2. **Chọn Đính Kèm Chuyến Đi (Trip Selector)**:
-   - Dropdown lấy danh sách chuyến đi của người dùng.
-3. **Hiển Thị Trên Feed**:
-   - **Bố cục lưới ảnh (Image Grid)**: 1 ảnh lớn, 2 cột cho 2 ảnh, hoặc lưới gallery hiện đại cho 3+ ảnh kèm click phóng to.
-   - **Card Lịch Trình Thông Minh (2 Kịch Bản)**:
-     - **Kịch bản Sắp đi - Tìm bạn đồng hành**: Badge `🟢 Sắp khởi hành: dd/mm/yyyy`, ngân sách, số người. Nút hành động chính: **"Nhắn tin tham gia"** -> Mở chat thời gian thực với tác giả kèm tin nhắn mẫu tự điền: *"Chào bạn, mình thấy lịch trình đi [Điểm đến] ngày [Ngày đi] của bạn rất thú vị, mình muốn đăng ký đi cùng được không?"*.
-     - **Kịch bản Đã đi về - Chia sẻ kinh nghiệm**: Badge `📍 Lịch trình tham quan`, tóm tắt địa điểm, nút **"Xem chi tiết"** và **"Nhân bản chuyến đi"** (1-click clone).
-4. **Menu Sửa & Xóa Cho Tác Giả**:
-   - Nếu là chủ bài viết: Hiển thị menu Sửa (mở modal cập nhật) và Xóa (dialog xác nhận).
+### A. Kiểm thử Tự động (Automated Verification)
+1. **Kiểm thử Feasibility Validator**: Chạy test kiểm tra tính toán OFS với các kịch bản khoảng cách xa (>30km), vượt ngân sách (>130%) và lịch trình cân bằng lý tưởng.
+2. **Kiểm thử Cold-Start Cá nhân hóa**: So sánh gợi ý giữa 2 người dùng mới với 2 phong cách khác nhau (Ẩm thực vs Nghỉ dưỡng) đảm bảo Jaccard similarity giữa 2 danh sách gợi ý $< 0.40$.
+3. **Kiểm thử RAG Entity Grounding**: Gửi câu hỏi về giá vé và kiểm tra phản hồi chứa dữ liệu xác thực từ bảng `places` kèm disclaimer.
 
----
-
-### H. Frontend: Trang Nhắn Tin Real-time 1-1
-**Thư mục mới:** `web/src/app/messages/`
-- [NEW] [`web/src/app/messages/page.tsx`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/web/src/app/messages/page.tsx):
-  - Thiết kế 2 cột chuẩn Universal UI (`#F9F9F8`, `#1A1A1A`, `#E5E7EB`):
-    - **Cột trái**: Danh sách hội thoại kèm avatar, tên, trích đoạn tin nhắn gần nhất, thời gian và chấm xanh tin nhắn mới.
-    - **Cột phải**: Khung chat đang mở:
-      - Header: Thông tin đối phương, avatar, sở thích du lịch `preferredStyles`.
-      - Vùng tin nhắn: Bong bóng chat phân biệt rõ người gửi (`#1A1A1A`) và người nhận (`#F0F0EF`).
-      - Nhận tin nhắn mới qua WebSocket tức thì mà **không cần load lại trang hay polling**.
-      - Thanh nhập tin nhắn: Input linh hoạt, nút gửi `Send`, phím Enter để gửi nhanh.
-      - Tự động cuộn xuống tin nhắn mới nhất với animation mượt mà.
-
----
-
-### I. Frontend: Cập Nhật Navbar
-**File:** [`web/src/components/Navbar.tsx`](file:///z:/Learn_Programming/DATN%20-%20AI%20Travel%20Planner/web/src/components/Navbar.tsx)
-
-- Thêm icon nút **"Tin nhắn"** (`MessageCircle`) ngay cạnh Avatar cá nhân trên Navbar.
-- Lắng nghe sự kiện WebSocket `unread_notification`: Badge số lượng tin nhắn mới nhảy số ngay lập tức khi đối phương gửi tin.
-- Bấm vào icon sẽ chuyển ngay tới trang `/messages`.
-
----
-
-## 3. Kế Hoạch Xác Minh & Kiểm Thử (Verification Plan)
-
-### A. Kiểm tra Hệ thống & Build
-```powershell
-# 1. Cập nhật và kiểm tra Prisma Schema
-cd "z:\Learn_Programming\DATN - AI Travel Planner\backend"
-pnpm prisma validate
-pnpm prisma db push
-
-# 2. Build Backend NestJS (kiểm tra TypeScript và WebSocket Gateway)
-pnpm build
-
-# 3. Build Frontend Next.js (kiểm tra socket.io-client)
-cd "z:\Learn_Programming\DATN - AI Travel Planner\web"
-pnpm build
-```
-
-### B. Kiểm tra Thủ công Theo Kịch Bản Sử Dụng (Manual Scenarios)
-1. **Kiểm tra Upload Ảnh (URL)**:
-   - Tải file ảnh từ máy -> Kiểm tra file lưu vào `backend/uploads/` và hiển thị ảnh xem trước.
-   - Thử dán link ảnh ngoài -> Đăng bài -> Kiểm tra ảnh hiển thị đẹp mắt theo dạng lưới trên Feed.
-2. **Kiểm tra Đính kèm Lịch Trình - Kịch bản "Sắp đi tìm bạn đồng hành"**:
-   - Chọn một chuyến đi có ngày khởi hành ở tương lai, gắn tag `#Tìm bạn đồng hành`.
-   - Xem bài trên Feed: Thấy badge `🟢 Sắp khởi hành: dd/mm/yyyy` và nút `Nhắn tin tham gia`.
-   - Đăng nhập tài khoản khác, bấm `Nhắn tin tham gia` -> Kiểm tra chuyển sang `/messages`, mở đúng hội thoại và tự điền sẵn tin nhắn xin ghép đoàn.
-3. **Kiểm tra Đính kèm Lịch Trình - Kịch bản "Chia sẻ kinh nghiệm"**:
-   - Đính kèm chuyến đi thông thường.
-   - Bấm `Nhân bản chuyến đi` -> Kiểm tra chuyến đi được sao chép vào mục "Lịch Trình" của tài khoản đang xem. Chuyến đi gốc không đổi.
-4. **Kiểm tra Sửa / Xóa Bài Viết**:
-   - Vào bài viết của chính mình -> Bấm Sửa -> Đổi nội dung -> Lưu -> Cập nhật thành công.
-   - Xóa bài viết -> Xác nhận -> Bài viết biến mất khỏi Feed.
-   - Bài của người khác -> Không có nút Sửa/Xóa.
-5. **Kiểm tra Trò Chuyện Real-time WebSocket**:
-   - Mở 2 trình duyệt với 2 tài khoản khác nhau (ví dụ: Chrome và Edge).
-   - Tài khoản A nhắn tin cho Tài khoản B:
-     - Tin nhắn xuất hiện bên màn hình B **ngay lập tức (<0.1 giây)** mà không cần F5.
-     - Badge số tin nhắn trên Navbar của B nhảy số tức thì.
+### B. Kiểm thử Thủ công trên Giao diện Web (Manual Verification)
+1. **Kiểm tra Onboarding Modal**: Đăng ký tài khoản mới $\rightarrow$ Popup khảo sát xuất hiện $\rightarrow$ Chọn tags $\rightarrow$ Bấm lưu $\rightarrow$ Kiểm tra thông tin đã cập nhật trong hồ sơ.
+2. **Kiểm tra Lập Lịch Trình & Feasibility Card**: Tạo chuyến đi 3 ngày $\rightarrow$ Mở trang chi tiết chuyến đi $\rightarrow$ Quan sát thẻ điểm Feasibility Card hiển thị rõ ràng điểm số và các cảnh báo (nếu có).
+3. **Kiểm tra Chatbot RAG**: Hỏi câu hỏi về giá vé địa điểm $\rightarrow$ Xem phản hồi kèm cảnh báo $\rightarrow$ Bấm nút 🚩 báo cáo thông tin $\rightarrow$ Gửi báo cáo thành công.
