@@ -150,7 +150,29 @@ function MessagesContent() {
     const handleNewMessage = (msg: DirectMessageItem) => {
       if (msg.conversationId === activeConversationId) {
         setMessages((prev) => {
+          // Tránh trùng lặp nếu tin nhắn thật đã có trong danh sách
           if (prev.some((m) => m.id === msg.id)) return prev;
+
+          // Nếu là tin nhắn do chính user gửi, thay thế optimistic tempMessage tương ứng
+          if (msg.senderId === user?.id) {
+            const tempIdx = prev.findIndex(
+              (m) => m.id.startsWith('temp-') && m.content === msg.content,
+            );
+            if (tempIdx !== -1) {
+              const updated = [...prev];
+              updated[tempIdx] = msg;
+              return updated;
+            }
+
+            // Fallback: nếu có temp message nào đang chờ, thay thế tin cũ nhất
+            const anyTempIdx = prev.findIndex((m) => m.id.startsWith('temp-'));
+            if (anyTempIdx !== -1) {
+              const updated = [...prev];
+              updated[anyTempIdx] = msg;
+              return updated;
+            }
+          }
+
           return [...prev, msg];
         });
         scrollToBottom();
