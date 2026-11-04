@@ -133,20 +133,81 @@ Khi người dùng mới đăng ký thành công (hoặc đăng nhập mà `pref
 - **Bật Modal Khảo Sát Bắt Buộc (Mandatory Blocking Modal)**:
   - **Không giới hạn thời gian**: Người dùng thoải mái suy nghĩ và lựa chọn kỹ lưỡng.
   - **Không cho tắt**: Không có nút đóng (X), khóa click ra ngoài backdrop, không cho chuyển trang nếu chưa hoàn tất khảo sát (đảm bảo 100% người dùng trên hệ thống đều có vector sở thích ban đầu, xóa bỏ hoàn toàn trạng thái cold-start trống).
-  - Nội dung khảo sát gồm 3 phần bắt buộc:
-    1. **Phong cách yêu thích (chọn $\ge 3$)**: Ẩm thực, Thiên nhiên & Sinh thái, Di tích Lịch sử, Nghỉ dưỡng & Spa, Biển đảo, Check-in sống ảo, Mạo hiểm.
-    2. **Nhóm đồng hành**: Đi một mình (Solo), Cặp đôi (Couple), Gia đình có trẻ nhỏ/người cao tuổi (Family), Nhóm bạn bè (Friends).
-    3. **Mức chi tiêu**: Tiết kiệm (Budget), Tiêu chuẩn (Standard), Cao cấp (Luxury).
-- Bấm "Hoàn tất & Khám phá" $\rightarrow$ Lưu vào CSDL qua `PATCH /api/users/profile` và kích hoạt ngay danh sách gợi ý cá nhân hóa.
+  - **Nội dung 3 câu hỏi khảo sát cụ thể**:
+    1. **Câu 1 - Gu du lịch yêu thích (chọn tối thiểu $\ge 3$ thẻ)**:
+       - 🏛️ *Văn hóa & Lịch sử*: Bảo tàng, di tích, đền chùa, phố cổ, làng nghề.
+       - 🌿 *Thiên nhiên & Sinh thái*: Rừng núi, thác nước, thung lũng, cắm trại.
+       - 🍜 *Ẩm thực & Đặc sản*: Chợ đêm, street food, món ngon bản địa, quán cafe view đẹp.
+       - 🏖️ *Nghỉ dưỡng & Biển đảo*: Resort, tắm khoáng onsen, bãi biển, spa.
+       - 📸 *Check-in & Sống ảo*: Cung đường view đẹp, quán cafe săn mây, kiến trúc độc lạ.
+       - 🧗 *Khám phá & Mạo hiểm*: Trekking, chèo SUP, khám phá hang động.
+       - 🎡 *Vui chơi & Giải trí*: Công viên chủ đề, khu giải trí cảm giác mạnh, phố đi bộ.
+    2. **Câu 2 - Đối tượng đồng hành thường xuyên nhất (chọn 1)**:
+       - 🎒 *Đi một mình (Solo)*: Tự do, linh hoạt, trải nghiệm cá nhân.
+       - 👫 *Cặp đôi (Couple)*: Lãng mạn, riêng tư, nhẹ nhàng.
+       - 👨‍👩‍👧‍👦 *Gia đình (Family)*: An toàn, khuôn viên thoáng mát, phù hợp trẻ nhỏ và người lớn tuổi.
+       - 👥 *Nhóm bạn bè (Friends)*: Sôi động, trải nghiệm tập thể, ăn uống vui chơi.
+    3. **Câu 3 - Mức ngân sách chi tiêu thông thường (chọn 1)**:
+       - 💰 *Tiết kiệm (Budget)*: Ưu tiên điểm miễn phí vé hoặc giá rẻ, homestay bình dân (< 500k/ngày).
+       - 💳 *Tiêu chuẩn (Standard)*: Chi tiêu cân bằng, trải nghiệm vừa đủ (500k - 1.5tr/ngày).
+       - 💎 *Cao cấp (Luxury)*: Trải nghiệm nghỉ dưỡng sang trọng, vé VIP, resort 4-5 sao (> 1.5tr/ngày).
+- Bấm "Hoàn tất & Khám phá" $\rightarrow$ Lưu vào CSDL qua `PATCH /api/users/profile` và kích hoạt ngay danh sách gợi ý cá nhân hóa trên trang chủ.
 
-#### B. Thuật toán xếp hạng Cold-Start trong Python Service & Backend Fallback
-Thay thế logic sắp xếp thuần theo popularity bằng công thức:
-$$\text{Score}_{\text{cold}}(u, p) = 0.50 \cdot \text{Sim}_{\text{content}}(u_{\text{styles}}, p_{\text{cats}}) + 0.25 \cdot \text{Fit}_{\text{budget}}(u_{\text{budget}}, p_{\text{price}}) + 0.15 \cdot \text{Fit}_{\text{group}}(u_{\text{group}}, p_{\text{attr}}) + 0.10 \cdot \text{NormPop}(p)$$
+#### B. Mối Quan Hệ Giữa Khảo Sát Tài Khoản (Onboarding) và Khảo Sát Khi Tạo Chuyến Đi (`/trips/new`)
+Hệ thống kết hợp 2 cấp độ sở thích theo cơ chế **"Tự động điền (Smart Pre-fill) & Ưu tiên chuyến đi (Contextual Override)"**:
+1. **Hồ sơ tài khoản (Long-term Profile)**: Đại diện cho *gu du lịch chung* của người dùng, dùng để cá nhân hóa Trang chủ và các đề xuất mặc định.
+2. **Ý định chuyến đi (Trip-specific Context)**: Đại diện cho *nhu cầu cụ thể của từng lần đi*.
+3. **Cơ chế phối hợp cụ thể**:
+   - **Tự động điền sẵn (Smart Pre-fill)**: Khi người dùng mở trang tạo tour (`/trips/new`), các ô chọn "Mức ngân sách" và "Sở thích" sẽ **tự động được tick sẵn** theo dữ liệu khảo sát Onboarding. Người dùng không cần bấm lại nếu chuyến đi này vẫn theo gu quen thuộc.
+   - **Quyền ưu tiên chuyến đi (Contextual Override)**: Nếu chuyến này người dùng thay đổi (ví dụ: tài khoản là phượt bụi tiết kiệm, nhưng chuyến này đưa gia đình đi nghỉ dưỡng cao cấp) $\rightarrow$ **Hệ thống ưu tiên 100% lựa chọn tại chuyến đi đó để sinh lịch trình**, trong khi hồ sơ tài khoản gốc vẫn được giữ nguyên vẹn.
 
-- **SimContent**: Tính độ khớp giữa thẻ sở thích của user và danh mục địa điểm.
-- **FitBudget**: Điểm tương thích giữa giá vé và phân khúc ngân sách của user.
-- **FitGroup**: Tính phù hợp theo nhóm đồng hành (ví dụ: gia đình có trẻ em sẽ ưu tiên điểm an toàn, không leo núi mạo hiểm; nhóm bạn ưu tiên điểm sôi động).
-- **NormPop**: Độ phổ biến chỉ chiếm **10%** đóng vai trò tiền nghiệm (Prior) đảm bảo chất lượng điểm đến. **90% trọng số còn lại hoàn toàn là cá nhân hóa**!
+#### C. Mô Hình Toán Học & Công Thức Tính Điểm Xếp Hạng Cold-Start
+
+Quá trình tính toán điểm gợi ý từ 2 lần khảo sát được giải quyết bằng **Phép dung hợp Vector đặc trưng theo trọng số (Weighted Linear Feature Fusion)** và **Phép nhân Ma trận - Vector (Matrix-Vector Multiplication)**:
+
+1. **Biểu diễn Vector của 2 lần khảo sát ($M$ chiều danh mục)**:
+   Giả sử hệ thống có không gian $M$ thể loại du lịch (ví dụ $M = 7$: Ẩm thực, Văn hóa, Check-in, Thiên nhiên, Nghỉ dưỡng, Mạo hiểm, Giải trí).
+   - Khảo sát tài khoản: $\mathbf{u}_{\text{onboard}} \in \{0, 1\}^M$
+   - Nhu cầu chuyến đi cụ thể: $\mathbf{t}_{\text{trip}} \in \{0, 1\}^M$
+
+2. **Dung hợp thành Vector Người Dùng Động ($\mathbf{u}_{\text{final}}$)**:
+   $$\mathbf{u}_{\text{final}} = \alpha \cdot \mathbf{t}_{\text{trip}} + (1 - \alpha) \cdot \mathbf{u}_{\text{onboard}}$$
+   - $\alpha = 0.75$: Nhu cầu chuyến đi $\mathbf{t}_{\text{trip}}$ chiếm **75% trọng số** quyết định; gu sở thích tài khoản $\mathbf{u}_{\text{onboard}}$ chiếm **25% trọng số** làm nền tảng.
+   - Nếu người dùng giữ nguyên mặc định $\rightarrow \mathbf{t}_{\text{trip}} = \mathbf{u}_{\text{onboard}} \Rightarrow \mathbf{u}_{\text{final}} = \mathbf{u}_{\text{onboard}}$.
+
+3. **Phép nhân Ma trận - Vector tính điểm Tương thích Sở thích hàng loạt ($\mathbf{S}_{\text{content}}$)**:
+   Với ma trận thuộc tính của $N$ địa điểm ứng viên $\mathbf{P} \in \mathbb{R}^{N \times M}$:
+   $$\mathbf{S}_{\text{content}} = \mathbf{P} \times (\mathbf{u}_{\text{final}})^T \quad (\in \mathbb{R}^{N \times 1})$$
+
+4. **Công thức Tổng Hợp Điểm Xếp Hạng Cuối Cùng ($Score$)**:
+   $$Score(p_j) = 0.50 \cdot \hat{\mathbf{S}}_{\text{content}}[j] + 0.25 \cdot \text{Fit}_{\text{budget}}(B_{\text{trip}}, price_j) + 0.15 \cdot \text{Fit}_{\text{group}}(G_{\text{trip}}, attr_j) + 0.10 \cdot \text{NormPop}(p_j)$$
+
+---
+
+#### D. Ví Dụ Tính Toán Bằng Số Cụ Thể (Minh Họa Trực Quan)
+
+* **Khách hàng:** Anh Nam chuẩn bị đi Đà Lạt.
+  - $\mathbf{u}_{\text{onboard}} = [1, 1, 1, 0, 0, 0, 0]$ (Lúc lập nick chọn: Ẩm thực, Văn hóa, Check-in).
+  - $\mathbf{t}_{\text{trip}} = [0, 0, 0, 1, 1, 0, 0]$ (Chuyến này đi với Gia đình chọn: Thiên nhiên, Nghỉ dưỡng).
+  - Ngân sách: $500.000$ VNĐ/người/ngày.
+* **Vector động sau dung hợp ($\alpha = 0.75$):**
+  $$\mathbf{u}_{\text{final}} = [0.25, \; 0.25, \; 0.25, \; \mathbf{0.75}, \; \mathbf{0.75}, \; 0, \; 0]$$
+
+**So sánh chấm điểm cho 2 địa điểm ứng viên tại Đà Lạt:**
+
+| Thành phần tính toán | KDL Thung Lũng Vàng (Địa điểm A) | Quán Bar Acoustic & Pub đêm (Địa điểm B) |
+| :--- | :--- | :--- |
+| **Đặc trưng địa điểm** | Thiên nhiên, Nghỉ dưỡng, Check-in | Ẩm thực, Giải trí náo nhiệt |
+| **Điểm sở thích (50%)** | $\mathbf{S}_{\text{content}} = 0.75 + 0.75 + 0.25 = 1.75 \rightarrow \mathbf{1.00}$ (100%) | $\mathbf{S}_{\text{content}} = 0.25 \rightarrow \mathbf{0.14}$ (Rất thấp) |
+| **Điểm ngân sách (25%)** | Vé 70.000đ $\ll$ 500.000đ $\rightarrow \mathbf{1.00}$ | Đồ uống 200.000đ $\le$ 500.000đ $\rightarrow \mathbf{0.90}$ |
+| **Điểm nhóm đi (15%)** | Hợp gia đình có trẻ em/người già $\rightarrow \mathbf{1.00}$ | Nhóm gia đình đi Bar $\rightarrow$ Phạt nặng $\rightarrow \mathbf{0.10}$ |
+| **Độ phổ biến (10%)** | $85/100 \rightarrow \mathbf{0.85}$ | $95/100 \rightarrow \mathbf{0.95}$ |
+| **CÔNG THỨC TÍNH** | $0.50(1.0) + 0.25(1.0) + 0.15(1.0) + 0.10(0.85)$ | $0.50(0.14) + 0.25(0.90) + 0.15(0.10) + 0.10(0.95)$ |
+| **TỔNG ĐIỂM SCORE** | $\mathbf{0.985} \quad (\mathbf{98.5} / 100 \text{ điểm})$ | $\mathbf{0.405} \quad (\mathbf{40.5} / 100 \text{ điểm})$ |
+| **KẾT LUẬN XẾP HẠNG** | 🥇 **Được gợi ý lên Top 1** | ❌ **Bị loại khỏi danh sách gợi ý** |
+
+> [!TIP]
+> **Ý nghĩa học thuật:** Nếu chỉ dựa vào độ phổ biến đơn thuần, Quán Bar (95 điểm) sẽ bị gợi ý nhầm cho gia đình Nam. Nhờ công thức dung hợp đa thuộc tính, hệ thống đã nhận diện chính xác Thung Lũng Vàng đạt 98.5 điểm và đưa lên đầu!
 
 ---
 
@@ -180,6 +241,19 @@ flowchart TD
      - Hàm phân loại ý định `classifyQueryIntent(question)` phát hiện từ khóa số liệu/thời sự (`giá vé`, `vé vào cổng`, `bao nhiêu tiền`, `giờ mở cửa`, `đóng cửa`, `tạm dừng`, `tu sửa`, `cấm đường`, `quy mô`, `sức chứa`, `hôm nay`, `mới nhất`, `2026`...).
      - Backend lập tức bật cấu hình `tools: [{ googleSearch: {} }]` khi gọi Gemini API.
      - Gemini tự động đóng vai trò **Search Agent**: Gửi truy vấn lên Google Search, đọc các bài báo/website mới nhất được đăng tải trong thời gian thực, tổng hợp câu trả lời chính xác nhất và trả về kèm đường link web dẫn chứng.
+   - *Chi tiết Nguồn Tra Cứu & Chiến Lược Lọc Nguồn Uy Tín (Source Whitelist & Verification):*
+     - **Cỗ máy tìm kiếm:** Sử dụng trực tiếp Google Search Engine thông qua tính năng Google Search Grounding của Gemini SDK.
+     - **3 nhóm nguồn được Agent ưu tiên cao nhất:**
+       1. 🏛️ *Website chính thức của Ban quản lý & Cổng thông tin Sở Du Lịch:* `dinhdoclap.gov.vn`, `banahills.sunworld.vn`, `vinwonders.com`, `vietnamtourism.gov.vn`, `dulichdanang.gov.vn`, `sodulich.hanoi.gov.vn`...
+       2. 📰 *Báo chí chính thống lớn của Việt Nam:* Chuyên mục Du lịch/Thời sự của VnExpress (`vnexpress.net/du-lich`), Báo Tuổi Trẻ (`tuoitre.vn`), Báo Thanh Niên, Báo Du Lịch Việt Nam.
+       3. 🎫 *Cổng niêm yết vé du lịch chính thống:* Klook, Traveloka, MoMo Travel (nơi cập nhật giá vé bán thực tế theo ngày).
+     - **Rào chắn lọc nguồn (Source Guardrail Directive):** Cài đặt trong System Prompt chỉ đạo Agent:
+       - Bắt buộc ưu tiên bài viết có mốc thời gian gần nhất (năm 2026/2025).
+       - Loại trừ và không trích dẫn thông tin từ blog cá nhân không ghi ngày tháng hoặc các diễn đàn thảo luận tự do không kiểm chứng.
+     - **Trích dẫn minh bạch trên Web:** Trả về danh sách URL có thể click trực tiếp:  
+       🔗 `[Cổng thông tin Di tích Dinh Độc Lập - dinhdoclap.gov.vn]`  
+       🔗 `[Báo VnExpress Du lịch]`  
+       để người dùng và Hội đồng chấm thi có thể bấm trực tiếp vào nguồn web gốc để đối chứng!
 3. **Cơ chế Dự phòng & Kiểm chứng Bổ sung**:
    - Tự động kèm **Disclaimer** khuyến cáo thời điểm cho mọi thông tin giá vé/giờ mở.
    - Nút cờ 🚩 *"Báo cáo thông tin sai / lỗi thời"* trên Web lưu vào bảng `knowledge_feedback` để Quản trị viên theo dõi.
@@ -278,7 +352,7 @@ model KnowledgeFeedback {
   5. **Kịch bản Trả lời Vấn đáp (Q&A Defense Script)**: Hướng dẫn chi tiết cách trả lời tự tin từng câu hỏi của giảng viên khi bảo vệ.
 
 ---
- 
+
 ## 5. Kế Hoạch Kiểm Thử & Xác Minh (Verification Plan)
 
 ### A. Kiểm thử Tự động (Automated Verification)
