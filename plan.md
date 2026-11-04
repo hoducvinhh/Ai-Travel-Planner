@@ -11,7 +11,7 @@ Kế hoạch này được điều chỉnh theo định hướng: **Tập trung 
 | **1** | Cần có mô-đun/phần App Mobile hỗ trợ lập kế hoạch | **Chiến lược giai đoạn (Phased Delivery)**: Hoàn thiện Web Platform làm bản quy chuẩn chuẩn mực (Web Reference Implementation), tối ưu Responsive chuẩn di động (Mobile-friendly PWA view), đóng gói toàn bộ API Contracts sẵn sàng cho Mobile App ở giai đoạn mở rộng tiếp theo. Tài liệu hóa luận chứng học thuật này vào báo cáo. |
 | **2** | Cần cơ chế/bước đánh giá tính hợp lý/khả thi của lịch trình sinh bởi LLM | Xây dựng bộ công cụ `ItineraryFeasibilityValidator` trên NestJS Backend lượng hóa 5 chỉ số ($S_{\text{geo}}, S_{\text{time}}, S_{\text{budget}}, S_{\text{pref}}, S_{\text{div}}$, $\text{OFS}$), tự động sửa lỗi vi phạm và hiển thị trực quan thẻ **Feasibility Score Card** trên trang chi tiết chuyến đi Web. |
 | **3** | Cơ chế Cold-start dựa trên độ phổ biến không thể hiện tính cá nhân hóa gợi ý | Xây dựng **Onboarding Preference Survey Modal** ngay trên Web khi người mới đăng nhập, kết hợp thuật toán **Multi-Attribute Content-Based Personalization** trên Python FastAPI (Khớp sở thích 50% + Ngân sách 25% + Nhóm đi 15% + Phổ biến 10%). |
-| **4** | RAG Chatbot: Thông tin tri thức không còn phù hợp (đóng cửa, giá vé đổi, nguồn không tin cậy) cần cơ chế kiểm chứng | Xây dựng **Quy trình Kiểm chứng Đa tầng (Multi-Tier Verification)**: Metadata cấp độ tin cậy nguồn + Real-time Entity Grounding với CSDL địa điểm + Disclaimer cảnh báo thời điểm + Nút báo cáo sai lệch/lỗi thời trên Web Chatbot. |
+| **4** | RAG Chatbot: Thông tin tri thức không còn phù hợp (đóng cửa, giá vé đổi, nguồn không tin cậy) cần cơ chế kiểm chứng | Xây dựng **Kiến trúc Phân Luồng Tri Thức Kép (Dual-Mode Knowledge Routing)**: Thông tin lịch sử/văn hóa chung bền vững tra cứu siêu tốc trong CSDL nội bộ; thông tin số liệu (giá vé, giờ mở, quy mô) hoặc nhạy cảm rủi ro (đóng/mở cửa, sự cố) tự động chuyển sang **Agentic Web Search (Google Search Grounding)** tra cứu trực tuyến thời gian thực kèm link kiểm chứng. |
 
 ---
 
@@ -57,10 +57,16 @@ flowchart TD
     LocalRepair -->|Lịch trình tối ưu + OFS Score| UI_TripDetail
     UI_TripDetail --> UI_FeasCard
 
-    UI_Chat -->|Hỏi thông tin du lịch| RagService
-    RagService -->|Vector Search| DB_Chunks
-    RagService -->|Đối soát giá vé/trạng thái| DB_Places
-    RagService -->|Câu trả lời + Cảnh báo thời vụ| UI_Chat
+    UI_Chat -->|Câu hỏi du lịch| Router{"Intelligent Knowledge Router"}
+    Router -->|1. Lịch sử / Văn hóa chung| RagService["RAG Service (BGE-M3 + pgvector)"]
+    Router -->|2. Số liệu giá vé / Giờ mở / Đóng cửa| WebSearchAgent["🌐 Live Web Search Agent (Google Search Grounding)"]
+    
+    RagService --> DB_Chunks
+    WebSearchAgent --> LiveInternet["Tra cứu Internet Thời Gian Thực (Google)"]
+    
+    RagService --> GeminiLLM2["Google Gemini LLM"]
+    LiveInternet --> GeminiLLM2
+    GeminiLLM2 -->|Câu trả lời xác thực + Link nguồn| UI_Chat
     UI_Chat -->|Báo cáo giá vé/địa điểm đổi| FeedbackController
     FeedbackController -->|Lưu báo cáo kiểm tra| DB_Feedback
 ```
@@ -144,24 +150,39 @@ $$\text{Score}_{\text{cold}}(u, p) = 0.50 \cdot \text{Sim}_{\text{content}}(u_{\
 
 ---
 
-### 🎯 Điểm 4: Cơ Chế Kiểm Chứng & Đảm Bảo Tính Tin Cậy Của Tri Thức RAG Chatbot
+### 🎯 Điểm 4: Cơ Chế Kiểm Chứng & Phân Luồng Tri Thức Kép (Dual-Mode Knowledge Architecture)
 
-#### A. Kiến trúc Kiểm chứng Đa tầng trên Backend & Web
-1. **Phân cấp Độ Tin Cậy Nguồn (Source Provenance Tiering)**:
-   - **Tier 1 (Official)**: Cổng thông tin Du lịch Việt Nam, Sở Du Lịch các tỉnh, Website chính thức ban quản lý.
-   - **Tier 2 (Reputable Media)**: VnExpress Du lịch, Tuổi Trẻ, Báo Du lịch.
-   - **Tier 3 (Community Travel Reviews)**: Bài viết review cộng đồng.
-2. **Đối soát Thực thể Thời gian thực với CSDL (Real-time DB Entity Grounding)**:
-   - Khi câu hỏi chứa từ khóa nhạy cảm về giá vé ("giá vé", "chi phí vào cổng", "bao nhiêu tiền", "giờ mở cửa"):
-   - Hệ thống trích xuất tên địa điểm, truy vấn trực tiếp bảng `places` trong PostgreSQL để lấy `price_estimate` và trạng thái hoạt động mới nhất năm 2026.
-   - Tiêm thông tin xác thực vào prompt với quyền ưu tiên cao nhất:  
-     *`[DỮ LIỆU ĐÃ XÁC THỰC TỪ CƠ SỞ DỮ LIỆU ĐỊA ĐIỂM]: Địa điểm "X" có giá vé niêm yết: ... VNĐ. Hãy ưu tiên số liệu này nếu các bài viết tham khảo ghi số liệu khác.`*
-3. **Cảnh báo Rủi ro Lỗi thời (Temporal Disclaimer)**:
-   - Chatbot tự động kèm chú thích chân trang:  
-     *`⚠️ Lưu ý: Thông tin về giá vé và thời gian mở cửa có thể thay đổi tùy theo mùa cao điểm và quy định mới nhất của ban quản lý. Bạn nên liên hệ trực tiếp trước khi đến.`*
-4. **Cơ chế Báo cáo từ Người dùng trên Web (`web/src/app/question-answer/page.tsx`)**:
-   - Dưới mỗi câu trả lời của AI có nút cờ báo cáo: 🚩 *"Báo cáo thông tin sai / giá vé đã đổi"*.
-   - Mở Dialog cho phép chọn lý do (`Giá vé đã đổi`, `Địa điểm đã đóng cửa`, `Sai giờ mở cửa`) và gửi về endpoint `POST /api/chat/feedback` lưu vào bảng `knowledge_feedback`.
+Để giải quyết bài toán thông tin tri thức tĩnh bị lỗi thời hoặc không đáng tin cậy, hệ thống nâng cấp Chatbot thành kiến trúc **Corrective RAG (CRAG) kết hợp Bộ Định Tuyến Ý Định Thông Minh (Intelligent Knowledge Router)** tự động phân loại và chuyển hướng linh hoạt giữa 2 chế độ:
+
+```mermaid
+flowchart TD
+    UserQ["Người Dùng Nhập Câu Hỏi"] --> Router{"Bộ Định Tuyến Ý Định Thông Minh\n(Intelligent Knowledge Router)"}
+
+    Router -->|1. THÔNG TIN LỊCH SỬ / CHUNG\n- Lịch sử hình thành, niên đại\n- Bản sắc văn hóa, phong tục\n- Giới thiệu đặc sản, ẩm thực\n- Cảnh quan thiên nhiên, mẹo du lịch| InternalMode["⚡ CHẾ ĐỘ 1: TRI THỨC NỘI BỘ (Local Fast RAG)\n─────────────────────────────────────\n- Tìm kiếm vector BGE-M3 trên bảng tourism_chunks\n- Phản hồi siêu tốc (< 200ms)\n- Không tốn tài nguyên mạng ngoài"]
+
+    Router -->|2. SỐ LIỆU & THÔNG TIN RỦI RO / NHẠY CẢM\n- Số liệu: Giá vé tham quan, phụ thu, giá cáp treo\n- Khung giờ: Giờ mở cửa, giờ đóng cửa, lịch diễn\n- Quy mô: Diện tích, sức chứa, hạ tầng\n- Rủi ro/Trạng thái: Có đang mở cửa không? Tạm đóng?\n- Thời sự: Cấm đường, sạt lở, thời tiết, quy định mới| ExternalMode["🌐 CHẾ ĐỘ 2: AGENT TÌM KIẾM TRỰC TUYẾN (Live Web Search)\n─────────────────────────────────────\n- Kích hoạt Google Search Grounding (Gemini Tool)\n- Tự động tra cứu website tin tức/ban quản lý mới nhất\n- Lấy dữ liệu thực tế năm 2026\n- Trích dẫn trực tiếp đường link web nguồn để kiểm chứng"]
+
+    InternalMode --> LLM_Synthesis["Mô hình Google Gemini Tổng Hợp & Phản Hồi"]
+    ExternalMode --> LLM_Synthesis
+
+    LLM_Synthesis --> Output["Giao Diện Web Chatbot:\n- Trả lời rõ ràng, chính xác\n- Huy hiệu nguồn (CSDL Nội Bộ hoặc Live Web)\n- Nút 🚩 Báo cáo sai lệch nếu thực tế có biến động"]
+```
+
+#### A. Chi tiết 2 Chế độ Tra cứu & Cơ chế Switch tự động
+1. **Chế độ 1 - Tri thức Nội bộ CSDL (Internal Fast Vector Retrieval)**:
+   - *Áp dụng cho:* Các câu hỏi mang tính bền vững vĩnh cửu theo thời gian (Evergreen Knowledge) như: *"Kinh thành Huế xây dựng vào năm nào?", "Sự tích Hồ Gươm", "Đặc sản mì Quảng bắt nguồn từ đâu?", "Những bãi biển đẹp nhất Phú Quốc"*.
+   - *Cơ chế:* Dùng mô hình BGE-M3 local nhúng câu hỏi $\rightarrow$ Quét cosine similarity trong `tourism_chunks` $\rightarrow$ Gemini sinh câu trả lời trong tích tắc (< 1.2 giây) với chi phí tối ưu nhất.
+2. **Chế độ 2 - Agent Tìm kiếm Trực tuyến Thời gian thực (Live Google Search Grounding)**:
+   - *Áp dụng cho:* Các câu hỏi có số liệu biến động hoặc trạng thái nhạy cảm (Dynamic & Real-time Sensitive Knowledge):
+     - **Số liệu cụ thể:** Giá vé vào cổng, giá vé combo, chi phí tour, giờ mở cửa/đóng cửa, quy mô diện tích.
+     - **Rủi ro & Trạng thái vận hành:** *"Địa điểm X có đang mở cửa không?", "Đèo Prenn có đang cấm đường không?", "Thời tiết Fansipan hôm nay thế nào?"*.
+   - *Cơ chế Switch tự động:*
+     - Hàm phân loại ý định `classifyQueryIntent(question)` phát hiện từ khóa số liệu/thời sự (`giá vé`, `vé vào cổng`, `bao nhiêu tiền`, `giờ mở cửa`, `đóng cửa`, `tạm dừng`, `tu sửa`, `cấm đường`, `quy mô`, `sức chứa`, `hôm nay`, `mới nhất`, `2026`...).
+     - Backend lập tức bật cấu hình `tools: [{ googleSearch: {} }]` khi gọi Gemini API.
+     - Gemini tự động đóng vai trò **Search Agent**: Gửi truy vấn lên Google Search, đọc các bài báo/website mới nhất được đăng tải trong thời gian thực, tổng hợp câu trả lời chính xác nhất và trả về kèm đường link web dẫn chứng.
+3. **Cơ chế Dự phòng & Kiểm chứng Bổ sung**:
+   - Tự động kèm **Disclaimer** khuyến cáo thời điểm cho mọi thông tin giá vé/giờ mở.
+   - Nút cờ 🚩 *"Báo cáo thông tin sai / lỗi thời"* trên Web lưu vào bảng `knowledge_feedback` để Quản trị viên theo dõi.
 
 ---
 
@@ -179,9 +200,15 @@ $$\text{Score}_{\text{cold}}(u, p) = 0.50 \cdot \text{Sim}_{\text{content}}(u_{\
 #### [MODIFY] `backend/src/recommendation/recommendation.service.ts`
 - Cập nhật hàm fallback cold-start sử dụng công thức kết hợp đa thuộc tính (Sở thích 50% + Ngân sách 25% + Nhóm đi 15% + Phổ biến 10%).
 
+#### [MODIFY] `backend/src/gemini/gemini.service.ts`
+- Bổ sung cấu hình công cụ `tools: [{ googleSearch: {} }]` cho Google Gemini API để hỗ trợ tra cứu trực tuyến thời gian thực (Google Search Grounding).
+- Hỗ trợ trích xuất `groundingMetadata` (danh sách đường link bài viết web thực tế từ kết quả tìm kiếm Google).
+
 #### [MODIFY] `backend/src/rag/rag.service.ts`
-- Thêm Entity Grounding đối soát với bảng `places`.
-- Nhận diện câu hỏi giá vé / giờ mở cửa và bổ sung thông tin xác thực cùng Disclaimer.
+- Cài đặt bộ định tuyến ý định `classifyQueryIntent(question)`:
+  - Nếu câu hỏi lịch sử / văn hóa chung $\rightarrow$ Truy xuất nhanh qua `tourism_chunks` (BGE-M3 vector cosine).
+  - Nếu câu hỏi số liệu (giá vé, giờ mở, quy mô) hoặc trạng thái nhạy cảm (đóng/mở cửa, sạt lở, thời tiết) $\rightarrow$ Kích hoạt `googleSearch` tool trên Gemini để lấy dữ liệu thực tế mới nhất năm 2026 kèm web links.
+- Tự động bổ sung Disclaimer cảnh báo thời điểm cho các thông tin số liệu.
 
 #### [NEW] `backend/src/chat/dto/feedback.dto.ts` & [MODIFY] `backend/src/chat/chat.controller.ts`
 - Endpoint `POST /api/chat/feedback` tiếp nhận báo cáo từ người dùng.
@@ -232,6 +259,9 @@ model KnowledgeFeedback {
 - Tích hợp `TripFeasibilityCard` vào trang chi tiết lịch trình.
 
 #### [MODIFY] `web/src/app/question-answer/page.tsx`
+- Hiển thị nhãn nguồn phân biệt:
+  - 📚 *"Nguồn Tri Thức Du Lịch Bản Địa"* (khi trả lời từ CSDL nội bộ).
+  - 🌐 *"Nguồn Kiểm Chứng Trực Tuyến Thời Gian Thực"* (khi chuyển chế độ Google Search kèm đường link bài báo gốc).
 - Thêm Disclaimer hiển thị dưới câu trả lời RAG.
 - Thêm nút cờ 🚩 *"Báo cáo thông tin chưa chính xác / lỗi thời"* và Dialog gửi phản hồi.
 
@@ -248,7 +278,7 @@ model KnowledgeFeedback {
   5. **Kịch bản Trả lời Vấn đáp (Q&A Defense Script)**: Hướng dẫn chi tiết cách trả lời tự tin từng câu hỏi của giảng viên khi bảo vệ.
 
 ---
-
+ 
 ## 5. Kế Hoạch Kiểm Thử & Xác Minh (Verification Plan)
 
 ### A. Kiểm thử Tự động (Automated Verification)
