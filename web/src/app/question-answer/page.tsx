@@ -815,20 +815,13 @@ export default function QuestionAnswerPage() {
               <span className="sm:hidden">Chủ đề</span>
             </Button>
 
-            {/* Trạng thái pgvector */}
+            {/* Trạng thái AI */}
             <Badge variant="secondary" className="gap-2 px-2.5 py-1 rounded-full text-[11px] border-[#E5E7EB] bg-white font-normal">
-              <Database className="w-3.5 h-3.5 text-[#6B7280]" />
-              {systemStatus?.database?.connected ? (
-                <span className="flex items-center gap-1.5 font-medium text-[#1A1A1A]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#65A30D]"></span>
-                  <span>{systemStatus.database.totalChunks.toLocaleString()} chunks</span>
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5 text-[#6B7280]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E5E7EB] animate-pulse"></span>
-                  <span>Đang kết nối</span>
-                </span>
-              )}
+              <Sparkles className="w-3.5 h-3.5 text-[#65A30D]" />
+              <span className="flex items-center gap-1.5 font-medium text-[#1A1A1A]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#65A30D]"></span>
+                <span>Trợ lý sẵn sàng</span>
+              </span>
             </Badge>
 
             {messages.length > 0 && (
@@ -856,7 +849,7 @@ export default function QuestionAnswerPage() {
               <div className="text-center mb-8 max-w-2xl">
                 <Badge variant="lime" className="gap-1.5 px-3 py-1 text-xs font-medium mb-3.5 shadow-2xs">
                   <Sparkles className="w-3.5 h-3.5 text-[#1A1A1A]" />
-                  <span>Kho tri thức RAG • 10.856 Chunks • 63 Tỉnh thành</span>
+                  <span>Trợ lý du lịch AI • 63 Tỉnh thành</span>
                 </Badge>
                 <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1A1A1A] mb-2.5">
                   Bạn muốn khám phá du lịch Việt Nam thế nào?
@@ -953,11 +946,6 @@ export default function QuestionAnswerPage() {
                                 {currentTopic.description}
                               </p>
                             </div>
-                          </div>
-                          <div className="shrink-0">
-                            <Badge variant="secondary" className="border-[#E5E7EB] text-xs font-medium text-[#6B7280]">
-                              {currentTopic.chunkCountEstimate}
-                            </Badge>
                           </div>
                         </div>
 

@@ -226,7 +226,7 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
           border: none !important;
         }
         .custom-photo-pin {
-          transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .custom-photo-pin:hover {
           transform: scale(1.15);

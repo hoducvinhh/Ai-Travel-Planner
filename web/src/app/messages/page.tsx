@@ -359,9 +359,9 @@ function MessagesContent() {
                       key={conv.id}
                       type="button"
                       onClick={() => loadConversation(conv.id, partner)}
-                      className={`w-full p-3.5 flex items-start gap-3 text-left transition cursor-pointer ${
+                      className={`w-full p-3.5 flex items-start gap-3 text-left transition rounded-xl cursor-pointer ${
                         isActive
-                          ? 'bg-[#F4FCE3]/60 border-l-4 border-l-[#365314]'
+                          ? 'bg-[#F4FCE3] text-[#1A1A1A] font-medium border border-[#D9F99D]'
                           : 'hover:bg-[#F9F9F8]'
                       }`}
                     >
@@ -534,9 +534,9 @@ function MessagesContent() {
                   {partnerTyping && (
                     <div className="flex items-center gap-2 text-xs text-[#6B7280] bg-white border border-[#E5E7EB] px-3 py-1.5 rounded-full w-fit animate-in fade-in">
                       <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce [animation-delay:-0.3s]" />
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce [animation-delay:-0.15s]" />
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-bounce" />
+                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse [animation-delay:-0.3s]" />
+                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse [animation-delay:-0.15s]" />
+                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse" />
                       </div>
                       <span className="text-[10px]">Đang soạn tin nhắn...</span>
                     </div>
