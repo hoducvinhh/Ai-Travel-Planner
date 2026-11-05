@@ -793,7 +793,7 @@ export default function QuestionAnswerPage() {
                   {currentSession ? currentSession.title : 'Cố Vấn Du Lịch Việt Nam AI'}
                 </h1>
                 <Badge variant="lime" className="text-[10px] font-semibold">
-                  RAG BGE-M3
+                  AI Assistant
                 </Badge>
               </div>
               <p className="text-[11px] text-[#6B7280] hidden sm:block mt-0.5">
@@ -1017,10 +1017,7 @@ export default function QuestionAnswerPage() {
                           </p>
                         </div>
 
-                        <div className="pt-2.5 border-t border-[#F0F0EF] flex items-center justify-between text-xs text-[#6B7280]">
-                          <span className="font-medium text-[#6B7280]">
-                            {topic.chunkCountEstimate}
-                          </span>
+                        <div className="pt-2.5 border-t border-[#F0F0EF] flex items-center justify-end text-xs text-[#6B7280]">
                           <span className="flex items-center gap-1 group-hover:text-[#1A1A1A] font-medium transition-colors">
                             Xem câu hỏi <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-[#6B7280] group-hover:text-[#1A1A1A]" />
                           </span>
@@ -1410,11 +1407,8 @@ export default function QuestionAnswerPage() {
                   <BookOpen className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <DialogTitle className="text-sm sm:text-base font-semibold text-[#1A1A1A] flex items-center gap-2">
-                    Toàn Bộ Chủ Đề Trong Kho Tri Thức RAG
-                    <Badge variant="lime" className="text-[10px] font-medium">
-                      10.856 Chunks
-                    </Badge>
+                  <DialogTitle className="text-sm sm:text-base font-semibold text-[#1A1A1A]">
+                    Toàn Bộ Chủ Đề Du Lịch Việt Nam
                   </DialogTitle>
                   <DialogDescription className="text-xs text-[#6B7280]">
                     Bấm vào bất kỳ câu hỏi nào để trao đổi ngay với hệ thống AI
@@ -1479,9 +1473,6 @@ export default function QuestionAnswerPage() {
                               <p className="text-xs text-[#6B7280]">{topic.description}</p>
                             </div>
                           </div>
-                          <Badge variant="secondary" className="bg-white border-[#E5E7EB] text-xs font-medium text-[#6B7280]">
-                            {topic.chunkCountEstimate}
-                          </Badge>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-[#E5E7EB]/70">
@@ -1510,7 +1501,7 @@ export default function QuestionAnswerPage() {
 
             {/* Footer Modal */}
             <div className="p-3.5 sm:p-4 border-t border-[#F0F0EF] bg-[#FAFAF9] flex items-center justify-between text-xs text-[#6B7280] shrink-0">
-              <span>Được xây dựng với mô hình BGE-M3 và dữ liệu 63 tỉnh thành Việt Nam</span>
+              <span>Cẩm nang du lịch 63 tỉnh thành Việt Nam</span>
               <Button
                 variant="default"
                 onClick={() => setIsTopicModalOpen(false)}

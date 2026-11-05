@@ -355,7 +355,7 @@ function TripDetailContent() {
                   {trip.itinerary?.optimizationStats && (
                     <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1A1A1A] text-white text-[11px] font-medium">
                       <Zap className="w-3 h-3 text-[#D4F066]" />
-                      Đã tối ưu 2-Opt TSPTW (-{trip.itinerary.optimizationStats.totalSavedPercentage}%)
+                      Đã tối ưu cung đường (-{trip.itinerary.optimizationStats.totalSavedPercentage}%)
                     </div>
                   )}
                 </div>
@@ -379,7 +379,7 @@ function TripDetailContent() {
                   ) : (
                     <Zap className="w-3.5 h-3.5 text-[#D4F066]" />
                   )}
-                  <span>{isOptimizing ? 'Đang chạy thuật toán TSP...' : 'Tối ưu hóa lộ trình (2-Opt TSP)'}</span>
+                  <span>{isOptimizing ? 'Đang chạy thuật toán TSP...' : 'Tối ưu hóa lộ trình'}</span>
                 </Button>
               </div>
             </div>
@@ -424,9 +424,7 @@ function TripDetailContent() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wider">
-                      Đánh Giá Hiệu Năng Thuật Toán Tối Ưu Hóa Tuyến Đường (2-Opt TSPTW)
-                    </h3>
+                    <h3 className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wider">Hiệu Quả Tối Ưu Tuyến Đường Di Chuyển</h3>
                   </div>
                   <p className="text-[11px] text-muted-foreground">
                     Cực tiểu hóa tổng quãng đường di chuyển và bảo toàn ràng buộc khung giờ các buổi (Sáng ➔ Chiều ➔ Tối)
@@ -463,7 +461,7 @@ function TripDetailContent() {
                   <div className="text-[10px] text-[#365314] font-medium mt-1">
                     {currentDay?.optimizationStats
                       ? `Ngày ${selectedDay}: ${currentDay.optimizationStats.optimizedDistanceKm} km`
-                      : 'Đã giải quyết bài toán TSPTW'}
+                      : 'Đã sắp xếp thứ tự di chuyển tối ưu'}
                   </div>
                 </div>
 

@@ -234,8 +234,8 @@ function NewTripContent() {
                 <div className="mb-4 p-3.5 rounded-xl bg-[#F4FCE3] border border-[#D9F99D] flex items-start gap-2.5 text-xs text-[#365314]">
                   <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#365314]" />
                   <div>
-                    <span className="font-bold">✨ Đã kích hoạt chế độ Tour Liên Tỉnh ({formData.destinations.length} địa phương): </span>
-                    Thuật toán Gom cụm Không Gian (Spatial Clustering) và Tối ưu hóa 2-Opt TSPTW sẽ tự động nhóm các ngày theo từng tỉnh thành liền kề, loại bỏ hoàn toàn việc di chuyển zíc-zắc qua lại.
+                    <span className="font-bold">✨ Chế độ Tour Liên Tỉnh ({formData.destinations.length} địa phương): </span>
+                    Hệ thống sẽ tự động phân bổ các ngày theo khu vực liền kề, giúp bạn di chuyển thuận tiện và liền mạch nhất.
                   </div>
                 </div>
               )}

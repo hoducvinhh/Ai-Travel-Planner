@@ -375,36 +375,15 @@ export default function PlacesSocialFeedPage() {
       )}
 
       {/* Header Section */}
-      <section className="border-b border-[#E5E7EB] bg-white py-12 md:py-16">
+      <section className="border-b border-[#E5E7EB] bg-white py-8 md:py-10">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-xs font-medium mb-4">
-            <Compass className="w-3.5 h-3.5" />
-            <span>Khám phá 520+ điểm đến thực tế tại Việt Nam</span>
-          </div>
-
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#1A1A1A] mb-3">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-[#1A1A1A] mb-2.5">
             Khám phá & trải nghiệm điểm đến
           </h1>
 
-          <p className="text-muted-foreground text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            Khám phá danh mục địa điểm, lưu lại mục yêu thích và đánh giá trải nghiệm. Hệ thống Machine Learning sẽ cá nhân hóa gợi ý cho hành trình tiếp theo của bạn.
+          <p className="text-muted-foreground text-sm max-w-xl mx-auto leading-relaxed">
+            Tìm kiếm địa điểm du lịch thực tế, lưu lại mục yêu thích và chia sẻ đánh giá trải nghiệm của bạn.
           </p>
-
-          {/* Key metadata pills */}
-          <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs font-medium">
-            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
-              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>520+ Điểm đến chọn lọc</span>
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
-              <TrendingUp className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>Gợi ý LightFM cá nhân hoá</span>
-            </Badge>
-            <Badge variant="secondary" className="px-3 py-1.5 gap-1.5 font-normal">
-              <Compass className="w-3.5 h-3.5 text-muted-foreground" />
-              <span>11 Tỉnh thành trọng điểm</span>
-            </Badge>
-          </div>
         </div>
       </section>
 
