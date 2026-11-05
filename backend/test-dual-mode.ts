@@ -1,27 +1,23 @@
-import { Test } from '@nestjs/testing';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from './src/prisma/prisma.module';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import { ConfigService } from '@nestjs/config';
+import { PrismaService } from './src/prisma/prisma.service';
 import { EmbeddingService } from './src/embedding/embedding.service';
 import { GeminiService } from './src/gemini/gemini.service';
 import { RagService } from './src/rag/rag.service';
 import { ChatService } from './src/chat/chat.service';
 
 async function verifyDualMode() {
-  console.log('🚀 Đang khởi tạo Testing Module cho RAG & Chat (Điểm 4)...');
-  const moduleRef = await Test.createTestingModule({
-    imports: [
-      ConfigModule.forRoot({
-        isGlobal: true,
-        envFilePath: '.env',
-      }),
-      PrismaModule,
-    ],
-    providers: [EmbeddingService, GeminiService, RagService, ChatService],
-  }).compile();
+  console.log('🚀 Khởi tạo các dịch vụ RAG & Chat (Điểm 4)...');
+  const prisma = new PrismaService();
+  await prisma.$connect();
 
-  const ragService = moduleRef.get(RagService);
-  const chatService = moduleRef.get(ChatService);
-  const geminiService = moduleRef.get(GeminiService);
+  const configService = new ConfigService();
+  const geminiService = new GeminiService(configService);
+  const embeddingService = new EmbeddingService();
+  const ragService = new RagService(prisma, embeddingService, geminiService);
+  const chatService = new ChatService(prisma);
 
   console.log('\n--- 1. KIỂM THỬ BỘ ĐỊNH TUYẾN Ý ĐỊNH THÔNG MINH (Intelligent Knowledge Router) ---');
   const testCases = [
@@ -85,12 +81,11 @@ async function verifyDualMode() {
   console.log('Lưu thành công phản hồi vào bảng knowledge_feedback:', feedback.id, feedback.status);
 
   // Xóa bản ghi test
-  const prisma = (chatService as any).prisma;
   await prisma.knowledgeFeedback.delete({ where: { id: feedback.id } });
   console.log('Đã dọn dẹp bản ghi test.');
 
   console.log('\n🎉 TẤT CẢ KIỂM THỬ CHO ĐIỂM 4 ĐÃ HOÀN TẤT VÀ CHÍNH XÁC 100%!');
-  await moduleRef.close();
+  await prisma.$disconnect();
 }
 
 verifyDualMode().catch((err) => {
