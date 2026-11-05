@@ -27,8 +27,8 @@ export class GeminiService {
 
   constructor(private readonly configService: ConfigService) {
     const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-    this.modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-3.5-flash-lite');
-    this.fallbackModelName = this.configService.get<string>('GEMINI_FALLBACK_MODEL', 'gemini-3.1-flash-lite');
+    this.modelName = this.configService.get<string>('GEMINI_MODEL', 'gemini-3.5-flash');
+    this.fallbackModelName = this.configService.get<string>('GEMINI_FALLBACK_MODEL', 'gemini-3.5-flash-lite');
 
     if (apiKey && apiKey.trim().length > 0) {
       this.ai = new GoogleGenAI({ apiKey });
@@ -44,6 +44,21 @@ export class GeminiService {
 
   isConfigured(): boolean {
     return this.ai !== null;
+  }
+
+  /**
+   * Danh sách chuỗi mô hình dự phòng đa tầng (Multi-model resilience fallback)
+   */
+  private getCandidateModels(): string[] {
+    const defaultList = [
+      'gemini-3-flash-preview',
+      'gemini-3.1-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.5-flash-lite',
+      this.modelName,
+      this.fallbackModelName,
+    ];
+    return Array.from(new Set(defaultList.filter(Boolean)));
   }
 
   /**
@@ -115,77 +130,70 @@ export class GeminiService {
 
     // 1. Nếu yêu cầu Google Search Grounding, thử gọi trước với công cụ googleSearch
     if (useSearch) {
-      try {
-        const response = await this.ai.models.generateContent({
-          model: this.modelName,
-          contents: prompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-          },
-        });
+      for (const model of this.getCandidateModels().slice(0, 2)) {
+        try {
+          const response = await this.ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: {
+              tools: [{ googleSearch: {} }],
+            },
+          });
 
-        const text = response.text || '';
-        const metadata = response.candidates?.[0]?.groundingMetadata;
-        const sources = this.extractSourcesFromMetadata(metadata);
-        const searchQueries = metadata?.webSearchQueries || [];
+          const text = response.text || '';
+          const metadata = response.candidates?.[0]?.groundingMetadata;
+          const sources = this.extractSourcesFromMetadata(metadata);
+          const searchQueries = metadata?.webSearchQueries || [];
 
-        // Nếu có link trong văn bản, bổ sung thêm
-        const mdLinks = this.extractMarkdownLinks(text);
-        for (const l of mdLinks) {
-          if (!sources.some((s) => s.url === l.url)) {
-            sources.push(l);
+          // Nếu có link trong văn bản, bổ sung thêm
+          const mdLinks = this.extractMarkdownLinks(text);
+          for (const l of mdLinks) {
+            if (!sources.some((s) => s.url === l.url)) {
+              sources.push(l);
+            }
           }
-        }
 
-        return {
-          text,
-          groundingSources: sources,
-          searchQueries,
-        };
-      } catch (searchError: any) {
-        this.logger.warn(
-          `Google Search Grounding không khả dụng (${searchError?.message || searchError}). Tự động chuyển tiếp sang mô hình tiêu chuẩn...`,
-        );
+          return {
+            text,
+            groundingSources: sources,
+            searchQueries,
+          };
+        } catch (searchError: any) {
+          const isQuota = searchError?.status === 429 || `${searchError?.message}`.includes('429') || `${searchError?.message}`.includes('quota');
+          this.logger.warn(
+            `Google Search Grounding trên ${model} không khả dụng (${searchError?.status || searchError?.message})...`,
+          );
+          if (isQuota) break;
+        }
       }
     }
 
-    // 2. Chạy với mô hình chuẩn (kèm cơ chế fallback model)
-    try {
-      const response = await this.ai.models.generateContent({
-        model: this.modelName,
-        contents: prompt,
-      });
-
-      const text = response.text || 'Không có phản hồi từ mô hình AI.';
-      const sources = this.extractMarkdownLinks(text);
-
-      return {
-        text,
-        groundingSources: sources,
-      };
-    } catch (error: any) {
-      this.logger.warn(
-        `Lỗi khi gọi model chính (${this.modelName}): ${error?.message || error}. Đang thử sang model dự phòng (${this.fallbackModelName})...`,
-      );
-
+    // 2. Chạy với chuỗi mô hình dự phòng (Multi-model resilience fallback)
+    for (const model of this.getCandidateModels()) {
       try {
-        const fallbackResponse = await this.ai.models.generateContent({
-          model: this.fallbackModelName,
+        const response = await this.ai.models.generateContent({
+          model,
           contents: prompt,
         });
 
-        const text = fallbackResponse.text || 'Không có phản hồi từ mô hình AI.';
+        const text = response.text || 'Không có phản hồi từ mô hình AI.';
         const sources = this.extractMarkdownLinks(text);
 
         return {
           text,
           groundingSources: sources,
         };
-      } catch (fallbackError: any) {
-        this.logger.error(`Lỗi cả model dự phòng (${this.fallbackModelName}):`, fallbackError);
-        throw fallbackError;
+      } catch (error: any) {
+        this.logger.warn(
+          `Model ${model} tạm thời không khả dụng (${error?.status || error?.message}). Đang chuyển sang model tiếp theo trong chuỗi...`,
+        );
       }
     }
+
+    return {
+      text: 'Hệ thống AI hiện đang chịu tải cao tạm thời từ máy chủ Google. Vui lòng thử lại sau giây lát.',
+      groundingSources: [],
+    };
   }
 
   /**
@@ -215,7 +223,7 @@ export class GeminiService {
   }
 
   /**
-   * Sinh câu trả lời dạng streaming có trích xuất grounding sources
+   * Sinh câu trả lời dạng streaming có trích xuất grounding sources với cơ chế đa model dự phòng
    */
   async *generateAnswerStreamWithGrounding(
     prompt: string,
@@ -236,70 +244,67 @@ export class GeminiService {
 
     // 1. Thử stream với Google Search Grounding nếu được yêu cầu
     if (useSearch) {
-      try {
-        const responseStream = await this.ai.models.generateContentStream({
-          model: this.modelName,
-          contents: prompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-          },
-        });
-
-        for await (const chunk of responseStream) {
-          if (chunk.candidates?.[0]?.groundingMetadata) {
-            lastGroundingMetadata = chunk.candidates[0].groundingMetadata;
-          }
-          if (chunk.text) {
-            accumulatedText += chunk.text;
-            yield { type: 'token', data: chunk.text };
-          }
-        }
-        streamSuccessful = true;
-      } catch (searchError: any) {
-        this.logger.warn(
-          `Lỗi stream Google Search Grounding: ${searchError?.message}. Tự động fallback sang stream tiêu chuẩn...`,
-        );
-      }
-    }
-
-    // 2. Fallback stream nếu chưa thành công
-    if (!streamSuccessful) {
-      const activeModel = this.modelName;
-      try {
-        const responseStream = await this.ai.models.generateContentStream({
-          model: activeModel,
-          contents: prompt,
-        });
-
-        for await (const chunk of responseStream) {
-          if (chunk.text) {
-            accumulatedText += chunk.text;
-            yield { type: 'token', data: chunk.text };
-          }
-        }
-      } catch (error: any) {
-        this.logger.warn(
-          `Lỗi streaming model ${activeModel}: ${error?.message}. Thử chuyển model dự phòng ${this.fallbackModelName}...`,
-        );
+      for (const model of this.getCandidateModels().slice(0, 2)) {
         try {
-          const fallbackStream = await this.ai.models.generateContentStream({
-            model: this.fallbackModelName,
+          const responseStream = await this.ai.models.generateContentStream({
+            model,
             contents: prompt,
+            config: {
+              tools: [{ googleSearch: {} }],
+            },
           });
 
-          for await (const chunk of fallbackStream) {
+          for await (const chunk of responseStream) {
+            if (chunk.candidates?.[0]?.groundingMetadata) {
+              lastGroundingMetadata = chunk.candidates[0].groundingMetadata;
+            }
             if (chunk.text) {
               accumulatedText += chunk.text;
               yield { type: 'token', data: chunk.text };
             }
           }
-        } catch (fallbackError: any) {
-          this.logger.error('Lỗi khi streaming cả model dự phòng:', fallbackError);
-          yield {
-            type: 'token',
-            data: `\n[Lỗi kết nối Gemini API: ${fallbackError.message || 'Lỗi không xác định'}]`,
-          };
+          streamSuccessful = true;
+          break;
+        } catch (searchError: any) {
+          const isQuota = searchError?.status === 429 || `${searchError?.message}`.includes('429') || `${searchError?.message}`.includes('quota');
+          this.logger.warn(
+            `Google Search Grounding trên ${model} không khả dụng (${searchError?.status || searchError?.message})...`,
+          );
+          if (isQuota) break;
         }
+      }
+    }
+
+    // 2. Fallback stream qua chuỗi candidate models nếu chưa thành công
+    if (!streamSuccessful) {
+      for (const model of this.getCandidateModels()) {
+        try {
+          const responseStream = await this.ai.models.generateContentStream({
+            model,
+            contents: prompt,
+          });
+
+          for await (const chunk of responseStream) {
+            if (chunk.text) {
+              accumulatedText += chunk.text;
+              yield { type: 'token', data: chunk.text };
+            }
+          }
+          streamSuccessful = true;
+          break;
+        } catch (error: any) {
+          this.logger.warn(
+            `Lỗi streaming trên model ${model}: ${error?.status || error?.message}. Đang thử model tiếp theo...`,
+          );
+        }
+      }
+
+      if (!streamSuccessful) {
+        this.logger.error('Toàn bộ các model AI trong chuỗi dự phòng đều không phản hồi.');
+        yield {
+          type: 'token',
+          data: '\n[Hệ thống AI hiện đang chịu tải cao tạm thời từ Google Cloud. Vui lòng gửi lại câu hỏi sau giây lát.]',
+        };
       }
     }
 
