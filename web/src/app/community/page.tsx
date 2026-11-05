@@ -448,13 +448,13 @@ export default function CommunityPage() {
         <div className="container mx-auto px-4 max-w-6xl text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-xs font-medium mb-3">
             <Users className="w-3.5 h-3.5" />
-            <span>Cộng đồng x Kết nối bạn đồng hành & Nhắn tin Real-time</span>
+            <span>Cộng đồng du lịch & Kết nối bạn đồng hành</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1A1A1A] mb-2">
-            Diễn đàn chia sẻ & Kết nối du lịch
+            Diễn đàn chia sẻ & kết nối du lịch
           </h1>
           <p className="text-muted-foreground text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
-            Chia sẻ trải nghiệm khám phá, tìm bạn đồng hành ghép đoàn, nhân bản lịch trình 1-click và trò chuyện trực tiếp qua WebSocket tốc độ cao.
+            Chia sẻ trải nghiệm khám phá, tìm bạn đồng hành cùng gu, lưu lại lịch trình hữu ích và trao đổi kinh nghiệm du lịch thực tế khắp Việt Nam.
           </p>
         </div>
       </section>
@@ -501,10 +501,10 @@ export default function CommunityPage() {
                     key={tag}
                     type="button"
                     onClick={() => setSelectedTag(tag)}
-                    className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer whitespace-nowrap font-medium ${
+                    className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer whitespace-nowrap font-medium ${
                       isActive
                         ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                        : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#F5F5F4]'
                     }`}
                   >
                     #{tag}
@@ -730,9 +730,10 @@ export default function CommunityPage() {
                                 <div className="flex items-center gap-1.5">
                                   <Badge
                                     variant="outline"
-                                    className="text-[10px] font-medium px-2 py-0.5 border-[#E5E7EB] text-[#1A1A1A]"
+                                    className="text-[10px] font-medium px-2 py-0.5 border-[#E5E7EB] text-[#1A1A1A] gap-1"
                                   >
-                                    📍 Lịch trình tham quan
+                                    <MapPin className="w-3 h-3 text-muted-foreground" />
+                                    <span>Lịch trình tham quan</span>
                                   </Badge>
                                 </div>
                                 <span className="text-[10px] text-muted-foreground">

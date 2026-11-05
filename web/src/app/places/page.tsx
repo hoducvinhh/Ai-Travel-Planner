@@ -436,8 +436,9 @@ export default function PlacesSocialFeedPage() {
 
             {/* Province Filter Pills */}
             <div>
-              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Tỉnh / Thành phố
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Tỉnh / Thành phố trọng điểm</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {PROVINCES.map((prov) => {
@@ -449,7 +450,7 @@ export default function PlacesSocialFeedPage() {
                         setSelectedProvince(prov.key);
                         setPage(1);
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-xs transition cursor-pointer font-medium ${
+                      className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium ${
                         isActive
                           ? 'bg-[#1A1A1A] text-white shadow-xs'
                           : 'bg-[#F5F5F4] text-[#1A1A1A] hover:bg-[#E5E7EB]'
@@ -464,8 +465,9 @@ export default function PlacesSocialFeedPage() {
 
             {/* Category Filter Pills */}
             <div>
-              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                Thể loại trải nghiệm
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
+                <span>Thể loại trải nghiệm</span>
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {CATEGORIES.map((cat) => {
@@ -477,10 +479,10 @@ export default function PlacesSocialFeedPage() {
                         setSelectedCategory(cat);
                         setPage(1);
                       }}
-                      className={`px-2.5 py-1 rounded-lg text-xs transition cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium ${
                         isActive
-                          ? 'bg-[#F4FCE3] text-[#365314] font-semibold border border-[#D9F99D]'
-                          : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                          ? 'bg-[#F4FCE3] text-[#365314] font-semibold border border-[#D9F99D] shadow-2xs'
+                          : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#F5F5F4]'
                       }`}
                     >
                       {cat}

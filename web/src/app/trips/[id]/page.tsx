@@ -379,7 +379,7 @@ function TripDetailContent() {
                   ) : (
                     <Zap className="w-3.5 h-3.5 text-[#D4F066]" />
                   )}
-                  <span>{isOptimizing ? 'Đang chạy thuật toán TSP...' : 'Tối ưu hóa lộ trình'}</span>
+                  <span>{isOptimizing ? 'Đang tối ưu lộ trình...' : 'Tối ưu hóa lộ trình'}</span>
                 </Button>
               </div>
             </div>
@@ -558,8 +558,7 @@ function TripDetailContent() {
                             : 'bg-[#F5F5F4] text-[#6B7280]'
                         }`}
                         title="Buổi sáng"
-                      >
-                        🌅 {mCount}
+                      ><Sunrise className="w-2.5 h-2.5 inline mr-1" />{mCount}
                       </span>
                       <span
                         className={`px-1.5 py-0.5 rounded text-[10px] ${
@@ -578,8 +577,7 @@ function TripDetailContent() {
                             : 'bg-[#F5F5F4] text-[#6B7280]'
                         }`}
                         title="Buổi tối"
-                      >
-                        🌙 {eCount}
+                      ><Moon className="w-2.5 h-2.5 inline mr-1" />{eCount}
                       </span>
                     </div>
                   </button>
