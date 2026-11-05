@@ -628,73 +628,22 @@ export default function PlacesSocialFeedPage() {
                         )}
                       </div>
 
-                      {/* Rating Interactive Bar */}
-                      <div className="py-2 px-2.5 rounded-xl bg-[#FAFAFA] border border-[#E5E7EB] mb-2">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <Star className="w-3.5 h-3.5 text-[#1A1A1A] fill-[#1A1A1A] flex-shrink-0" />
-                            <span className="text-xs font-semibold text-[#1A1A1A]">
-                              {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : '—'}
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              ({place.ratingCount})
-                            </span>
-                          </div>
-
-                          {/* 5-Star Rating Picker */}
-                          <div
-                            className="flex items-center gap-0.5"
-                            onMouseLeave={() =>
-                              setHoverRating((prev) => {
-                                const copy = { ...prev };
-                                delete copy[place.id];
-                                return copy;
-                              })
-                            }
-                          >
-                            {[1, 2, 3, 4, 5].map((star) => {
-                              const isHovered = hoverRating[place.id] !== undefined;
-                              const activeStar = isHovered
-                                ? hoverRating[place.id] >= star
-                                : (place.userRating || 0) >= star;
-
-                              return (
-                                <button
-                                  key={star}
-                                  type="button"
-                                  onMouseEnter={() =>
-                                    setHoverRating((prev) => ({ ...prev, [place.id]: star }))
-                                  }
-                                  onClick={() => handleRate(place.id, star)}
-                                  title={`Đánh giá ${star} sao`}
-                                  className="p-0.5 transition-transform hover:scale-120 cursor-pointer"
-                                >
-                                  <Star
-                                    className={`w-3.5 h-3.5 transition-colors ${
-                                      activeStar
-                                        ? 'text-[#1A1A1A] fill-[#1A1A1A]'
-                                        : 'text-neutral-300 hover:text-neutral-600'
-                                    }`}
-                                  />
-                                </button>
-                              );
-                            })}
-                          </div>
+                      {/* Rating Summary */}
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-3 px-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <Star className="w-3.5 h-3.5 text-[#1A1A1A] fill-[#1A1A1A] flex-shrink-0" />
+                          <span className="text-xs font-semibold text-[#1A1A1A]">
+                            {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : '—'}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">
+                            ({place.ratingCount} đánh giá)
+                          </span>
                         </div>
 
                         {place.userRating && (
-                          <div className="mt-1.5 pt-1.5 border-t border-[#E5E7EB] flex items-center justify-between text-[11px]">
-                            <span className="text-[#365314] font-medium flex items-center gap-1">
-                              <Check className="w-3 h-3" /> Đã đánh giá {place.userRating} sao
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleUnrate(place.id)}
-                              className="text-muted-foreground hover:text-rose-600 transition text-[10px] underline underline-offset-2 cursor-pointer"
-                            >
-                              Hủy đánh giá
-                            </button>
-                          </div>
+                          <span className="text-[11px] font-medium text-[#365314] flex items-center gap-1 bg-[#F4FCE3] border border-[#D9F99D] px-2 py-0.5 rounded-full">
+                            <Check className="w-3 h-3" /> Đã chấm {place.userRating}★
+                          </span>
                         )}
                       </div>
                     </CardContent>

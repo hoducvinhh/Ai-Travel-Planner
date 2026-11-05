@@ -20,7 +20,6 @@ import {
   Moon,
   Compass,
   Zap,
-  TrendingDown,
   Route,
 } from 'lucide-react';
 
@@ -413,79 +412,6 @@ function TripDetailContent() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Algorithm Performance Comparison Card */}
-        {trip.itinerary?.optimizationStats && (
-          <Card className="mb-6 bg-white border-[#E5E7EB] shadow-2xs overflow-hidden">
-            <div className="bg-[#FAFAFA] border-b border-[#E5E7EB] px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center flex-shrink-0">
-                  <Route className="w-4 h-4 text-[#D4F066]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wider">Hiệu Quả Tối Ưu Tuyến Đường Di Chuyển</h3>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground">
-                    Cực tiểu hóa tổng quãng đường di chuyển và bảo toàn ràng buộc khung giờ các buổi (Sáng ➔ Chiều ➔ Tối)
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Badge className="bg-[#F4FCE3] text-[#365314] border border-[#D9F99D] font-mono text-xs font-semibold px-2.5 py-1">
-                  Tiết kiệm {trip.itinerary.optimizationStats.totalSavedDistanceKm} km (-{trip.itinerary.optimizationStats.totalSavedPercentage}%)
-                </Badge>
-              </div>
-            </div>
-
-            <CardContent className="p-5">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="p-4 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB]">
-                  <div className="text-[11px] font-medium text-muted-foreground mb-1">Quãng đường ban đầu</div>
-                  <div className="text-xl font-bold font-mono text-[#1A1A1A]">
-                    {trip.itinerary.optimizationStats.totalOriginalDistanceKm} <span className="text-xs font-normal text-muted-foreground">km</span>
-                  </div>
-                  <div className="text-[10px] text-muted-foreground mt-1">
-                    {currentDay?.optimizationStats
-                      ? `Ngày ${selectedDay}: ${currentDay.optimizationStats.originalDistanceKm} km`
-                      : 'Thứ tự ban đầu chưa qua tối ưu'}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB]">
-                  <div className="text-[11px] font-medium text-muted-foreground mb-1">Quãng đường sau tối ưu</div>
-                  <div className="text-xl font-bold font-mono text-[#1A1A1A]">
-                    {trip.itinerary.optimizationStats.totalOptimizedDistanceKm} <span className="text-xs font-normal text-muted-foreground">km</span>
-                  </div>
-                  <div className="text-[10px] text-[#365314] font-medium mt-1">
-                    {currentDay?.optimizationStats
-                      ? `Ngày ${selectedDay}: ${currentDay.optimizationStats.optimizedDistanceKm} km`
-                      : 'Đã sắp xếp thứ tự di chuyển tối ưu'}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-xl bg-[#F4FCE3] border border-[#D9F99D]">
-                  <div className="text-[11px] font-medium text-[#365314] mb-1 flex items-center gap-1">
-                    <TrendingDown className="w-3.5 h-3.5" />
-                    Tổng quãng đường tiết kiệm
-                  </div>
-                  <div className="text-xl font-bold font-mono text-[#365314]">
-                    {trip.itinerary.optimizationStats.totalSavedDistanceKm} <span className="text-xs font-normal text-[#365314]">km</span>
-                    <span className="text-xs font-bold ml-1.5 px-2 py-0.5 rounded-full bg-white text-[#365314] border border-[#D9F99D]">
-                      -{trip.itinerary.optimizationStats.totalSavedPercentage}%
-                    </span>
-                  </div>
-                  <div className="text-[10px] text-[#365314]/90 font-medium mt-1">
-                    {currentDay?.optimizationStats && currentDay.optimizationStats.savedDistanceKm > 0
-                      ? `🎯 Ngày ${selectedDay} đang xem: Tiết kiệm ${currentDay.optimizationStats.savedDistanceKm} km (-${currentDay.optimizationStats.savedPercentage}%)`
-                      : 'Tiết kiệm thời gian di chuyển & bảo đảm sức khỏe du khách'}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Day Selector Sidebar */}
