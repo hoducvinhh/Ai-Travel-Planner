@@ -144,6 +144,15 @@ export const chatApi = {
   deleteSession: async (id: string) => {
     return api.delete(`/api/chat/sessions/${id}`);
   },
+  submitFeedback: async (payload: {
+    sessionId?: string;
+    userQuestion: string;
+    botAnswer: string;
+    reason: string;
+    userNote?: string;
+  }) => {
+    return api.post('/api/chat/feedback', payload);
+  },
 };
 
 export { API_BASE_URL };

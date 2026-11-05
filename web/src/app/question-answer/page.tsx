@@ -63,8 +63,13 @@ import {
   Waves,
   LucideIcon,
   Ticket,
+  Globe,
+  ExternalLink,
+  Flag,
+  ShieldAlert,
+  CheckCircle2,
 } from 'lucide-react';
-import { SourceCitation, Message, SystemStatus, ChatSession } from '@/types';
+import { SourceCitation, WebSourceCitation, Message, SystemStatus, ChatSession } from '@/types';
 import { chatApi, getStoredToken } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { RAG_TOPICS, RagTopic } from '@/lib/ragTopics';
@@ -114,6 +119,17 @@ export default function QuestionAnswerPage() {
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [activeQuickTopic, setActiveQuickTopic] = useState<string | null>(null);
   const [searchTopicQuery, setSearchTopicQuery] = useState('');
+
+  // Trạng thái modal báo cáo thông tin sai / lỗi thời
+  const [feedbackDialogOpen, setFeedbackDialogOpen] = useState(false);
+  const [feedbackTargetMessage, setFeedbackTargetMessage] = useState<{
+    userQuestion: string;
+    botAnswer: string;
+  } | null>(null);
+  const [feedbackReason, setFeedbackReason] = useState<string>('OUTDATED_PRICE');
+  const [feedbackNote, setFeedbackNote] = useState('');
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -212,16 +228,37 @@ export default function QuestionAnswerPage() {
     setIsLoading(true);
     try {
       const detail = await chatApi.getSessionDetail(sessionId);
-      const formattedMessages: Message[] = (detail.messages || []).map((m: any) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        sources: m.sources || undefined,
-        timestamp: new Date(m.createdAt).toLocaleTimeString([], {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      }));
+      const formattedMessages: Message[] = (detail.messages || []).map((m: any) => {
+        let mode: 'internal' | 'live_web' = 'internal';
+        let sources: SourceCitation[] = [];
+        let webSources: WebSourceCitation[] = [];
+        let disclaimer: string | null = null;
+
+        if (m.sources) {
+          if (Array.isArray(m.sources)) {
+            sources = m.sources;
+          } else if (typeof m.sources === 'object') {
+            mode = m.sources.mode || (m.sources.webSources?.length > 0 ? 'live_web' : 'internal');
+            sources = m.sources.items || [];
+            webSources = m.sources.webSources || [];
+            disclaimer = m.sources.disclaimer || null;
+          }
+        }
+
+        return {
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          mode,
+          sources: sources.length > 0 ? sources : undefined,
+          webSources: webSources.length > 0 ? webSources : undefined,
+          disclaimer,
+          timestamp: new Date(m.createdAt).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+        };
+      });
       setMessages(formattedMessages);
     } catch (err) {
       console.error('Lỗi khi tải chi tiết cuộc trò chuyện:', err);
@@ -308,7 +345,10 @@ export default function QuestionAnswerPage() {
       id: botMessageId,
       role: 'assistant',
       content: '',
+      mode: 'internal',
       sources: [],
+      webSources: [],
+      disclaimer: null,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
@@ -369,14 +409,45 @@ export default function QuestionAnswerPage() {
                   }
                   loadSessions();
                 }
-              } else if (event.type === 'sources') {
+              } else if (event.type === 'routing') {
+                const { mode, disclaimer, reason } = event.data;
                 setMessages((prev) =>
                   prev.map((msg) =>
                     msg.id === botMessageId
-                      ? { ...msg, sources: event.data }
+                      ? {
+                          ...msg,
+                          mode,
+                          disclaimer: disclaimer || null,
+                          routerReason: reason,
+                        }
                       : msg
                   )
                 );
+              } else if (event.type === 'sources') {
+                if (Array.isArray(event.data)) {
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === botMessageId
+                        ? { ...msg, sources: event.data }
+                        : msg
+                    )
+                  );
+                } else if (event.data && typeof event.data === 'object') {
+                  const { mode, items, webSources, disclaimer } = event.data;
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === botMessageId
+                        ? {
+                            ...msg,
+                            mode: mode || msg.mode,
+                            sources: items && items.length > 0 ? items : msg.sources,
+                            webSources: webSources && webSources.length > 0 ? webSources : msg.webSources,
+                            disclaimer: disclaimer !== undefined ? disclaimer : msg.disclaimer,
+                          }
+                        : msg
+                    )
+                  );
+                }
               } else if (event.type === 'token') {
                 setMessages((prev) =>
                   prev.map((msg) =>
@@ -430,6 +501,50 @@ export default function QuestionAnswerPage() {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  // Xử lý mở modal báo cáo phản hồi
+  const handleOpenFeedback = (assistantMsg: Message, index: number) => {
+    let userQuestion = '';
+    for (let i = index - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        userQuestion = messages[i].content;
+        break;
+      }
+    }
+    setFeedbackTargetMessage({
+      userQuestion: userQuestion || 'Câu hỏi du lịch',
+      botAnswer: assistantMsg.content,
+    });
+    setFeedbackReason('OUTDATED_PRICE');
+    setFeedbackNote('');
+    setFeedbackSuccess(false);
+    setFeedbackDialogOpen(true);
+  };
+
+  // Xử lý gửi báo cáo phản hồi tới backend
+  const handleSubmitFeedback = async () => {
+    if (!feedbackTargetMessage) return;
+    setIsSubmittingFeedback(true);
+    try {
+      await chatApi.submitFeedback({
+        sessionId: currentSessionId || undefined,
+        userQuestion: feedbackTargetMessage.userQuestion,
+        botAnswer: feedbackTargetMessage.botAnswer,
+        reason: feedbackReason,
+        userNote: feedbackNote.trim() || undefined,
+      });
+      setFeedbackSuccess(true);
+      setTimeout(() => {
+        setFeedbackDialogOpen(false);
+        setFeedbackSuccess(false);
+      }, 1500);
+    } catch (err) {
+      console.error('Lỗi khi gửi báo cáo phản hồi:', err);
+      alert('Không thể gửi báo cáo vào lúc này. Vui lòng thử lại sau.');
+    } finally {
+      setIsSubmittingFeedback(false);
     }
   };
 
@@ -918,7 +1033,7 @@ export default function QuestionAnswerPage() {
             /* DANH SÁCH TIN NHẮN TRÒ CHUYỆN                            */
             /* ========================================================= */
             <div className="max-w-4xl mx-auto space-y-6 pb-4">
-              {messages.map((msg) => (
+              {messages.map((msg, idx) => (
                 <div
                   key={msg.id}
                   className={`flex gap-3 ${
@@ -939,6 +1054,42 @@ export default function QuestionAnswerPage() {
                         : 'bg-white border border-[#E5E7EB] text-[#1A1A1A] rounded-tl-sm'
                     }`}
                   >
+                    {/* Header thông tin nguồn phân luồng & Nút báo cáo sai lệch */}
+                    {msg.role === 'assistant' && (
+                      <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
+                        {msg.mode === 'live_web' ? (
+                          <Badge
+                            variant="outline"
+                            className="text-[11px] font-medium bg-emerald-50 text-emerald-800 border-emerald-200 gap-1.5 py-0.5 px-2.5 rounded-full"
+                          >
+                            <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Nguồn Kiểm Chứng Trực Tuyến Thời Gian Thực</span>
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="outline"
+                            className="text-[11px] font-medium bg-[#F4F4F3] text-[#4B5563] border-[#E5E7EB] gap-1.5 py-0.5 px-2.5 rounded-full"
+                          >
+                            <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
+                            <span>Nguồn Tri Thức Du Lịch Bản Địa</span>
+                          </Badge>
+                        )}
+
+                        {/* Nút 🚩 Báo cáo sai lệch */}
+                        {msg.content && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenFeedback(msg, idx)}
+                            className="inline-flex items-center gap-1.5 text-[11px] text-[#6B7280] hover:text-[#DC2626] transition-colors py-1 px-2 rounded-lg hover:bg-red-50 cursor-pointer"
+                            title="Báo cáo thông tin chưa chính xác / lỗi thời"
+                          >
+                            <Flag className="w-3 h-3 text-[#6B7280]" />
+                            <span>Báo cáo sai lệch</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+
                     {/* Message Content */}
                     <div
                       className={`text-sm leading-relaxed break-words [&>p]:mb-3 [&>p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:ml-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:ml-4 [&_ol]:space-y-1 ${
@@ -955,6 +1106,40 @@ export default function QuestionAnswerPage() {
                       )}
                     </div>
 
+                    {/* Live Web Grounding Sources */}
+                    {msg.role === 'assistant' && msg.webSources && msg.webSources.length > 0 && (
+                      <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
+                        <div className="text-xs font-semibold text-[#1A1A1A] mb-2 flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Nguồn kiểm chứng trực tuyến ({msg.webSources.length} liên kết đối chứng)</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {msg.webSources.map((webSrc, wIdx) => (
+                            <a
+                              key={wIdx}
+                              href={webSrc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-between p-2.5 rounded-xl bg-[#F9F9F8] hover:bg-emerald-50/40 border border-[#E5E7EB] hover:border-emerald-300 text-xs text-[#1A1A1A] group transition-all"
+                            >
+                              <div className="flex items-center gap-2 min-w-0 pr-2">
+                                <Globe className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <div className="min-w-0">
+                                  <p className="font-medium truncate group-hover:text-emerald-700">
+                                    {webSrc.title || webSrc.domain || 'Trang web xác thực'}
+                                  </p>
+                                  {webSrc.domain && (
+                                    <p className="text-[10px] text-[#6B7280] truncate">{webSrc.domain}</p>
+                                  )}
+                                </div>
+                              </div>
+                              <ExternalLink className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-emerald-600 shrink-0" />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Sources Accordion sử dụng shadcn Accordion */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
                       <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
@@ -963,7 +1148,7 @@ export default function QuestionAnswerPage() {
                             <AccordionTrigger className="py-1 text-xs font-medium text-[#1A1A1A] hover:no-underline">
                               <span className="flex items-center gap-1.5">
                                 <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
-                                <span>Nguồn tham chiếu ({msg.sources.length} tài liệu)</span>
+                                <span>Nguồn tham chiếu CSDL ({msg.sources.length} tài liệu)</span>
                                 {msg.sources[0]?.similarity && (
                                   <span className="text-[11px] text-[#6B7280] font-normal">
                                     • Độ khớp: {(Number(msg.sources[0].similarity) * 100).toFixed(1)}%
@@ -1004,6 +1189,14 @@ export default function QuestionAnswerPage() {
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>
+                      </div>
+                    )}
+
+                    {/* Disclaimer cảnh báo thời điểm */}
+                    {msg.role === 'assistant' && msg.disclaimer && (
+                      <div className="mt-3.5 p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-2">
+                        <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{msg.disclaimer}</span>
                       </div>
                     )}
 
@@ -1277,6 +1470,104 @@ export default function QuestionAnswerPage() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* ========================================================= */}
+      {/* 5. MODAL: BÁO CÁO SAI LỆCH / LỖI THỜI TRI THỨC           */}
+      {/* ========================================================= */}
+      <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
+        <DialogContent className="max-w-md bg-white p-6 rounded-2xl border-[#E5E7EB] shadow-xl">
+          <DialogHeader className="space-y-1.5">
+            <DialogTitle className="text-base font-semibold text-[#1A1A1A] flex items-center gap-2">
+              <Flag className="w-4 h-4 text-[#DC2626]" />
+              Báo Cáo Thông Tin Chưa Chính Xác / Lỗi Thời
+            </DialogTitle>
+            <DialogDescription className="text-xs text-[#6B7280]">
+              Đóng góp của bạn giúp hệ thống cập nhật và đối soát thông tin du lịch chính xác hơn.
+            </DialogDescription>
+          </DialogHeader>
+
+          {feedbackSuccess ? (
+            <div className="py-6 flex flex-col items-center justify-center text-center space-y-2">
+              <CheckCircle2 className="w-10 h-10 text-emerald-600 animate-in zoom-in-50" />
+              <p className="text-sm font-semibold text-[#1A1A1A]">Đã gửi báo cáo thành công!</p>
+              <p className="text-xs text-[#6B7280]">Cảm ơn bạn đã đóng góp phản hồi cho hệ thống.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 pt-2">
+              {feedbackTargetMessage && (
+                <div className="p-3 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB] text-xs space-y-1">
+                  <p className="text-[#6B7280] font-medium text-[11px]">Câu hỏi:</p>
+                  <p className="text-[#1A1A1A] font-semibold truncate">"{feedbackTargetMessage.userQuestion}"</p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[#1A1A1A]">Lý do báo cáo:</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'OUTDATED_PRICE', label: '💰 Giá vé đã đổi' },
+                    { id: 'CLOSED', label: '🚪 Tạm ngưng / Đóng' },
+                    { id: 'INCORRECT_INFO', label: '❌ Thông tin sai' },
+                    { id: 'OTHER', label: '📝 Lý do khác' },
+                  ].map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setFeedbackReason(r.id)}
+                      className={`p-2 rounded-xl text-xs font-medium border text-left transition-all ${
+                        feedbackReason === r.id
+                          ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
+                          : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F9F9F8]'
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-[#1A1A1A]">
+                  Ghi chú chi tiết hoặc nguồn đính chính:
+                </label>
+                <Textarea
+                  value={feedbackNote}
+                  onChange={(e) => setFeedbackNote(e.target.value)}
+                  placeholder="Ví dụ: Giá vé combo tham quan hiện nay đã cập nhật thành 65.000đ theo thông báo mới nhất..."
+                  className="text-xs min-h-[80px] rounded-xl border-[#E5E7EB] focus:ring-1 focus:ring-[#1A1A1A]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setFeedbackDialogOpen(false)}
+                  disabled={isSubmittingFeedback}
+                  className="rounded-xl text-xs border-[#E5E7EB]"
+                >
+                  Hủy
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleSubmitFeedback}
+                  disabled={isSubmittingFeedback}
+                  className="rounded-xl bg-[#1A1A1A] text-white text-xs hover:bg-[#2C2C2C] gap-1.5"
+                >
+                  {isSubmittingFeedback ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                      <span>Đang gửi...</span>
+                    </>
+                  ) : (
+                    <span>Gửi báo cáo</span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -7,13 +7,31 @@ export interface SourceCitation {
   metadata?: any;
 }
 
+export interface WebSourceCitation {
+  title: string;
+  url: string;
+  domain?: string;
+}
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  mode?: 'internal' | 'live_web';
   sources?: SourceCitation[];
+  webSources?: WebSourceCitation[];
+  disclaimer?: string | null;
+  routerReason?: string;
   timestamp: string;
   createdAt?: string;
+}
+
+export interface KnowledgeFeedbackPayload {
+  sessionId?: string;
+  userQuestion: string;
+  botAnswer: string;
+  reason: string; // "OUTDATED_PRICE" | "CLOSED" | "INCORRECT_INFO" | "OTHER"
+  userNote?: string;
 }
 
 export interface ChatSession {
@@ -33,7 +51,7 @@ export interface ChatSessionDetail extends ChatSession {
     sessionId: string;
     role: 'user' | 'assistant';
     content: string;
-    sources?: SourceCitation[];
+    sources?: any;
     createdAt: string;
   }>;
 }

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { CreateFeedbackDto } from './dto/feedback.dto';
 
 @Injectable()
 export class ChatService {
@@ -153,5 +154,21 @@ export class ChatService {
     ]);
 
     return message;
+  }
+
+  /**
+   * Lưu phản hồi / báo cáo sai lệch tri thức từ người dùng
+   */
+  async createFeedback(dto: CreateFeedbackDto) {
+    return this.prisma.knowledgeFeedback.create({
+      data: {
+        sessionId: dto.sessionId || null,
+        userQuestion: dto.userQuestion,
+        botAnswer: dto.botAnswer,
+        reason: dto.reason,
+        userNote: dto.userNote || null,
+        status: 'PENDING',
+      },
+    });
   }
 }

@@ -282,3 +282,17 @@ model DirectMessage {
   @@index([createdAt])
   @@map("direct_messages")
 }
+
+model KnowledgeFeedback {
+  id           String   @id @default(uuid())
+  sessionId    String?  @map("session_id")
+  userQuestion String   @map("user_question") @db.Text
+  botAnswer    String   @map("bot_answer") @db.Text
+  reason       String   // "OUTDATED_PRICE", "CLOSED", "INCORRECT_INFO"
+  userNote     String?  @map("user_note") @db.Text
+  status       String   @default("PENDING") // PENDING, VERIFIED, RESOLVED
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("knowledge_feedback")
+}
+

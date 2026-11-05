@@ -20,6 +20,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmbeddingService } from '../embedding/embedding.service';
 import { GeminiService } from '../gemini/gemini.service';
 import { ChatDto, CreateSessionDto, UpdateSessionDto } from './chat.dto';
+import { CreateFeedbackDto } from './dto/feedback.dto';
 
 @Controller('api/chat')
 export class ChatController {
@@ -153,13 +154,13 @@ export class ChatController {
       await this.chatService.addMessage(activeSessionId, 'user', body.message);
 
       // 4. Biến lưu tích lũy kết quả bot để lưu vào DB khi kết thúc
-      let accumulatedSources: any[] = [];
+      let accumulatedSources: any = null;
       let accumulatedContent = '';
 
       // 5. Stream kết quả từ RagService
       for await (const event of this.ragService.streamRagAnswer(body.message)) {
         if (event.type === 'sources') {
-          accumulatedSources = event.data || [];
+          accumulatedSources = event.data || null;
         } else if (event.type === 'token') {
           accumulatedContent += event.data || '';
         }
@@ -209,11 +210,18 @@ export class ChatController {
 
     const result = await this.ragService.getRagAnswer(body.message);
 
+    const sourcesPayload = {
+      mode: result.mode,
+      items: result.sources,
+      webSources: result.webSources,
+      disclaimer: result.disclaimer,
+    };
+
     await this.chatService.addMessage(
       activeSessionId,
       'assistant',
       result.answer,
-      result.sources,
+      sourcesPayload,
     );
 
     return {
@@ -258,5 +266,18 @@ export class ChatController {
         error: error.message,
       };
     }
+  }
+
+  /**
+   * 9. Endpoint tiếp nhận báo cáo/phản hồi sai lệch tri thức từ người dùng
+   */
+  @Post('feedback')
+  async submitFeedback(@Body() body: CreateFeedbackDto) {
+    const feedback = await this.chatService.createFeedback(body);
+    return {
+      success: true,
+      message: 'Cảm ơn bạn đã gửi phản hồi. Hệ thống sẽ kiểm tra và cập nhật dữ liệu.',
+      data: feedback,
+    };
   }
 }
