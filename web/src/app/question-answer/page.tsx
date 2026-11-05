@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -92,6 +93,20 @@ const TOPIC_ICONS: Record<string, LucideIcon> = {
 
 function getTopicIcon(id: string): LucideIcon {
   return TOPIC_ICONS[id] || Compass;
+}
+
+/**
+ * Chuẩn hóa nội dung markdown từ LLM:
+ * - Khắc phục tình trạng các hàng bảng markdown bị dính liền '| |' trên cùng một dòng
+ * - Đảm bảo có dòng ngắt trước tiêu đề bảng để react-markdown / remark-gfm nhận diện bảng
+ */
+function normalizeMarkdownContent(text: string): string {
+  if (!text) return text;
+  // 1. Tách dòng bảng bị dính liền '| |' thay vì xuống dòng '|\n|'
+  let normalized = text.replace(/\|\s*\|\s*/g, '|\n|');
+  // 2. Đảm bảo có dòng trống trước khi bắt đầu một bảng markdown nếu phía trước là văn bản
+  normalized = normalized.replace(/([^\n])\n(\|[^\n]+\|\n\|[\s-:]+\|)/g, '$1\n\n$2');
+  return normalized;
 }
 
 export default function QuestionAnswerPage() {
@@ -1097,7 +1112,56 @@ export default function QuestionAnswerPage() {
                       }`}
                     >
                       {msg.content ? (
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            table: ({ children }) => (
+                              <div className="overflow-x-auto my-3 rounded-xl border border-[#E5E7EB] bg-white shadow-xs">
+                                <table className="w-full text-left text-xs border-collapse">
+                                  {children}
+                                </table>
+                              </div>
+                            ),
+                            thead: ({ children }) => (
+                              <thead className="bg-[#F9F9F8] border-b border-[#E5E7EB] text-[#1A1A1A] font-semibold">
+                                {children}
+                              </thead>
+                            ),
+                            th: ({ children }) => (
+                              <th className="py-2.5 px-3 font-semibold text-[#1A1A1A] text-xs">
+                                {children}
+                              </th>
+                            ),
+                            tbody: ({ children }) => (
+                              <tbody className="divide-y divide-[#F0F0EF]">
+                                {children}
+                              </tbody>
+                            ),
+                            tr: ({ children }) => (
+                              <tr className="hover:bg-[#F9F9F8]/60 transition-colors">
+                                {children}
+                              </tr>
+                            ),
+                            td: ({ children }) => (
+                              <td className="py-2.5 px-3 text-[#374151] text-xs align-top">
+                                {children}
+                              </td>
+                            ),
+                            a: ({ href, children }) => (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-emerald-700 hover:text-emerald-800 underline underline-offset-2 font-medium inline-flex items-center gap-0.5"
+                              >
+                                <span>{children}</span>
+                                <ExternalLink className="w-3 h-3 inline-block shrink-0" />
+                              </a>
+                            ),
+                          }}
+                        >
+                          {normalizeMarkdownContent(msg.content)}
+                        </ReactMarkdown>
                       ) : (
                         <span className="inline-flex items-center gap-2 text-[#6B7280] italic text-xs">
                           <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1A1A1A]" />

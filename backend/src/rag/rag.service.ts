@@ -193,7 +193,10 @@ RÀO CHẮN LỌC NGUỒN & QUY TẮC PHẢN HỒI (Source Guardrail Directive):
 1. BẮT BUỘC ưu tiên thông tin cập nhật gần nhất (năm 2025 - 2026).
 2. KHÔNG sử dụng thông tin từ blog cá nhân không ghi ngày tháng hoặc các diễn đàn không kiểm chứng.
 3. Luôn trích dẫn rõ ràng nguồn web hoặc đường link kiểm chứng trong câu trả lời dưới định dạng liên kết Markdown có thể click: [Tên nguồn/website](URL).
-4. Phân tách rõ các loại giá vé (nếu có): vé người lớn, vé trẻ em, vé combo, cáp treo, phụ thu ngày lễ.
+4. QUY CÁCH TRÌNH BÀY GIÁ VÉ & SỐ LIỆU:
+   - Ưu tiên trình bày dạng danh sách gạch đầu dòng rõ ràng, trực quan cho từng loại vé:
+     • **[Loại vé / Đối tượng]**: [Mức giá VNĐ] — *[Ghi chú / Điều kiện áp dụng]*
+   - Nếu trình bày dạng bảng Markdown: BẮT BUỘC mỗi dòng trong bảng phải xuống dòng (\n) độc lập, có dòng tiêu đề và phân cách | :--- | :--- | chuẩn xác. TUYỆT ĐỐI KHÔNG viết các hàng bảng dính liền nhau trên một dòng.
 5. Nếu là trạng thái đóng/mở cửa hoặc cấm đường, hãy nêu rõ khung giờ áp dụng hoặc lưu ý an toàn.
 
 ${entityContext ? `THÔNG TIN THAM CHIẾU NIÊM YẾT TỪ CSDL NỘI BỘ (Entity Grounding):\n${entityContext}\n` : ''}
