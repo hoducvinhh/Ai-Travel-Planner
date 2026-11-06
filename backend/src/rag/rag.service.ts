@@ -167,6 +167,7 @@ HƯỚNG DẪN TRẢ LỜI:
 2. Trả lời bằng tiếng Việt thân thiện, nhiệt tình, có cấu trúc rõ ràng (sử dụng gạch đầu dòng hoặc in đậm các địa danh, món ăn nổi bật khi thích hợp).
 3. Nếu tài liệu tham khảo có chứa câu trả lời trực tiếp từ cặp Hỏi - Đáp hoặc Ngữ cảnh bài viết, hãy tổng hợp đầy đủ và làm phong phú thêm câu trả lời.
 4. Nếu câu hỏi hoàn toàn không liên quan đến du lịch Việt Nam hoặc thông tin không có trong tài liệu, hãy thông báo lịch sự rằng cơ sở dữ liệu hiện tại chỉ tập trung vào du lịch Việt Nam.
+5. VÌ ĐÂY LÀ CHẾ ĐỘ TRI THỨC NỘI BỘ (KHÔNG TÌM KIẾM TRÊN MẠNG INTERNET): BẠN TUYỆT ĐỐI KHÔNG TỰ BỊA ĐẶT ĐƯỜNG LINK WEB HOẶC GẮN BẤT KỲ LIÊN KẾT [Tên nguồn](URL) NÀO VÀO CÂU TRẢ LỜI. Chỉ trả lời bằng văn bản thuần túy, súc tích và chính xác.
 
 TÀI LIỆU THAM KHẢO:
 ${contextSections}
@@ -193,8 +194,11 @@ RÀO CHẮN LỌC NGUỒN & QUY TẮC PHẢN HỒI (Source Guardrail Directive):
 1. BẮT BUỘC ưu tiên thông tin cập nhật gần nhất (năm 2025 - 2026).
 2. KHÔNG sử dụng thông tin từ blog cá nhân không ghi ngày tháng hoặc các diễn đàn không kiểm chứng.
 3. QUY TẮC CHÈN BẰNG CHỨNG NGUỒN TRỰC TIẾP TỪNG ĐOẠN (Inline Evidence Citation):
-   - BẮT BUỘC chèn đường link nguồn ngay ở cuối câu hoặc đoạn chứa thông tin/số liệu bạn tra cứu được từ Internet làm bằng chứng, theo định dạng Markdown: [Tên nguồn ngắn gọn](URL).
-   - Tên nguồn hiển thị phải ngắn gọn, súc tích (ví dụ: [KiotViet], [VnExpress], [Dinh Độc Lập], [Traveloka], [Sun World Ba Na Hills]...).
+   - BẮT BUỘC chèn đường link nguồn ngay ở cuối câu hoặc đoạn chứa thông tin/số liệu bạn tra cứu được từ các website du lịch làm bằng chứng, theo định dạng Markdown: [Tên nguồn ngắn gọn](URL).
+   - Tên nguồn hiển thị phải ngắn gọn, súc tích từ các cổng thông tin du lịch chính thống (ví dụ: [Dinh Độc Lập], [VnExpress Du Lịch], [Sun World Bà Nà Hills], [VinWonders], [Traveloka], [Klook], [Báo Tuổi Trẻ Du Lịch]...).
+   - Ví dụ minh họa:
+     • "Vé tham quan Dinh Độc Lập hiện tại là 40.000 VNĐ/người lớn [Dinh Độc Lập](https://dinhdoclap.gov.vn/gia-ve)."
+     • "Cáp treo Bà Nà Hills vận hành từ 8:00 đến 17:00 hàng ngày [Sun World Bà Nà Hills](https://banahills.sunworld.vn)."
    - QUY TẮC TRÙNG LẶP: Trong cùng một câu hoặc đoạn thông tin, nếu dùng chung một link thì CHỈ CHÈN 1 LINK DUY NHẤT ở cuối câu/đoạn đó (không lặp lại link giống nhau trong cùng câu/đoạn). Nếu có thông tin từ nguồn link khác thì mới chèn thêm link của nguồn đó.
    - TUYỆT ĐỐI KHÔNG gom toàn bộ link xuống cuối câu trả lời hay tạo mục "Nguồn tham khảo" ở cuối phản hồi. Hãy đặt link làm bằng chứng ngay sau câu/ý cần dẫn chứng để người dùng bấm vào xem bằng chứng ngay tại chỗ.
 4. QUY CÁCH TRÌNH BÀY GIÁ VÉ & SỐ LIỆU:

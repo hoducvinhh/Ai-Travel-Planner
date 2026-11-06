@@ -65,7 +65,7 @@ export class GeminiService {
   }
 
   /**
-   * Trích xuất tên nguồn ngắn gọn, trực quan (ví dụ: "KiotViet", "VnExpress", "Dinh Độc Lập")
+   * Trích xuất tên nguồn ngắn gọn, trực quan (ví dụ: "VnExpress Du Lịch", "Dinh Độc Lập", "Traveloka")
    */
   getCleanSourceName(title?: string, url?: string): string {
     let domainName = '';
