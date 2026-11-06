@@ -192,10 +192,14 @@ HỆ THỐNG NGUỒN ĐƯỢC ƯU TIÊN KIỂM CHỨNG:
 RÀO CHẮN LỌC NGUỒN & QUY TẮC PHẢN HỒI (Source Guardrail Directive):
 1. BẮT BUỘC ưu tiên thông tin cập nhật gần nhất (năm 2025 - 2026).
 2. KHÔNG sử dụng thông tin từ blog cá nhân không ghi ngày tháng hoặc các diễn đàn không kiểm chứng.
-3. Luôn trích dẫn rõ ràng nguồn web hoặc đường link kiểm chứng trong câu trả lời dưới định dạng liên kết Markdown có thể click: [Tên nguồn/website](URL).
+3. QUY TẮC CHÈN BẰNG CHỨNG NGUỒN TRỰC TIẾP TỪNG ĐOẠN (Inline Evidence Citation):
+   - BẮT BUỘC chèn đường link nguồn ngay ở cuối câu hoặc đoạn chứa thông tin/số liệu bạn tra cứu được từ Internet làm bằng chứng, theo định dạng Markdown: [Tên nguồn ngắn gọn](URL).
+   - Tên nguồn hiển thị phải ngắn gọn, súc tích (ví dụ: [KiotViet], [VnExpress], [Dinh Độc Lập], [Traveloka], [Sun World Ba Na Hills]...).
+   - QUY TẮC TRÙNG LẶP: Trong cùng một câu hoặc đoạn thông tin, nếu dùng chung một link thì CHỈ CHÈN 1 LINK DUY NHẤT ở cuối câu/đoạn đó (không lặp lại link giống nhau trong cùng câu/đoạn). Nếu có thông tin từ nguồn link khác thì mới chèn thêm link của nguồn đó.
+   - TUYỆT ĐỐI KHÔNG gom toàn bộ link xuống cuối câu trả lời hay tạo mục "Nguồn tham khảo" ở cuối phản hồi. Hãy đặt link làm bằng chứng ngay sau câu/ý cần dẫn chứng để người dùng bấm vào xem bằng chứng ngay tại chỗ.
 4. QUY CÁCH TRÌNH BÀY GIÁ VÉ & SỐ LIỆU:
    - Ưu tiên trình bày dạng danh sách gạch đầu dòng rõ ràng, trực quan cho từng loại vé:
-     • **[Loại vé / Đối tượng]**: [Mức giá VNĐ] — *[Ghi chú / Điều kiện áp dụng]*
+     • **[Loại vé / Đối tượng]**: [Mức giá VNĐ] — *[Ghi chú / Điều kiện áp dụng]* [Tên nguồn](URL)
    - Nếu trình bày dạng bảng Markdown: BẮT BUỘC mỗi dòng trong bảng phải xuống dòng (\n) độc lập, có dòng tiêu đề và phân cách | :--- | :--- | chuẩn xác. TUYỆT ĐỐI KHÔNG viết các hàng bảng dính liền nhau trên một dòng.
 5. Nếu là trạng thái đóng/mở cửa hoặc cấm đường, hãy nêu rõ khung giờ áp dụng hoặc lưu ý an toàn.
 
@@ -211,7 +215,7 @@ CÂU TRẢ LỜI CỦA AGENT:`;
    * Xử lý câu hỏi và stream phản hồi kèm danh sách nguồn trích dẫn kép (Dual-Mode SSE Stream)
    */
   async *streamRagAnswer(question: string): AsyncGenerator<{
-    type: 'routing' | 'sources' | 'token' | 'done';
+    type: 'routing' | 'sources' | 'token' | 'content_update' | 'done';
     data: any;
   }> {
     this.logger.log(`Bắt đầu xử lý truy vấn RAG kép cho: "${question}"`);
@@ -271,6 +275,11 @@ CÂU TRẢ LỜI CỦA AGENT:`;
         if (chunk.type === 'token') {
           yield {
             type: 'token',
+            data: chunk.data,
+          };
+        } else if (chunk.type === 'content_update') {
+          yield {
+            type: 'content_update',
             data: chunk.data,
           };
         } else if (chunk.type === 'grounding') {

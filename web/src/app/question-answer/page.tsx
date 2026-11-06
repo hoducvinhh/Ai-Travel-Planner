@@ -69,9 +69,113 @@ const SUGGESTED_PROMPTS = [
   },
 ];
 
+function CitationPill({ href, children }: { href?: string; children?: React.ReactNode }) {
+  const [imgError, setImgError] = useState(false);
+
+  if (!href) return <span>{children}</span>;
+
+  let domain = '';
+  try {
+    domain = new URL(href).hostname.replace(/^www\./, '');
+  } catch {
+    domain = '';
+  }
+
+  const rawText =
+    typeof children === 'string'
+      ? children
+      : Array.isArray(children)
+      ? children.filter((c) => typeof c === 'string').join('')
+      : '';
+
+  let label = rawText.trim() || domain || 'Nguồn';
+  if (label.startsWith('http://') || label.startsWith('https://')) {
+    label = domain || 'Nguồn';
+  }
+
+  if (label.includes(':') || label.includes(' - ') || label.includes(' | ')) {
+    const parts = label.split(/\s*[-:|–—]\s*/).filter(Boolean);
+    if (parts.length > 1) {
+      if (domain) {
+        const matchingPart = parts.find(
+          (p) =>
+            p.toLowerCase().includes(domain.toLowerCase()) ||
+            domain.toLowerCase().includes(p.toLowerCase()),
+        );
+        if (matchingPart && matchingPart.length <= 25) {
+          label = matchingPart;
+        } else {
+          label = parts[0];
+        }
+      } else {
+        label = parts[0];
+      }
+    }
+  }
+
+  if (label.length > 22) {
+    label = label.slice(0, 20) + '...';
+  }
+
+  const faviconUrl = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32` : null;
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`${rawText || label} (${href})`}
+      className="inline-flex items-center gap-1.5 align-middle mx-1 px-2.5 py-0.5 rounded-full bg-[#24272C] hover:bg-[#32363D] text-[#E0E2E7] hover:text-white border border-[#3A3E45] text-xs font-medium transition-all shadow-xs group no-underline cursor-pointer select-none"
+    >
+      {faviconUrl && !imgError ? (
+        <img
+          src={faviconUrl}
+          alt=""
+          referrerPolicy="no-referrer"
+          className="w-3.5 h-3.5 rounded-full object-contain shrink-0"
+          onError={() => setImgError(true)}
+          loading="lazy"
+        />
+      ) : (
+        <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+      )}
+      <span className="truncate max-w-[130px]">{label}</span>
+      <ExternalLink className="w-2.5 h-2.5 text-neutral-400 group-hover:text-white shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
+    </a>
+  );
+}
+
 function normalizeMarkdownContent(text: string): string {
   if (!text) return text;
-  return text;
+
+  const lines = text.split('\n');
+  const processedLines = lines.map((line) => {
+    if (!line.includes('](')) return line;
+
+    // Tách dòng thành các câu theo dấu kết thúc câu (.!? hoặc đầu dòng gạch đầu dòng)
+    const sentences = line.split(/(?<=[.!?])\s+/);
+    const cleanedSentences = sentences.map((sentence) => {
+      const seen = new Set<string>();
+      const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+      return sentence
+        .replace(linkRegex, (fullMatch, title, url) => {
+          const normUrl = url.toLowerCase().replace(/\/+$/, '');
+          // Trong cùng 1 câu/đoạn, nếu cùng 1 link thì chỉ hiện 1 link duy nhất
+          if (seen.has(normUrl)) {
+            return '';
+          }
+          seen.add(normUrl);
+          return fullMatch;
+        })
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    });
+
+    return cleanedSentences.join(' ');
+  });
+
+  return processedLines.join('\n');
 }
 
 export default function QuestionAnswerPage() {
@@ -442,6 +546,14 @@ export default function QuestionAnswerPage() {
                   prev.map((msg) =>
                     msg.id === botMessageId
                       ? { ...msg, content: msg.content + event.data }
+                      : msg
+                  )
+                );
+              } else if (event.type === 'content_update') {
+                setMessages((prev) =>
+                  prev.map((msg) =>
+                    msg.id === botMessageId
+                      ? { ...msg, content: event.data }
                       : msg
                   )
                 );
@@ -831,15 +943,7 @@ export default function QuestionAnswerPage() {
                               </td>
                             ),
                             a: ({ href, children }) => (
-                              <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-emerald-700 hover:text-emerald-800 underline underline-offset-2 font-medium inline-flex items-center gap-0.5"
-                              >
-                                <span>{children}</span>
-                                <ExternalLink className="w-3 h-3 inline-block shrink-0" />
-                              </a>
+                              <CitationPill href={href}>{children}</CitationPill>
                             ),
                           }}
                         >
@@ -853,8 +957,11 @@ export default function QuestionAnswerPage() {
                       )}
                     </div>
 
-                    {/* Live Web Grounding Sources */}
-                    {msg.role === 'assistant' && msg.webSources && msg.webSources.length > 0 && (
+                    {/* Live Web Grounding Sources (Chỉ hiển thị dự phòng nếu câu trả lời chưa có link bằng chứng chèn trực tiếp) */}
+                    {msg.role === 'assistant' &&
+                      !/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/.test(msg.content || '') &&
+                      msg.webSources &&
+                      msg.webSources.length > 0 && (
                       <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
                         <div className="text-xs font-semibold text-[#1A1A1A] mb-2 flex items-center gap-1.5">
                           <Globe className="w-3.5 h-3.5 text-emerald-600" />

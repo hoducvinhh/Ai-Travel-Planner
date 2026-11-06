@@ -163,6 +163,8 @@ export class ChatController {
           accumulatedSources = event.data || null;
         } else if (event.type === 'token') {
           accumulatedContent += event.data || '';
+        } else if (event.type === 'content_update') {
+          accumulatedContent = event.data || accumulatedContent;
         }
 
         res.write(`data: ${JSON.stringify(event)}\n\n`);

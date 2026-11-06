@@ -53,12 +53,147 @@ export class GeminiService {
     const defaultList = [
       this.modelName,
       this.fallbackModelName,
+      'gemini-3.8-flash',
       'gemini-3.5-flash-lite',
       'gemini-3.1-flash-lite',
+      'gemini-flash-latest',
+      'gemini-flash-lite-latest',
       'gemini-3.5-flash',
       'gemini-3-flash-preview',
     ];
     return Array.from(new Set(defaultList.filter(Boolean)));
+  }
+
+  /**
+   * Trích xuất tên nguồn ngắn gọn, trực quan (ví dụ: "KiotViet", "VnExpress", "Dinh Độc Lập")
+   */
+  getCleanSourceName(title?: string, url?: string): string {
+    let domainName = '';
+    if (url) {
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, '');
+        const parts = host.split('.');
+        if (parts.length >= 2) {
+          domainName = parts[0];
+        }
+      } catch {}
+    }
+
+    if (title && title.trim()) {
+      const clean = title.trim();
+      const parts = clean.split(/\s*[-|–—:•]\s*/).filter((p) => p.trim().length > 0);
+      if (parts.length > 1) {
+        if (domainName) {
+          const matchingPart = parts.find(
+            (p) =>
+              p.toLowerCase().includes(domainName.toLowerCase()) ||
+              domainName.toLowerCase().includes(p.toLowerCase()),
+          );
+          if (matchingPart && matchingPart.trim().length <= 25) {
+            return matchingPart.trim();
+          }
+        }
+        const candidates = parts.filter((p) => p.trim().length >= 3 && p.trim().length <= 25);
+        if (candidates.length > 0) {
+          return candidates[0].trim();
+        }
+      }
+      if (clean.length <= 25) return clean;
+    }
+
+    if (domainName) {
+      return domainName.charAt(0).toUpperCase() + domainName.slice(1);
+    }
+
+    return 'Nguồn';
+  }
+
+  /**
+   * Helper gắn inline markdown citations [Tên nguồn](URL) vào cuối các câu/đoạn tương ứng
+   * dựa trên metadata groundingSupports từ Google Gemini
+   */
+  attachGroundingSupports(
+    text: string,
+    metadata?: any,
+    sourcesList?: WebGroundingSource[],
+  ): string {
+    if (!text || !metadata) return text;
+    const supports = metadata.groundingSupports;
+    const chunks = metadata.groundingChunks;
+
+    if (!Array.isArray(supports) || supports.length === 0 || !Array.isArray(chunks) || chunks.length === 0) {
+      return text;
+    }
+
+    // Kiểm tra các URL đã có trong text dạng markdown link [Title](url)
+    const existingMdUrls = new Set(
+      this.extractMarkdownLinks(text).map((s) => s.url.toLowerCase().replace(/\/+$/, '')),
+    );
+
+    let resultText = text;
+
+    for (const support of supports) {
+      const segmentText = support.segment?.text?.trim();
+      if (!segmentText) continue;
+
+      const chunkIndices: number[] = support.groundingChunkIndices || [];
+      if (chunkIndices.length === 0) continue;
+
+      // Gom danh sách link duy nhất cho segment này
+      const segmentUrls: Array<{ title: string; url: string }> = [];
+      const seenInSegment = new Set<string>();
+
+      for (const idx of chunkIndices) {
+        const chunk = chunks[idx];
+        const uri = chunk?.web?.uri;
+        if (!uri) continue;
+        const normUri = uri.toLowerCase().replace(/\/+$/, '');
+        if (seenInSegment.has(normUri)) continue;
+        seenInSegment.add(normUri);
+
+        const title = this.getCleanSourceName(chunk?.web?.title, uri);
+        segmentUrls.push({ title, url: uri });
+      }
+
+      // Chỉ chèn nếu URL chưa được xuất hiện trong text
+      const urlsToInsert = segmentUrls.filter((s) => {
+        const norm = s.url.toLowerCase().replace(/\/+$/, '');
+        return !existingMdUrls.has(norm);
+      });
+
+      if (urlsToInsert.length === 0) continue;
+
+      const citationString = urlsToInsert
+        .map((s) => `[${s.title}](${s.url})`)
+        .join(' ');
+
+      const segIndex = resultText.indexOf(segmentText);
+      if (segIndex !== -1) {
+        let endOfSeg = segIndex + segmentText.length;
+        // Nếu ngay sau đó là dấu câu (. hoặc , hoặc ! hoặc ?), chèn sau dấu câu
+        while (
+          endOfSeg < resultText.length &&
+          (resultText[endOfSeg] === '.' ||
+            resultText[endOfSeg] === ',' ||
+            resultText[endOfSeg] === '!' ||
+            resultText[endOfSeg] === '?')
+        ) {
+          endOfSeg++;
+        }
+
+        resultText =
+          resultText.slice(0, endOfSeg) +
+          ' ' +
+          citationString +
+          resultText.slice(endOfSeg);
+
+        for (const u of urlsToInsert) {
+          existingMdUrls.add(u.url.toLowerCase().replace(/\/+$/, ''));
+        }
+      }
+    }
+
+    return resultText;
   }
 
   /**
@@ -153,8 +288,10 @@ export class GeminiService {
             }
           }
 
+          const enhancedText = this.attachGroundingSupports(text, metadata, sources);
+
           return {
-            text,
+            text: enhancedText,
             groundingSources: sources,
             searchQueries,
           };
@@ -228,7 +365,7 @@ export class GeminiService {
   async *generateAnswerStreamWithGrounding(
     prompt: string,
     options?: GenerateOptions,
-  ): AsyncGenerator<{ type: 'token' | 'grounding'; data: any }, void, unknown> {
+  ): AsyncGenerator<{ type: 'token' | 'grounding' | 'content_update'; data: any }, void, unknown> {
     if (!this.ai) {
       yield {
         type: 'token',
@@ -315,6 +452,15 @@ export class GeminiService {
       if (!sources.some((s) => s.url === l.url)) {
         sources.push(l);
       }
+    }
+
+    // 4. Nếu có groundingSupports mà text chưa chèn link, bổ sung link vào text
+    const enhancedText = this.attachGroundingSupports(accumulatedText, lastGroundingMetadata, sources);
+    if (enhancedText !== accumulatedText) {
+      yield {
+        type: 'content_update',
+        data: enhancedText,
+      };
     }
 
     yield {
