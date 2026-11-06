@@ -47,11 +47,12 @@ const DYNAMIC_KEYWORDS = [
   'bao nhiêu', 'mấy', 'số lượng', 'con số', 'số liệu', 'thống kê', 'tổng số',
   'diện tích', 'chiều cao', 'chiều dài', 'chiều rộng', 'chiều sâu', 'độ cao', 'độ sâu',
   'sức chứa', 'khoảng cách', 'bao xa', 'cách bao xa', 'quy mô', 'dân số', 'lượt khách',
-  // Giá vé & Chi phí
-  'giá vé', 'vé vào', 'vé tham quan', 'bao nhiêu tiền', 'giá bao nhiêu',
+  // Giá vé, giá tiền & Chi phí
+  'giá tiền', 'giá vé', 'vé vào', 'vé tham quan', 'bao nhiêu tiền', 'giá bao nhiêu',
   'bảng giá', 'phí vào', 'phí tham quan', 'giá cáp treo', 'vé combo',
   'phụ thu', 'vé trẻ em', 'vé người lớn', 'mua vé', 'đặt vé', 'chi phí',
-  'giá tour', 'tiền vé', 'mức giá',
+  'giá tour', 'tiền vé', 'tiền vào', 'mức giá', 'giá cả', 'hết bao nhiêu', 'tốn bao nhiêu', 'mất bao nhiêu',
+  'vào cửa', 'vào cổng', 'vé vào cửa', 'vé vào cổng', 'miễn phí', 'vé', 'phí', 'giá', 'tiền',
   // Khung giờ & Lịch vận hành
   'giờ mở cửa', 'mở cửa', 'giờ đóng cửa', 'đóng cửa', 'giờ hoạt động',
   'lịch diễn', 'lịch biểu diễn', 'suất chiếu', 'mấy giờ mở', 'mấy giờ đóng',
@@ -65,6 +66,7 @@ const DYNAMIC_KEYWORDS = [
 ];
 
 const NUMERICAL_DATE_REGEXES: RegExp[] = [
+  /(^|\s)(giá(\s+tiền|\s+vé|\s+cả|\s+vào|\s+tour|\s+phòng|\s+thuê|\s+dịch vụ)?|tiền(\s+vé|\s+vào|\s+tham quan)?|phí(\s+vào|\s+tham quan|\s+vé)?|vé(\s+vào|\s+cổng|\s+tham quan|\s+cửa)?|chi\s*phí|bao\s*nhiêu\s*tiền|hết\s*bao\s*nhiêu|tốn\s*bao\s*nhiêu|mất\s*bao\s*nhiêu)(\s|$|[?,.])/i,
   /(năm|ngày|tháng|thời gian|thời điểm|lúc|hồi|khi)\s*(nào|mấy|gì|bao nhiêu)/i,
   /(xây dựng|thành lập|hoàn thành|khởi công|khánh thành|xây)\s*(.*)?(vào|từ|năm|khi nào|năm nào|năm bao nhiêu)/i,
   /bao nhiêu\s*(năm|tháng|ngày|giờ|phút|tuổi|tiền|km|mét|m|ha|m2|bậc|tầng|phòng|người|lượt|vé|cửa|đảo|cột|cầu)/i,

@@ -839,12 +839,14 @@ export default function QuestionAnswerPage() {
             </div>
           ) : (
             /* MESSAGES LIST */
-            <div className="max-w-3xl mx-auto space-y-6 pb-4">
+            <div className="max-w-3xl mx-auto pb-6">
               {messages.map((msg, idx) => (
                 <div
                   key={msg.id || idx}
                   className={`flex gap-3 ${
-                    msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    msg.role === 'user'
+                      ? 'justify-end mt-7 first:mt-0'
+                      : 'justify-start mt-2'
                   }`}
                 >
                   {msg.role === 'assistant' && (
@@ -854,10 +856,10 @@ export default function QuestionAnswerPage() {
                   )}
 
                   <div
-                    className={`max-w-2xl sm:max-w-3xl rounded-2xl p-4 sm:p-5 shadow-xs ${
+                    className={`${
                       msg.role === 'user'
-                        ? 'bg-[#1A1A1A] text-white rounded-tr-sm'
-                        : 'bg-white border border-[#E5E7EB] text-[#1A1A1A] rounded-tl-sm'
+                        ? 'max-w-xl sm:max-w-2xl bg-[#1A1A1A] text-white rounded-2xl sm:rounded-3xl px-5 py-3 shadow-xs'
+                        : 'w-full max-w-2xl sm:max-w-3xl text-[#1A1A1A] px-1 py-1'
                     }`}
                   >
                     {/* Header thông tin nguồn & nút báo cáo sai lệch */}
