@@ -37,6 +37,16 @@ export const DISCLAIMER_NOTE =
   '⚠️ Lưu ý: Thông tin về giá vé, giờ mở cửa và trạng thái hoạt động có thể thay đổi tùy thời điểm, dịp lễ/tết hoặc chính sách mới nhất của đơn vị quản lý. Du khách nên kiểm tra lại với cổng thông tin chính thức trước chuyến đi.';
 
 const DYNAMIC_KEYWORDS = [
+  // Mốc thời gian, ngày, tháng, năm, thời điểm
+  'năm nào', 'năm bao nhiêu', 'vào năm nào', 'từ năm nào', 'năm mấy', 'năm xây dựng', 'năm khánh thành',
+  'năm thành lập', 'năm hoàn thành', 'năm khởi công', 'xây năm nào', 'xây vào năm nào', 'xây khi nào',
+  'ngày nào', 'ngày mấy', 'vào ngày nào', 'hôm nào', 'tháng nào', 'tháng mấy', 'vào tháng nào',
+  'thời gian nào', 'khi nào', 'lúc nào', 'hồi nào', 'bao giờ', 'thời điểm nào', 'mấy giờ', 'giờ nào',
+  'bao lâu', 'mất bao lâu', 'thời lượng', 'khung giờ', 'thế kỷ nào', 'thế kỷ mấy', 'thời kỳ nào', 'triều đại nào',
+  // Con số, số lượng, định lượng, kích thước, khoảng cách
+  'bao nhiêu', 'mấy', 'số lượng', 'con số', 'số liệu', 'thống kê', 'tổng số',
+  'diện tích', 'chiều cao', 'chiều dài', 'chiều rộng', 'chiều sâu', 'độ cao', 'độ sâu',
+  'sức chứa', 'khoảng cách', 'bao xa', 'cách bao xa', 'quy mô', 'dân số', 'lượt khách',
   // Giá vé & Chi phí
   'giá vé', 'vé vào', 'vé tham quan', 'bao nhiêu tiền', 'giá bao nhiêu',
   'bảng giá', 'phí vào', 'phí tham quan', 'giá cáp treo', 'vé combo',
@@ -44,16 +54,25 @@ const DYNAMIC_KEYWORDS = [
   'giá tour', 'tiền vé', 'mức giá',
   // Khung giờ & Lịch vận hành
   'giờ mở cửa', 'mở cửa', 'giờ đóng cửa', 'đóng cửa', 'giờ hoạt động',
-  'lịch diễn', 'lịch biểu diễn', 'suất chiếu', 'khung giờ', 'mấy giờ mở', 'mấy giờ đóng',
+  'lịch diễn', 'lịch biểu diễn', 'suất chiếu', 'mấy giờ mở', 'mấy giờ đóng',
   // Rủi ro & Trạng thái hoạt động
   'có đang mở cửa', 'có mở cửa', 'đang mở cửa', 'đang đóng cửa', 'tạm đóng',
   'tạm dừng', 'tạm ngưng', 'ngưng hoạt động', 'tu sửa', 'bảo trì',
   'cấm đường', 'sạt lở', 'ngập lụt', 'thời tiết hôm nay', 'thời tiết', 'bão', 'mưa bão',
   'quy định mới', 'lưu ý mới',
-  // Quy mô & Sức chứa
-  'quy mô', 'sức chứa', 'diện tích',
   // Yếu tố thời gian thực & cập nhật
-  'hôm nay', 'hiện nay', 'mới nhất', 'năm nay', 'cập nhật mới', '2025', '2026',
+  'hôm nay', 'hiện nay', 'mới nhất', 'năm nay', 'cập nhật mới', '2024', '2025', '2026',
+];
+
+const NUMERICAL_DATE_REGEXES: RegExp[] = [
+  /(năm|ngày|tháng|thời gian|thời điểm|lúc|hồi|khi)\s*(nào|mấy|gì|bao nhiêu)/i,
+  /(xây dựng|thành lập|hoàn thành|khởi công|khánh thành|xây)\s*(.*)?(vào|từ|năm|khi nào|năm nào|năm bao nhiêu)/i,
+  /bao nhiêu\s*(năm|tháng|ngày|giờ|phút|tuổi|tiền|km|mét|m|ha|m2|bậc|tầng|phòng|người|lượt|vé|cửa|đảo|cột|cầu)/i,
+  /(mấy|bao nhiêu)\s*(giờ|phút|tiếng|ngày|tháng|năm|bậc|tầng|phòng|người|km|mét|cửa|đảo)/i,
+  /(cao|dài|rộng|sâu|nặng|xa)\s*(bao nhiêu|thế nào|mấy)/i,
+  /(năm\s*\d{3,4})|(thế kỷ\s*(thứ\s*)?[ivxldcm\d]+)|(thế kỷ\s*(nào|mấy|bao nhiêu))/i,
+  /\b\d{1,2}\/\d{1,2}(\/\d{2,4})?\b/,
+  /\b(1[0-9]{3}|20[0-9]{2})\b/,
 ];
 
 @Injectable()
@@ -78,14 +97,23 @@ export class RagService {
     if (matched.length > 0) {
       return {
         mode: 'live_web',
-        reason: `Phát hiện truy vấn số liệu / trạng thái thời gian thực (${matched.slice(0, 3).join(', ')})`,
+        reason: `Phát hiện câu hỏi về con số, số liệu, mốc thời gian hoặc trạng thái thực tế (${matched.slice(0, 3).join(', ')})`,
         matchedKeywords: matched,
+      };
+    }
+
+    const matchedRegex = NUMERICAL_DATE_REGEXES.find((r) => r.test(question));
+    if (matchedRegex) {
+      return {
+        mode: 'live_web',
+        reason: 'Phát hiện câu hỏi chứa con số, số liệu, ngày tháng hoặc mốc thời gian cụ thể',
+        matchedKeywords: [question.slice(0, 40)],
       };
     }
 
     return {
       mode: 'internal',
-      reason: 'Truy vấn tri thức lịch sử, văn hóa, ẩm thực hoặc thông tin du lịch bền vững',
+      reason: 'Truy vấn tri thức tổng quan, văn hóa, danh lam thắng cảnh hoặc ẩm thực du lịch',
       matchedKeywords: [],
     };
   }
@@ -183,7 +211,7 @@ CÂU TRẢ LỜI:`;
    */
   buildLiveWebSearchPrompt(question: string, entityContext?: string): string {
     return `Bạn là "Agent Kiểm Chứng Du Lịch Thông Minh" (Real-time Travel Verification Agent) của Việt Nam.
-Nhiệm vụ của bạn là tra cứu và cung cấp thông tin số liệu thực tế chính xác nhất (giá vé, giờ mở cửa, trạng thái hoạt động) tính đến năm 2026.
+Nhiệm vụ của bạn là tra cứu và cung cấp thông tin số liệu, con số thực tế chính xác nhất (mốc thời gian, ngày tháng năm xây dựng/thành lập, thông số kích thước/quy mô/sức chứa, giá vé, giờ mở cửa, trạng thái hoạt động).
 
 HỆ THỐNG NGUỒN ĐƯỢC ƯU TIÊN KIỂM CHỨNG:
 1. Website chính thức của Ban quản lý & Cổng thông tin Sở Du Lịch (ví dụ: dinhdoclap.gov.vn, banahills.sunworld.vn, vinwonders.com, vietnamtourism.gov.vn, dulichdanang.gov.vn, sodulich.hanoi.gov.vn...).
@@ -191,19 +219,20 @@ HỆ THỐNG NGUỒN ĐƯỢC ƯU TIÊN KIỂM CHỨNG:
 3. Cổng niêm yết vé du lịch chính thống: Klook, Traveloka, MoMo Travel (nơi cập nhật giá vé bán thực tế theo ngày).
 
 RÀO CHẮN LỌC NGUỒN & QUY TẮC PHẢN HỒI (Source Guardrail Directive):
-1. BẮT BUỘC ưu tiên thông tin cập nhật gần nhất (năm 2025 - 2026).
+1. Đối với thông tin trạng thái, giá vé: BẮT BUỘC ưu tiên thông tin cập nhật gần nhất (năm 2025 - 2026). Đối với mốc thời gian lịch sử, năm xây dựng/khởi công/khánh thành, số liệu kích thước: tra cứu website chính thức của Ban quản lý di tích, cổng thông tin Sở/Bộ Du Lịch hoặc báo chí chính thống uy tín.
 2. KHÔNG sử dụng thông tin từ blog cá nhân không ghi ngày tháng hoặc các diễn đàn không kiểm chứng.
 3. QUY TẮC CHÈN BẰNG CHỨNG NGUỒN TRỰC TIẾP TỪNG ĐOẠN (Inline Evidence Citation):
    - BẮT BUỘC chèn đường link nguồn ngay ở cuối câu hoặc đoạn chứa thông tin/số liệu bạn tra cứu được từ các website du lịch làm bằng chứng, theo định dạng Markdown: [Tên nguồn ngắn gọn](URL).
    - Tên nguồn hiển thị phải ngắn gọn, súc tích từ các cổng thông tin du lịch chính thống (ví dụ: [Dinh Độc Lập], [VnExpress Du Lịch], [Sun World Bà Nà Hills], [VinWonders], [Traveloka], [Klook], [Báo Tuổi Trẻ Du Lịch]...).
    - Ví dụ minh họa:
+     • "Dinh Độc Lập được khởi công xây dựng vào ngày 23/2/1868 và hoàn thành vào năm 1871 [Dinh Độc Lập](https://dinhdoclap.gov.vn/lich-su)."
      • "Vé tham quan Dinh Độc Lập hiện tại là 40.000 VNĐ/người lớn [Dinh Độc Lập](https://dinhdoclap.gov.vn/gia-ve)."
      • "Cáp treo Bà Nà Hills vận hành từ 8:00 đến 17:00 hàng ngày [Sun World Bà Nà Hills](https://banahills.sunworld.vn)."
    - QUY TẮC TRÙNG LẶP: Trong cùng một câu hoặc đoạn thông tin, nếu dùng chung một link thì CHỈ CHÈN 1 LINK DUY NHẤT ở cuối câu/đoạn đó (không lặp lại link giống nhau trong cùng câu/đoạn). Nếu có thông tin từ nguồn link khác thì mới chèn thêm link của nguồn đó.
    - TUYỆT ĐỐI KHÔNG gom toàn bộ link xuống cuối câu trả lời hay tạo mục "Nguồn tham khảo" ở cuối phản hồi. Hãy đặt link làm bằng chứng ngay sau câu/ý cần dẫn chứng để người dùng bấm vào xem bằng chứng ngay tại chỗ.
 4. QUY CÁCH TRÌNH BÀY GIÁ VÉ & SỐ LIỆU:
-   - Ưu tiên trình bày dạng danh sách gạch đầu dòng rõ ràng, trực quan cho từng loại vé:
-     • **[Loại vé / Đối tượng]**: [Mức giá VNĐ] — *[Ghi chú / Điều kiện áp dụng]* [Tên nguồn](URL)
+   - Ưu tiên trình bày dạng danh sách gạch đầu dòng rõ ràng, trực quan cho từng loại vé hoặc thông số:
+     • **[Loại vé / Đối tượng / Hạng mục]**: [Mức giá VNĐ hoặc Số liệu] — *[Ghi chú / Điều kiện áp dụng]* [Tên nguồn](URL)
    - Nếu trình bày dạng bảng Markdown: BẮT BUỘC mỗi dòng trong bảng phải xuống dòng (\n) độc lập, có dòng tiêu đề và phân cách | :--- | :--- | chuẩn xác. TUYỆT ĐỐI KHÔNG viết các hàng bảng dính liền nhau trên một dòng.
 5. Nếu là trạng thái đóng/mở cửa hoặc cấm đường, hãy nêu rõ khung giờ áp dụng hoặc lưu ý an toàn.
 
@@ -226,13 +255,30 @@ CÂU TRẢ LỜI CỦA AGENT:`;
     const intent = this.classifyQueryIntent(question);
     this.logger.log(`Bộ định tuyến ý định: mode=${intent.mode} (${intent.reason})`);
 
+    const normalizedQ = question.toLowerCase();
+    const isTicketOrOperating =
+      normalizedQ.includes('vé') ||
+      normalizedQ.includes('giờ') ||
+      normalizedQ.includes('mở cửa') ||
+      normalizedQ.includes('đóng cửa') ||
+      normalizedQ.includes('giá') ||
+      normalizedQ.includes('chi phí') ||
+      normalizedQ.includes('hoạt động') ||
+      normalizedQ.includes('tạm dừng') ||
+      normalizedQ.includes('bảo trì');
+
+    const disclaimer =
+      intent.mode === 'live_web' && isTicketOrOperating
+        ? this.DISCLAIMER_NOTE
+        : undefined;
+
     // 1. Gửi metadata routing về client
     yield {
       type: 'routing',
       data: {
         mode: intent.mode,
         reason: intent.reason,
-        disclaimer: intent.mode === 'live_web' ? this.DISCLAIMER_NOTE : undefined,
+        disclaimer,
       },
     };
 
@@ -295,7 +341,7 @@ CÂU TRẢ LỜI CỦA AGENT:`;
         mode: 'live_web',
         items: [],
         webSources,
-        disclaimer: this.DISCLAIMER_NOTE,
+        disclaimer: disclaimer || null,
       };
 
       yield {
@@ -345,12 +391,24 @@ CÂU TRẢ LỜI CỦA AGENT:`;
         enableGoogleSearch: true,
       });
 
+      const normalizedQ = question.toLowerCase();
+      const isTicketOrOperating =
+        normalizedQ.includes('vé') ||
+        normalizedQ.includes('giờ') ||
+        normalizedQ.includes('mở cửa') ||
+        normalizedQ.includes('đóng cửa') ||
+        normalizedQ.includes('giá') ||
+        normalizedQ.includes('chi phí') ||
+        normalizedQ.includes('hoạt động') ||
+        normalizedQ.includes('tạm dừng') ||
+        normalizedQ.includes('bảo trì');
+
       return {
         question,
         answer: result.text,
         mode: 'live_web' as const,
         routerReason: intent.reason,
-        disclaimer: this.DISCLAIMER_NOTE,
+        disclaimer: isTicketOrOperating ? this.DISCLAIMER_NOTE : null,
         sources: [],
         webSources: result.groundingSources,
       };
