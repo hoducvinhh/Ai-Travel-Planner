@@ -962,10 +962,6 @@ export default function CommunityPage() {
                               </div>
                             </div>
                           </div>
-
-                          <Badge variant="lime" className="text-[10px] h-4 font-mono">
-                            {buddy.matchScore}% Hợp gu
-                          </Badge>
                         </div>
 
                         {/* Styles */}

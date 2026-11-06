@@ -9,7 +9,6 @@ import { Trip } from '@/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 
 function TripsContent() {
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -89,12 +88,6 @@ function TripsContent() {
                       <div className="w-10 h-10 rounded-xl bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center">
                         <MapPin className="w-5 h-5" />
                       </div>
-                      <Badge
-                        variant={trip.status === 'GENERATED' ? 'lime' : 'secondary'}
-                        className="text-[11px] font-normal"
-                      >
-                        {trip.status === 'GENERATED' ? 'Đã tạo lịch trình' : trip.status}
-                      </Badge>
                     </div>
 
                     <h3 className="text-lg font-bold text-[#1A1A1A] mb-2 group-hover:underline">

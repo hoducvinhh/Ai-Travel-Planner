@@ -785,11 +785,6 @@ export default function QuestionAnswerPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="gap-1.5 px-2.5 py-1 rounded-full text-[11px] border-[#E5E7EB] bg-white font-normal">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#65A30D]"></span>
-              <span className="text-[#1A1A1A] font-medium">Sẵn sàng</span>
-            </Badge>
-
             {messages.length > 0 && (
               <Button
                 variant="outline"
@@ -868,7 +863,7 @@ export default function QuestionAnswerPage() {
                     {/* Header thông tin nguồn & nút báo cáo sai lệch */}
                     {msg.role === 'assistant' && (
                       <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
-                        {msg.mode === 'live_web' ? (
+                        {msg.mode === 'live_web' && (
                           <Badge
                             variant="outline"
                             className="text-[11px] font-medium bg-emerald-50 text-emerald-800 border-emerald-200 gap-1.5 py-0.5 px-2.5 rounded-full"
@@ -876,21 +871,13 @@ export default function QuestionAnswerPage() {
                             <Globe className="w-3.5 h-3.5 text-emerald-600" />
                             <span>Kiểm chứng trực tuyến</span>
                           </Badge>
-                        ) : (
-                          <Badge
-                            variant="outline"
-                            className="text-[11px] font-medium bg-[#F4F4F3] text-[#4B5563] border-[#E5E7EB] gap-1.5 py-0.5 px-2.5 rounded-full"
-                          >
-                            <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
-                            <span>Cơ sở tri thức du lịch</span>
-                          </Badge>
                         )}
 
                         {msg.content && (
                           <button
                             type="button"
                             onClick={() => handleOpenFeedback(msg, idx)}
-                            className="inline-flex items-center gap-1.5 text-[11px] text-[#6B7280] hover:text-[#DC2626] transition-colors py-1 px-2 rounded-lg hover:bg-red-50 cursor-pointer"
+                            className="inline-flex items-center gap-1.5 text-[11px] text-[#6B7280] hover:text-[#DC2626] transition-colors py-1 px-2 rounded-lg hover:bg-red-50 cursor-pointer ml-auto"
                             title="Báo cáo thông tin chưa chính xác"
                           >
                             <Flag className="w-3 h-3 text-[#6B7280]" />

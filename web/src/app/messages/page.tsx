@@ -314,9 +314,6 @@ function MessagesContent() {
                   </div>
                   <h1 className="text-sm font-bold text-[#1A1A1A]">Hộp thư trực tiếp</h1>
                 </div>
-                <Badge variant="lime" className="text-[10px] font-mono px-2 py-0.5">
-                  Real-time
-                </Badge>
               </div>
 
               {/* Ô tìm kiếm đối thoại */}
