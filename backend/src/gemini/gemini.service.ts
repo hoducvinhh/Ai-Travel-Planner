@@ -51,12 +51,12 @@ export class GeminiService {
    */
   private getCandidateModels(): string[] {
     const defaultList = [
-      'gemini-3-flash-preview',
-      'gemini-3.1-flash-lite',
-      'gemini-3.5-flash',
-      'gemini-3.5-flash-lite',
       this.modelName,
       this.fallbackModelName,
+      'gemini-3.5-flash-lite',
+      'gemini-3.1-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3-flash-preview',
     ];
     return Array.from(new Set(defaultList.filter(Boolean)));
   }
