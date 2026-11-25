@@ -255,7 +255,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
                     ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String?>(
-                      value: trips.any((t) => t.id == _selectedTripId)
+                      initialValue: trips.any((t) => t.id == _selectedTripId)
                           ? _selectedTripId
                           : null,
                       isExpanded: true,

@@ -109,7 +109,7 @@ class TripCard extends StatelessWidget {
                     ],
                   ),
 
-                  if (trip.travelersCount != null) ...[
+                  if (trip.travelersCount > 0) ...[
                     const SizedBox(height: AppSpacing.xs),
                     Row(
                       children: [

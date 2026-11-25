@@ -528,8 +528,9 @@ class _PlaceDirectionsSheetState extends ConsumerState<PlaceDirectionsSheet> {
                                 points: _routeResult!.points,
                                 strokeWidth: 4.5,
                                 color: AppColors.primary,
-                                isDotted:
-                                    _transportMode == TransportMode.walking,
+                                pattern: _transportMode == TransportMode.walking
+                                    ? const StrokePattern.dotted()
+                                    : const StrokePattern.solid(),
                               ),
                             ],
                           ),

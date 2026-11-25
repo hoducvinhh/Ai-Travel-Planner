@@ -47,6 +47,8 @@ class AppTextStyles {
     height: 1.5,
   );
 
+  static const TextStyle titleMedium = headlineSmall;
+
   // Body
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,

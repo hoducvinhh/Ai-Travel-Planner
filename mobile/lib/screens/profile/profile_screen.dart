@@ -532,7 +532,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
   }
 
   Widget _buildSettingsTab() {
-    final bioAsync = ref.watch(biometricSettingsProvider);
+    final bioAvailable =
+        ref.watch(biometricAvailableProvider).valueOrNull ?? false;
+    final bioEnabled =
+        ref.watch(biometricEnabledProvider).valueOrNull ?? false;
 
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -637,21 +640,21 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
         ),
         const SizedBox(height: AppSpacing.lg),
         const Divider(),
-        bioAsync.when(
-          loading: () => const SizedBox.shrink(),
-          error: (_, __) => const SizedBox.shrink(),
-          data: (bio) {
-            if (!bio.isAvailable) return const SizedBox.shrink();
-            return SwitchListTile(
-              title: const Text('Đăng nhập sinh trắc học'),
-              subtitle: const Text('Sử dụng vân tay hoặc FaceID'),
-              value: bio.isEnabled,
-              onChanged: (val) => ref
-                  .read(biometricSettingsProvider.notifier)
-                  .setBiometricEnabled(val),
-            );
-          },
-        ),
+        if (bioAvailable)
+          SwitchListTile(
+            title: const Text('Đăng nhập sinh trắc học'),
+            subtitle: const Text('Sử dụng vân tay hoặc FaceID'),
+            value: bioEnabled,
+            onChanged: (val) async {
+              final service = ref.read(biometricServiceProvider);
+              if (val) {
+                await service.enableBiometric();
+              } else {
+                await service.disableBiometric();
+              }
+              ref.invalidate(biometricEnabledProvider);
+            },
+          ),
       ],
     );
   }

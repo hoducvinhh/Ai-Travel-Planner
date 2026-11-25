@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:travel_planner/models/trip.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
 import 'package:travel_planner/repositories/trips_repository.dart';
 import 'package:travel_planner/services/providers.dart';
 
@@ -9,8 +10,14 @@ final tripsRepositoryProvider = Provider<TripsRepository>((ref) {
   return TripsRepository(api);
 });
 
-/// Trips list provider
+/// Trips list provider (returns empty list when unauthenticated)
 final tripsProvider = FutureProvider<List<Trip>>((ref) async {
+  final authState = ref.watch(authProvider);
+  final isAuthenticated = authState.maybeWhen(
+    authenticated: (_) => true,
+    orElse: () => false,
+  );
+  if (!isAuthenticated) return [];
   final repository = ref.watch(tripsRepositoryProvider);
   return await repository.getTrips();
 });
