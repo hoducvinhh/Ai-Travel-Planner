@@ -9,6 +9,9 @@ class RecommendationRequest(BaseModel):
     group_size: int
     month_of_year: int
     explicit_preferences: Optional[List[str]] = []
+    user_preferred_styles: Optional[List[str]] = []
+    budget_level: Optional[str] = None
+    companion_type: Optional[str] = None
 
 class RecommendationResponse(BaseModel):
     place_ids: List[str]

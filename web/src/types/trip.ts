@@ -38,11 +38,53 @@ export interface DayPlan {
   optimizationStats?: DayOptimizationStats;
 }
 
+export interface FeasibilityCriterion {
+  score: number;
+  weight: number;
+  label: string;
+  status: 'excellent' | 'good' | 'warning' | 'critical';
+  summary: string;
+}
+
+export interface FeasibilityWarning {
+  type: 'CRITICAL' | 'WARNING' | 'TIP';
+  category: 'geo' | 'time' | 'budget' | 'pref' | 'div';
+  dayNumber?: number;
+  message: string;
+}
+
+export interface FeasibilityDayDetail {
+  dayNumber: number;
+  placesCount: number;
+  distanceKm: number;
+  estimatedTransitTimeHours: number;
+  dayCost: number;
+  warnings: string[];
+}
+
+export interface FeasibilityReport {
+  overallScore: number;
+  rating: 'Rất khả thi' | 'Khả thi' | 'Cần cân nhắc' | 'Kém khả thi';
+  metrics: {
+    geo: FeasibilityCriterion;
+    time: FeasibilityCriterion;
+    budget: FeasibilityCriterion;
+    preference: FeasibilityCriterion;
+    diversity: FeasibilityCriterion;
+  };
+  warnings: FeasibilityWarning[];
+  dayDetails: FeasibilityDayDetail[];
+  totalDistanceKm: number;
+  totalTransitTimeHours: number;
+  evaluatedAt: string;
+}
+
 export interface TripItinerary {
   days: DayPlan[];
   summary: string;
   totalEstimatedCost: number;
   optimizationStats?: TripOptimizationStats;
+  feasibilityReport?: FeasibilityReport;
 }
 
 export interface Trip {

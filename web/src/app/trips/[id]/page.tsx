@@ -26,6 +26,7 @@ import {
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { api } from '@/lib/api';
 import PlaceWeatherPill from '@/components/PlaceWeatherPill';
+import TripFeasibilityCard from '@/components/trips/TripFeasibilityCard';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -412,6 +413,11 @@ function TripDetailContent() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Thẻ đánh giá tính khả thi lịch trình */}
+        {trip.itinerary?.feasibilityReport && (
+          <TripFeasibilityCard report={trip.itinerary.feasibilityReport} className="mb-6" />
+        )}
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Day Selector Sidebar */}

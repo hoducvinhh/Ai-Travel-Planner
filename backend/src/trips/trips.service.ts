@@ -7,6 +7,10 @@ import {
   DayOptimizationStats,
   TripOptimizationStats,
 } from './optimizer/route-optimizer.service';
+import {
+  FeasibilityValidatorService,
+  FeasibilityReport,
+} from './optimizer/feasibility-validator.service';
 
 export interface CreateTripDto {
   userId: string;
@@ -25,6 +29,7 @@ export interface TripItinerary {
   summary: string;
   totalEstimatedCost: number;
   optimizationStats?: TripOptimizationStats;
+  feasibilityReport?: FeasibilityReport;
 }
 
 export interface DayPlan {
@@ -59,6 +64,7 @@ export class TripsService {
     private readonly gemini: GeminiService,
     private readonly recommendation: RecommendationService,
     private readonly optimizer: RouteOptimizerService,
+    private readonly feasibilityValidator: FeasibilityValidatorService,
   ) {}
 
   async createTrip(dto: CreateTripDto) {
@@ -526,10 +532,32 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
         itinerary.totalEstimatedCost = calculatedTotalCost;
       }
 
+      // Tự động sửa lỗi vi phạm khung giờ / nhịp độ (Local Spatial Repair)
+      const { repairedDays, repairCount } = this.feasibilityValidator.autoRepairItinerary(itinerary.days);
+      if (repairCount > 0) {
+        itinerary.days = repairedDays as DayPlan[];
+        this.logger.log(`Tự động sửa lỗi vi phạm thành công (${repairCount} điểm điều chỉnh nhịp độ/buổi).`);
+      }
+
       // Tối ưu hóa thứ tự các địa điểm bằng thuật toán TSPTW 2-Opt & tính toán chỉ số tiết kiệm
       const optimized = this.optimizer.optimizeTripDays(itinerary.days);
       itinerary.days = optimized.days as DayPlan[];
       itinerary.optimizationStats = optimized.stats;
+
+      // Đánh giá tính khả thi 5 chiều của lịch trình
+      try {
+        itinerary.feasibilityReport = this.feasibilityValidator.validateItinerary(
+          itinerary.days,
+          {
+            totalBudget: budgetPerPerson * (groupSize || 1),
+            daysCount: Math.max(1, days),
+            groupSize,
+            explicitPreferences: preferences,
+          },
+        );
+      } catch (valErr: any) {
+        this.logger.warn(`Feasibility validation error: ${valErr?.message}`);
+      }
 
       return itinerary;
     } catch (error: any) {
@@ -622,11 +650,27 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
       // Tối ưu hóa thứ tự 2-Opt cho fallback
       const optimized = this.optimizer.optimizeTripDays(mockDays);
 
+      let fallbackFeasibility: FeasibilityReport | undefined;
+      try {
+        fallbackFeasibility = this.feasibilityValidator.validateItinerary(
+          optimized.days,
+          {
+            totalBudget: budgetPerPerson * (groupSize || 1),
+            daysCount: daysCount,
+            groupSize,
+            explicitPreferences: preferences,
+          },
+        );
+      } catch (valErr: any) {
+        this.logger.warn(`Fallback feasibility validation error: ${valErr?.message}`);
+      }
+
       return {
         days: optimized.days as DayPlan[],
         summary: `Lịch trình ${daysCount} ngày tối ưu hóa thông minh theo không gian địa lý. Dựa trên gợi ý Recommendation Model & K-Means Clustering.`,
         totalEstimatedCost: totalCost,
         optimizationStats: optimized.stats,
+        feasibilityReport: fallbackFeasibility,
       };
     }
   }
@@ -677,10 +721,32 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
       throw new NotFoundException(`Lịch trình chưa được tạo cho chuyến đi này`);
     }
 
+    // Tự động sửa lỗi vi phạm khung giờ / nhịp độ nếu có
+    const { repairedDays } = this.feasibilityValidator.autoRepairItinerary(itinerary.days);
+    itinerary.days = repairedDays as DayPlan[];
+
     // Tối ưu hóa thứ tự bằng 2-Opt TSPTW Heuristic
     const optimized = this.optimizer.optimizeTripDays(itinerary.days);
     itinerary.days = optimized.days as DayPlan[];
     itinerary.optimizationStats = optimized.stats;
+
+    // Đánh giá lại tính khả thi sau khi tối ưu lộ trình
+    try {
+      const diffDays = Math.ceil(
+        (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) || itinerary.days.length;
+      itinerary.feasibilityReport = this.feasibilityValidator.validateItinerary(
+        itinerary.days,
+        {
+          totalBudget: trip.budgetPerPerson * (trip.groupSize || 1),
+          daysCount: Math.max(1, diffDays),
+          groupSize: trip.groupSize,
+        },
+      );
+    } catch (valErr: any) {
+      this.logger.warn(`Optimization feasibility validation error: ${valErr?.message}`);
+    }
 
     // Cập nhật lại bản ghi TripPlace trong database
     await this.prisma.tripPlace.deleteMany({
@@ -749,6 +815,27 @@ ${places.map((p, i) => `${i + 1}. [ID: ${p.id}] ${p.name} (Tỉnh/TP: ${p.provin
             if (dbPlace.latitude && !p.latitude) p.latitude = dbPlace.latitude;
             if (dbPlace.longitude && !p.longitude) p.longitude = dbPlace.longitude;
           }
+        }
+      }
+
+      // Tự động tính toán FeasibilityReport nếu bản ghi cũ chưa có
+      if (!(trip.itinerary as any).feasibilityReport) {
+        try {
+          const diffDays = Math.ceil(
+            (new Date(trip.endDate).getTime() - new Date(trip.startDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ) || (trip.itinerary as any).days.length;
+
+          (trip.itinerary as any).feasibilityReport = this.feasibilityValidator.validateItinerary(
+            (trip.itinerary as any).days,
+            {
+              totalBudget: trip.budgetPerPerson * (trip.groupSize || 1),
+              daysCount: Math.max(1, diffDays),
+              groupSize: trip.groupSize,
+            },
+          );
+        } catch (valErr: any) {
+          this.logger.warn(`Dynamically computing feasibility report error: ${valErr?.message}`);
         }
       }
     }

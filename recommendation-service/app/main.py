@@ -213,16 +213,34 @@ async def recommend_places(
 
         candidate_place_ids = [row[0] for row in candidates]
         candidate_popularity = {row[0]: float(row[4] or 0.0) for row in candidates}
+        candidate_details = {
+            row[0]: {
+                'name': row[1],
+                'categories': _normalize_categories(row[2]),
+                'price_estimate': row[3] or 0,
+                'popularity': float(row[4] or 0.0),
+            }
+            for row in candidates
+        }
 
-        # Step 2: Get predictions from model (handles warm users & cold start with popularity)
+        daily_budget = request.budget_per_person / max(1, request.days)
+
+        # Step 2: Get predictions from model (handles warm users & cold start with multi-attribute personalization)
         predictions = recommendation_model.predict(
             user_id=request.user_id,
             candidate_place_ids=candidate_place_ids,
-            candidate_popularity=candidate_popularity
+            candidate_popularity=candidate_popularity,
+            candidate_details=candidate_details,
+            trip_preferences=request.explicit_preferences,
+            user_onboard_styles=request.user_preferred_styles,
+            daily_budget=daily_budget,
+            companion_type=request.companion_type,
         )
 
-        # Step 3: Boost scores using explicit preferences
-        if request.explicit_preferences:
+        # Step 3: Boost scores using explicit preferences for warm users (collaborative filtering)
+        is_warm_user = (recommendation_model.model is not None and 
+                        request.user_id in getattr(recommendation_model, 'user_id_mapping', {}))
+        if is_warm_user and request.explicit_preferences:
             boosted_predictions = []
             for place_id, score in predictions:
                 place = next((c for c in candidates if c[0] == place_id), None)

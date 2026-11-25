@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { SocketProvider } from '@/context/SocketContext';
 import Navbar from '@/components/Navbar';
+import OnboardingModal from '@/components/onboarding/OnboardingModal';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -36,6 +37,7 @@ export default function RootLayout({
         <AuthProvider>
           <SocketProvider>
             <Navbar />
+            <OnboardingModal />
             {children}
           </SocketProvider>
         </AuthProvider>

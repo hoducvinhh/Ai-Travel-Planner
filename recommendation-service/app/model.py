@@ -156,14 +156,27 @@ class RecommendationModel:
 
     def predict(self, user_id: str, candidate_place_ids: List[str],
                 user_features: np.ndarray = None,
-                candidate_popularity: Dict[str, float] = None) -> List[Tuple[str, float]]:
+                candidate_popularity: Dict[str, float] = None,
+                candidate_details: Dict[str, dict] = None,
+                trip_preferences: List[str] = None,
+                user_onboard_styles: List[str] = None,
+                daily_budget: float = 0.0,
+                companion_type: str = None) -> List[Tuple[str, float]]:
         """Predict scores for candidate places with cold-start fallback"""
         if self.model is None:
-            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
+            return self._cold_start_recommend(
+                candidate_place_ids, user_features, candidate_popularity,
+                candidate_details, trip_preferences, user_onboard_styles,
+                daily_budget, companion_type
+            )
 
         # Handle cold start (new user)
         if user_id not in self.user_id_mapping:
-            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
+            return self._cold_start_recommend(
+                candidate_place_ids, user_features, candidate_popularity,
+                candidate_details, trip_preferences, user_onboard_styles,
+                daily_budget, companion_type
+            )
 
         user_idx = self.user_id_mapping[user_id]
 
@@ -174,7 +187,11 @@ class RecommendationModel:
         ]
 
         if not valid_candidates:
-            return self._cold_start_recommend(candidate_place_ids, user_features, candidate_popularity)
+            return self._cold_start_recommend(
+                candidate_place_ids, user_features, candidate_popularity,
+                candidate_details, trip_preferences, user_onboard_styles,
+                daily_budget, companion_type
+            )
 
         place_indices = [self.place_id_mapping[pid] for pid in valid_candidates]
 
@@ -201,7 +218,9 @@ class RecommendationModel:
         unseen_candidates = [pid for pid in candidate_place_ids if pid not in self.place_id_mapping]
         if unseen_candidates:
             unseen_results = self._cold_start_recommend(
-                unseen_candidates, user_features, candidate_popularity
+                unseen_candidates, user_features, candidate_popularity,
+                candidate_details, trip_preferences, user_onboard_styles,
+                daily_budget, companion_type
             )
             results.extend(unseen_results)
 
@@ -211,29 +230,119 @@ class RecommendationModel:
 
     def _cold_start_recommend(self, candidate_place_ids: List[str],
                              user_features: np.ndarray = None,
-                             candidate_popularity: Dict[str, float] = None) -> List[Tuple[str, float]]:
-        """Content-based & popularity-ranked recommendation for cold start"""
+                             candidate_popularity: Dict[str, float] = None,
+                             candidate_details: Dict[str, dict] = None,
+                             trip_preferences: List[str] = None,
+                             user_onboard_styles: List[str] = None,
+                             daily_budget: float = 0.0,
+                             companion_type: str = None) -> List[Tuple[str, float]]:
+        """
+        Multi-Attribute Content-Based Personalization Engine for Cold-Start.
+        Công thức kết hợp đa thuộc tính:
+        u_final = 0.75 * t_trip + 0.25 * u_onboard
+        Score(p_j) = 0.50 * S_content[j] + 0.25 * Fit_budget + 0.15 * Fit_group + 0.10 * NormPop
+        """
         if not candidate_place_ids:
             return []
 
-        if not candidate_popularity:
-            return [(place_id, 0.5) for place_id in candidate_place_ids]
+        # 1. Dung hợp Vector nhu cầu chuyến đi (75%) và gu tài khoản Onboarding (25%)
+        alpha = 0.75
+        trip_prefs = [p.lower().strip() for p in (trip_preferences or []) if p.strip()]
+        onboard_prefs = [
+            s.lower().strip().replace('companion:', '')
+            for s in (user_onboard_styles or [])
+            if s.strip() and not s.startswith('companion:')
+        ]
 
+        pref_weights: Dict[str, float] = {}
+        if trip_prefs and onboard_prefs:
+            for p in trip_prefs:
+                pref_weights[p] = pref_weights.get(p, 0.0) + alpha
+            for s in onboard_prefs:
+                pref_weights[s] = pref_weights.get(s, 0.0) + (1.0 - alpha)
+        elif trip_prefs:
+            for p in trip_prefs:
+                pref_weights[p] = 1.0
+        elif onboard_prefs:
+            for s in onboard_prefs:
+                pref_weights[s] = 1.0
+
+        # Chuẩn bị độ phổ biến chuẩn hóa
+        candidate_popularity = candidate_popularity or {}
         pop_values = [candidate_popularity.get(pid, 0.0) for pid in candidate_place_ids]
         max_pop = max(pop_values) if pop_values else 1.0
         min_pop = min(pop_values) if pop_values else 0.0
-        range_pop = max_pop - min_pop
+        range_pop = max_pop - min_pop if (max_pop - min_pop) > 0 else 1.0
 
         scores = []
         for place_id in candidate_place_ids:
+            details = (candidate_details or {}).get(place_id, {})
+            cats = [c.lower() for c in details.get('categories', [])]
+            place_name = (details.get('name') or '').lower()
+            price = details.get('price_estimate', 0) or 0
             pop = candidate_popularity.get(place_id, 0.0)
-            if range_pop > 0:
-                normalized_score = 0.2 + 0.7 * float((pop - min_pop) / range_pop)
-            else:
-                normalized_score = 0.5
-            scores.append((place_id, normalized_score))
 
-        # Sort by popularity score descending
+            # A. Điểm sở thích (50%)
+            if pref_weights:
+                match_sum = 0.0
+                for kw, w in pref_weights.items():
+                    if any(kw in c or c in kw for c in cats) or (kw in place_name):
+                        match_sum += w
+                s_content = min(1.0, match_sum)
+            else:
+                s_content = 0.5
+
+            # B. Điểm ngân sách (25%)
+            if daily_budget > 0:
+                if price <= daily_budget * 0.6:
+                    fit_budget = 1.0
+                elif price <= daily_budget:
+                    fit_budget = 0.9
+                elif price <= daily_budget * 1.3:
+                    fit_budget = 0.6
+                else:
+                    fit_budget = 0.3
+            else:
+                fit_budget = 0.85
+
+            # C. Điểm nhóm đi (15%)
+            is_nightlife = any(c in ['nightlife', 'bar', 'pub', 'club', 'chợ đêm'] for c in cats)
+            is_nature_relax = any(c in ['nature', 'relax', 'park', 'beach', 'resort', 'spa'] for c in cats)
+
+            comp = (companion_type or 'friends').lower()
+            if comp == 'family':
+                if is_nightlife:
+                    fit_group = 0.10  # Phạt nặng quán bar/nightlife
+                elif is_nature_relax:
+                    fit_group = 1.00
+                else:
+                    fit_group = 0.75
+            elif comp == 'couple':
+                if is_nature_relax or any(c in ['photography', 'food', 'cafe', 'scenic'] for c in cats):
+                    fit_group = 1.00
+                else:
+                    fit_group = 0.80
+            elif comp == 'friends':
+                if is_nightlife or any(c in ['adventure', 'food', 'shopping', 'entertainment'] for c in cats):
+                    fit_group = 1.00
+                else:
+                    fit_group = 0.80
+            elif comp == 'solo':
+                if any(c in ['culture', 'historical', 'adventure', 'photography', 'cafe', 'nature'] for c in cats):
+                    fit_group = 1.00
+                else:
+                    fit_group = 0.85
+            else:
+                fit_group = 0.80
+
+            # D. Độ phổ biến chuẩn hóa (10%)
+            norm_pop = float((pop - min_pop) / range_pop)
+
+            # CÔNG THỨC: Score = 0.50 * S_content + 0.25 * Fit_budget + 0.15 * Fit_group + 0.10 * NormPop
+            final_score = 0.50 * s_content + 0.25 * fit_budget + 0.15 * fit_group + 0.10 * norm_pop
+            scores.append((place_id, round(final_score, 4)))
+
+        # Sắp xếp giảm dần theo điểm
         scores.sort(key=lambda x: x[1], reverse=True)
         return scores
 

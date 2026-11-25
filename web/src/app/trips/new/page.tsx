@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import {
   MapPin,
   Calendar,
@@ -62,8 +63,11 @@ const PREFERENCES = [
 
 function NewTripContent() {
   const router = useRouter();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasPrefilled, setHasPrefilled] = useState(false);
+  const [isSmartPrefilled, setIsSmartPrefilled] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     destinations: [],
     startDate: '',
@@ -72,6 +76,38 @@ function NewTripContent() {
     groupSize: 1,
     preferences: [],
   });
+
+  // Cơ chế Tự động điền (Smart Pre-fill) từ hồ sơ Onboarding cá nhân
+  useEffect(() => {
+    if (user && !hasPrefilled) {
+      const userStyles = Array.isArray(user.preferredStyles) ? user.preferredStyles : [];
+      const cleanStyles = userStyles.filter((s) => !s.startsWith('companion:'));
+      const compTag = userStyles.find((s) => s.startsWith('companion:'));
+
+      let defaultGroup = 1;
+      if (compTag) {
+        const c = compTag.replace('companion:', '');
+        if (c === 'couple') defaultGroup = 2;
+        else if (c === 'family' || c === 'friends') defaultGroup = 4;
+      }
+
+      let defaultBudget = 0;
+      if (user.budgetLevel === 'budget') defaultBudget = 500000;
+      else if (user.budgetLevel === 'standard') defaultBudget = 1200000;
+      else if (user.budgetLevel === 'luxury') defaultBudget = 2500000;
+
+      if (cleanStyles.length > 0 || defaultBudget > 0 || defaultGroup > 1) {
+        setFormData((prev) => ({
+          ...prev,
+          preferences: cleanStyles.length > 0 ? cleanStyles : prev.preferences,
+          budgetPerPerson: defaultBudget > 0 ? defaultBudget : prev.budgetPerPerson,
+          groupSize: defaultGroup > 1 ? defaultGroup : prev.groupSize,
+        }));
+        setIsSmartPrefilled(true);
+      }
+      setHasPrefilled(true);
+    }
+  }, [user, hasPrefilled]);
 
   const updateFormData = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -314,6 +350,16 @@ function NewTripContent() {
               <p className="text-muted-foreground text-sm">Xác định quy mô đoàn và hạn mức chi tiêu để AI cân đối chi phí</p>
             </div>
 
+            {/* Smart Pre-fill Notice */}
+            {isSmartPrefilled && (
+              <div className="p-3 rounded-xl bg-[#F4FCE3] border border-[#D9F99D] flex items-center gap-2 text-xs text-[#365314]">
+                <Sparkles className="w-4 h-4 text-[#365314] shrink-0" />
+                <span>
+                  <strong>Smart Pre-fill:</strong> Đã tự động chọn ngân sách & số người theo hồ sơ khảo sát của bạn. Bạn có thể thay đổi tùy ý cho chuyến đi này (Contextual Override).
+                </span>
+              </div>
+            )}
+
             {/* Budget */}
             <Card className="bg-white border-[#E5E7EB] shadow-2xs">
               <CardContent className="p-5 space-y-2">
@@ -386,6 +432,16 @@ function NewTripContent() {
               <h2 className="text-2xl md:text-3xl font-bold mb-1.5 text-[#1A1A1A]">Sở thích & trải nghiệm</h2>
               <p className="text-muted-foreground text-sm">Chọn những hoạt động bạn yêu thích (có thể chọn nhiều)</p>
             </div>
+
+            {/* Smart Pre-fill Notice for Preferences */}
+            {isSmartPrefilled && formData.preferences.length > 0 && (
+              <div className="p-3 rounded-xl bg-[#F4FCE3] border border-[#D9F99D] flex items-center gap-2 text-xs text-[#365314]">
+                <Sparkles className="w-4 h-4 text-[#365314] shrink-0" />
+                <span>
+                  <strong>Smart Pre-fill:</strong> Đã chọn sẵn các gu du lịch từ khảo sát khởi tạo của bạn. Bạn có thể nhấp để thêm/bớt theo nhu cầu riêng của chuyến đi này.
+                </span>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {PREFERENCES.map((pref) => {
