@@ -120,7 +120,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         vertical: 1,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: AppColors.notificationBadge,
                         borderRadius: BorderRadius.circular(AppRadius.full),
                       ),
                       constraints: const BoxConstraints(minWidth: 16),

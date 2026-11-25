@@ -149,7 +149,7 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                                     vertical: 1,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary,
+                                    color: AppColors.notificationBadge,
                                     borderRadius:
                                         BorderRadius.circular(AppRadius.full),
                                   ),

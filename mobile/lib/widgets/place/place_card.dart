@@ -402,7 +402,7 @@ class PlaceCard extends StatelessWidget {
                         icon: LucideIcons.heart,
                         label: '${place.likesCount}',
                         active: place.isLiked,
-                        activeColor: AppColors.primary,
+                        activeColor: AppColors.likeRed,
                         onTap: onLike!,
                       ),
                     if (onSave != null)

@@ -230,7 +230,7 @@ class PostCard extends StatelessWidget {
                   icon: LucideIcons.heart,
                   label: '${post.likesCount} Thích',
                   color:
-                      post.isLiked ? AppColors.primary : AppColors.textSecondary,
+                      post.isLiked ? AppColors.likeRed : AppColors.textSecondary,
                   onTap: onLike,
                 ),
                 const SizedBox(width: AppSpacing.sm),
