@@ -1,16 +1,25 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
-import 'dart:io';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/models/community_post.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
+import 'package:travel_planner/providers/community_provider.dart';
+import 'package:travel_planner/providers/trips_provider.dart';
+import 'package:travel_planner/services/api_service.dart';
 
-/// Create post screen for community
+/// Create or Edit Community Post screen with Title, Tags, Trip Attachment, and Image Upload
 class CreatePostScreen extends ConsumerStatefulWidget {
-  const CreatePostScreen({super.key});
+  final CommunityPost? existingPost;
+
+  const CreatePostScreen({super.key, this.existingPost});
 
   @override
   ConsumerState<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -18,127 +27,180 @@ class CreatePostScreen extends ConsumerStatefulWidget {
 
 class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _contentController = TextEditingController();
-  final List<File> _selectedImages = [];
-  bool _isLoading = false;
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+  late final TextEditingController _tagsController;
+  final TextEditingController _imageUrlController = TextEditingController();
+
+  final List<String> _imageUrls = [];
+  String? _selectedTripId;
+  bool _isUploading = false;
+  bool _isSubmitting = false;
+
+  bool get _isEditing => widget.existingPost != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final post = widget.existingPost;
+    _titleController = TextEditingController(text: post?.title ?? '');
+    _contentController = TextEditingController(text: post?.content ?? '');
+    _tagsController =
+        TextEditingController(text: post?.tags.join(', ') ?? '');
+    if (post != null) {
+      _imageUrls.addAll(post.images);
+      _selectedTripId = post.tripId;
+    }
+  }
 
   @override
   void dispose() {
+    _titleController.dispose();
     _contentController.dispose();
+    _tagsController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImages() async {
+  Future<void> _pickAndUploadImage(ImageSource source) async {
     try {
-      final ImagePicker picker = ImagePicker();
-      final List<XFile> images = await picker.pickMultiImage(
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
         imageQuality: 80,
-        maxWidth: 1920,
-        maxHeight: 1080,
+        maxWidth: 1600,
       );
+      if (picked == null) return;
 
-      if (images.isNotEmpty) {
-        setState(() {
-          _selectedImages.addAll(images.map((e) => File(e.path)));
-          // Limit to 6 images
-          if (_selectedImages.length > 6) {
-            _selectedImages.removeRange(6, _selectedImages.length);
-          }
-        });
+      setState(() => _isUploading = true);
+      final uploadedUrl = await ref
+          .read(communityRepositoryProvider)
+          .uploadImage(File(picked.path));
+      if (uploadedUrl.isNotEmpty && mounted) {
+        setState(() => _imageUrls.add(uploadedUrl));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tải ảnh thành công!')),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi chọn ảnh: $e')),
+          SnackBar(content: Text('Không thể tải ảnh lên: $e')),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
-  Future<void> _takePhoto() async {
-    try {
-      final ImagePicker picker = ImagePicker();
-      final XFile? photo = await picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-        maxWidth: 1920,
-        maxHeight: 1080,
+  void _addExternalImageUrl() {
+    final trimmed = _imageUrlController.text.trim();
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng nhập URL hợp lệ (http:// hoặc https://)'),
+        ),
       );
-
-      if (photo != null) {
-        setState(() {
-          if (_selectedImages.length < 6) {
-            _selectedImages.add(File(photo.path));
-          }
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi chụp ảnh: $e')),
-        );
-      }
+      return;
     }
-  }
-
-  void _removeImage(int index) {
     setState(() {
-      _selectedImages.removeAt(index);
+      _imageUrls.add(trimmed);
+      _imageUrlController.clear();
     });
   }
 
   Future<void> _submitPost() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    final user = ref.read(authProvider).maybeWhen(
+          authenticated: (u) => u,
+          orElse: () => null,
+        );
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng đăng nhập để đăng bài!')),
+      );
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
-
+    setState(() => _isSubmitting = true);
     try {
-      // TODO: Implement post creation with image upload
-      await Future<void>.delayed(const Duration(seconds: 2));
+      final tags = _tagsController.text
+          .split(',')
+          .map((t) => t.trim())
+          .where((t) => t.isNotEmpty)
+          .toList();
+
+      final repo = ref.read(communityRepositoryProvider);
+      if (_isEditing) {
+        final updated = await repo.updatePost(
+          postId: widget.existingPost!.id,
+          title: _titleController.text.trim(),
+          content: _contentController.text.trim(),
+          tags: tags,
+          images: _imageUrls,
+          tripId: _selectedTripId,
+        );
+        ref.read(communityFeedProvider.notifier).replacePost(updated);
+      } else {
+        final created = await repo.createPost(
+          userId: user.id,
+          title: _titleController.text.trim(),
+          content: _contentController.text.trim(),
+          tags: tags,
+          images: _imageUrls,
+          tripId: _selectedTripId,
+        );
+        ref.read(communityFeedProvider.notifier).prependPost(created);
+      }
 
       if (mounted) {
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã đăng bài viết')),
+          SnackBar(
+            content: Text(
+              _isEditing
+                  ? 'Đã cập nhật bài viết!'
+                  : 'Đăng bài thành công lên diễn đàn!',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi đăng bài: $e')),
+          SnackBar(content: Text('Lỗi lưu bài viết: $e')),
         );
       }
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final tripsAsync = ref.watch(tripsProvider);
+
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Tạo bài viết'),
-        backgroundColor: Colors.white,
+        title: Text(_isEditing ? 'Chỉnh sửa bài viết' : 'Đăng bài viết'),
+        backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         actions: [
           TextButton(
-            onPressed: _isLoading ? null : _submitPost,
-            child: _isLoading
+            onPressed: (_isSubmitting || _isUploading) ? null : _submitPost,
+            child: _isSubmitting
                 ? const SizedBox(
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Đăng'),
+                : Text(
+                    _isEditing ? 'Lưu' : 'Đăng bài',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
           ),
         ],
       ),
@@ -147,166 +209,216 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen> {
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [
-            // User info
-            Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    LucideIcons.user,
-                    size: 20,
-                    color: AppColors.primary,
-                  ),
+            TextFormField(
+              controller: _titleController,
+              decoration: InputDecoration(
+                labelText: 'Tiêu đề bài viết *',
+                hintText: 'VD: Tìm 2 bạn phượt săn mây Đà Lạt 3N2Đ...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Text(
-                  'Bạn',
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+              ),
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Vui lòng nhập tiêu đề'
+                  : null,
             ),
-
             const SizedBox(height: AppSpacing.md),
 
-            // Content input
             TextFormField(
               controller: _contentController,
+              maxLines: 5,
               decoration: InputDecoration(
-                hintText: 'Bạn đang nghĩ gì?',
-                hintStyle: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
+                labelText: 'Nội dung chia sẻ *',
+                hintText: 'Chia sẻ kinh nghiệm, lịch trình dự kiến hoặc tìm bạn đồng hành...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                border: InputBorder.none,
               ),
-              style: AppTextStyles.bodyLarge,
-              maxLines: 8,
-              validator: (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return 'Vui lòng nhập nội dung';
-                }
-                return null;
-              },
+              validator: (v) => (v == null || v.trim().isEmpty)
+                  ? 'Vui lòng nhập nội dung'
+                  : null,
             ),
-
             const SizedBox(height: AppSpacing.md),
 
-            // Image grid
-            if (_selectedImages.isNotEmpty)
-              _buildImageGrid(),
+            // Attach Trip selector
+            tripsAsync.maybeWhen(
+              data: (trips) {
+                if (trips.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Đính kèm lịch trình của bạn (Tùy chọn)',
+                      style: AppTextStyles.labelMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    DropdownButtonFormField<String?>(
+                      value: trips.any((t) => t.id == _selectedTripId)
+                          ? _selectedTripId
+                          : null,
+                      isExpanded: true,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: 10,
+                        ),
+                      ),
+                      items: [
+                        const DropdownMenuItem<String?>(
+                          value: null,
+                          child: Text('-- Không đính kèm lịch trình --'),
+                        ),
+                        ...trips.map((t) {
+                          String range = '';
+                          try {
+                            final f = DateFormat('dd/MM/yyyy');
+                            range =
+                                '${f.format(DateTime.parse(t.startDate))} - ${f.format(DateTime.parse(t.endDate))}';
+                          } catch (_) {}
+                          return DropdownMenuItem<String?>(
+                            value: t.id,
+                            child: Text(
+                              '${t.destination} ($range)',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        }),
+                      ],
+                      onChanged: (val) => setState(() => _selectedTripId = val),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                  ],
+                );
+              },
+              orElse: () => const SizedBox.shrink(),
+            ),
 
-            const SizedBox(height: AppSpacing.lg),
+            // Tags input
+            TextFormField(
+              controller: _tagsController,
+              decoration: InputDecoration(
+                labelText: 'Tags phân loại (phân cách bằng dấu phẩy)',
+                hintText: 'Đà Lạt, Săn mây, Tìm bạn đồng hành',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
 
-            // Action buttons
+            // Image Upload & URL Paste
+            Text(
+              'Hình ảnh bài viết',
+              style: AppTextStyles.labelMedium.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _pickImages,
-                    icon: const Icon(LucideIcons.image, size: 20),
-                    label: const Text('Thêm ảnh'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.md,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                      ),
-                    ),
+                    onPressed: _isUploading
+                        ? null
+                        : () => _pickAndUploadImage(ImageSource.gallery),
+                    icon: const Icon(LucideIcons.image, size: 16),
+                    label: const Text('Thư viện'),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: _isLoading ? null : _takePhoto,
-                    icon: const Icon(LucideIcons.camera, size: 20),
+                    onPressed: _isUploading
+                        ? null
+                        : () => _pickAndUploadImage(ImageSource.camera),
+                    icon: const Icon(LucideIcons.camera, size: 16),
                     label: const Text('Chụp ảnh'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: AppSpacing.md,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                      ),
-                    ),
                   ),
                 ),
               ],
             ),
-
-            if (_selectedImages.length >= 6)
-              Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: Text(
-                  'Tối đa 6 ảnh',
-                  style: AppTextStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+            if (_isUploading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: LinearProgressIndicator(color: AppColors.primary),
               ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _imageUrlController,
+                    decoration: InputDecoration(
+                      hintText: 'Hoặc dán link ảnh URL...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.md),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: 10,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                OutlinedButton(
+                  onPressed: _addExternalImageUrl,
+                  child: const Text('Thêm'),
+                ),
+              ],
+            ),
+
+            if (_imageUrls.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _imageUrls.asMap().entries.map((entry) {
+                  final idx = entry.key;
+                  final url = ApiService.formatImageUrl(entry.value);
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        child: CachedNetworkImage(
+                          imageUrl: url,
+                          width: 80,
+                          height: 80,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        top: 2,
+                        right: 2,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _imageUrls.removeAt(idx)),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              LucideIcons.x,
+                              size: 12,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ],
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildImageGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: AppSpacing.xs,
-        mainAxisSpacing: AppSpacing.xs,
-        childAspectRatio: 1,
-      ),
-      itemCount: _selectedImages.length,
-      itemBuilder: (context, index) {
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-              child: Image.file(
-                _selectedImages[index],
-                fit: BoxFit.cover,
-              ),
-            ),
-            // Remove button
-            Positioned(
-              top: 4,
-              right: 4,
-              child: GestureDetector(
-                onTap: () => _removeImage(index),
-                child: Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.6),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    LucideIcons.x,
-                    size: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

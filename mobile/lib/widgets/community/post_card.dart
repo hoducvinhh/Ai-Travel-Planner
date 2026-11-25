@@ -1,29 +1,55 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/models/community_post.dart';
+import 'package:travel_planner/services/api_service.dart';
 
-/// Post card widget for community feed
+/// Post card widget for community feed (with attached trip, 1-click clone, DM author, edit/delete)
 class PostCard extends StatelessWidget {
   final CommunityPost post;
+  final String? currentUserId;
+  final bool isCloningTrip;
   final VoidCallback? onLike;
   final VoidCallback? onComment;
-  final VoidCallback? onShare;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onMessageAuthor;
+  final VoidCallback? onJoinTripMessage;
+  final VoidCallback? onViewTrip;
+  final VoidCallback? onCloneTrip;
+  final void Function(String imageUrl)? onImageTap;
 
   const PostCard({
     super.key,
     required this.post,
+    this.currentUserId,
+    this.isCloningTrip = false,
     this.onLike,
     this.onComment,
-    this.onShare,
+    this.onEdit,
+    this.onDelete,
+    this.onMessageAuthor,
+    this.onJoinTripMessage,
+    this.onViewTrip,
+    this.onCloneTrip,
+    this.onImageTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isAuthor = currentUserId != null && currentUserId == post.userId;
+    final attachedTrip = post.trip;
+    final isUpcomingOrLookingBuddy = attachedTrip != null &&
+        (_isFutureDate(attachedTrip.startDate) ||
+            post.tags.any((t) =>
+                t.toLowerCase().contains('tìm bạn') ||
+                t.toLowerCase().contains('đồng hành')));
+
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -31,139 +57,227 @@ class PostCard extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.border),
       ),
-      elevation: 1,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // User header
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Author Header
+            Row(
               children: [
-                // Avatar
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    LucideIcons.user,
-                    size: 20,
-                    color: AppColors.primary,
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+                  child: Text(
+                    post.userName.isNotEmpty
+                        ? post.userName[0].toUpperCase()
+                        : 'U',
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                // User info
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        post.userName,
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              post.userName,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (isAuthor) ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.sm),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: const Text(
+                                'Tác giả',
+                                style: TextStyle(fontSize: 10),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       Text(
                         _formatTime(post.createdAt),
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
+                          fontSize: 11,
                         ),
                       ),
                     ],
                   ),
                 ),
-                // More button
-                IconButton(
-                  icon: const Icon(LucideIcons.moreVertical),
-                  onPressed: () {
-                    // TODO: Show options menu
-                  },
-                  iconSize: 20,
-                  color: AppColors.textSecondary,
-                ),
+                if (isAuthor)
+                  PopupMenuButton<String>(
+                    icon: const Icon(
+                      LucideIcons.moreVertical,
+                      size: 18,
+                      color: AppColors.textSecondary,
+                    ),
+                    onSelected: (val) {
+                      if (val == 'edit') onEdit?.call();
+                      if (val == 'delete') onDelete?.call();
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Text('Sửa bài viết'),
+                      ),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Text(
+                          'Xóa bài viết',
+                          style: TextStyle(color: AppColors.error),
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
-          ),
 
-          // Content
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-            child: Text(
+            if (post.tags.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: 6,
+                runSpacing: 4,
+                children: post.tags
+                    .map(
+                      (t) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Text(
+                          '#$t',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            fontSize: 10,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ],
+
+            const SizedBox(height: AppSpacing.sm),
+
+            // Title & Content
+            if (post.title.isNotEmpty) ...[
+              Text(
+                post.title,
+                style: AppTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+            ],
+            Text(
               post.content,
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textPrimary,
-                height: 1.5,
+                height: 1.45,
               ),
             ),
-          ),
 
-          const SizedBox(height: AppSpacing.sm),
+            // Images Gallery
+            if (post.images.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _buildImagesGrid(post.images),
+            ],
 
-          // Images
-          if (post.imageUrls != null && post.imageUrls!.isNotEmpty)
-            _buildImagesGrid(post.imageUrls!),
+            // Smart Attached Trip Card
+            if (attachedTrip != null) ...[
+              const SizedBox(height: AppSpacing.md),
+              _buildAttachedTripCard(attachedTrip, isUpcomingOrLookingBuddy),
+            ],
 
-          // Action bar
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Row(
+            const SizedBox(height: AppSpacing.sm),
+            const Divider(height: 1),
+            const SizedBox(height: 4),
+
+            // Actions Bar
+            Row(
               children: [
-                // Like button
-                _buildActionButton(
-                  icon: post.isLiked ? LucideIcons.heart : LucideIcons.heart,
-                  label: post.likesCount > 0 ? '${post.likesCount}' : 'Thích',
-                  color: post.isLiked ? AppColors.likeRed : AppColors.textSecondary,
+                _ActionPill(
+                  icon: LucideIcons.heart,
+                  label: '${post.likesCount} Thích',
+                  color:
+                      post.isLiked ? AppColors.primary : AppColors.textSecondary,
                   onTap: onLike,
                 ),
                 const SizedBox(width: AppSpacing.sm),
-                // Comment button
-                _buildActionButton(
+                _ActionPill(
                   icon: LucideIcons.messageCircle,
-                  label: post.commentsCount > 0
-                      ? '${post.commentsCount}'
-                      : 'Bình luận',
+                  label: '${post.commentsCount} Bình luận',
                   color: AppColors.textSecondary,
                   onTap: onComment,
                 ),
                 const Spacer(),
-                // Share button
-                _buildActionButton(
-                  icon: LucideIcons.share2,
-                  label: 'Chia sẻ',
-                  color: AppColors.textSecondary,
-                  onTap: onShare,
-                ),
+                if (!isAuthor && onMessageAuthor != null)
+                  _ActionPill(
+                    icon: LucideIcons.send,
+                    label: 'Nhắn tin',
+                    color: AppColors.textPrimary,
+                    onTap: onMessageAuthor,
+                  ),
               ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildImagesGrid(List<String> imageUrls) {
     if (imageUrls.length == 1) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: CachedNetworkImage(
-          imageUrl: imageUrls[0],
-          width: double.infinity,
-          height: 300,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => Container(
-            height: 300,
-            color: AppColors.border,
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-          errorWidget: (context, url, error) => Container(
-            height: 300,
-            color: AppColors.border,
-            child: const Icon(LucideIcons.image),
+      final url = ApiService.formatImageUrl(imageUrls.first);
+      return GestureDetector(
+        onTap: () => onImageTap?.call(url),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: CachedNetworkImage(
+            imageUrl: url,
+            width: double.infinity,
+            height: 220,
+            fit: BoxFit.cover,
+            placeholder: (_, __) => Container(
+              height: 220,
+              color: AppColors.background,
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+            errorWidget: (_, __, ___) => Container(
+              height: 220,
+              color: AppColors.background,
+              child: const Icon(LucideIcons.image),
+            ),
           ),
         ),
       );
@@ -172,101 +286,264 @@ class PostCard extends StatelessWidget {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: imageUrls.length == 2 ? 2 : 3,
-        crossAxisSpacing: AppSpacing.xs,
-        mainAxisSpacing: AppSpacing.xs,
+        crossAxisSpacing: 6,
+        mainAxisSpacing: 6,
         childAspectRatio: 1,
       ),
       itemCount: imageUrls.length > 6 ? 6 : imageUrls.length,
-      itemBuilder: (context, index) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.sm),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              CachedNetworkImage(
-                imageUrl: imageUrls[index],
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: AppColors.border,
-                  child: const Center(
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: AppColors.border,
-                  child: const Icon(LucideIcons.image, size: 24),
-                ),
+      itemBuilder: (_, idx) {
+        final url = ApiService.formatImageUrl(imageUrls[idx]);
+        return GestureDetector(
+          onTap: () => onImageTap?.call(url),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.sm),
+            child: CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              errorWidget: (_, __, ___) => Container(
+                color: AppColors.background,
+                child: const Icon(LucideIcons.image, size: 20),
               ),
-              // Show +N overlay on last image if there are more
-              if (index == 5 && imageUrls.length > 6)
-                Container(
-                  color: Colors.black.withValues(alpha: 0.6),
-                  child: Center(
-                    child: Text(
-                      '+${imageUrls.length - 6}',
-                      style: AppTextStyles.headlineMedium.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildActionButton({
-    required IconData icon,
-    required String label,
-    required Color color,
-    VoidCallback? onTap,
-  }) {
+  Widget _buildAttachedTripCard(
+    CommunityAttachedTrip trip,
+    bool isUpcomingOrBuddy,
+  ) {
+    final startStr = _shortDate(trip.startDate);
+    final endStr = _shortDate(trip.endDate);
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isUpcomingOrBuddy
+                      ? AppColors.success.withValues(alpha: 0.14)
+                      : AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Text(
+                  isUpcomingOrBuddy
+                      ? 'Sắp khởi hành: $startStr'
+                      : 'Lịch trình tham quan',
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: isUpcomingOrBuddy
+                        ? AppColors.success
+                        : AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+              Text(
+                '${trip.groupSize} người • ${NumberFormat('#,###', 'vi_VN').format(trip.budgetPerPerson)} đ',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(LucideIcons.mapPin, size: 16, color: AppColors.primary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '${trip.destination} ($startStr - $endStr)',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          if (!isUpcomingOrBuddy &&
+              trip.places != null &&
+              trip.places!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 28,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: trip.places!.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                itemBuilder: (_, idx) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Text(
+                      trip.places![idx].place.name,
+                      style: AppTextStyles.bodySmall.copyWith(fontSize: 10),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (onViewTrip != null)
+                OutlinedButton(
+                  onPressed: onViewTrip,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Text('Chi tiết', style: TextStyle(fontSize: 11)),
+                ),
+              const SizedBox(width: 8),
+              if (isUpcomingOrBuddy && onJoinTripMessage != null)
+                ElevatedButton.icon(
+                  onPressed: onJoinTripMessage,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  icon: const Icon(LucideIcons.messageCircle, size: 13),
+                  label: const Text(
+                    'Nhắn tin tham gia',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                )
+              else if (!isUpcomingOrBuddy && onCloneTrip != null)
+                ElevatedButton.icon(
+                  onPressed: isCloningTrip ? null : onCloneTrip,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.textPrimary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  icon: isCloningTrip
+                      ? const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Icon(LucideIcons.copy, size: 13),
+                  label: const Text(
+                    'Nhân bản (1-Click)',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isFutureDate(String raw) {
+    try {
+      return DateTime.parse(raw).isAfter(DateTime.now());
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String _shortDate(String raw) {
+    try {
+      return DateFormat('dd/MM/yyyy').format(DateTime.parse(raw));
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inSeconds < 60) return 'Vừa xong';
+    if (diff.inMinutes < 60) return '${diff.inMinutes} phút trước';
+    if (diff.inHours < 24) return '${diff.inHours} giờ trước';
+    if (diff.inDays < 7) return '${diff.inDays} ngày trước';
+    return DateFormat('dd/MM/yyyy').format(time);
+  }
+}
+
+class _ActionPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback? onTap;
+
+  const _ActionPill({
+    required this.icon,
+    required this.label,
+    required this.color,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppRadius.sm),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm,
-          vertical: AppSpacing.xs,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(width: AppSpacing.xs),
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 4),
             Text(
               label,
-              style: AppTextStyles.bodyMedium.copyWith(
+              style: AppTextStyles.bodySmall.copyWith(
                 color: color,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  String _formatTime(DateTime time) {
-    final now = DateTime.now();
-    final diff = now.difference(time);
-
-    if (diff.inSeconds < 60) {
-      return 'Vừa xong';
-    } else if (diff.inMinutes < 60) {
-      return '${diff.inMinutes} phút trước';
-    } else if (diff.inHours < 24) {
-      return '${diff.inHours} giờ trước';
-    } else if (diff.inDays < 7) {
-      return '${diff.inDays} ngày trước';
-    } else {
-      return '${time.day}/${time.month}/${time.year}';
-    }
   }
 }
