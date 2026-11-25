@@ -10,7 +10,9 @@ import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/models/place.dart';
 import 'package:travel_planner/providers/auth_provider.dart';
 import 'package:travel_planner/providers/places_provider.dart';
+import 'package:travel_planner/widgets/common/empty_state_view.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
+import 'package:travel_planner/widgets/common/skeleton_cards.dart';
 import 'package:travel_planner/widgets/place/place_card.dart';
 import 'package:travel_planner/widgets/place/place_directions_sheet.dart';
 import 'package:travel_planner/widgets/place/places_filter_sheet.dart';
@@ -240,7 +242,11 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
 
   Widget _buildFeedBody(PlacesFeedState feedState) {
     if (feedState.isLoading) {
-      return const LoadingIndicator();
+      return ListView.builder(
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        itemCount: 4,
+        itemBuilder: (_, __) => const PlaceCardSkeleton(),
+      );
     }
 
     if (feedState.error != null && feedState.places.isEmpty) {
@@ -267,41 +273,16 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
     }
 
     if (feedState.places.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                LucideIcons.compass,
-                size: 64,
-                color: AppColors.textTertiary,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              const Text(
-                'Không tìm thấy địa điểm phù hợp',
-                style: AppTextStyles.headlineSmall,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                'Hãy thử đổi từ khóa tìm kiếm hoặc bỏ chọn tiêu chí lọc.',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              OutlinedButton(
-                onPressed: () {
-                  _searchController.clear();
-                  ref.read(placesFilterProvider.notifier).reset();
-                },
-                child: const Text('Đặt lại bộ lọc'),
-              ),
-            ],
-          ),
-        ),
+      return EmptyStateView(
+        assetPath: 'assets/images/illustrations/empty_places.jpg',
+        title: 'Không tìm thấy địa điểm phù hợp',
+        subtitle: 'Hãy thử đổi từ khóa tìm kiếm hoặc bỏ chọn tiêu chí lọc.',
+        actionLabel: 'Đặt lại bộ lọc',
+        actionIcon: LucideIcons.rotateCcw,
+        onAction: () {
+          _searchController.clear();
+          ref.read(placesFilterProvider.notifier).reset();
+        },
       );
     }
 

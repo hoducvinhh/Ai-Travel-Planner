@@ -26,6 +26,37 @@ class _RouterRefreshNotifier extends ChangeNotifier {
   }
 }
 
+CustomTransitionPage<void> _buildEditorialTransitionPage({
+  required BuildContext context,
+  required GoRouterState state,
+  required Widget child,
+}) {
+  final disableMotion = MediaQuery.disableAnimationsOf(context);
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration:
+        disableMotion ? Duration.zero : const Duration(milliseconds: 240),
+    reverseTransitionDuration:
+        disableMotion ? Duration.zero : const Duration(milliseconds: 180),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (disableMotion) return child;
+      const curve = Cubic(0.16, 1.0, 0.3, 1.0);
+      final curved = CurvedAnimation(parent: animation, curve: curve);
+      return FadeTransition(
+        opacity: curved,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.0, 0.04),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 /// App routing provider with StatefulShellRoute (5 bottom tabs) and Auth/Onboarding guards
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _RouterRefreshNotifier(ref);
@@ -117,11 +148,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (_, __) => const OnboardingScreen(),
+        pageBuilder: (context, state) => _buildEditorialTransitionPage(
+          context: context,
+          state: state,
+          child: const OnboardingScreen(),
+        ),
       ),
       GoRoute(
         path: '/trips/create',
-        builder: (_, __) => const CreateTripScreen(),
+        pageBuilder: (context, state) => _buildEditorialTransitionPage(
+          context: context,
+          state: state,
+          child: const CreateTripScreen(),
+        ),
       ),
       GoRoute(
         path: '/trips/:id',
@@ -135,11 +174,19 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/community/create',
-        builder: (_, __) => const CreatePostScreen(),
+        pageBuilder: (context, state) => _buildEditorialTransitionPage(
+          context: context,
+          state: state,
+          child: const CreatePostScreen(),
+        ),
       ),
       GoRoute(
         path: '/chat',
-        builder: (_, __) => const ChatScreen(),
+        pageBuilder: (context, state) => _buildEditorialTransitionPage(
+          context: context,
+          state: state,
+          child: const ChatScreen(),
+        ),
       ),
       GoRoute(
         path: '/messages',

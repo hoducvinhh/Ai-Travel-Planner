@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/provinces.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
@@ -27,8 +28,9 @@ class TripCard extends StatelessWidget {
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.border),
       ),
-      elevation: 2,
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.lg),
@@ -138,14 +140,20 @@ class TripCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholderImage() {
-    return Container(
-      height: 180,
+    return Image.asset(
+      provinceAssetPath(trip.destination),
+      height: 170,
       width: double.infinity,
-      color: AppColors.primary.withValues(alpha: 0.1),
-      child: Icon(
-        LucideIcons.image,
-        size: 48,
-        color: AppColors.primary.withValues(alpha: 0.3),
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        height: 170,
+        width: double.infinity,
+        color: AppColors.primary.withValues(alpha: 0.1),
+        child: Icon(
+          LucideIcons.image,
+          size: 48,
+          color: AppColors.primary.withValues(alpha: 0.3),
+        ),
       ),
     );
   }

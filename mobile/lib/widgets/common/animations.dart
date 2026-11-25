@@ -250,6 +250,9 @@ class _ShimmerEffectState extends State<ShimmerEffect>
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return widget.child;
+    }
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -259,14 +262,14 @@ class _ShimmerEffectState extends State<ShimmerEffect>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               stops: [
-                _controller.value - 0.3,
-                _controller.value,
-                _controller.value + 0.3,
+                (_controller.value - 0.3).clamp(0.0, 1.0),
+                _controller.value.clamp(0.0, 1.0),
+                (_controller.value + 0.3).clamp(0.0, 1.0),
               ],
               colors: const [
-                Color(0xFFEBEBF4),
-                Color(0xFFF4F4F4),
-                Color(0xFFEBEBF4),
+                Color(0xFFE2E8F0),
+                Color(0xFFF1F5F9),
+                Color(0xFFE2E8F0),
               ],
             ).createShader(bounds);
           },
@@ -277,7 +280,122 @@ class _ShimmerEffectState extends State<ShimmerEffect>
   }
 }
 
-/// Bounce in animation
+/// Subtle deceleration reveal anchored from an already-grounded offset, honoring Reduce Motion
+class EditorialArrival extends StatefulWidget {
+  final Widget child;
+  final Duration delay;
+  final Duration duration;
+  final double offsetY;
+
+  const EditorialArrival({
+    super.key,
+    required this.child,
+    this.delay = Duration.zero,
+    this.duration = const Duration(milliseconds: 260),
+    this.offsetY = 10,
+  });
+
+  @override
+  State<EditorialArrival> createState() => _EditorialArrivalState();
+}
+
+class _EditorialArrivalState extends State<EditorialArrival>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    const curve = Cubic(0.16, 1.0, 0.3, 1.0);
+    _opacity = CurvedAnimation(parent: _controller, curve: curve);
+    _slide = Tween<Offset>(
+      begin: Offset(0, widget.offsetY),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: curve));
+
+    if (widget.delay == Duration.zero) {
+      _controller.forward();
+    } else {
+      Future.delayed(widget.delay, () {
+        if (mounted) _controller.forward();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return widget.child;
+    }
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _opacity.value,
+          child: Transform.translate(
+            offset: _slide.value,
+            child: child,
+          ),
+        );
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// Crisp tactile press micro-interaction (0.97 scale down on touch)
+class TactilePressScale extends StatefulWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+  final double pressedScale;
+
+  const TactilePressScale({
+    super.key,
+    required this.child,
+    this.onTap,
+    this.pressedScale = 0.97,
+  });
+
+  @override
+  State<TactilePressScale> createState() => _TactilePressScaleState();
+}
+
+class _TactilePressScaleState extends State<TactilePressScale> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final disableMotion = MediaQuery.disableAnimationsOf(context);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTapDown: widget.onTap == null ? null : (_) => setState(() => _isPressed = true),
+      onTapUp: widget.onTap == null
+          ? null
+          : (_) {
+              setState(() => _isPressed = false);
+              widget.onTap?.call();
+            },
+      onTapCancel: widget.onTap == null ? null : () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: (!disableMotion && _isPressed) ? widget.pressedScale : 1.0,
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOutCubic,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// Smooth arrival scale (replaces elastic bounce cliché with natural deceleration)
 class BounceInAnimation extends StatefulWidget {
   final Widget child;
   final Duration delay;
@@ -287,7 +405,7 @@ class BounceInAnimation extends StatefulWidget {
     super.key,
     required this.child,
     this.delay = Duration.zero,
-    this.duration = const Duration(milliseconds: 500),
+    this.duration = const Duration(milliseconds: 280),
   });
 
   @override
@@ -306,15 +424,22 @@ class _BounceInAnimationState extends State<BounceInAnimation>
       duration: widget.duration,
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+    _scaleAnimation = Tween<double>(begin: 0.92, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: const Cubic(0.16, 1.0, 0.3, 1.0),
+      ),
     );
 
-    Future.delayed(widget.delay, () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
+    if (widget.delay == Duration.zero) {
+      _controller.forward();
+    } else {
+      Future.delayed(widget.delay, () {
+        if (mounted) {
+          _controller.forward();
+        }
+      });
+    }
   }
 
   @override
@@ -325,6 +450,9 @@ class _BounceInAnimationState extends State<BounceInAnimation>
 
   @override
   Widget build(BuildContext context) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return widget.child;
+    }
     return ScaleTransition(
       scale: _scaleAnimation,
       child: widget.child,

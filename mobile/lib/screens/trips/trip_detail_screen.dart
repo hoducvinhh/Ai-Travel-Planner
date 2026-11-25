@@ -460,7 +460,9 @@ class _TripDetailScreenState extends ConsumerState<TripDetailScreen> {
                             _selectedSession = 'all';
                           }),
                           borderRadius: BorderRadius.circular(AppRadius.md),
-                          child: Container(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 180),
+                            curve: Curves.easeOutCubic,
                             width: 155,
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(

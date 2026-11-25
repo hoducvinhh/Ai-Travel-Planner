@@ -8,6 +8,7 @@ import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/providers/messages_provider.dart';
+import 'package:travel_planner/widgets/common/empty_state_view.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 
 /// 1-1 Direct Messaging Inbox Screen matching Web /messages
@@ -80,35 +81,11 @@ class _ConversationsScreenState extends ConsumerState<ConversationsScreen> {
                   }).toList();
 
                   if (filtered.isEmpty) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.xl),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              LucideIcons.messageCircle,
-                              size: 56,
-                              color: AppColors.textTertiary,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                            Text(
-                              'Chưa có cuộc trò chuyện nào',
-                              style: AppTextStyles.titleMedium.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              'Hãy bấm "Nhắn tin tham gia" từ Cộng đồng hoặc "Giao lưu kết nối" ở Travel Buddy để bắt đầu!',
-                              textAlign: TextAlign.center,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                    return const EmptyStateView(
+                      assetPath: 'assets/images/illustrations/empty_messages.jpg',
+                      title: 'Chưa có cuộc trò chuyện nào',
+                      subtitle:
+                          'Hãy bấm "Nhắn tin tham gia" từ Cộng đồng hoặc "Giao lưu kết nối" ở Travel Buddy để bắt đầu!',
                     );
                   }
 

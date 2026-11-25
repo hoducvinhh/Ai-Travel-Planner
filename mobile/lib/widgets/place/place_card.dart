@@ -134,7 +134,7 @@ class PlaceCard extends StatelessWidget {
                               LucideIcons.heart,
                               size: 16,
                               color: place.isLiked
-                                  ? AppColors.primary
+                                  ? AppColors.likeRed
                                   : AppColors.textSecondary,
                             ),
                           ),
@@ -175,16 +175,19 @@ class PlaceCard extends StatelessWidget {
             // Banner Image + Top Badges
             Stack(
               children: [
-                AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: place.imageUrl != null && place.imageUrl!.isNotEmpty
-                      ? CachedNetworkImage(
-                          imageUrl: place.imageUrl!,
-                          fit: BoxFit.cover,
-                          placeholder: (_, __) => _buildPlaceholder(),
-                          errorWidget: (_, __, ___) => _buildPlaceholder(),
-                        )
-                      : _buildPlaceholder(),
+                Hero(
+                  tag: 'place-hero-${place.id}',
+                  child: AspectRatio(
+                    aspectRatio: 16 / 9,
+                    child: place.imageUrl != null && place.imageUrl!.isNotEmpty
+                        ? CachedNetworkImage(
+                            imageUrl: place.imageUrl!,
+                            fit: BoxFit.cover,
+                            placeholder: (_, __) => _buildPlaceholder(),
+                            errorWidget: (_, __, ___) => _buildPlaceholder(),
+                          )
+                        : _buildPlaceholder(),
+                  ),
                 ),
                 Positioned(
                   top: AppSpacing.sm,
@@ -461,13 +464,19 @@ class PlaceCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholder() {
-    return Container(
-      color: AppColors.primary.withValues(alpha: 0.08),
-      child: Center(
-        child: Icon(
-          LucideIcons.mapPin,
-          size: 40,
-          color: AppColors.primary.withValues(alpha: 0.4),
+    return Image.asset(
+      provinceAssetPath(place.province),
+      width: double.infinity,
+      height: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: AppColors.primary.withValues(alpha: 0.08),
+        child: Center(
+          child: Icon(
+            LucideIcons.mapPin,
+            size: 40,
+            color: AppColors.primary.withValues(alpha: 0.4),
+          ),
         ),
       ),
     );

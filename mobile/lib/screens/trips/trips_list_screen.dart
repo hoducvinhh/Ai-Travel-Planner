@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/radius.dart';
 import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/providers/trips_provider.dart';
-import 'package:travel_planner/widgets/common/loading_indicator.dart';
+import 'package:travel_planner/widgets/common/empty_state_view.dart';
+import 'package:travel_planner/widgets/common/skeleton_cards.dart';
 import 'package:travel_planner/widgets/trip/trip_card.dart';
 
 /// Trips list screen
@@ -33,7 +33,11 @@ class TripsListScreen extends ConsumerWidget {
           ref.invalidate(tripsProvider);
         },
         child: tripsAsync.when(
-          loading: () => const LoadingIndicator(),
+          loading: () => ListView.builder(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            itemCount: 3,
+            itemBuilder: (_, __) => const TripCardSkeleton(),
+          ),
           error: (error, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacing.xl),
@@ -95,52 +99,13 @@ class TripsListScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              LucideIcons.plane,
-              size: 72,
-              color: AppColors.textSecondary.withValues(alpha: 0.45),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Chưa có lịch trình nào',
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Bắt đầu khám phá và tạo chuyến đi thông minh đầu tiên cùng AI.',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            ElevatedButton.icon(
-              onPressed: () => context.push('/trips/create'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.lg,
-                  vertical: AppSpacing.md,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-              ),
-              icon: const Icon(LucideIcons.plus, size: 18),
-              label: const Text('Tạo lịch trình ngay'),
-            ),
-          ],
-        ),
-      ),
+    return EmptyStateView(
+      assetPath: 'assets/images/illustrations/empty_trips.jpg',
+      title: 'Chưa có lịch trình nào',
+      subtitle: 'Bắt đầu khám phá và tạo chuyến đi thông minh đầu tiên cùng AI.',
+      actionLabel: 'Tạo lịch trình ngay',
+      actionIcon: LucideIcons.plus,
+      onAction: () => context.push('/trips/create'),
     );
   }
 }

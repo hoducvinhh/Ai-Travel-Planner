@@ -106,48 +106,72 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final progress = ((_selectedStyles.length.clamp(0, 3) / 3) * 0.6) + 0.4;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
+            // Smooth completion progress strip
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.4, end: progress),
+              duration: const Duration(milliseconds: 220),
+              curve: const Cubic(0.16, 1.0, 0.3, 1.0),
+              builder: (_, val, __) => LinearProgressIndicator(
+                value: val,
+                minHeight: 4,
+                backgroundColor: AppColors.border,
+                color: _isValid ? AppColors.success : AppColors.primary,
+              ),
+            ),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(LucideIcons.compass, size: 16, color: AppColors.primary),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Khảo Sát Cá Nhân Hóa',
-                          style: AppTextStyles.labelSmall.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    child: SizedBox(
+                      height: 120,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          Image.asset(
+                            'assets/images/provinces/sapa.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                            ),
                           ),
-                        ),
-                      ],
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  const Color(0xFF0F172A).withValues(alpha: 0.72),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            left: AppSpacing.md,
+                            right: AppSpacing.md,
+                            bottom: AppSpacing.sm,
+                            child: Text(
+                              'Chào mừng đến với AI Travel Planner',
+                              style: AppTextStyles.headlineMedium.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Chào mừng đến với AI Travel Planner!',
-                    style: AppTextStyles.displaySmall.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
+                  const SizedBox(height: AppSpacing.sm),
                   Text(
                     'Hãy dành 1 phút chia sẻ gu du lịch để AI gợi ý lịch trình chuẩn xác nhất cho bạn.',
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -189,7 +213,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                           });
                         },
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
                             color: selected
@@ -339,7 +365,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       child: InkWell(
                         onTap: () => setState(() => _selectedBudget = b.id),
                         borderRadius: BorderRadius.circular(AppRadius.md),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
                           padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
                             color: selected

@@ -15,7 +15,9 @@ import 'package:travel_planner/providers/community_provider.dart';
 import 'package:travel_planner/providers/messages_provider.dart';
 import 'package:travel_planner/providers/trips_provider.dart';
 import 'package:travel_planner/screens/community/create_post_screen.dart';
+import 'package:travel_planner/widgets/common/empty_state_view.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
+import 'package:travel_planner/widgets/common/skeleton_cards.dart';
 import 'package:travel_planner/widgets/community/comments_bottom_sheet.dart';
 import 'package:travel_planner/widgets/community/post_card.dart';
 
@@ -332,7 +334,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
             onRefresh: () =>
                 ref.read(communityFeedProvider.notifier).loadPosts(),
             child: postsAsync.when(
-              loading: () => const LoadingIndicator(),
+              loading: () => ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                itemCount: 3,
+                itemBuilder: (_, __) => const PlaceCardSkeleton(),
+              ),
               error: (error, _) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -349,13 +358,14 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
               ),
               data: (posts) {
                 if (posts.isEmpty) {
-                  return Center(
-                    child: Text(
-                      'Chưa có bài viết nào phù hợp.',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
+                  return EmptyStateView(
+                    assetPath: 'assets/images/illustrations/empty_community.jpg',
+                    title: 'Chưa có bài viết nào',
+                    subtitle:
+                        'Chia sẻ trải nghiệm hành trình hoặc đăng bài tìm bạn đồng hành cùng gu với bạn.',
+                    actionLabel: 'Đăng bài viết đầu tiên',
+                    actionIcon: LucideIcons.plus,
+                    onAction: () => context.push('/community/create'),
                   );
                 }
                 return ListView.builder(
@@ -427,17 +437,11 @@ class _CommunityScreenState extends ConsumerState<CommunityScreen>
         error: (err, _) => Center(child: Text('Lỗi tải bạn đồng hành: $err')),
         data: (buddies) {
           if (buddies.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xl),
-                child: Text(
-                  'Chưa tìm thấy bạn đồng hành phù hợp. Hãy cập nhật gu du lịch trong Hồ sơ!',
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
+            return const EmptyStateView(
+              assetPath: 'assets/images/illustrations/empty_community.jpg',
+              title: 'Chưa tìm thấy bạn đồng hành phù hợp',
+              subtitle:
+                  'Hãy cập nhật gu du lịch và mức ngân sách trong Hồ sơ để AI ghép đôi chuẩn hơn!',
             );
           }
 

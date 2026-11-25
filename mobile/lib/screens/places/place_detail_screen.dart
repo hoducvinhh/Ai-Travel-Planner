@@ -169,20 +169,22 @@ class _PlaceDetailScreenState extends ConsumerState<PlaceDetailScreen> {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      if (place.imageUrl != null && place.imageUrl!.isNotEmpty)
-                        CachedNetworkImage(
-                          imageUrl: place.imageUrl!,
-                          fit: BoxFit.cover,
-                          errorWidget: (_, __, ___) => Container(
-                            color: AppColors.primary.withValues(alpha: 0.12),
-                            child: const Icon(LucideIcons.image, size: 64),
-                          ),
-                        )
-                      else
-                        Container(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          child: const Icon(LucideIcons.mapPin, size: 64),
-                        ),
+                      Hero(
+                        tag: 'place-hero-${place.id}',
+                        child: place.imageUrl != null && place.imageUrl!.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: place.imageUrl!,
+                                fit: BoxFit.cover,
+                                errorWidget: (_, __, ___) => Image.asset(
+                                  provinceAssetPath(place.province),
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Image.asset(
+                                provinceAssetPath(place.province),
+                                fit: BoxFit.cover,
+                              ),
+                      ),
                       Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(

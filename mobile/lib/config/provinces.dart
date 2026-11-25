@@ -135,3 +135,92 @@ ProvinceInfo getProvinceMeta(String? province) {
 
   return ProvinceInfo(key: province, label: province, shortLabel: province);
 }
+
+class FeaturedDestinationBanner {
+  final String provinceKey;
+  final String title;
+  final String subtitle;
+  final String query;
+  final String assetPath;
+
+  const FeaturedDestinationBanner({
+    required this.provinceKey,
+    required this.title,
+    required this.subtitle,
+    required this.query,
+    required this.assetPath,
+  });
+}
+
+const List<FeaturedDestinationBanner> featuredDestinationBanners = [
+  FeaturedDestinationBanner(
+    provinceKey: 'Lam Dong',
+    title: 'Đà Lạt sương sớm',
+    subtitle: 'Đồi thông lặng gió, hồ Xuân Hương và những quán cà phê lưng đồi',
+    query: 'Đà Lạt',
+    assetPath: 'assets/images/provinces/dalat.jpg',
+  ),
+  FeaturedDestinationBanner(
+    provinceKey: 'Lao Cai',
+    title: 'Sa Pa mùa mây',
+    subtitle: 'Ruộng bậc thang Mường Hoa và cung đèo chạm đỉnh Fansipan',
+    query: 'Sa Pa',
+    assetPath: 'assets/images/provinces/sapa.jpg',
+  ),
+  FeaturedDestinationBanner(
+    provinceKey: 'Quang Ninh',
+    title: 'Hạ Long kỳ quan',
+    subtitle: 'Vịnh đá vôi xanh ngọc và hải trình bình minh trên du thuyền',
+    query: 'Hạ Long',
+    assetPath: 'assets/images/provinces/halong.jpg',
+  ),
+  FeaturedDestinationBanner(
+    provinceKey: 'Quang Nam',
+    title: 'Hội An phố cổ',
+    subtitle: 'Dãy nhà tường vàng bên sông Hoài lung linh ánh đèn lồng',
+    query: 'Hội An',
+    assetPath: 'assets/images/provinces/hoian.jpg',
+  ),
+  FeaturedDestinationBanner(
+    provinceKey: 'Ninh Binh',
+    title: 'Ninh Bình non nước',
+    subtitle: 'Chèo thuyền xuyên hang Tràng An giữa trùng điệp núi đá vôi',
+    query: 'Ninh Bình',
+    assetPath: 'assets/images/provinces/ninhbinh.jpg',
+  ),
+  FeaturedDestinationBanner(
+    provinceKey: 'Kien Giang',
+    title: 'Phú Quốc biển ngọc',
+    subtitle: 'Bãi cát mịn, làn nước trong vắt và hoàng hôn phía Tây đảo',
+    query: 'Phú Quốc',
+    assetPath: 'assets/images/provinces/phuquoc.jpg',
+  ),
+];
+
+const Map<String, String> _provinceAssetMap = {
+  'Hanoi': 'assets/images/provinces/hanoi.jpg',
+  'Ho Chi Minh': 'assets/images/provinces/danang.jpg',
+  'Da Nang': 'assets/images/provinces/danang.jpg',
+  'Quang Nam': 'assets/images/provinces/hoian.jpg',
+  'Thua Thien Hue': 'assets/images/provinces/hue.jpg',
+  'Lam Dong': 'assets/images/provinces/dalat.jpg',
+  'Khanh Hoa': 'assets/images/provinces/nhatrang.jpg',
+  'Kien Giang': 'assets/images/provinces/phuquoc.jpg',
+  'Quang Ninh': 'assets/images/provinces/halong.jpg',
+  'Lao Cai': 'assets/images/provinces/sapa.jpg',
+  'Ninh Binh': 'assets/images/provinces/ninhbinh.jpg',
+};
+
+/// Resolve a bundled local asset path for any province or multi-province trip destination.
+String provinceAssetPath(String? destinationOrProvince) {
+  if (destinationOrProvince == null || destinationOrProvince.trim().isEmpty) {
+    return 'assets/images/provinces/halong.jpg';
+  }
+  final firstSegment = destinationOrProvince.split(',').first.trim();
+  final meta = getProvinceMeta(firstSegment);
+  if (_provinceAssetMap.containsKey(meta.key)) {
+    return _provinceAssetMap[meta.key]!;
+  }
+  final wholeMeta = getProvinceMeta(destinationOrProvince);
+  return _provinceAssetMap[wholeMeta.key] ?? 'assets/images/provinces/halong.jpg';
+}
