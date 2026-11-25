@@ -2,19 +2,18 @@ import 'package:travel_planner/models/trip.dart';
 import 'package:travel_planner/services/api_service.dart';
 import 'package:travel_planner/utils/constants.dart';
 
-/// Trips repository
+/// Trips repository aligned with backend TripsController
 class TripsRepository {
   final ApiService _api;
 
   TripsRepository(this._api);
 
-  /// Get all trips
+  /// Get all trips of the authenticated user
   Future<List<Trip>> getTrips() async {
-    final response = await _api.get<List<dynamic>>(
-      AppConstants.trips,
-    );
-
-    return response.map((json) => Trip.fromJson(json as Map<String, dynamic>)).toList();
+    final response = await _api.get<List<dynamic>>(AppConstants.trips);
+    return response
+        .map((json) => Trip.fromJson(Map<String, dynamic>.from(json as Map)))
+        .toList();
   }
 
   /// Get trip by ID
@@ -22,17 +21,16 @@ class TripsRepository {
     final response = await _api.get<Map<String, dynamic>>(
       '${AppConstants.trips}/$id',
     );
-
     return Trip.fromJson(response);
   }
 
-  /// Create new trip
+  /// Create new trip with backend CreateTripDto schema
   Future<Trip> createTrip({
     required String destination,
     required String startDate,
     required String endDate,
-    required double budget,
-    int? travelersCount,
+    required double budgetPerPerson,
+    required int groupSize,
     List<String>? preferences,
   }) async {
     final response = await _api.post<Map<String, dynamic>>(
@@ -41,16 +39,32 @@ class TripsRepository {
         'destination': destination,
         'startDate': startDate,
         'endDate': endDate,
-        'budget': budget,
-        if (travelersCount != null) 'travelersCount': travelersCount,
-        if (preferences != null) 'preferences': preferences,
+        'budgetPerPerson': budgetPerPerson,
+        'groupSize': groupSize,
+        if (preferences != null && preferences.isNotEmpty)
+          'preferences': preferences,
       },
     );
-
     return Trip.fromJson(response);
   }
 
-  /// Delete trip
+  /// Optimize trip route using backend TSP/RouteOptimizer
+  Future<Trip> optimizeTrip(String id) async {
+    final response = await _api.post<Map<String, dynamic>>(
+      '${AppConstants.trips}/$id/optimize',
+    );
+    return Trip.fromJson(response);
+  }
+
+  /// Clone another user's trip (1-Click Clone from Community)
+  Future<Trip> cloneTrip(String id) async {
+    final response = await _api.post<Map<String, dynamic>>(
+      '${AppConstants.trips}/$id/clone',
+    );
+    return Trip.fromJson(response);
+  }
+
+  /// Delete trip (Admin endpoint on backend)
   Future<void> deleteTrip(String id) async {
     await _api.delete('${AppConstants.trips}/$id');
   }

@@ -1,36 +1,563 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
+import 'package:travel_planner/config/provinces.dart';
+import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/text_styles.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
+import 'package:travel_planner/providers/messages_provider.dart';
+import 'package:travel_planner/providers/places_provider.dart';
+import 'package:travel_planner/providers/trips_provider.dart';
 
-class HomeScreen extends StatelessWidget {
+/// Home screen dashboard aligned with Web home features
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final TextEditingController _quickSearchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _quickSearchController.dispose();
+    super.dispose();
+  }
+
+  void _executeQuickSearch([String? overrideQuery]) {
+    final query = (overrideQuery ?? _quickSearchController.text).trim();
+    ref.read(placesFilterProvider.notifier).reset();
+    if (query.isNotEmpty) {
+      ref.read(placesFilterProvider.notifier).setSearch(query);
+    }
+    StatefulNavigationShell.of(context).goBranch(1);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    final tripsAsync = ref.watch(tripsProvider);
+    final unreadCount = ref.watch(unreadMessagesCountProvider);
+
+    final userName = authState.maybeWhen(
+      authenticated: (user) => user.displayName,
+      orElse: () => 'bạn',
+    );
+
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('AI Travel Planner'),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        centerTitle: false,
+        title: Row(
           children: [
-            Icon(
-              Icons.travel_explore,
-              size: 64,
-              color: AppColors.primary,
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+              ),
+              child: const Icon(
+                LucideIcons.mapPin,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
-            SizedBox(height: 16),
-            Text(
-              'Welcome to AI Travel Planner',
-              style: AppTextStyles.displayMedium,
-              textAlign: TextAlign.center,
+            const SizedBox(width: AppSpacing.sm),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'AI Travel Planner',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  'Du lịch thông minh Việt Nam',
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontSize: 10,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 8),
+          ],
+        ),
+        actions: [
+          // AI Chat quick button
+          IconButton(
+            onPressed: () => context.push('/chat'),
+            icon: const Icon(LucideIcons.messageSquare, size: 22),
+            tooltip: 'Hỏi đáp AI',
+          ),
+          // 1-1 Direct Messages button with unread badge
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.xs),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  onPressed: () => context.push('/messages'),
+                  icon: const Icon(LucideIcons.messageCircle, size: 22),
+                  tooltip: 'Tin nhắn 1-1',
+                ),
+                if (unreadCount > 0)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(AppRadius.full),
+                      ),
+                      constraints: const BoxConstraints(minWidth: 16),
+                      child: Text(
+                        unreadCount > 99 ? '99+' : '$unreadCount',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () async {
+          ref.invalidate(tripsProvider);
+          await ref.read(unreadMessagesCountProvider.notifier).refreshUnreadCount();
+        },
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
+            // Hero Greeting
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          LucideIcons.sparkles,
+                          size: 14,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Cá nhân hóa cho $userName',
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Nền tảng du lịch thông minh dành riêng cho bạn',
+                    style: AppTextStyles.headlineMedium.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Khám phá điểm đến thực tế, kết nối bạn đồng hành cùng gu và để AI tối ưu lịch trình từng buổi.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Quick Search Bar
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _quickSearchController,
+                          textInputAction: TextInputAction.search,
+                          onSubmitted: (_) => _executeQuickSearch(),
+                          decoration: InputDecoration(
+                            hintText: 'Bạn muốn đi đâu? (Đà Lạt, Sa Pa...)',
+                            prefixIcon: const Icon(
+                              LucideIcons.search,
+                              size: 18,
+                              color: AppColors.textSecondary,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: 10,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.full),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.full),
+                              borderSide: const BorderSide(color: AppColors.border),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      ElevatedButton(
+                        onPressed: () => _executeQuickSearch(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                          ),
+                        ),
+                        child: const Icon(LucideIcons.arrowRight, size: 18),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Popular Destinations Quick Chips
+                  Wrap(
+                    spacing: AppSpacing.xs,
+                    runSpacing: AppSpacing.xs,
+                    children: popularQuickDestinations.map((dest) {
+                      return ActionChip(
+                        label: Text(dest['name']!),
+                        labelStyle: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        backgroundColor: AppColors.background,
+                        side: const BorderSide(color: AppColors.border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                        ),
+                        onPressed: () => _executeQuickSearch(dest['query']),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // 4 Core Feature Cards (2x2 Grid)
             Text(
-              'Setup in progress...',
-              style: AppTextStyles.bodyMedium,
+              'Tính năng nổi bật',
+              style: AppTextStyles.headlineSmall.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+
+            GridView.count(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              crossAxisCount: 2,
+              crossAxisSpacing: AppSpacing.sm,
+              mainAxisSpacing: AppSpacing.sm,
+              childAspectRatio: 1.05,
+              children: [
+                _FeatureCard(
+                  icon: LucideIcons.compass,
+                  accentColor: AppColors.secondary,
+                  title: 'Khám phá điểm đến',
+                  subtitle: 'Thích, Wishlist, đánh giá & chỉ đường thời tiết',
+                  onTap: () => StatefulNavigationShell.of(context).goBranch(1),
+                ),
+                _FeatureCard(
+                  icon: LucideIcons.calendar,
+                  accentColor: AppColors.primary,
+                  title: 'Lập lịch trình AI',
+                  subtitle: 'Tour liên tỉnh, 3 buổi/ngày, tối ưu & OFS',
+                  badge: 'AI',
+                  onTap: () => context.push('/trips/create'),
+                ),
+                _FeatureCard(
+                  icon: LucideIcons.users,
+                  accentColor: AppColors.categoryNature,
+                  title: 'Cộng đồng & Buddy',
+                  subtitle: 'Chia sẻ, nhân bản lịch trình & chat 1-1',
+                  onTap: () => StatefulNavigationShell.of(context).goBranch(3),
+                ),
+                _FeatureCard(
+                  icon: LucideIcons.messageSquare,
+                  accentColor: AppColors.accent,
+                  title: 'Hỏi đáp du lịch AI',
+                  subtitle: 'RAG trích dẫn nguồn web & cẩm nang',
+                  badge: 'Trợ lý',
+                  onTap: () => context.push('/chat'),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: AppSpacing.lg),
+
+            // Recent Trips Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Chuyến đi gần đây',
+                  style: AppTextStyles.headlineSmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () =>
+                      StatefulNavigationShell.of(context).goBranch(2),
+                  child: const Text('Xem tất cả'),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xs),
+
+            tripsAsync.when(
+              loading: () => const Padding(
+                padding: EdgeInsets.all(AppSpacing.lg),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              ),
+              error: (_, __) => _buildEmptyTripsCard(context),
+              data: (trips) {
+                if (trips.isEmpty) {
+                  return _buildEmptyTripsCard(context);
+                }
+                return Column(
+                  children: trips.take(3).map((trip) {
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        side: const BorderSide(color: AppColors.border),
+                      ),
+                      elevation: 0,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                          vertical: AppSpacing.xs,
+                        ),
+                        leading: Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
+                          child: const Icon(
+                            LucideIcons.mapPin,
+                            color: AppColors.primary,
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          trip.destination,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          '${_formatShortDate(trip.startDate)} - ${_formatShortDate(trip.endDate)} • ${trip.groupSize} người',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        trailing: const Icon(
+                          LucideIcons.chevronRight,
+                          size: 18,
+                          color: AppColors.textSecondary,
+                        ),
+                        onTap: () => context.push('/trips/${trip.id}'),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyTripsCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            LucideIcons.map,
+            size: 36,
+            color: AppColors.textTertiary,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Chưa có lịch trình nào',
+            style: AppTextStyles.labelLarge.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            'Bắt đầu tạo chuyến đi đầu tiên để AI lên kế hoạch cho bạn.',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          OutlinedButton.icon(
+            onPressed: () => context.push('/trips/create'),
+            icon: const Icon(LucideIcons.plus, size: 16),
+            label: const Text('Tạo lịch trình ngay'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatShortDate(String dateStr) {
+    try {
+      return DateFormat('dd/MM/yyyy').format(DateTime.parse(dateStr));
+    } catch (_) {
+      return dateStr;
+    }
+  }
+}
+
+class _FeatureCard extends StatelessWidget {
+  final IconData icon;
+  final Color accentColor;
+  final String title;
+  final String subtitle;
+  final String? badge;
+  final VoidCallback onTap;
+
+  const _FeatureCard({
+    required this.icon,
+    required this.accentColor,
+    required this.title,
+    required this.subtitle,
+    this.badge,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: accentColor.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                  ),
+                  child: Icon(icon, color: AppColors.textPrimary, size: 20),
+                ),
+                if (badge != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(AppRadius.full),
+                    ),
+                    child: Text(
+                      badge!,
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const Spacer(),
+            Text(
+              title,
+              style: AppTextStyles.labelLarge.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -38,488 +565,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
-// phải thiết kế lại giao diện của home screen làm cho nó đẹp hơn
-// có thể xem thêm các app khác làm tham khảo
-// - tạo 1 cái travel journal
-// -
-
-
-
-
-  
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:lucide_icons_flutter/lucide_icons.dart';
-// import 'package:travel_planner/config/colors.dart';
-// import 'package:travel_planner/config/text_styles.dart';
-// import 'package:travel_planner/config/spacing.dart';
-// import 'package:travel_planner/config/radius.dart';
-// import 'package:travel_planner/providers/auth_provider.dart';
-// import 'package:travel_planner/providers/trips_provider.dart';
-// import 'package:travel_planner/screens/trips/trips_list_screen.dart';
-// import 'package:travel_planner/screens/profile/profile_screen.dart';
-
-// /// Main screen with Bottom Navigation Bar
-// class HomeScreen extends ConsumerStatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   ConsumerState<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends ConsumerState<HomeScreen> {
-//   int _currentIndex = 0;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final List<Widget> pages = [
-//       _buildHomeDashboard(context),
-//       const TripsListScreen(),
-//       const ProfileScreen(),
-//     ];
-
-//     return Scaffold(
-//       body: IndexedStack(
-//         index: _currentIndex,
-//         children: pages,
-//       ),
-//       bottomNavigationBar: NavigationBar(
-//         selectedIndex: _currentIndex,
-//         onDestinationSelected: (index) {
-//           setState(() {
-//             _currentIndex = index;
-//           });
-//         },
-//         backgroundColor: Colors.white,
-//         indicatorColor: AppColors.primary.withValues(alpha: 0.15),
-//         destinations: const [
-//           NavigationDestination(
-//             icon: Icon(LucideIcons.compass),
-//             selectedIcon: Icon(LucideIcons.compass, color: AppColors.primary),
-//             label: 'Khám phá',
-//           ),
-//           NavigationDestination(
-//             icon: Icon(LucideIcons.plane),
-//             selectedIcon: Icon(LucideIcons.plane, color: AppColors.primary),
-//             label: 'Chuyến đi',
-//           ),
-//           NavigationDestination(
-//             icon: Icon(LucideIcons.user),
-//             selectedIcon: Icon(LucideIcons.user, color: AppColors.primary),
-//             label: 'Tài khoản',
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildHomeDashboard(BuildContext context) {
-//     final authState = ref.watch(authProvider);
-//     final tripsAsync = ref.watch(tripsProvider);
-
-//     final userName = authState.maybeWhen(
-//       authenticated: (user) =>
-//           user.name.isNotEmpty ? user.name : user.email.split('@').first,
-//       orElse: () => 'bạn',
-//     );
-
-//     return Scaffold(
-//       backgroundColor: AppColors.background,
-//       appBar: AppBar(
-//         backgroundColor: Colors.white,
-//         elevation: 0,
-//         title: Row(
-//           children: [
-//             Container(
-//               padding: const EdgeInsets.all(AppSpacing.xs),
-//               decoration: BoxDecoration(
-//                 color: AppColors.primary.withValues(alpha: 0.1),
-//                 borderRadius: BorderRadius.circular(AppRadius.sm),
-//               ),
-//               child: const Icon(
-//                 LucideIcons.mapPin,
-//                 color: AppColors.primary,
-//                 size: 20,
-//               ),
-//             ),
-//             const SizedBox(width: AppSpacing.sm),
-//             const Text(
-//               'AI Travel Planner',
-//               style: AppTextStyles.headlineSmall,
-//             ),
-//           ],
-//         ),
-//         actions: [
-//           IconButton(
-//             icon: const Icon(LucideIcons.bell, size: 20),
-//             onPressed: () {},
-//             tooltip: 'Thông báo',
-//           ),
-//         ],
-//       ),
-//       body: SingleChildScrollView(
-//         padding: const EdgeInsets.all(AppSpacing.lg),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             // Welcome Header
-//             Text(
-//               'Xin chào, $userName! 👋',
-//               style: AppTextStyles.headlineMedium.copyWith(
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             const SizedBox(height: AppSpacing.xs),
-//             Text(
-//               'Hôm nay bạn muốn lên lịch trình đi đâu?',
-//               style: AppTextStyles.bodyMedium.copyWith(
-//                 color: AppColors.textSecondary,
-//               ),
-//             ),
-//             const SizedBox(height: AppSpacing.lg),
-
-//             // Hero AI Card
-//             Container(
-//               width: double.infinity,
-//               padding: const EdgeInsets.all(AppSpacing.xl),
-//               decoration: BoxDecoration(
-//                 gradient: const LinearGradient(
-//                   colors: [AppColors.primary, Color(0xFFFF8E8E)],
-//                   begin: Alignment.topLeft,
-//                   end: Alignment.bottomRight,
-//                 ),
-//                 borderRadius: BorderRadius.circular(AppRadius.xl),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: AppColors.primary.withValues(alpha: 0.3),
-//                     blurRadius: 15,
-//                     offset: const Offset(0, 8),
-//                   ),
-//                 ],
-//               ),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Row(
-//                     children: [
-//                       Container(
-//                         padding: const EdgeInsets.symmetric(
-//                           horizontal: AppSpacing.sm,
-//                           vertical: 4,
-//                         ),
-//                         decoration: BoxDecoration(
-//                           color: Colors.white.withValues(alpha: 0.25),
-//                           borderRadius: BorderRadius.circular(AppRadius.full),
-//                         ),
-//                         child: const Row(
-//                           mainAxisSize: MainAxisSize.min,
-//                           children: [
-//                             Icon(LucideIcons.sparkles, size: 14, color: Colors.white),
-//                             SizedBox(width: 4),
-//                             Text(
-//                               'AI TRỢ LÝ',
-//                               style: TextStyle(
-//                                 color: Colors.white,
-//                                 fontSize: 11,
-//                                 fontWeight: FontWeight.bold,
-//                                 letterSpacing: 0.5,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: AppSpacing.md),
-//                   const Text(
-//                     'Lên kế hoạch du lịch thông minh trong chớp mắt',
-//                     style: TextStyle(
-//                       color: Colors.white,
-//                       fontSize: 18,
-//                       fontWeight: FontWeight.bold,
-//                       height: 1.3,
-//                     ),
-//                   ),
-//                   const SizedBox(height: AppSpacing.sm),
-//                   Text(
-//                     'Tự động gợi ý điểm đến, lịch trình và ngân sách tối ưu theo sở thích của bạn.',
-//                     style: TextStyle(
-//                       color: Colors.white.withValues(alpha: 0.9),
-//                       fontSize: 13,
-//                     ),
-//                   ),
-//                   const SizedBox(height: AppSpacing.lg),
-//                   ElevatedButton.icon(
-//                     onPressed: () {
-//                       setState(() {
-//                         _currentIndex = 1; // Switch to Trips tab
-//                       });
-//                     },
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.white,
-//                       foregroundColor: AppColors.primary,
-//                       elevation: 0,
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(AppRadius.lg),
-//                       ),
-//                       padding: const EdgeInsets.symmetric(
-//                         horizontal: AppSpacing.lg,
-//                         vertical: AppSpacing.sm,
-//                       ),
-//                     ),
-//                     icon: const Icon(LucideIcons.plane, size: 18),
-//                     label: const Text(
-//                       'Khám phá chuyến đi',
-//                       style: TextStyle(fontWeight: FontWeight.bold),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-
-//             const SizedBox(height: AppSpacing.xl),
-
-//             // Quick Actions Title
-//             const Text(
-//               'Tính năng nhanh',
-//               style: AppTextStyles.headlineSmall,
-//             ),
-//             const SizedBox(height: AppSpacing.md),
-
-//             // Action Grid
-//             Row(
-//               children: [
-//                 Expanded(
-//                   child: _buildActionCard(
-//                     icon: LucideIcons.plane,
-//                     title: 'Chuyến đi',
-//                     subtitle: 'Quản lý lịch trình',
-//                     color: AppColors.primary,
-//                     onTap: () {
-//                       setState(() {
-//                         _currentIndex = 1;
-//                       });
-//                     },
-//                   ),
-//                 ),
-//                 const SizedBox(width: AppSpacing.md),
-//                 Expanded(
-//                   child: _buildActionCard(
-//                     icon: LucideIcons.user,
-//                     title: 'Hồ sơ',
-//                     subtitle: 'Cài đặt tài khoản',
-//                     color: AppColors.secondary,
-//                     onTap: () {
-//                       setState(() {
-//                         _currentIndex = 2;
-//                       });
-//                     },
-//                   ),
-//                 ),
-//               ],
-//             ),
-
-//             const SizedBox(height: AppSpacing.xl),
-
-//             // Recent Trips Header
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 const Text(
-//                   'Chuyến đi gần đây',
-//                   style: AppTextStyles.headlineSmall,
-//                 ),
-//                 TextButton(
-//                   onPressed: () {
-//                     setState(() {
-//                       _currentIndex = 1;
-//                     });
-//                   },
-//                   child: const Text('Xem tất cả'),
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: AppSpacing.sm),
-
-//             // Trips Preview
-//             tripsAsync.when(
-//               loading: () => const Center(
-//                 child: Padding(
-//                   padding: EdgeInsets.all(AppSpacing.xl),
-//                   child: CircularProgressIndicator(),
-//                 ),
-//               ),
-//               error: (_, __) => Container(
-//                 padding: const EdgeInsets.all(AppSpacing.lg),
-//                 decoration: BoxDecoration(
-//                   color: Colors.white,
-//                   borderRadius: BorderRadius.circular(AppRadius.lg),
-//                   border: Border.all(color: AppColors.border),
-//                 ),
-//                 child: Row(
-//                   children: [
-//                     const Icon(LucideIcons.info, color: AppColors.textSecondary),
-//                     const SizedBox(width: AppSpacing.md),
-//                     Expanded(
-//                       child: Text(
-//                         'Chưa có chuyến đi nào được tạo.',
-//                         style: AppTextStyles.bodyMedium.copyWith(
-//                           color: AppColors.textSecondary,
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//               data: (trips) {
-//                 if (trips.isEmpty) {
-//                   return Container(
-//                     width: double.infinity,
-//                     padding: const EdgeInsets.all(AppSpacing.xl),
-//                     decoration: BoxDecoration(
-//                       color: Colors.white,
-//                       borderRadius: BorderRadius.circular(AppRadius.lg),
-//                       border: Border.all(color: AppColors.border),
-//                     ),
-//                     child: Column(
-//                       children: [
-//                         Icon(
-//                           LucideIcons.map,
-//                           size: 40,
-//                           color: AppColors.textTertiary,
-//                         ),
-//                         const SizedBox(height: AppSpacing.sm),
-//                         const Text(
-//                           'Bạn chưa có chuyến đi nào',
-//                           style: AppTextStyles.bodyMedium,
-//                         ),
-//                         const SizedBox(height: AppSpacing.md),
-//                         OutlinedButton.icon(
-//                           onPressed: () {
-//                             setState(() {
-//                               _currentIndex = 1;
-//                             });
-//                           },
-//                           icon: const Icon(LucideIcons.plus, size: 16),
-//                           label: const Text('Tạo chuyến đi đầu tiên'),
-//                         ),
-//                       ],
-//                     ),
-//                   );
-//                 }
-
-//                 final trip = trips.first;
-//                 return Container(
-//                   width: double.infinity,
-//                   padding: const EdgeInsets.all(AppSpacing.lg),
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(AppRadius.lg),
-//                     border: Border.all(color: AppColors.border),
-//                   ),
-//                   child: Row(
-//                     children: [
-//                       Container(
-//                         padding: const EdgeInsets.all(AppSpacing.md),
-//                         decoration: BoxDecoration(
-//                           color: AppColors.primary.withValues(alpha: 0.1),
-//                           shape: BoxShape.circle,
-//                         ),
-//                         child: const Icon(
-//                           LucideIcons.mapPin,
-//                           color: AppColors.primary,
-//                         ),
-//                       ),
-//                       const SizedBox(width: AppSpacing.md),
-//                       Expanded(
-//                         child: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text(
-//                               trip.destination,
-//                               style: AppTextStyles.labelLarge.copyWith(
-//                                 fontWeight: FontWeight.bold,
-//                               ),
-//                             ),
-//                             const SizedBox(height: 2),
-//                             Text(
-//                               '${trip.startDate} - ${trip.endDate}',
-//                               style: AppTextStyles.bodySmall.copyWith(
-//                                 color: AppColors.textSecondary,
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ),
-//                       IconButton(
-//                         icon: const Icon(LucideIcons.chevronRight),
-//                         onPressed: () {
-//                           setState(() {
-//                             _currentIndex = 1;
-//                           });
-//                         },
-//                       ),
-//                     ],
-//                   ),
-//                 );
-//               },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   Widget _buildActionCard({
-//     required IconData icon,
-//     required String title,
-//     required String subtitle,
-//     required Color color,
-//     required VoidCallback onTap,
-//   }) {
-//     return Material(
-//       color: Colors.white,
-//       borderRadius: BorderRadius.circular(AppRadius.lg),
-//       child: InkWell(
-//         onTap: onTap,
-//         borderRadius: BorderRadius.circular(AppRadius.lg),
-//         child: Container(
-//           padding: const EdgeInsets.all(AppSpacing.lg),
-//           decoration: BoxDecoration(
-//             borderRadius: BorderRadius.circular(AppRadius.lg),
-//             border: Border.all(color: AppColors.border),
-//           ),
-//           child: Column(
-//             crossAxisAlignment: CrossAxisAlignment.start,
-//             children: [
-//               Container(
-//                 padding: const EdgeInsets.all(AppSpacing.sm),
-//                 decoration: BoxDecoration(
-//                   color: color.withValues(alpha: 0.1),
-//                   borderRadius: BorderRadius.circular(AppRadius.md),
-//                 ),
-//                 child: Icon(icon, color: color, size: 24),
-//               ),
-//               const SizedBox(height: AppSpacing.md),
-//               Text(
-//                 title,
-//                 style: AppTextStyles.labelLarge.copyWith(
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//               const SizedBox(height: 2),
-//               Text(
-//                 subtitle,
-//                 style: AppTextStyles.bodySmall.copyWith(
-//                   color: AppColors.textSecondary,
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }

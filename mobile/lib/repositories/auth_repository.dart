@@ -3,7 +3,7 @@ import 'package:travel_planner/services/api_service.dart';
 import 'package:travel_planner/services/storage_service.dart';
 import 'package:travel_planner/utils/constants.dart';
 
-/// Authentication repository
+/// Authentication and User Profile repository
 class AuthRepository {
   final ApiService _api;
   final StorageService _storage;
@@ -21,14 +21,12 @@ class AuthRepository {
     );
 
     final loginResponse = LoginResponse.fromJson(response);
-
-    // Save token
     await _storage.saveToken(loginResponse.token);
-
-    // Save user info
     await _storage.saveString(AppConstants.keyUserId, loginResponse.user.id);
     await _storage.saveString(
-        AppConstants.keyUserEmail, loginResponse.user.email,);
+      AppConstants.keyUserEmail,
+      loginResponse.user.email,
+    );
 
     return loginResponse.user;
   }
@@ -45,14 +43,12 @@ class AuthRepository {
     );
 
     final loginResponse = LoginResponse.fromJson(response);
-
-    // Save token
     await _storage.saveToken(loginResponse.token);
-
-    // Save user info
     await _storage.saveString(AppConstants.keyUserId, loginResponse.user.id);
     await _storage.saveString(
-        AppConstants.keyUserEmail, loginResponse.user.email,);
+      AppConstants.keyUserEmail,
+      loginResponse.user.email,
+    );
 
     return loginResponse.user;
   }
@@ -62,7 +58,32 @@ class AuthRepository {
     final response = await _api.get<Map<String, dynamic>>(
       AppConstants.authProfile,
     );
+    return User.fromJson(response);
+  }
 
+  /// Get full user profile dashboard (stats, trips, wishlist, liked, rated, shared)
+  Future<UserProfileData> getUserProfileDashboard(String userId) async {
+    final response = await _api.get<Map<String, dynamic>>(
+      '${AppConstants.users}/$userId/profile',
+    );
+    return UserProfileData.fromJson(response);
+  }
+
+  /// Update user profile / onboarding preferences
+  Future<User> updateProfile({
+    required String userId,
+    String? name,
+    List<String>? preferredStyles,
+    String? budgetLevel,
+  }) async {
+    final response = await _api.patch<Map<String, dynamic>>(
+      '${AppConstants.users}/$userId/profile',
+      data: {
+        if (name != null) 'name': name,
+        if (preferredStyles != null) 'preferredStyles': preferredStyles,
+        if (budgetLevel != null) 'budgetLevel': budgetLevel,
+      },
+    );
     return User.fromJson(response);
   }
 
@@ -78,4 +99,6 @@ class AuthRepository {
     final token = await _storage.getToken();
     return token != null && token.isNotEmpty;
   }
+
+  Future<String?> getStoredToken() => _storage.getToken();
 }

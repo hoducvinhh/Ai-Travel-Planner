@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
@@ -21,10 +22,20 @@ abstract class AuthState with _$AuthState {
 /// Auth state notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
+  StreamSubscription<void>? _unauthSub;
 
-  AuthNotifier(this._repository) : super(const AuthState.initial()) {
+  AuthNotifier(this._repository, Stream<void> unauthorizedStream)
+      : super(const AuthState.initial()) {
+    _unauthSub = unauthorizedStream.listen((_) {
+      state = const AuthState.unauthenticated();
+    });
     _checkAuthStatus();
   }
+
+  User? get currentUser => state.maybeWhen(
+        authenticated: (u) => u,
+        orElse: () => null,
+      );
 
   /// Check if user is logged in on app start
   Future<void> _checkAuthStatus() async {
@@ -36,9 +47,39 @@ class AuthNotifier extends StateNotifier<AuthState> {
       } else {
         state = const AuthState.unauthenticated();
       }
-    } catch (e) {
+    } catch (_) {
       state = const AuthState.unauthenticated();
     }
+  }
+
+  /// Refresh current user profile (e.g. after Onboarding or Settings edit)
+  Future<void> refreshProfile() async {
+    try {
+      final isLoggedIn = await _repository.isLoggedIn();
+      if (!isLoggedIn) {
+        state = const AuthState.unauthenticated();
+        return;
+      }
+      final user = await _repository.getProfile();
+      state = AuthState.authenticated(user);
+    } catch (_) {}
+  }
+
+  /// Update profile / onboarding preferences
+  Future<void> updateProfile({
+    String? name,
+    List<String>? preferredStyles,
+    String? budgetLevel,
+  }) async {
+    final user = currentUser;
+    if (user == null) return;
+    final updated = await _repository.updateProfile(
+      userId: user.id,
+      name: name,
+      preferredStyles: preferredStyles,
+      budgetLevel: budgetLevel,
+    );
+    state = AuthState.authenticated(updated);
   }
 
   String _parseError(dynamic e) {
@@ -79,7 +120,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-
   /// Logout
   Future<void> logout() async {
     await _repository.logout();
@@ -89,6 +129,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Clear error
   void clearError() {
     state = const AuthState.unauthenticated();
+  }
+
+  @override
+  void dispose() {
+    _unauthSub?.cancel();
+    super.dispose();
   }
 }
 
@@ -107,5 +153,6 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 /// Auth provider
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
+  final api = ref.watch(apiServiceProvider);
+  return AuthNotifier(repository, api.onUnauthorized);
 });
