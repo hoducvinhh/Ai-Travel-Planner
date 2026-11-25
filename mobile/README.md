@@ -1,379 +1,127 @@
-# AI Travel Planner - Mobile App
+# AI Travel Planner — Mobile App (Flutter)
 
-Flutter mobile application for AI Travel Planner - iOS and Android end-user experience.
-
-## 📚 Documentation
-
-- **[CLAUDE.md](CLAUDE.md)** - Rules for AI agents (auto-loaded)
-- **[TASKS.md](TASKS.md)** - 471 tasks breakdown with checkboxes
-- **[mobile-tech-stack.md](mobile-tech-stack.md)** - Technology decisions
-- **Guides & Specifications** (in docs/guides/):
-  - [SETUP.md](docs/guides/SETUP.md) & [SETUP_ADVANCED.md](docs/guides/SETUP_ADVANCED.md)
-  - [API_INTEGRATION.md](docs/guides/API_INTEGRATION.md)
-  - [TESTING_GUIDE.md](docs/guides/TESTING_GUIDE.md) & [QUICK_FIX_GUIDE.md](docs/guides/QUICK_FIX_GUIDE.md)
-  - [STRUCTURE.md](docs/guides/STRUCTURE.md)
-  - [FEATURE_SHOWCASE.md](docs/guides/FEATURE_SHOWCASE.md)
-- **Progress Reports** (in docs/reports/):
-  - [COMPLETION_REPORT.md](docs/reports/COMPLETION_REPORT.md)
-  - [FINAL_STATUS_REPORT.md](docs/reports/FINAL_STATUS_REPORT.md)
-  - [DEVELOPMENT_SUMMARY.md](docs/reports/DEVELOPMENT_SUMMARY.md)
-  - [IMPLEMENTATION_PROGRESS.md](docs/reports/IMPLEMENTATION_PROGRESS.md)
-- **Skills** (in `.claude/skills/`):
-  - `mobile-ui-guidelines.md` - UI/UX design rules
-  - `mobile-architecture.md` - Architecture patterns
-  - `mobile-development-rules.md` - Development constraints
-
-## 🎯 Project Overview
-
-**Platform:** Flutter 3.24+ (iOS & Android)  
-**Language:** Dart 3.5+  
-**State Management:** Riverpod 2.5+  
-**Target Users:** End users only (no admin features)
-
-## 📱 Features
-
-### Phase 1 (MVP - Weeks 1-2)
-- ✅ Authentication (Login, Register, Biometric)
-- ✅ Trip Management (List, Create, Detail)
-- ✅ Map Integration (flutter_map + Google tiles)
-
-### Phase 2 (Enhanced - Weeks 3-4)
-- ✅ Places Discovery (Browse, Search, Filters)
-- ✅ RAG Chatbot (SSE streaming)
-- ✅ Offline Support (SQLite caching)
-
-### Phase 3 (Social - Weeks 5-6)
-- ✅ Community (Feed, Posts, Comments)
-- ✅ Local Notifications
-- ✅ UI Polish (Sunset theme)
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-```bash
-# Install Flutter SDK 3.24+
-# https://flutter.dev/docs/get-started/install
-
-# Verify installation
-flutter doctor
-
-# Install dependencies
-flutter pub get
-```
-
-### Run Development
-
-```bash
-# Run on Android emulator/device
-flutter run --dart-define=API_URL=http://localhost:3002
-
-# Run on iOS simulator (Mac only)
-flutter run --dart-define=API_URL=http://localhost:3002
-
-# Hot reload: Press 'r' in terminal
-# Hot restart: Press 'R' in terminal
-```
-
-### Build
-
-```bash
-# Android debug
-flutter build apk --debug
-
-# Android release
-flutter build apk --release
-
-# iOS debug (Mac only)
-flutter build ios --debug
-
-# iOS release (Mac only)
-flutter build ios --release
-```
-
-## 🏗️ Architecture
-
-```
-lib/
-├── screens/          # UI Screens (Presentation Layer)
-├── widgets/          # Reusable Widgets
-├── providers/        # State Management (Riverpod)
-├── repositories/     # Business Logic
-├── services/         # Data Layer (API, Storage)
-├── models/           # Data Models
-├── config/           # App Configuration
-└── utils/            # Utilities
-```
-
-**Pattern:** Screen → Provider → Repository → Service → Backend API
-
-## 🎨 Design System
-
-### Colors (Sunset Travel Theme)
-
-```dart
-AppColors.primary       // Coral #FF6B6B (CTA buttons)
-AppColors.secondary     // Turquoise #4ECDC4 (Beach category)
-AppColors.accent        // Golden #FFA500 (Ratings, bookmarks)
-AppColors.textPrimary   // Black #1A1A1A (Main text)
-AppColors.background    // Light Gray #FAFAFA (Screen background)
-```
-
-### Icons (Black/White Only)
-
-```dart
-// Package: lucide_icons_flutter
-Icon(LucideIcons.heart, color: AppColors.textPrimary)  // Black on light
-Icon(LucideIcons.plus, color: Colors.white)            // White on button
-```
-
-### Rounded Corners (All Components)
-
-```dart
-AppRadius.sm   // 8dp  - Badges, chips
-AppRadius.md   // 12dp - Buttons, inputs
-AppRadius.lg   // 16dp - Cards
-AppRadius.xl   // 20dp - Modals
-AppRadius.full // 999dp - Avatars, icon buttons
-```
-
-## 📋 Development Rules
-
-### ✅ Allowed (Mobile Team)
-
-- Modify any files in `mobile/` folder
-- Call backend API endpoints
-- Create issues for backend bugs/features
-- Test locally against backend
-
-### ❌ Forbidden (Without Permission)
-
-- Modify `backend/`, `frontend/`, `ml-service/`
-- Change database schema
-- Edit root `package.json`, `docker-compose.yml`
-- Modify CI/CD workflows (except mobile-specific)
-
-### Backend Integration
-
-**Consume API, don't modify backend:**
-
-```dart
-// ✅ CORRECT - Call existing endpoint
-final trips = await apiService.get('/trips');
-
-// ❌ WRONG - Don't edit backend code
-// backend/src/trips/trips.controller.ts
-```
-
-**When endpoint is missing:**
-1. Create issue with label `backend-needed`
-2. Implement workaround in mobile (if possible)
-3. Wait for backend team to implement
-
-## 🧪 Testing
-
-### Run Tests
-
-```bash
-# All tests
-flutter test
-
-# With coverage
-flutter test --coverage
-
-# Specific file
-flutter test test/repositories/trips_repository_test.dart
-```
-
-### Linting
-
-```bash
-# Run analyzer
-flutter analyze
-
-# Fix auto-fixable issues
-dart fix --apply
-```
-
-## 📝 Git Workflow
-
-### Branch Naming
-
-```bash
-git checkout -b mobile/feature-login-screen
-git checkout -b mobile/fix-trip-card-layout
-```
-
-### Commit Messages
-
-```bash
-git commit -m "mobile: implement login screen with biometric auth"
-git commit -m "mobile: fix trip card image caching"
-```
-
-### Pre-Commit Checklist
-
-- [ ] `flutter analyze` passes (0 issues)
-- [ ] `flutter test` passes (all green)
-- [ ] Only mobile/ files staged
-- [ ] Commit message starts with "mobile:"
-- [ ] Branch name starts with "mobile/"
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-# Development
-flutter run --dart-define=API_URL=http://localhost:3002
-
-# Staging
-flutter run --dart-define=API_URL=https://api-staging.example.com
-
-# Production
-flutter build apk --release --dart-define=API_URL=https://api.example.com
-```
-
-### Backend API Endpoints
-
-```
-Base URL: http://localhost:3002 (local)
-
-Auth:
-- POST /auth/login
-- POST /auth/register
-- GET /auth/profile
-
-Trips:
-- GET /trips
-- POST /trips
-- GET /trips/:id
-
-Places:
-- GET /places
-- GET /places/:id
-
-Chat:
-- POST /api/chat (SSE streaming)
-
-Community:
-- GET /community/posts
-- POST /community/posts
-```
-
-## 📚 Documentation
-
-- [Mobile Plan](./plan-mobile.md) - Full development plan
-- [Tech Stack](./mobile-tech-stack.md) - Technologies used
-- [CLAUDE.md](./CLAUDE.md) - Claude agent rules
-
-### Skills (in `.claude/skills/`)
-
-- `mobile-ui-guidelines.md` - UI/UX design rules
-- `mobile-architecture.md` - Architecture patterns
-- `mobile-development-rules.md` - Development constraints
-
-## 🐛 Troubleshooting
-
-### Flutter Doctor Issues
-
-```bash
-flutter doctor
-
-# Fix Android licenses
-flutter doctor --android-licenses
-
-# Fix iOS setup (Mac only)
-sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
-```
-
-### Build Issues
-
-```bash
-# Clean build
-flutter clean
-flutter pub get
-
-# Clear cache
-flutter pub cache clean
-```
-
-### Hot Reload Not Working
-
-```bash
-# Stop app and restart
-flutter run
-# Press 'R' for hot restart
-```
-
-## 📦 Dependencies
-
-### Core
-- `flutter_riverpod: ^2.5.0` - State management
-- `dio: ^5.4.0` - HTTP client
-- `go_router: ^14.2.0` - Navigation
-
-### UI
-- `lucide_icons_flutter: ^1.1.0` - Icons
-- `cached_network_image: ^3.3.0` - Image caching
-- `flutter_animate: ^4.5.0` - Animations
-
-### Maps
-- `flutter_map: ^7.0.2` - Map widget
-- `latlong2: ^0.9.0` - Coordinates
-- `geolocator: ^11.0.0` - Location services
-
-### Storage
-- `sqflite: ^2.3.0` - Local database
-- `flutter_secure_storage: ^9.0.0` - Secure storage
-- `shared_preferences: ^2.2.0` - Key-value storage
-
-### Chat
-- `http: ^1.2.0` - SSE streaming
-- `flutter_markdown: ^0.6.0` - Markdown rendering
-
-See `pubspec.yaml` for full list.
-
-## 📊 Project Status
-
-**Current Phase:** Setup & Planning  
-**Sprint:** Pre-Sprint  
-**Progress:** 0% (Plan complete, implementation starts next)
-
-**Timeline:**
-- Setup: Week 1 (current)
-- Phase 1 (Core): Weeks 1-2
-- Phase 2 (Enhanced): Weeks 3-4
-- Phase 3 (Social): Weeks 5-6
-- Testing: Week 7
-- App Store Prep: Week 8
-
-## 🤝 Contributing
-
-### For Mobile Team
-
-1. Read `CLAUDE.md` before coding
-2. Load skills before implementing features
-3. Follow architecture patterns
-4. Use design system (AppColors, LucideIcons, AppRadius)
-5. Run quality checks before committing
-6. Only modify files in `mobile/`
-
-### For Backend Team
-
-When mobile team creates issue with `backend-needed`:
-1. Review issue for endpoint requirements
-2. Implement in backend repo
-3. Deploy to staging
-4. Notify mobile team when ready
-5. Mobile team integrates and tests
-
-## 📞 Contact
-
-**Mobile Team Lead:** [Your Name]  
-**Backend Team Lead:** [Backend Lead]  
-**Project Manager:** [PM Name]
+Ứng dụng di động Flutter (Android & iOS) cho hệ thống **AI Travel Planner**, được thiết kế **chỉ dành cho người dùng cuối** (không bao gồm chức năng quản trị Admin).
 
 ---
 
-**Built with ❤️ using Flutter**
+## 📚 Tài Liệu Liên Quan
+
+- **[CLAUDE.md](CLAUDE.md)** — Quy tắc phát triển và ranh giới phạm vi cho module `mobile/`
+- **[TASKS.md](TASKS.md)** — Danh sách theo dõi công việc
+- **[mobile-tech-stack.md](mobile-tech-stack.md)** — Quyết định công nghệ Flutter
+- **Thư mục tài liệu & báo cáo (`docs/`)**: xem [docs/](docs/)
+
+---
+
+## 🎯 Tổng Quan & Công Nghệ
+
+- **Framework**: Flutter (`sdk: >=3.5.0 <4.0.0`) / Dart 3
+- **State Management**: `flutter_riverpod` (`^2.5.1`)
+- **Navigation**: `go_router` (`^14.2.7`) với `StatefulShellRoute.indexedStack` (5 tab chính)
+- **Networking**: `dio` (`^5.4.3+1`), `http` (`^1.2.2` cho SSE streaming), `socket_io_client` (`^3.0.2` cho chat 1-1 real-time)
+- **Maps & Location**: `flutter_map` (`^7.0.2`), `latlong2` (`^0.9.1`), `geolocator` (`^12.0.0`)
+- **Local & Secure Storage**: `sqflite`, `flutter_secure_storage`, `shared_preferences`, `local_auth`
+- **UI & Media**: `lucide_icons_flutter`, `cached_network_image`, `image_picker`, `flutter_markdown`, `url_launcher`
+
+---
+
+## 📱 Các Tính Năng Đã Triển Khai
+
+### 1. Xác thực & Onboarding
+- Đăng nhập / Đăng ký JWT, tự động đăng xuất khi token hết hạn (`onUnauthorized` stream).
+- Đăng nhập sinh trắc học (vân tay / Face ID) cấu hình tại tab **Cài đặt** trong Hồ sơ.
+- **Onboarding 3 bước (`/onboarding`)**: Chọn ≥ 3 phong cách du lịch, bạn đồng hành và ngân sách ưa thích.
+
+### 2. Trang Chủ (`HomeScreen`) & Shell 5 Tab
+- Bottom Navigation Bar 5 tab: **Trang chủ**, **Khám phá**, **Lịch trình**, **Cộng đồng**, **Hồ sơ**.
+- Tìm kiếm nhanh địa điểm, 6 chip điểm đến nổi bật, lối tắt tính năng, danh sách chuyến đi gần đây, truy cập nhanh **Hỏi đáp AI** và **Tin nhắn 1-1** kèm badge số tin chưa đọc.
+
+### 3. Khám Phá Địa Điểm (`PlacesScreen` & `PlaceDetailScreen`)
+- Bộ lọc **11 tỉnh/thành phố**, **10 danh mục**, **5 tùy chọn sắp xếp** (`popularity`, `rating`, `price_asc`, `price_desc`, `newest`) và phân trang (`{ items, pagination }`).
+- Thao tác Like (optimistic), Save / Wishlist, Đánh giá 1–5★ / Gỡ đánh giá, Bình luận, Chia sẻ bài đăng lên Cộng đồng.
+- **Weather Pill (`WeatherService`)**: Hiển thị thời tiết hiện tại từ **Open-Meteo API** (có cache).
+- **Chỉ đường (`PlaceDirectionsSheet` + `RoutingService`)**: Bản đồ tuyến đường **OSRM API** (fallback Haversine) cho **Xe máy / Ô tô / Đi bộ** và mở Google Maps ngoài qua `url_launcher`.
+
+### 4. Lập Lịch Trình Thông Minh (`CreateTripScreen`, `TripsListScreen`, `TripDetailScreen`)
+- **Wizard tạo chuyến đi**: Hỗ trợ **Tour liên tỉnh** nhiều điểm đến và **Smart Pre-fill** từ hồ sơ người dùng.
+- **Chi tiết lịch trình**: Nhóm hoạt động theo **3 buổi/ngày** (Sáng / Chiều / Tối), lọc bản đồ theo ngày và buổi.
+- **Tối ưu lộ trình (`POST /trips/:id/optimize`)**: Sắp xếp lại lộ trình hợp lý kèm thống kê quãng đường tiết kiệm.
+- **Thẻ đánh giá khả thi 5 chiều (`TripFeasibilityCard`)**: Hiển thị Overall Feasibility Score (OFS) theo 5 tiêu chí (`geo`, `time`, `budget`, `preference`, `diversity`), cảnh báo và gợi ý.
+
+### 5. Cộng Đồng, Travel Buddy & Tin Nhắn 1-1
+- **Cộng đồng (`CommunityScreen` & `CreatePostScreen`)**: Xem bài viết theo tag/tìm kiếm, upload nhiều ảnh (`POST /upload/image`), đính kèm lịch trình, **1-Click Clone** (`POST /trips/:id/clone`), bình luận & thích bài viết.
+- **Travel Buddy**: Gợi ý bạn đồng hành phù hợp kèm nút mở chat 1-1 trực tiếp.
+- **Tin nhắn 1-1 (`ConversationsScreen`, `DirectChatScreen`, `SocketService`)**: Đồng bộ tin nhắn thời gian thực qua Socket.IO, typing indicator, đánh dấu đã đọc.
+
+### 6. Hỏi Đáp AI (`ChatScreen`) & Hồ Sơ 6 Tab (`ProfileScreen`)
+- **AI RAG Chat**: Trò chuyện streaming SSE (`POST /api/chat`), render Markdown và trích dẫn nguồn.
+- **Hồ sơ 6 tab**: Quản lý chuyến đi, địa điểm đã thích, wishlist đã lưu, địa điểm đã chia sẻ, bài viết cộng đồng và cài đặt hồ sơ / sinh trắc học.
+
+---
+
+## 🏗️ Kiến Trúc Thư Mục
+
+```text
+mobile/lib/
+├── config/          # colors.dart, theme.dart, text_styles.dart, routes.dart, provinces.dart, env.dart
+├── models/          # Freezed + json_serializable (user, place, trip, community_post, chat_message, direct_message)
+├── providers/       # Riverpod providers & notifiers (auth, places, trips, create_trip, community, chat, messages, user_profile, biometric)
+├── repositories/    # Business logic & DTO mapping (auth, places, trips, community, chat, messages)
+├── services/        # api_service, stream_service, socket_service, weather_service, routing_service, storage_service, biometric_service, database_service
+├── screens/         # main, onboarding, home, auth, places, trips, community, messages, chat, search, profile
+├── utils/           # constants.dart (API endpoints), formatters, validators
+└── widgets/         # Reusable widgets (place/, trip/, community/, chat/, map/, common/)
+```
+
+**Luồng dữ liệu chuẩn:** `Screen -> Provider -> Repository -> Service -> Backend API`
+
+---
+
+## 🎨 Hệ Thống Thiết Kế (Ocean Teal / Emerald Travel)
+
+### Bảng màu (`lib/config/colors.dart`)
+
+```dart
+AppColors.primary            // Teal #0D9488       — Nút CTA chính, tab đang chọn, route map
+AppColors.secondary          // Lagoon #14B8A6     — Điểm nhấn phụ, banner gợi ý, pin vị trí
+AppColors.accent             // Sand Gold #F59E0B  — Đánh giá sao, Wishlist/Bookmark, AI highlight
+AppColors.likeRed            // Coral #FF6B6B      — Chỉ dùng cho nút Like (tim)
+AppColors.notificationBadge  // Coral #FF6B6B      — Badge đếm tin nhắn / thông báo chưa đọc
+AppColors.background         // Slate Off-white #F8FAFC
+AppColors.surface            // White #FFFFFF
+AppColors.textPrimary        // Slate 900 #0F172A
+AppColors.border             // Slate 200 #E2E8F0
+```
+
+### Bo góc & Icons
+- Icons dùng `lucide_icons_flutter`.
+- Bo góc (`AppRadius`): `sm` (`8dp`), `md` (`12dp`), `lg` (`16dp`), `xl` (`20dp`), `full` (`999dp`).
+
+---
+
+## 🚀 Cài Đặt, Chạy & Kiểm Thử
+
+### Chạy ứng dụng
+
+```bash
+cd mobile
+flutter pub get
+
+# Tạo mã Freezed / json_serializable (khi sửa models hoặc auth_provider)
+dart run build_runner build --delete-conflicting-outputs
+
+# Chạy trên máy thật / iOS simulator (Backend port 3002)
+flutter run --dart-define=API_URL=http://localhost:3002
+
+# Chạy trên Android Emulator kết nối localhost máy host
+flutter run --dart-define=API_URL=http://10.0.2.2:3002
+```
+
+### Kiểm tra chất lượng & Build
+
+```bash
+cd mobile
+flutter analyze
+flutter test
+flutter build apk --debug
+```
