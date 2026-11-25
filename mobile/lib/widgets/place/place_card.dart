@@ -1,22 +1,34 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/provinces.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/models/place.dart';
 
-/// Place card widget
+/// Place card widget with social actions (Like, Save, Comment, Directions, Share)
 class PlaceCard extends StatelessWidget {
   final Place place;
   final VoidCallback? onTap;
+  final VoidCallback? onLike;
+  final VoidCallback? onSave;
+  final VoidCallback? onComment;
+  final VoidCallback? onDirections;
+  final VoidCallback? onShare;
   final bool isCompact;
 
   const PlaceCard({
     super.key,
     required this.place,
     this.onTap,
+    this.onLike,
+    this.onSave,
+    this.onComment,
+    this.onDirections,
+    this.onShare,
     this.isCompact = false,
   });
 
@@ -29,61 +41,58 @@ class PlaceCard extends StatelessWidget {
   }
 
   Widget _buildCompactCard() {
+    final prov = getProvinceMeta(place.province);
     return Card(
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.border),
       ),
-      elevation: 2,
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
             AspectRatio(
-              aspectRatio: 1,
+              aspectRatio: 1.15,
               child: Stack(
                 children: [
-                  place.imageUrl != null
+                  place.imageUrl != null && place.imageUrl!.isNotEmpty
                       ? CachedNetworkImage(
                           imageUrl: place.imageUrl!,
                           width: double.infinity,
                           height: double.infinity,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => _buildPlaceholder(),
-                          errorWidget: (context, url, error) => _buildPlaceholder(),
+                          placeholder: (_, __) => _buildPlaceholder(),
+                          errorWidget: (_, __, ___) => _buildPlaceholder(),
                         )
                       : _buildPlaceholder(),
-                  // Category badge
-                  if (place.category != null)
-                    Positioned(
-                      top: AppSpacing.xs,
-                      right: AppSpacing.xs,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.xs,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getCategoryColor(place.category!),
-                          borderRadius: BorderRadius.circular(AppRadius.sm),
-                        ),
-                        child: Text(
-                          _getCategoryName(place.category!),
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10,
-                          ),
+                  Positioned(
+                    top: AppSpacing.xs,
+                    left: AppSpacing.xs,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                      ),
+                      child: Text(
+                        prov.shortLabel,
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
-
-            // Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.sm),
@@ -104,16 +113,31 @@ class PlaceCard extends StatelessWidget {
                       children: [
                         const Icon(
                           LucideIcons.star,
-                          size: 14,
+                          size: 13,
                           color: AppColors.rating,
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          place.rating.toStringAsFixed(1),
+                          place.ratingAvg > 0
+                              ? place.ratingAvg.toStringAsFixed(1)
+                              : '—',
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                        const Spacer(),
+                        if (onLike != null)
+                          GestureDetector(
+                            onTap: onLike,
+                            child: Icon(
+                              LucideIcons.heart,
+                              size: 16,
+                              color: place.isLiked
+                                  ? AppColors.primary
+                                  : AppColors.textSecondary,
+                            ),
+                          ),
                       ],
                     ),
                   ],
@@ -127,6 +151,11 @@ class PlaceCard extends StatelessWidget {
   }
 
   Widget _buildFullCard() {
+    final prov = getProvinceMeta(place.province);
+    final priceLabel = place.priceEstimate > 0
+        ? '${NumberFormat('#,###', 'vi_VN').format(place.priceEstimate)} đ'
+        : 'Miễn phí';
+
     return Card(
       margin: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -135,61 +164,85 @@ class PlaceCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.border),
       ),
-      elevation: 2,
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image
+            // Banner Image + Top Badges
             Stack(
               children: [
                 AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: place.imageUrl != null
+                  child: place.imageUrl != null && place.imageUrl!.isNotEmpty
                       ? CachedNetworkImage(
                           imageUrl: place.imageUrl!,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => _buildPlaceholder(),
-                          errorWidget: (context, url, error) => _buildPlaceholder(),
+                          placeholder: (_, __) => _buildPlaceholder(),
+                          errorWidget: (_, __, ___) => _buildPlaceholder(),
                         )
                       : _buildPlaceholder(),
                 ),
-                // Category badge
-                if (place.category != null)
-                  Positioned(
-                    top: AppSpacing.sm,
-                    left: AppSpacing.sm,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _getCategoryColor(place.category!),
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            _getCategoryIcon(place.category!),
-                            size: 14,
-                            color: Colors.white,
+                Positioned(
+                  top: AppSpacing.sm,
+                  left: AppSpacing.sm,
+                  right: AppSpacing.sm,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Text(
+                          prov.label,
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            _getCategoryName(place.category!),
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.sm,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              LucideIcons.ticket,
+                              size: 12,
+                              color: AppColors.textSecondary,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              priceLabel,
+                              style: AppTextStyles.labelSmall.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
+                ),
               ],
             ),
 
@@ -199,74 +252,126 @@ class PlaceCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name
                   Text(
                     place.name,
                     style: AppTextStyles.headlineSmall.copyWith(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    place.description ??
+                        'Địa điểm du lịch nổi tiếng với nhiều hoạt động hấp dẫn.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: AppSpacing.sm),
 
-                  const SizedBox(height: AppSpacing.xs),
-
-                  // Location
-                  Row(
+                  // Categories + indoor/outdoor
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
                     children: [
-                      const Icon(
-                        LucideIcons.mapPin,
-                        size: 14,
-                        color: AppColors.textSecondary,
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          '${place.district ?? ''} ${place.province}',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
+                      ...place.categories.take(3).map(
+                            (cat) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius:
+                                    BorderRadius.circular(AppRadius.sm),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: Text(
+                                '#$cat',
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  fontSize: 10,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      if (place.indoorOutdoor != null &&
+                          place.indoorOutdoor!.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                          ),
+                          child: Text(
+                            place.indoorOutdoor!,
+                            style: AppTextStyles.bodySmall.copyWith(
+                              fontSize: 10,
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
-                      ),
                     ],
                   ),
 
                   const SizedBox(height: AppSpacing.sm),
 
-                  // Rating and budget
+                  // Rating Summary
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        LucideIcons.star,
-                        size: 16,
-                        color: AppColors.rating,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        place.rating.toStringAsFixed(1),
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (place.reviewCount > 0) ...[
-                        Text(
-                          ' (${place.reviewCount})',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
+                      Row(
+                        children: [
+                          const Icon(
+                            LucideIcons.star,
+                            size: 15,
+                            color: AppColors.rating,
                           ),
-                        ),
-                      ],
-                      const Spacer(),
-                      if (place.budgetLevel != null)
-                        Text(
-                          _getBudgetDisplay(place.budgetLevel!),
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.accent,
-                            fontWeight: FontWeight.bold,
+                          const SizedBox(width: 4),
+                          Text(
+                            place.ratingAvg > 0
+                                ? place.ratingAvg.toStringAsFixed(1)
+                                : '—',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '(${place.ratingCount} đánh giá)',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (place.userRating != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                          ),
+                          child: Text(
+                            'Đã chấm ${place.userRating}★',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              fontSize: 10,
+                              color: AppColors.success,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                     ],
@@ -274,6 +379,81 @@ class PlaceCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Social Actions Footer
+            if (onLike != null ||
+                onSave != null ||
+                onComment != null ||
+                onDirections != null ||
+                onShare != null)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: 6,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  border: Border(top: BorderSide(color: AppColors.border)),
+                ),
+                child: Row(
+                  children: [
+                    if (onLike != null)
+                      _FooterIconBtn(
+                        icon: LucideIcons.heart,
+                        label: '${place.likesCount}',
+                        active: place.isLiked,
+                        activeColor: AppColors.primary,
+                        onTap: onLike!,
+                      ),
+                    if (onSave != null)
+                      _FooterIconBtn(
+                        icon: LucideIcons.bookmark,
+                        label: '${place.savesCount}',
+                        active: place.isSaved,
+                        activeColor: AppColors.accent,
+                        onTap: onSave!,
+                      ),
+                    if (onComment != null)
+                      _FooterIconBtn(
+                        icon: LucideIcons.messageCircle,
+                        label: '${place.commentsCount}',
+                        active: false,
+                        activeColor: AppColors.textPrimary,
+                        onTap: onComment!,
+                      ),
+                    const Spacer(),
+                    if (onDirections != null)
+                      OutlinedButton.icon(
+                        onPressed: onDirections,
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          side: const BorderSide(color: AppColors.border),
+                          foregroundColor: AppColors.textPrimary,
+                        ),
+                        icon: const Icon(LucideIcons.navigation, size: 13),
+                        label: const Text(
+                          'Chỉ đường',
+                          style: TextStyle(fontSize: 11),
+                        ),
+                      ),
+                    if (onShare != null)
+                      IconButton(
+                        onPressed: onShare,
+                        icon: const Icon(
+                          LucideIcons.share2,
+                          size: 16,
+                          color: AppColors.textSecondary,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),
@@ -282,84 +462,57 @@ class PlaceCard extends StatelessWidget {
 
   Widget _buildPlaceholder() {
     return Container(
-      color: AppColors.primary.withValues(alpha: 0.1),
+      color: AppColors.primary.withValues(alpha: 0.08),
       child: Center(
         child: Icon(
-          LucideIcons.image,
-          size: 48,
-          color: AppColors.primary.withValues(alpha: 0.3),
+          LucideIcons.mapPin,
+          size: 40,
+          color: AppColors.primary.withValues(alpha: 0.4),
         ),
       ),
     );
   }
+}
 
-  Color _getCategoryColor(String category) {
-    switch (category.toLowerCase()) {
-      case 'beach':
-        return AppColors.categoryBeach;
-      case 'mountain':
-        return AppColors.categoryMountain;
-      case 'culture':
-        return AppColors.categoryCulture;
-      case 'food':
-        return AppColors.categoryFood;
-      case 'nature':
-        return AppColors.categoryNature;
-      case 'city':
-        return AppColors.categoryCity;
-      default:
-        return AppColors.primary;
-    }
-  }
+class _FooterIconBtn extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool active;
+  final Color activeColor;
+  final VoidCallback onTap;
 
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'beach':
-        return LucideIcons.waves;
-      case 'mountain':
-        return LucideIcons.mountain;
-      case 'culture':
-        return LucideIcons.landmark;
-      case 'food':
-        return LucideIcons.utensils;
-      case 'nature':
-        return LucideIcons.treeDeciduous;
-      case 'city':
-        return LucideIcons.building2;
-      default:
-        return LucideIcons.mapPin;
-    }
-  }
+  const _FooterIconBtn({
+    required this.icon,
+    required this.label,
+    required this.active,
+    required this.activeColor,
+    required this.onTap,
+  });
 
-  String _getCategoryName(String category) {
-    switch (category.toLowerCase()) {
-      case 'beach':
-        return 'Biển';
-      case 'mountain':
-        return 'Núi';
-      case 'culture':
-        return 'Văn hóa';
-      case 'food':
-        return 'Ẩm thực';
-      case 'nature':
-        return 'Thiên nhiên';
-      case 'city':
-        return 'Đô thị';
-      default:
-        return category;
-    }
-  }
-
-  String _getBudgetDisplay(String level) {
-    switch (level.toLowerCase()) {
-      case 'low':
-        return '💰';
-      case 'medium':
-        return '💰💰';
-      case 'high':
-        return '💰💰💰';
-      default:
-        return '💰';
-    }
+  @override
+  Widget build(BuildContext context) {
+    final color = active ? activeColor : AppColors.textSecondary;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.sm),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: color),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: color,
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

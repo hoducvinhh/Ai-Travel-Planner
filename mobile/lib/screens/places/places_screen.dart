@@ -3,16 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/provinces.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/models/place.dart';
+import 'package:travel_planner/providers/auth_provider.dart';
 import 'package:travel_planner/providers/places_provider.dart';
 import 'package:travel_planner/widgets/common/loading_indicator.dart';
 import 'package:travel_planner/widgets/place/place_card.dart';
+import 'package:travel_planner/widgets/place/place_directions_sheet.dart';
 import 'package:travel_planner/widgets/place/places_filter_sheet.dart';
+import 'package:travel_planner/widgets/place/share_place_sheet.dart';
 
-/// Places browse screen
+/// Places social discovery feed matching Web /places
 class PlacesScreen extends ConsumerStatefulWidget {
   const PlacesScreen({super.key});
 
@@ -23,62 +27,102 @@ class PlacesScreen extends ConsumerStatefulWidget {
 class _PlacesScreenState extends ConsumerState<PlacesScreen> {
   bool _isGridView = false;
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.text = ref.read(placesFilterProvider).search ?? '';
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      ref.read(placesFeedProvider.notifier).loadMore();
+    }
+  }
+
+  void _showMessage(String? msg) {
+    if (msg == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), duration: const Duration(seconds: 2)),
+    );
+  }
+
+  Future<void> _openPlaceCommentsSheet(Place place) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _PlaceCommentsSheet(place: place),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final placesAsync = ref.watch(placesProvider);
+    final feedState = ref.watch(placesFeedProvider);
     final filter = ref.watch(placesFilterProvider);
 
+    // Sync controller if external quick search updated filter
+    if ((filter.search ?? '') != _searchController.text &&
+        !FocusScope.of(context).hasFocus) {
+      _searchController.text = filter.search ?? '';
+    }
+
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Khám phá địa điểm'),
+        title: const Text('Khám phá điểm đến'),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         actions: [
           IconButton(
             icon: Icon(_isGridView ? LucideIcons.list : LucideIcons.grid3x3),
-            onPressed: () {
-              setState(() {
-                _isGridView = !_isGridView;
-              });
-            },
+            onPressed: () => setState(() => _isGridView = !_isGridView),
             tooltip: _isGridView ? 'Xem dạng danh sách' : 'Xem dạng lưới',
           ),
         ],
       ),
       body: Column(
         children: [
-          // Search and filter bar
+          // Search & Filter Header
           Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.sm,
+              AppSpacing.md,
+              AppSpacing.sm,
+            ),
             decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(color: AppColors.border, width: 1),
-              ),
+              color: AppColors.surface,
+              border: Border(bottom: BorderSide(color: AppColors.border)),
             ),
             child: Column(
               children: [
-                // Search bar
                 TextField(
                   controller: _searchController,
+                  textInputAction: TextInputAction.search,
                   decoration: InputDecoration(
-                    hintText: 'Tìm kiếm địa điểm...',
-                    prefixIcon: const Icon(LucideIcons.search),
+                    hintText: 'Tìm theo tên địa điểm, quận, mô tả...',
+                    prefixIcon: const Icon(LucideIcons.search, size: 18),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(LucideIcons.x),
+                            icon: const Icon(LucideIcons.x, size: 18),
                             onPressed: () {
                               _searchController.clear();
-                              ref.read(placesFilterProvider.notifier).setSearch(null);
+                              ref
+                                  .read(placesFilterProvider.notifier)
+                                  .setSearch(null);
                             },
                           )
                         : null,
@@ -89,113 +133,104 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
                       borderRadius: BorderRadius.circular(AppRadius.full),
                       borderSide: const BorderSide(color: AppColors.border),
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
+                      vertical: 10,
                     ),
                   ),
-                  onChanged: (value) {
-                    ref.read(placesFilterProvider.notifier).setSearch(
-                          value.isEmpty ? null : value,
-                        );
+                  onSubmitted: (val) {
+                    ref.read(placesFilterProvider.notifier).setSearch(val);
+                  },
+                  onChanged: (val) {
+                    setState(() {});
+                    if (val.isEmpty) {
+                      ref.read(placesFilterProvider.notifier).setSearch(null);
+                    }
                   },
                 ),
 
                 const SizedBox(height: AppSpacing.sm),
 
-                // Filter chips
+                // Quick Province & Category Filter Row
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      FilterChip(
-                        label: const Text('Bộ lọc'),
-                        avatar: const Icon(LucideIcons.sliders, size: 18),
-                        onSelected: (selected) {
-                          _showFilterSheet(context);
+                      ActionChip(
+                        avatar: const Icon(LucideIcons.slidersHorizontal, size: 15),
+                        label: const Text('Bộ lọc & Sắp xếp'),
+                        onPressed: () {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (_) => const PlacesFilterSheet(),
+                          );
                         },
-                        backgroundColor: Colors.white,
+                        backgroundColor: AppColors.background,
                         side: const BorderSide(color: AppColors.border),
                       ),
-                      if (filter.category != null) ...[
-                        const SizedBox(width: AppSpacing.sm),
-                        Chip(
-                          label: Text(_getCategoryName(filter.category!)),
-                          avatar: const Icon(LucideIcons.tag, size: 18),
-                          deleteIcon: const Icon(LucideIcons.x, size: 16),
-                          onDeleted: () {
-                            ref.read(placesFilterProvider.notifier).setCategory(null);
-                          },
-                          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                        ),
-                      ],
-                      if (filter.province != null) ...[
-                        const SizedBox(width: AppSpacing.sm),
-                        Chip(
-                          label: Text(filter.province!),
-                          avatar: const Icon(LucideIcons.mapPin, size: 18),
-                          deleteIcon: const Icon(LucideIcons.x, size: 16),
-                          onDeleted: () {
-                            ref.read(placesFilterProvider.notifier).setProvince(null);
-                          },
-                          backgroundColor: AppColors.secondary.withValues(alpha: 0.1),
-                        ),
-                      ],
-                      if (filter.budgetLevel != null) ...[
-                        const SizedBox(width: AppSpacing.sm),
-                        Chip(
-                          label: Text(_getBudgetName(filter.budgetLevel!)),
-                          avatar: const Icon(LucideIcons.dollarSign, size: 18),
-                          deleteIcon: const Icon(LucideIcons.x, size: 16),
-                          onDeleted: () {
-                            ref.read(placesFilterProvider.notifier).setBudgetLevel(null);
-                          },
-                          backgroundColor: AppColors.accent.withValues(alpha: 0.1),
-                        ),
-                      ],
-                      if (filter.category != null || filter.province != null || filter.budgetLevel != null) ...[
-                        const SizedBox(width: AppSpacing.sm),
-                        TextButton.icon(
-                          onPressed: () {
-                            ref.read(placesFilterProvider.notifier).reset();
-                          },
-                          icon: const Icon(LucideIcons.x, size: 16),
-                          label: const Text('Xóa tất cả'),
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.error,
+                      const SizedBox(width: AppSpacing.xs),
+                      ...vietnamProvinces.map((prov) {
+                        final active = filter.province == prov.key;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: AppSpacing.xs),
+                          child: ChoiceChip(
+                            label: Text(prov.shortLabel),
+                            selected: active,
+                            onSelected: (sel) {
+                              ref
+                                  .read(placesFilterProvider.notifier)
+                                  .setProvince(sel ? prov.key : null);
+                            },
                           ),
-                        ),
-                      ],
+                        );
+                      }),
                     ],
                   ),
+                ),
+
+                const SizedBox(height: 6),
+
+                // Results summary row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Hiển thị ${feedState.places.length} / ${feedState.total} địa điểm',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    if (filter.category != null ||
+                        filter.province != null ||
+                        filter.sortBy != 'popularity')
+                      GestureDetector(
+                        onTap: () {
+                          _searchController.clear();
+                          ref.read(placesFilterProvider.notifier).reset();
+                        },
+                        child: Text(
+                          'Đặt lại lọc',
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
             ),
           ),
 
-          // Places list
+          // Feed Content
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () async {
-                ref.invalidate(placesProvider);
-              },
-              child: placesAsync.when(
-                loading: () => const LoadingIndicator(),
-                error: (error, stack) => _buildErrorState(error),
-                data: (places) {
-                  if (places.isEmpty) {
-                    return _buildEmptyState();
-                  }
-
-                  return _isGridView
-                      ? _buildGridView(places)
-                      : _buildListView(places);
-                },
-              ),
+              color: AppColors.primary,
+              onRefresh: () =>
+                  ref.read(placesFeedProvider.notifier).loadInitial(),
+              child: _buildFeedBody(feedState),
             ),
           ),
         ],
@@ -203,151 +238,339 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
     );
   }
 
-  Widget _buildGridView(List<Place> places) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: AppSpacing.md,
-        mainAxisSpacing: AppSpacing.md,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: places.length,
-      itemBuilder: (context, index) {
-        return PlaceCard(
-          place: places[index],
-          isCompact: true,
-          onTap: () {
-            context.push('/places/${places[index].id}');
-          },
-        );
-      },
-    );
-  }
+  Widget _buildFeedBody(PlacesFeedState feedState) {
+    if (feedState.isLoading) {
+      return const LoadingIndicator();
+    }
 
-  Widget _buildListView(List<Place> places) {
+    if (feedState.error != null && feedState.places.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(LucideIcons.circleAlert, size: 56, color: AppColors.error),
+              const SizedBox(height: AppSpacing.md),
+              const Text('Không tải được địa điểm', style: AppTextStyles.headlineSmall),
+              const SizedBox(height: AppSpacing.sm),
+              ElevatedButton.icon(
+                onPressed: () =>
+                    ref.read(placesFeedProvider.notifier).loadInitial(),
+                icon: const Icon(LucideIcons.refreshCw, size: 18),
+                label: const Text('Thử lại'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (feedState.places.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                LucideIcons.compass,
+                size: 64,
+                color: AppColors.textTertiary,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              const Text(
+                'Không tìm thấy địa điểm phù hợp',
+                style: AppTextStyles.headlineSmall,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Hãy thử đổi từ khóa tìm kiếm hoặc bỏ chọn tiêu chí lọc.',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              OutlinedButton(
+                onPressed: () {
+                  _searchController.clear();
+                  ref.read(placesFilterProvider.notifier).reset();
+                },
+                child: const Text('Đặt lại bộ lọc'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_isGridView) {
+      return GridView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: AppSpacing.sm,
+          mainAxisSpacing: AppSpacing.sm,
+          childAspectRatio: 0.78,
+        ),
+        itemCount: feedState.places.length + (feedState.isLoadingMore ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= feedState.places.length) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final place = feedState.places[index];
+          return PlaceCard(
+            place: place,
+            isCompact: true,
+            onTap: () => context.push('/places/${place.id}'),
+            onLike: () async {
+              final msg = await ref
+                  .read(placesFeedProvider.notifier)
+                  .toggleLike(place);
+              _showMessage(msg);
+            },
+          );
+        },
+      );
+    }
+
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-      itemCount: places.length,
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      itemCount: feedState.places.length + (feedState.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index >= feedState.places.length) {
+          return const Padding(
+            padding: EdgeInsets.all(AppSpacing.md),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          );
+        }
+        final place = feedState.places[index];
         return PlaceCard(
-          place: places[index],
-          onTap: () {
-            context.push('/places/${places[index].id}');
+          place: place,
+          onTap: () => context.push('/places/${place.id}'),
+          onLike: () async {
+            final msg =
+                await ref.read(placesFeedProvider.notifier).toggleLike(place);
+            _showMessage(msg);
           },
+          onSave: () async {
+            final msg =
+                await ref.read(placesFeedProvider.notifier).toggleSave(place);
+            _showMessage(msg);
+          },
+          onComment: () => _openPlaceCommentsSheet(place),
+          onDirections: () {
+            PlaceDirectionsSheet.show(
+              context,
+              name: place.name,
+              latitude: place.latitude,
+              longitude: place.longitude,
+              province: place.province,
+              district: place.district,
+            );
+          },
+          onShare: () => SharePlaceSheet.show(context, place),
         );
       },
     );
   }
+}
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
+class _PlaceCommentsSheet extends ConsumerStatefulWidget {
+  final Place place;
+  const _PlaceCommentsSheet({required this.place});
+
+  @override
+  ConsumerState<_PlaceCommentsSheet> createState() =>
+      _PlaceCommentsSheetState();
+}
+
+class _PlaceCommentsSheetState extends ConsumerState<_PlaceCommentsSheet> {
+  final TextEditingController _controller = TextEditingController();
+  bool _submitting = false;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty || _submitting) return;
+    final user = ref.read(authProvider).maybeWhen(
+          authenticated: (u) => u,
+          orElse: () => null,
+        );
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Vui lòng đăng nhập để bình luận!')),
+      );
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      await ref.read(placesRepositoryProvider).addPlaceComment(
+            placeId: widget.place.id,
+            userId: user.id,
+            content: text,
+          );
+      _controller.clear();
+      ref.invalidate(placeCommentsProvider(widget.place.id));
+      ref
+          .read(placesFeedProvider.notifier)
+          .incrementCommentCount(widget.place.id);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không thể gửi bình luận: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final commentsAsync = ref.watch(placeCommentsProvider(widget.place.id));
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.65,
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              LucideIcons.searchX,
-              size: 80,
-              color: AppColors.textSecondary.withValues(alpha: 0.5),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Không tìm thấy địa điểm',
-              style: AppTextStyles.headlineMedium.copyWith(
-                color: AppColors.textPrimary,
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm',
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Bình luận • ${widget.place.name}',
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(LucideIcons.x, size: 20),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: commentsAsync.when(
+                loading: () => const LoadingIndicator(),
+                error: (e, _) => Center(child: Text('Lỗi tải bình luận: $e')),
+                data: (comments) {
+                  if (comments.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Chưa có bình luận nào. Hãy là người đầu tiên!',
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    itemCount: comments.length,
+                    separatorBuilder: (_, __) =>
+                        const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (_, idx) {
+                      final c = comments[idx];
+                      return Container(
+                        padding: const EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: AppColors.background,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              c.user.displayName,
+                              style: AppTextStyles.labelMedium.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(c.content, style: AppTextStyles.bodySmall),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            SafeArea(
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: AppColors.border)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: 'Viết bình luận, chia sẻ trải nghiệm...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: 8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    IconButton(
+                      onPressed: _submitting ? null : _submit,
+                      icon: _submitting
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(LucideIcons.send, color: AppColors.primary),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildErrorState(Object error) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              LucideIcons.circleAlert,
-              size: 64,
-              color: AppColors.error,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            const Text(
-              'Đã có lỗi xảy ra',
-              style: AppTextStyles.headlineMedium,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              error.toString(),
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            ElevatedButton.icon(
-              onPressed: () => ref.invalidate(placesProvider),
-              icon: const Icon(LucideIcons.refreshCw, size: 20),
-              label: const Text('Thử lại'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showFilterSheet(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const PlacesFilterSheet(),
-    );
-  }
-
-  String _getCategoryName(String category) {
-    switch (category.toLowerCase()) {
-      case 'beach':
-        return 'Biển';
-      case 'mountain':
-        return 'Núi';
-      case 'culture':
-        return 'Văn hóa';
-      case 'food':
-        return 'Ẩm thực';
-      case 'nature':
-        return 'Thiên nhiên';
-      case 'city':
-        return 'Đô thị';
-      default:
-        return category;
-    }
-  }
-
-  String _getBudgetName(String level) {
-    switch (level) {
-      case 'low':
-        return 'Tiết kiệm';
-      case 'medium':
-        return 'Trung bình';
-      case 'high':
-        return 'Cao cấp';
-      default:
-        return level;
-    }
   }
 }

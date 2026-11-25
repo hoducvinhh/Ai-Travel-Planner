@@ -2,43 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/provinces.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/providers/places_provider.dart';
 import 'package:travel_planner/widgets/common/custom_button.dart';
 
-/// Places filter bottom sheet
+/// Places filter & sort bottom sheet aligned with Web 11 provinces & 10 categories
 class PlacesFilterSheet extends ConsumerWidget {
   const PlacesFilterSheet({super.key});
-
-  static const List<String> _provinces = [
-    'Hà Nội',
-    'Hồ Chí Minh',
-    'Đà Nẵng',
-    'Hải Phòng',
-    'Cần Thơ',
-    'Khánh Hòa',
-    'Quảng Nam',
-    'Thừa Thiên Huế',
-    'Kiên Giang',
-    'Lâm Đồng',
-  ];
-
-  static const List<Map<String, dynamic>> _categories = [
-    {'id': 'beach', 'name': 'Biển', 'icon': LucideIcons.waves},
-    {'id': 'mountain', 'name': 'Núi', 'icon': LucideIcons.mountain},
-    {'id': 'culture', 'name': 'Văn hóa', 'icon': LucideIcons.landmark},
-    {'id': 'food', 'name': 'Ẩm thực', 'icon': LucideIcons.utensils},
-    {'id': 'nature', 'name': 'Thiên nhiên', 'icon': LucideIcons.treeDeciduous},
-    {'id': 'city', 'name': 'Đô thị', 'icon': LucideIcons.building2},
-  ];
-
-  static const List<Map<String, String>> _budgetLevels = [
-    {'id': 'low', 'name': 'Tiết kiệm', 'icon': '💰'},
-    {'id': 'medium', 'name': 'Trung bình', 'icon': '💰💰'},
-    {'id': 'high', 'name': 'Cao cấp', 'icon': '💰💰💰'},
-  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -46,17 +19,13 @@ class PlacesFilterSheet extends ConsumerWidget {
 
     return Container(
       decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(AppRadius.xl),
-          topRight: Radius.circular(AppRadius.xl),
-        ),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle
             Container(
               margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
               width: 40,
@@ -66,16 +35,13 @@ class PlacesFilterSheet extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
             ),
-
-            // Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Row(
                 children: [
                   Text(
-                    'Bộ lọc',
+                    'Bộ lọc & Sắp xếp',
                     style: AppTextStyles.headlineMedium.copyWith(
-                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -84,51 +50,48 @@ class PlacesFilterSheet extends ConsumerWidget {
                     onPressed: () {
                       ref.read(placesFilterProvider.notifier).reset();
                     },
-                    child: const Text('Xóa tất cả'),
+                    child: const Text('Đặt lại'),
                   ),
                 ],
               ),
             ),
-
-            const Divider(),
-
-            // Content
+            const Divider(height: 1),
             Flexible(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Category filter
+                    // Sort By
                     Text(
-                      'Loại hình',
+                      'Sắp xếp theo',
                       style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: AppSpacing.sm),
-
                     Wrap(
                       spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: _categories.map((cat) {
-                        final isSelected = filter.category == cat['id'];
-                        return FilterChip(
-                          label: Text(cat['name'] as String),
-                          avatar: Icon(cat['icon'] as IconData, size: 18),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            ref.read(placesFilterProvider.notifier).setCategory(
-                                  selected ? cat['id'] as String : null,
-                                );
+                      runSpacing: AppSpacing.xs,
+                      children: placeSortOptions.map((opt) {
+                        final selected = filter.sortBy == opt['value'];
+                        return ChoiceChip(
+                          label: Text(opt['label']!),
+                          selected: selected,
+                          onSelected: (_) {
+                            ref
+                                .read(placesFilterProvider.notifier)
+                                .setSortBy(opt['value']!);
                           },
-                          backgroundColor: Colors.white,
-                          selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                          checkmarkColor: AppColors.primary,
-                          side: BorderSide(
-                            color: isSelected ? AppColors.primary : AppColors.border,
+                          selectedColor:
+                              AppColors.primary.withValues(alpha: 0.14),
+                          labelStyle: TextStyle(
+                            color: selected
+                                ? AppColors.primary
+                                : AppColors.textPrimary,
+                            fontSize: 12,
+                            fontWeight:
+                                selected ? FontWeight.bold : FontWeight.normal,
                           ),
                         );
                       }).toList(),
@@ -136,79 +99,65 @@ class PlacesFilterSheet extends ConsumerWidget {
 
                     const SizedBox(height: AppSpacing.lg),
 
-                    // Province filter
+                    // Provinces (11 key provinces)
                     Text(
-                      'Tỉnh/Thành phố',
+                      'Tỉnh / Thành phố trọng điểm',
                       style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: AppSpacing.sm),
-
                     Wrap(
                       spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: _provinces.map((province) {
-                        final isSelected = filter.province == province;
-                        return FilterChip(
-                          label: Text(province),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            ref.read(placesFilterProvider.notifier).setProvince(
-                                  selected ? province : null,
-                                );
+                      runSpacing: AppSpacing.xs,
+                      children: [
+                        ChoiceChip(
+                          label: const Text('Tất cả điểm đến'),
+                          selected: filter.province == null,
+                          onSelected: (_) {
+                            ref
+                                .read(placesFilterProvider.notifier)
+                                .setProvince(null);
                           },
-                          backgroundColor: Colors.white,
-                          selectedColor: AppColors.secondary.withValues(alpha: 0.15),
-                          checkmarkColor: AppColors.secondary,
-                          side: BorderSide(
-                            color: isSelected ? AppColors.secondary : AppColors.border,
-                          ),
-                        );
-                      }).toList(),
+                        ),
+                        ...vietnamProvinces.map((prov) {
+                          final selected = filter.province == prov.key;
+                          return ChoiceChip(
+                            label: Text(prov.label),
+                            selected: selected,
+                            onSelected: (isSel) {
+                              ref
+                                  .read(placesFilterProvider.notifier)
+                                  .setProvince(isSel ? prov.key : null);
+                            },
+                          );
+                        }),
+                      ],
                     ),
 
                     const SizedBox(height: AppSpacing.lg),
 
-                    // Budget filter
+                    // Categories (10 Vietnamese categories)
                     Text(
-                      'Mức giá',
+                      'Thể loại trải nghiệm',
                       style: AppTextStyles.labelLarge.copyWith(
-                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: AppSpacing.sm),
-
                     Wrap(
                       spacing: AppSpacing.sm,
-                      runSpacing: AppSpacing.sm,
-                      children: _budgetLevels.map((budget) {
-                        final isSelected = filter.budgetLevel == budget['id'];
-                        return FilterChip(
-                          label: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(budget['icon']!),
-                              const SizedBox(width: 4),
-                              Text(budget['name']!),
-                            ],
-                          ),
-                          selected: isSelected,
-                          onSelected: (selected) {
-                            ref.read(placesFilterProvider.notifier).setBudgetLevel(
-                                  selected ? budget['id'] : null,
-                                );
+                      runSpacing: AppSpacing.xs,
+                      children: placeCategories.map((cat) {
+                        final selected = (filter.category ?? 'Tất cả') == cat;
+                        return ChoiceChip(
+                          label: Text(cat),
+                          selected: selected,
+                          onSelected: (_) {
+                            ref
+                                .read(placesFilterProvider.notifier)
+                                .setCategory(cat == 'Tất cả' ? null : cat);
                           },
-                          backgroundColor: Colors.white,
-                          selectedColor: AppColors.accent.withValues(alpha: 0.15),
-                          checkmarkColor: AppColors.accent,
-                          side: BorderSide(
-                            color: isSelected ? AppColors.accent : AppColors.border,
-                          ),
                         );
                       }).toList(),
                     ),
@@ -216,16 +165,12 @@ class PlacesFilterSheet extends ConsumerWidget {
                 ),
               ),
             ),
-
-            // Apply button
             Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: CustomButton(
                 text: 'Áp dụng',
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(LucideIcons.check),
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(LucideIcons.check, color: Colors.white),
               ),
             ),
           ],
