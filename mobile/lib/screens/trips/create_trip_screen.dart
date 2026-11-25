@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/providers/create_trip_provider.dart';
 import 'package:travel_planner/widgets/common/custom_button.dart';
 import 'package:travel_planner/widgets/trip/create_trip_step_indicator.dart';
@@ -30,10 +30,11 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     final createTripState = ref.watch(createTripProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Tạo chuyến đi mới'),
+        title: const Text('Lập lịch trình thông minh'),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         leading: IconButton(
@@ -43,56 +44,37 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
       ),
       body: Column(
         children: [
-          // Step indicator
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.border,
-                  width: 1,
-                ),
-              ),
+              color: AppColors.surface,
+              border: Border(bottom: BorderSide(color: AppColors.border)),
             ),
             child: CreateTripStepIndicator(
               currentStep: _currentStep + 1,
               totalSteps: _totalSteps,
             ),
           ),
-
-          // Step content
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: _buildStepContent(),
             ),
           ),
-
-          // Navigation buttons
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                top: BorderSide(
-                  color: AppColors.border,
-                  width: 1,
-                ),
-              ),
+              color: AppColors.surface,
+              border: Border(top: BorderSide(color: AppColors.border)),
             ),
             child: SafeArea(
               child: Row(
                 children: [
-                  if (_currentStep > 0)
+                  if (_currentStep > 0) ...[
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _currentStep--;
-                          });
-                        },
-                        icon: const Icon(LucideIcons.arrowLeft, size: 20),
+                        onPressed: () => setState(() => _currentStep--),
+                        icon: const Icon(LucideIcons.arrowLeft, size: 18),
                         label: const Text('Quay lại'),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -105,16 +87,23 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
                         ),
                       ),
                     ),
-                  if (_currentStep > 0) const SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.md),
+                  ],
                   Expanded(
-                    flex: _currentStep == 0 ? 1 : 1,
                     child: CustomButton(
-                      text: _currentStep == _totalSteps - 1 ? 'Tạo chuyến đi' : 'Tiếp tục',
-                      onPressed: _canProceed() ? _handleNext : null,
+                      text: _currentStep == _totalSteps - 1
+                          ? 'Khởi tạo lịch trình'
+                          : 'Tiếp tục',
+                      onPressed:
+                          _canProceed(createTripState) ? _handleNext : null,
                       isLoading: createTripState.isLoading,
-                      icon: _currentStep == _totalSteps - 1
-                          ? const Icon(LucideIcons.check)
-                          : const Icon(LucideIcons.arrowRight),
+                      icon: Icon(
+                        _currentStep == _totalSteps - 1
+                            ? LucideIcons.sparkles
+                            : LucideIcons.arrowRight,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],
@@ -141,81 +130,70 @@ class _CreateTripScreenState extends ConsumerState<CreateTripScreen> {
     }
   }
 
-  bool _canProceed() {
-    final state = ref.read(createTripProvider);
-
+  bool _canProceed(CreateTripState state) {
     switch (_currentStep) {
       case 0:
-        return state.destination.isNotEmpty;
+        return state.destinations.isNotEmpty;
       case 1:
         return state.startDate != null && state.endDate != null;
       case 2:
-        return state.budget > 0;
+        return state.budgetPerPerson > 0 && state.groupSize > 0;
       case 3:
-        return true; // Preferences are optional
+        return state.preferences.isNotEmpty;
       default:
         return false;
     }
   }
 
-  void _handleNext() async {
+  Future<void> _handleNext() async {
     if (_currentStep < _totalSteps - 1) {
-      setState(() {
-        _currentStep++;
-      });
+      setState(() => _currentStep++);
+      return;
+    }
+
+    final created = await ref.read(createTripProvider.notifier).createTrip();
+    if (!mounted) return;
+    if (created != null) {
+      ref.read(createTripProvider.notifier).reset();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Tạo lịch trình thông minh thành công!'),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      context.pushReplacement('/trips/${created.id}');
     } else {
-      // Create trip
-      final success = await ref.read(createTripProvider.notifier).createTrip();
-      if (success && mounted) {
-        // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Tạo chuyến đi thành công!'),
-            backgroundColor: AppColors.success,
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            ref.read(createTripProvider).error ?? 'Không thể tạo lịch trình',
           ),
-        );
-        // Navigate back and refresh trips list
-        context.go('/trips');
-      } else if (mounted) {
-        // Show error message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(ref.read(createTripProvider).error ?? 'Có lỗi xảy ra'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-      }
+          backgroundColor: AppColors.error,
+        ),
+      );
     }
   }
 
   void _handleBack(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Hủy tạo chuyến đi?'),
-        content: const Text(
-          'Các thông tin bạn đã nhập sẽ không được lưu.',
-        ),
+        content: const Text('Các thông tin bạn đã nhập sẽ không được lưu.'),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Tiếp tục',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Tiếp tục'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               context.pop();
             },
-            child: const Text(
-              'Hủy',
-              style: TextStyle(color: AppColors.error),
-            ),
+            child: const Text('Hủy', style: TextStyle(color: AppColors.error)),
           ),
         ],
       ),

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:travel_planner/config/colors.dart';
-import 'package:travel_planner/config/text_styles.dart';
-import 'package:travel_planner/config/spacing.dart';
 import 'package:travel_planner/config/radius.dart';
+import 'package:travel_planner/config/spacing.dart';
+import 'package:travel_planner/config/text_styles.dart';
 import 'package:travel_planner/providers/create_trip_provider.dart';
 
-/// Step 3: Budget input
+/// Step 3: Budget per person & Group size (with Smart Pre-fill)
 class Step3Budget extends ConsumerStatefulWidget {
   const Step3Budget({super.key});
 
@@ -18,24 +18,21 @@ class Step3Budget extends ConsumerStatefulWidget {
 
 class _Step3BudgetState extends ConsumerState<Step3Budget> {
   late TextEditingController _budgetController;
-  late TextEditingController _travelersController;
 
   @override
   void initState() {
     super.initState();
     final state = ref.read(createTripProvider);
     _budgetController = TextEditingController(
-      text: state.budget > 0 ? state.budget.toStringAsFixed(0) : '',
-    );
-    _travelersController = TextEditingController(
-      text: state.travelersCount.toString(),
+      text: state.budgetPerPerson > 0
+          ? state.budgetPerPerson.toStringAsFixed(0)
+          : '',
     );
   }
 
   @override
   void dispose() {
     _budgetController.dispose();
-    _travelersController.dispose();
     super.dispose();
   }
 
@@ -46,198 +43,152 @@ class _Step3BudgetState extends ConsumerState<Step3Budget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title
         Text(
-          'Ngân sách của bạn?',
+          'Ngân sách & số người',
           style: AppTextStyles.displayMedium.copyWith(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
-
-        const SizedBox(height: AppSpacing.sm),
-
+        const SizedBox(height: AppSpacing.xs),
         Text(
-          'Nhập tổng ngân sách dự kiến cho chuyến đi',
-          style: AppTextStyles.bodyLarge.copyWith(
+          'Xác định quy mô đoàn và hạn mức chi tiêu mỗi người để AI cân đối chi phí',
+          style: AppTextStyles.bodyMedium.copyWith(
             color: AppColors.textSecondary,
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
 
-        const SizedBox(height: AppSpacing.xl),
+        if (state.isSmartPrefilled)
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            margin: const EdgeInsets.only(bottom: AppSpacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.secondary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(
+                color: AppColors.secondary.withValues(alpha: 0.35),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(LucideIcons.sparkles, size: 18),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    'Smart Pre-fill: Đã tự động điền ngân sách & số người theo hồ sơ khảo sát của bạn. Bạn có thể tùy chỉnh cho chuyến đi này.',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-        // Budget input
+        // Budget per person input
         TextField(
           controller: _budgetController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
-            labelText: 'Tổng ngân sách',
-            hintText: '0',
+            labelText: 'Ngân sách dự kiến mỗi người (VNĐ)',
+            hintText: 'Ví dụ: 3000000',
             prefixIcon: const Icon(LucideIcons.dollarSign),
             suffixText: '₫',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.border),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
           ),
           onChanged: (value) {
             final budget = double.tryParse(value.replaceAll(',', '')) ?? 0;
-            ref.read(createTripProvider.notifier).setBudget(budget);
+            ref.read(createTripProvider.notifier).setBudgetPerPerson(budget);
           },
         ),
-
-        const SizedBox(height: AppSpacing.lg),
-
-        // Quick budget options
-        Text(
-          'Hoặc chọn mức ngân sách',
-          style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
         const SizedBox(height: AppSpacing.md),
 
+        Text(
+          'Chọn nhanh ngân sách/người',
+          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         Wrap(
           spacing: AppSpacing.sm,
-          runSpacing: AppSpacing.sm,
+          runSpacing: AppSpacing.xs,
           children: [
-            _buildBudgetChip('< 5 triệu', 5000000),
-            _buildBudgetChip('5-10 triệu', 7500000),
-            _buildBudgetChip('10-20 triệu', 15000000),
-            _buildBudgetChip('20-30 triệu', 25000000),
-            _buildBudgetChip('> 30 triệu', 35000000),
+            _buildBudgetChip('500k (Tiết kiệm)', 500000),
+            _buildBudgetChip('1.2tr (Tiêu chuẩn)', 1200000),
+            _buildBudgetChip('2.5tr (Cao cấp)', 2500000),
+            _buildBudgetChip('5 triệu', 5000000),
+            _buildBudgetChip('10 triệu', 10000000),
           ],
         ),
 
         const SizedBox(height: AppSpacing.xl),
 
-        // Travelers count
         Text(
-          'Số người đi cùng',
-          style: AppTextStyles.labelLarge.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.bold,
-          ),
+          'Số lượng người tham gia',
+          style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.bold),
         ),
-
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.sm),
 
         Row(
-          children: [
-            IconButton(
-              onPressed: state.travelersCount > 1
-                  ? () {
-                      final newCount = state.travelersCount - 1;
-                      _travelersController.text = newCount.toString();
-                      ref.read(createTripProvider.notifier).setTravelersCount(newCount);
-                    }
-                  : null,
-              icon: const Icon(LucideIcons.minus),
-              style: IconButton.styleFrom(
-                backgroundColor: state.travelersCount > 1
-                    ? AppColors.primary.withValues(alpha: 0.1)
-                    : AppColors.border.withValues(alpha: 0.3),
-                foregroundColor: state.travelersCount > 1
-                    ? AppColors.primary
-                    : AppColors.textSecondary,
-              ),
-            ),
-            Expanded(
-              child: TextField(
-                controller: _travelersController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
+          children: [1, 2, 3, 4, 5, 6].map((size) {
+            final selected = state.groupSize == size;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: size == 6 ? 0 : 6),
+                child: InkWell(
+                  onTap: () =>
+                      ref.read(createTripProvider.notifier).setGroupSize(size),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: selected ? AppColors.primary : AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: selected ? AppColors.primary : AppColors.border,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      size == 6 ? '6+' : '$size',
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: selected ? Colors.white : AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                  ),
-                  suffixText: 'người',
                 ),
-                onChanged: (value) {
-                  final count = int.tryParse(value) ?? 1;
-                  if (count > 0 && count <= 99) {
-                    ref.read(createTripProvider.notifier).setTravelersCount(count);
-                  }
-                },
               ),
-            ),
-            IconButton(
-              onPressed: state.travelersCount < 99
-                  ? () {
-                      final newCount = state.travelersCount + 1;
-                      _travelersController.text = newCount.toString();
-                      ref.read(createTripProvider.notifier).setTravelersCount(newCount);
-                    }
-                  : null,
-              icon: const Icon(LucideIcons.plus),
-              style: IconButton.styleFrom(
-                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                foregroundColor: AppColors.primary,
-              ),
-            ),
-          ],
+            );
+          }).toList(),
         ),
 
-        if (state.budget > 0 && state.travelersCount > 0) ...[
+        if (state.budgetPerPerson > 0 && state.groupSize > 0) ...[
           const SizedBox(height: AppSpacing.lg),
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.accent.withValues(alpha: 0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: AppColors.accent,
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: const Icon(
-                    LucideIcons.calculator,
-                    size: 20,
-                    color: Colors.white,
+                Text(
+                  'Tổng ngân sách toàn chuyến đi:',
+                  style: AppTextStyles.labelMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ngân sách mỗi người',
-                        style: AppTextStyles.labelMedium.copyWith(
-                          color: AppColors.accent,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        _formatCurrency(state.budget / state.travelersCount),
-                        style: AppTextStyles.bodyLarge.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                Text(
+                  _formatCurrency(state.totalBudget),
+                  style: AppTextStyles.titleMedium.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
@@ -251,27 +202,20 @@ class _Step3BudgetState extends ConsumerState<Step3Budget> {
   Widget _buildBudgetChip(String label, double budget) {
     return ActionChip(
       label: Text(label),
-      labelStyle: AppTextStyles.bodyMedium.copyWith(
-        color: AppColors.textPrimary,
-      ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surface,
       side: const BorderSide(color: AppColors.border),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
       onPressed: () {
         _budgetController.text = budget.toStringAsFixed(0);
-        ref.read(createTripProvider.notifier).setBudget(budget);
+        ref.read(createTripProvider.notifier).setBudgetPerPerson(budget);
       },
     );
   }
 
   String _formatCurrency(double amount) {
-    final formatter = NumberFormat.currency(
+    return NumberFormat.currency(
       locale: 'vi_VN',
-      symbol: '₫',
+      symbol: 'đ',
       decimalDigits: 0,
-    );
-    return formatter.format(amount);
+    ).format(amount);
   }
 }

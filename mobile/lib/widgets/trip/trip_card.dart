@@ -167,6 +167,6 @@ class TripCard extends StatelessWidget {
       symbol: '₫',
       decimalDigits: 0,
     );
-    return formatter.format(trip.budget);
+    return '${formatter.format(trip.budgetPerPerson)} / người';
   }
 }
