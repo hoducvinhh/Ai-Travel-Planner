@@ -55,6 +55,7 @@ dependencies:
   # Utilities
   intl: ^0.19.0
   path: ^1.9.0
+  flutter_dotenv: ^5.2.1
   freezed_annotation: 3.1.0
   json_annotation: ^4.8.0
 
@@ -78,5 +79,6 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/images/provinces/
     - assets/images/illustrations/

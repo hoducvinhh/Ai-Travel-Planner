@@ -1,20 +1,31 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 /// Environment configuration
 class Env {
-  /// API base URL
-  static const String apiUrl = String.fromEnvironment(
-    'API_URL',
-    defaultValue: 'http://localhost:3002',
-  );
+  static const String _dartDefineApiUrl = String.fromEnvironment('API_URL');
+  static const String _dartDefineEnvironment = String.fromEnvironment('ENV');
 
-  /// Environment type
-  static const String environment = String.fromEnvironment(
-    'ENV',
-    defaultValue: 'dev',
-  );
+  static String? _readDotenv(String key) {
+    if (!dotenv.isInitialized) return null;
+    final value = dotenv.env[key]?.trim();
+    return (value != null && value.isNotEmpty) ? value : null;
+  }
+
+  /// API base URL (priority: --dart-define > .env > default)
+  static String get apiUrl {
+    if (_dartDefineApiUrl.isNotEmpty) return _dartDefineApiUrl;
+    return _readDotenv('API_URL') ?? 'http://localhost:3002';
+  }
+
+  /// Environment type (priority: --dart-define > .env > default)
+  static String get environment {
+    if (_dartDefineEnvironment.isNotEmpty) return _dartDefineEnvironment;
+    return _readDotenv('ENV') ?? 'dev';
+  }
 
   /// Is production environment
-  static const bool isProduction = environment == 'production';
+  static bool get isProduction => environment == 'production';
 
   /// Is development environment
-  static const bool isDevelopment = environment == 'dev';
+  static bool get isDevelopment => environment == 'dev';
 }

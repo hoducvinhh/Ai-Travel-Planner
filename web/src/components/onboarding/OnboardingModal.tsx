@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 
 interface StyleOption {
   id: string;
@@ -147,6 +148,7 @@ const BUDGET_OPTIONS: BudgetOption[] = [
 
 export default function OnboardingModal() {
   const { user, isAuthenticated, isLoading, refreshProfile } = useAuth();
+  const { showToast } = useToast();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
@@ -205,7 +207,7 @@ export default function OnboardingModal() {
       }
     } catch (err: any) {
       console.error('Lỗi lưu khảo sát Onboarding:', err);
-      alert(err.message || 'Không thể lưu khảo sát gu du lịch. Vui lòng thử lại.');
+      showToast(err.message || 'Không thể lưu khảo sát gu du lịch. Vui lòng thử lại.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -216,7 +218,7 @@ export default function OnboardingModal() {
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
       <DialogContent
-        className="max-w-2xl max-h-[92vh] overflow-y-auto p-0 gap-0 border-[#E5E7EB] shadow-2xl rounded-2xl bg-white sm:rounded-2xl"
+        className="max-w-2xl max-h-[92vh] overflow-y-auto p-0 gap-0 border-[#E2E8F0] shadow-2xl rounded-2xl bg-white sm:rounded-2xl"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -228,16 +230,16 @@ export default function OnboardingModal() {
         </div>
 
         {/* Header với thương hiệu */}
-        <div className="bg-gradient-to-b from-[#FAF8F5] to-white p-6 pb-4 border-b border-[#F0F0EF]">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1A1A1A] text-white text-[11px] font-medium mb-3 shadow-xs">
-            <Compass className="w-3.5 h-3.5 text-[#D4F066]" />
+        <div className="bg-[#F8FAFC] p-6 pb-4 border-b border-[#E2E8F0]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0D9488] text-white text-[11px] font-medium mb-3">
+            <Compass className="w-3.5 h-3.5 text-white" />
             <span>Khảo Sát Khởi Tạo Cá Nhân Hóa (Onboarding)</span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1A1A] tracking-tight">
-            Chào mừng bạn đến với AI Travel Planner! 🎉
+          <h2 className="text-xl sm:text-2xl font-extrabold text-[#0F172A] tracking-tight">
+            Chào mừng bạn đến với AI Travel Planner
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#64748B] mt-1.5 leading-relaxed">
             Để mang đến những đề xuất lịch trình được may đo chuẩn xác nhất ngay từ lần đầu tiên, hãy dành 1 phút chia sẻ gu du lịch quen thuộc của bạn:
           </p>
         </div>
@@ -247,11 +249,11 @@ export default function OnboardingModal() {
           {/* CÂU HỎI 1: Gu du lịch */}
           <div>
             <div className="flex items-center justify-between mb-2.5">
-              <label className="text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5">
-                <span className="w-5 h-5 rounded-full bg-[#1A1A1A] text-white text-xs flex items-center justify-center font-mono">1</span>
+              <label className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5">
+                <span className="w-5 h-5 rounded-full bg-[#0D9488] text-white text-xs flex items-center justify-center font-mono">1</span>
                 <span>Gu du lịch yêu thích của bạn</span>
               </label>
-              <span className={`text-xs font-medium ${selectedStyles.length >= 3 ? 'text-emerald-700' : 'text-amber-700'}`}>
+              <span className={`text-xs font-medium ${selectedStyles.length >= 3 ? 'text-[#0D9488] font-semibold' : 'text-[#F59E0B]'}`}>
                 Đã chọn {selectedStyles.length}/3 thẻ tối thiểu
               </span>
             </div>
@@ -267,13 +269,13 @@ export default function OnboardingModal() {
                     onClick={() => toggleStyle(style.id)}
                     className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white shadow-xs'
-                        : 'border-[#E5E7EB] bg-white hover:border-neutral-400 text-[#1A1A1A]'
+                        ? 'border-[#0D9488] bg-[#0D9488] text-white'
+                        : 'border-[#E2E8F0] bg-white hover:border-[#0D9488]/50 text-[#0F172A]'
                     }`}
                   >
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                        isSelected ? 'bg-neutral-800 text-[#D4F066]' : 'bg-[#F5F5F4] text-neutral-700'
+                        isSelected ? 'bg-white/15 text-white' : 'bg-[#F0FDFA] text-[#0D9488]'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -281,11 +283,11 @@ export default function OnboardingModal() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold leading-none">{style.name}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-[#D4F066]" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                       </div>
                       <p
                         className={`text-[11px] mt-1 line-clamp-1 leading-snug ${
-                          isSelected ? 'text-neutral-300' : 'text-muted-foreground'
+                          isSelected ? 'text-teal-50' : 'text-[#64748B]'
                         }`}
                       >
                         {style.desc}
@@ -299,8 +301,8 @@ export default function OnboardingModal() {
 
           {/* CÂU HỎI 2: Đối tượng đồng hành */}
           <div>
-            <label className="text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5 mb-2.5">
-              <span className="w-5 h-5 rounded-full bg-[#1A1A1A] text-white text-xs flex items-center justify-center font-mono">2</span>
+            <label className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5 mb-2.5">
+              <span className="w-5 h-5 rounded-full bg-[#0D9488] text-white text-xs flex items-center justify-center font-mono">2</span>
               <span>Đối tượng bạn thường đồng hành nhất</span>
             </label>
 
@@ -315,13 +317,13 @@ export default function OnboardingModal() {
                     onClick={() => setSelectedCompanion(comp.id)}
                     className={`p-3 rounded-xl border text-center transition-all duration-200 cursor-pointer flex flex-col items-center justify-center ${
                       isSelected
-                        ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white shadow-xs'
-                        : 'border-[#E5E7EB] bg-white hover:border-neutral-400 text-[#1A1A1A]'
+                        ? 'border-[#0D9488] bg-[#0D9488] text-white'
+                        : 'border-[#E2E8F0] bg-white hover:border-[#0D9488]/50 text-[#0F172A]'
                     }`}
                   >
                     <div
                       className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 ${
-                        isSelected ? 'bg-neutral-800 text-[#D4F066]' : 'bg-[#F5F5F4] text-neutral-700'
+                        isSelected ? 'bg-white/15 text-white' : 'bg-[#F0FDFA] text-[#0D9488]'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -329,7 +331,7 @@ export default function OnboardingModal() {
                     <span className="text-xs font-bold">{comp.name.split(' (')[0]}</span>
                     <span
                       className={`text-[10px] mt-0.5 line-clamp-1 ${
-                        isSelected ? 'text-neutral-300' : 'text-muted-foreground'
+                        isSelected ? 'text-teal-50' : 'text-[#64748B]'
                       }`}
                     >
                       {comp.id === 'family' ? 'Trẻ em & người lớn' : comp.desc.split(',')[0]}
@@ -342,8 +344,8 @@ export default function OnboardingModal() {
 
           {/* CÂU HỎI 3: Mức ngân sách chi tiêu */}
           <div>
-            <label className="text-sm font-bold text-[#1A1A1A] flex items-center gap-1.5 mb-2.5">
-              <span className="w-5 h-5 rounded-full bg-[#1A1A1A] text-white text-xs flex items-center justify-center font-mono">3</span>
+            <label className="text-sm font-bold text-[#0F172A] flex items-center gap-1.5 mb-2.5">
+              <span className="w-5 h-5 rounded-full bg-[#0D9488] text-white text-xs flex items-center justify-center font-mono">3</span>
               <span>Mức ngân sách chi tiêu thông thường</span>
             </label>
 
@@ -358,24 +360,24 @@ export default function OnboardingModal() {
                     onClick={() => setSelectedBudget(b.id)}
                     className={`p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white shadow-xs'
-                        : 'border-[#E5E7EB] bg-white hover:border-neutral-400 text-[#1A1A1A]'
+                        ? 'border-[#0D9488] bg-[#0D9488] text-white'
+                        : 'border-[#E2E8F0] bg-white hover:border-[#0D9488]/50 text-[#0F172A]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <div
                         className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                          isSelected ? 'bg-neutral-800 text-[#D4F066]' : 'bg-[#F5F5F4] text-neutral-700'
+                          isSelected ? 'bg-white/15 text-white' : 'bg-[#F0FDFA] text-[#0D9488]'
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" />
                       </div>
-                      <span className={`text-[11px] font-mono font-semibold ${isSelected ? 'text-[#D4F066]' : 'text-emerald-700'}`}>
+                      <span className={`text-[11px] font-mono font-semibold ${isSelected ? 'text-teal-50' : 'text-[#0D9488]'}`}>
                         {b.range}
                       </span>
                     </div>
                     <div className="text-xs font-bold">{b.name}</div>
-                    <p className={`text-[11px] mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
+                    <p className={`text-[11px] mt-1 line-clamp-2 leading-snug ${isSelected ? 'text-teal-50' : 'text-[#64748B]'}`}>
                       {b.desc}
                     </p>
                   </button>
@@ -386,8 +388,8 @@ export default function OnboardingModal() {
         </div>
 
         {/* Footer cố định với nút Hoàn tất */}
-        <div className="p-4 sm:p-6 bg-[#FAF8F5] border-t border-[#F0F0EF] flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs text-muted-foreground text-center sm:text-left">
+        <div className="p-4 sm:p-6 bg-[#F8FAFC] border-t border-[#E2E8F0] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="text-xs text-[#64748B] text-center sm:text-left">
             Khảo sát này giúp loại bỏ hoàn toàn hiện tượng Cold-Start trống cho tài khoản mới.
           </div>
 
@@ -395,7 +397,7 @@ export default function OnboardingModal() {
             type="button"
             onClick={handleSubmit}
             disabled={!isFormValid || isSubmitting}
-            className="w-full sm:w-auto bg-[#1A1A1A] hover:bg-neutral-800 text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl shadow-xs transition-all gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto bg-[#0D9488] hover:bg-[#0F766E] text-white font-bold text-xs sm:text-sm px-6 py-2.5 rounded-xl transition-all gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

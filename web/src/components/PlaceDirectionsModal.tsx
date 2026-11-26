@@ -111,13 +111,13 @@ function interpretWeatherCode(code: number, temp: number): {
 }
 
 function getWeatherIconComponent(code: number) {
-  if (code === 0) return <Sun className="w-5 h-5 text-amber-500" />;
-  if (code === 1 || code === 2) return <CloudSun className="w-5 h-5 text-amber-500" />;
-  if (code === 3) return <Cloud className="w-5 h-5 text-neutral-500" />;
-  if (code === 45 || code === 48) return <CloudFog className="w-5 h-5 text-neutral-500" />;
-  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return <CloudRain className="w-5 h-5 text-sky-500" />;
-  if ([95, 96, 99].includes(code)) return <CloudLightning className="w-5 h-5 text-amber-600" />;
-  return <Sun className="w-5 h-5 text-amber-500" />;
+  if (code === 0) return <Sun className="w-5 h-5 text-[#F59E0B]" />;
+  if (code === 1 || code === 2) return <CloudSun className="w-5 h-5 text-[#F59E0B]" />;
+  if (code === 3) return <Cloud className="w-5 h-5 text-[#64748B]" />;
+  if (code === 45 || code === 48) return <CloudFog className="w-5 h-5 text-[#64748B]" />;
+  if ([51, 53, 55, 61, 63, 65, 80, 81, 82].includes(code)) return <CloudRain className="w-5 h-5 text-[#0EA5E9]" />;
+  if ([95, 96, 99].includes(code)) return <CloudLightning className="w-5 h-5 text-[#D97706]" />;
+  return <Sun className="w-5 h-5 text-[#F59E0B]" />;
 }
 
 export default function PlaceDirectionsModal({
@@ -288,14 +288,14 @@ export default function PlaceDirectionsModal({
         className: 'dest-marker',
         html: `
           <div style="display:flex; flex-direction:column; align-items:center;">
-            <div style="background: #1A1A1A; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); overflow: hidden;">
+            <div style="background: #0D9488; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(13,148,136,0.35); overflow: hidden;">
               ${placeImg 
                 ? `<img src="${placeImg}" alt="${place.name}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'" />` 
                 : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>`
               }
             </div>
-            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #1A1A1A; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); margin-top: -1px;"></div>
-            <div style="background: #1A1A1A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2.5px 8px; border-radius: 6px; margin-top: 3px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
+            <div style="width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #0D9488; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2)); margin-top: -1px;"></div>
+            <div style="background: #0F172A; color: #FFFFFF; font-size: 11px; font-weight: 600; padding: 2.5px 8px; border-radius: 6px; margin-top: 3px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,0.25);">
               ${place.name}
             </div>
           </div>
@@ -346,8 +346,8 @@ export default function PlaceDirectionsModal({
         className: 'user-radar-marker',
         html: `
           <div style="position: relative; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;">
-            <div style="position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(26, 26, 26, 0.2); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
-            <div style="width: 22px; height: 22px; border-radius: 50%; background: #1A1A1A; border: 2.5px solid white; box-shadow: 0 3px 8px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white;">
+            <div style="position: absolute; width: 36px; height: 36px; border-radius: 50%; background: rgba(13, 148, 136, 0.22); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+            <div style="width: 22px; height: 22px; border-radius: 50%; background: #0D9488; border: 2.5px solid white; box-shadow: 0 3px 8px rgba(13,148,136,0.35); display: flex; align-items: center; justify-content: center; color: white;">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             </div>
           </div>
@@ -362,9 +362,9 @@ export default function PlaceDirectionsModal({
       }).addTo(map);
 
       userMarker.bindPopup(`
-        <div style="font-size: 12px; font-weight: 600; color: #1A1A1A;">
+        <div style="font-size: 12px; font-weight: 600; color: #0F172A;">
           Điểm xuất phát của bạn<br/>
-          <span style="font-weight: 400; font-size: 10px; color: #6B7280;">(Kéo thả để đổi điểm đi)</span>
+          <span style="font-weight: 400; font-size: 10px; color: #64748B;">(Kéo thả để đổi điểm đi)</span>
         </div>
       `);
 
@@ -419,9 +419,9 @@ export default function PlaceDirectionsModal({
             );
 
             const routeLine = L.polyline(coordinates, {
-              color: '#1A1A1A',
+              color: '#0D9488',
               weight: 4.5,
-              opacity: 0.85,
+              opacity: 0.9,
               dashArray: transportMode === 'walking' ? '6, 6' : undefined,
             }).addTo(map);
 
@@ -470,7 +470,7 @@ export default function PlaceDirectionsModal({
   useEffect(() => {
     if (!routeLayerRef.current) return;
     routeLayerRef.current.setStyle({
-      color: '#1A1A1A',
+      color: '#0D9488',
       dashArray: transportMode === 'walking' ? '6, 6' : undefined,
     });
   }, [transportMode]);
@@ -490,25 +490,25 @@ export default function PlaceDirectionsModal({
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[92vh] p-0 overflow-hidden flex flex-col bg-white border-[#E5E7EB] text-[#1A1A1A] rounded-2xl shadow-xl">
+      <DialogContent className="max-w-4xl max-h-[92vh] p-0 overflow-hidden flex flex-col bg-white border-[#E2E8F0] text-[#0F172A] rounded-2xl shadow-xl">
         {/* Header */}
-        <div className="p-5 border-b border-[#E5E7EB] bg-[#FAFAFA]">
+        <div className="p-5 border-b border-[#E2E8F0] bg-[#F8FAFC]">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-[#F0F0EF] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center flex-shrink-0">
                 <Navigation className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <DialogTitle className="text-base font-semibold text-[#1A1A1A] truncate">
+                  <DialogTitle className="text-base font-semibold text-[#0F172A] truncate">
                     Chỉ đường & thời tiết: {place.name}
                   </DialogTitle>
-                  <Badge variant="outline" className="text-[11px] font-normal text-muted-foreground">
+                  <Badge variant="outline" className="text-[11px] font-normal text-[#64748B] border-[#E2E8F0]">
                     Bản đồ vệ tinh & OSRM
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1.5 truncate">
-                  <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+                <p className="text-xs text-[#64748B] mt-0.5 flex items-center gap-1.5 truncate">
+                  <MapPin className="w-3.5 h-3.5 text-[#0D9488] flex-shrink-0" />
                   <span className="truncate">
                     {place.district ? `${place.district}, ` : ''}
                     {place.province || 'Việt Nam'}
@@ -520,11 +520,11 @@ export default function PlaceDirectionsModal({
         </div>
 
         {/* GPS Status Banner */}
-        <div className="bg-[#F9F9F8] border-b border-[#E5E7EB] px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-2 text-muted-foreground truncate">
+        <div className="bg-[#F8FAFC] border-b border-[#E2E8F0] px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-2 text-[#64748B] truncate">
             <span
               className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                isRealGps ? 'bg-[#365314] ring-2 ring-[#D9F99D]' : 'bg-neutral-400'
+                isRealGps ? 'bg-[#10B981] ring-2 ring-emerald-200' : 'bg-[#94A3B8]'
               }`}
             />
             <span className="truncate">
@@ -538,7 +538,7 @@ export default function PlaceDirectionsModal({
             variant="outline"
             onClick={requestLocation}
             disabled={locationStatus === 'requesting'}
-            className="h-7 text-xs gap-1.5 self-start sm:self-auto flex-shrink-0"
+            className="h-7 text-xs gap-1.5 self-start sm:self-auto flex-shrink-0 border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488]"
           >
             {locationStatus === 'requesting' ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -550,11 +550,11 @@ export default function PlaceDirectionsModal({
         </div>
 
         {/* Transport Modes & Live Weather */}
-        <div className="p-4 bg-white border-b border-[#E5E7EB] grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
+        <div className="p-4 bg-white border-b border-[#E2E8F0] grid grid-cols-1 md:grid-cols-2 gap-3 items-center">
           {/* Transport mode pills */}
           <div className="space-y-2">
-            <div className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5" />
+            <div className="text-[11px] font-medium text-[#64748B] uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-[#0D9488]" />
               <span>Thời gian ước tính theo phương tiện:</span>
             </div>
 
@@ -564,15 +564,15 @@ export default function PlaceDirectionsModal({
                 onClick={() => setTransportMode('motorbike')}
                 className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'motorbike'
-                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
-                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
+                    ? 'bg-[#0D9488] border-[#0D9488] text-white'
+                    : 'bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F0FDFA]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <Bike className="w-3.5 h-3.5" />
                   <span className="font-medium">Xe máy</span>
                 </div>
-                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'motorbike' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'motorbike' ? 'text-white' : 'text-[#0F172A]'}`}>
                   {formatDuration(modeDurations.motorbike)}
                 </span>
               </button>
@@ -582,15 +582,15 @@ export default function PlaceDirectionsModal({
                 onClick={() => setTransportMode('driving')}
                 className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'driving'
-                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
-                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
+                    ? 'bg-[#0D9488] border-[#0D9488] text-white'
+                    : 'bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F0FDFA]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <Car className="w-3.5 h-3.5" />
                   <span className="font-medium">Ô tô</span>
                 </div>
-                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'driving' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'driving' ? 'text-white' : 'text-[#0F172A]'}`}>
                   {formatDuration(modeDurations.driving)}
                 </span>
               </button>
@@ -600,15 +600,15 @@ export default function PlaceDirectionsModal({
                 onClick={() => setTransportMode('walking')}
                 className={`flex flex-col items-center justify-center py-2 px-2.5 rounded-xl border text-xs transition cursor-pointer ${
                   transportMode === 'walking'
-                    ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
-                    : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#F5F5F4]'
+                    ? 'bg-[#0D9488] border-[#0D9488] text-white'
+                    : 'bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F0FDFA]'
                 }`}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <Footprints className="w-3.5 h-3.5" />
                   <span className="font-medium">Đi bộ</span>
                 </div>
-                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'walking' ? 'text-[#D4F066]' : 'text-[#1A1A1A]'}`}>
+                <span className={`text-[12px] font-semibold font-mono ${transportMode === 'walking' ? 'text-white' : 'text-[#0F172A]'}`}>
                   {formatDuration(modeDurations.walking)}
                 </span>
               </button>
@@ -616,7 +616,7 @@ export default function PlaceDirectionsModal({
 
             <div className="text-[11px] text-muted-foreground flex items-center justify-between px-1">
               <span>
-                Khoảng cách: <strong className="text-[#1A1A1A]">{routeDistanceKm !== null ? `${routeDistanceKm} km` : '...'}</strong>
+                Khoảng cách: <strong className="text-[#0F172A]">{routeDistanceKm !== null ? `${routeDistanceKm} km` : '...'}</strong>
               </span>
               {isRouting && (
                 <span className="flex items-center gap-1 text-muted-foreground text-[10px]">
@@ -627,14 +627,14 @@ export default function PlaceDirectionsModal({
           </div>
 
           {/* Weather card */}
-          <Card className="p-3 bg-[#FAFAFA] border-[#E5E7EB] shadow-2xs">
+          <Card className="p-3 bg-[#F8FAFC] border-[#E2E8F0] shadow-2xs">
             <CardContent className="p-0">
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-                  <CloudSun className="w-3.5 h-3.5 text-neutral-600" />
+                <span className="text-[11px] font-medium text-[#64748B] uppercase tracking-wider flex items-center gap-1.5">
+                  <CloudSun className="w-3.5 h-3.5 text-[#F59E0B]" />
                   Thời tiết hôm nay
                 </span>
-                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 font-normal text-muted-foreground">
+                <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]">
                   Open-Meteo
                 </Badge>
               </div>
@@ -648,11 +648,11 @@ export default function PlaceDirectionsModal({
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      <div className="p-1.5 rounded-lg bg-white border border-[#E5E7EB]">
+                      <div className="p-1.5 rounded-lg bg-white border border-[#E2E8F0]">
                         {getWeatherIconComponent(weather.code)}
                       </div>
                       <div>
-                        <div className="text-sm font-semibold text-[#1A1A1A] flex items-center gap-1.5">
+                        <div className="text-sm font-semibold text-[#0F172A] flex items-center gap-1.5">
                           <span>{weather.temp}°C</span>
                           <span className="text-[11px] font-normal text-muted-foreground">
                             (cảm giác {weather.apparentTemp}°C)
@@ -676,13 +676,13 @@ export default function PlaceDirectionsModal({
                     </div>
                   </div>
 
-                  <div className="pt-1.5 border-t border-[#E5E7EB] text-[11px] text-[#1A1A1A] flex items-start gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-neutral-700" />
+                  <div className="pt-1.5 border-t border-[#E2E8F0] text-[11px] text-[#0F172A] flex items-start gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-[#0D9488]" />
                     <span className="line-clamp-2">{weather.advice}</span>
                   </div>
                 </div>
               ) : (
-                <div className="text-[11px] text-muted-foreground text-center py-2">
+                <div className="text-[11px] text-[#64748B] text-center py-2">
                   Chưa thể tải dữ liệu thời tiết
                 </div>
               )}
@@ -691,26 +691,26 @@ export default function PlaceDirectionsModal({
         </div>
 
         {/* Map canvas */}
-        <div className="relative flex-1 min-h-[350px] md:min-h-[420px] bg-[#F5F5F4]">
+        <div className="relative flex-1 min-h-[350px] md:min-h-[420px] bg-[#F1F5F9]">
           <div ref={mapContainerRef} className="w-full h-full min-h-[350px] md:min-h-[420px]" />
 
           {/* Floating instructions */}
           <div className="absolute top-3 left-3 z-[400] flex flex-col gap-1.5 max-w-[65%] pointer-events-none">
-            <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1.5 rounded-lg border border-[#E5E7EB] text-[11px] text-[#1A1A1A] flex items-center gap-2 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-[#1A1A1A] flex-shrink-0" />
+            <div className="bg-white/95 backdrop-blur-xs px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] text-[11px] text-[#0F172A] flex items-center gap-2 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-[#0D9488] flex-shrink-0" />
               <span>Kéo chấm hoặc bấm map để đổi điểm đi</span>
             </div>
           </div>
 
           {/* Layer switcher */}
-          <div className="absolute top-3 right-3 z-[400] flex items-center gap-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl border border-[#E5E7EB] shadow-xs text-[11px]">
+          <div className="absolute top-3 right-3 z-[400] flex items-center gap-1 bg-white/95 backdrop-blur-xs p-1 rounded-xl border border-[#E2E8F0] shadow-xs text-[11px]">
             <button
               type="button"
               onClick={() => handleSwitchMapStyle('osm')}
               className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'osm'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A]'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0F172A]'
               }`}
             >
               OSM
@@ -720,8 +720,8 @@ export default function PlaceDirectionsModal({
               onClick={() => handleSwitchMapStyle('google')}
               className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'google'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A]'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0F172A]'
               }`}
             >
               Google
@@ -731,8 +731,8 @@ export default function PlaceDirectionsModal({
               onClick={() => handleSwitchMapStyle('satellite')}
               className={`px-2 py-1 rounded-lg transition font-medium cursor-pointer ${
                 mapStyle === 'satellite'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A]'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0F172A]'
               }`}
             >
               Vệ tinh

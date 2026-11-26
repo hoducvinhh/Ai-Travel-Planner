@@ -125,7 +125,7 @@ function CitationPill({ href, children }: { href?: string; children?: React.Reac
       target="_blank"
       rel="noopener noreferrer"
       title={`${rawText || label} (${href})`}
-      className="inline-flex items-center gap-1.5 align-middle mx-1 px-2.5 py-0.5 rounded-full bg-[#24272C] hover:bg-[#32363D] text-[#E0E2E7] hover:text-white border border-[#3A3E45] text-xs font-medium transition-all shadow-xs group no-underline cursor-pointer select-none"
+      className="inline-flex items-center gap-1.5 align-middle mx-1 px-2.5 py-0.5 rounded-full bg-[#F0FDFA] hover:bg-[#CCFBF1] text-[#0F766E] border border-[#99F6E4] text-xs font-medium transition-colors group no-underline cursor-pointer select-none"
     >
       {faviconUrl && !imgError ? (
         <img
@@ -137,10 +137,10 @@ function CitationPill({ href, children }: { href?: string; children?: React.Reac
           loading="lazy"
         />
       ) : (
-        <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+        <Globe className="w-3.5 h-3.5 text-[#0D9488] shrink-0" />
       )}
       <span className="truncate max-w-[130px]">{label}</span>
-      <ExternalLink className="w-2.5 h-2.5 text-neutral-400 group-hover:text-white shrink-0 opacity-70 group-hover:opacity-100 transition-opacity" />
+      <ExternalLink className="w-2.5 h-2.5 text-[#0D9488] group-hover:text-[#0F766E] shrink-0 opacity-75 group-hover:opacity-100 transition-opacity" />
     </a>
   );
 }
@@ -611,21 +611,29 @@ export default function QuestionAnswerPage() {
   });
 
   return (
-    <div className="flex h-[calc(100vh-65px)] bg-[#F9F9F8] text-[#1A1A1A] font-sans overflow-hidden">
+    <div className="relative flex h-[calc(100vh-61px)] bg-[#F8FAFC] text-[#0F172A] font-sans overflow-hidden">
+      {/* Mobile Sidebar Backdrop */}
+      {isSidebarOpen && (
+        <div
+          onClick={() => setIsSidebarOpen(false)}
+          className="fixed inset-x-0 top-[61px] bottom-0 bg-slate-900/30 z-30 md:hidden"
+        />
+      )}
+
       {/* 1. SIDEBAR: Lịch Sử Cuộc Trò Chuyện */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 md:static flex flex-col bg-white border-r border-[#E5E7EB] transition-all duration-200 ease-in-out shrink-0 ${
+        className={`fixed top-[61px] bottom-0 left-0 z-40 md:static flex flex-col bg-white border-r border-[#E2E8F0] transition-all duration-200 ease-in-out shrink-0 ${
           isSidebarOpen
             ? 'w-72 sm:w-80 translate-x-0'
             : '-translate-x-full md:translate-x-0 md:w-0 md:border-r-0 md:overflow-hidden'
         }`}
       >
-        <div className="p-3.5 border-b border-[#F0F0EF] flex items-center justify-between gap-2">
+        <div className="p-3.5 border-b border-[#E2E8F0] flex items-center justify-between gap-2">
           <Button
             onClick={handleNewChat}
             disabled={isLoading}
             variant="default"
-            className="flex-1 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white text-xs sm:text-sm font-medium gap-2 shadow-xs cursor-pointer"
+            className="flex-1 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs sm:text-sm font-medium gap-2 cursor-pointer"
           >
             <Plus className="w-4 h-4 text-white" />
             <span>Đoạn chat mới</span>
@@ -636,23 +644,23 @@ export default function QuestionAnswerPage() {
             size="icon"
             onClick={() => setIsSidebarOpen(false)}
             aria-label="Đóng sidebar"
-            className="md:hidden h-9 w-9 rounded-lg text-[#6B7280] hover:text-[#1A1A1A]"
+            className="md:hidden h-9 w-9 rounded-lg text-[#64748B] hover:text-[#0D9488]"
           >
-            <PanelLeftClose className="w-4 h-4 text-[#6B7280]" />
+            <PanelLeftClose className="w-4 h-4 text-[#64748B]" />
           </Button>
         </div>
 
         {/* Tìm kiếm phiên chat nếu có nhiều hơn 5 phiên */}
         {sessions.length > 5 && (
-          <div className="p-2 border-b border-[#F0F0EF]">
+          <div className="p-2 border-b border-[#E2E8F0]">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
               <Input
                 type="text"
                 value={searchSessionQuery}
                 onChange={(e) => setSearchSessionQuery(e.target.value)}
                 placeholder="Tìm đoạn chat..."
-                className="h-8 text-xs pl-8 bg-[#FAFAFA] border-[#E5E7EB] rounded-lg"
+                className="h-8 text-xs pl-8 bg-[#F8FAFC] border-[#E2E8F0] rounded-lg"
               />
             </div>
           </div>
@@ -660,26 +668,26 @@ export default function QuestionAnswerPage() {
 
         {/* Danh Sách Sessions */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
-          <div className="px-2 py-1.5 text-[11px] font-semibold text-[#6B7280] tracking-wider uppercase flex items-center justify-between">
+          <div className="px-2 py-1.5 text-[11px] font-semibold text-[#64748B] tracking-wider uppercase flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#6B7280]" />
+              <Clock className="w-3.5 h-3.5 text-[#0D9488]" />
               Lịch sử trò chuyện
             </span>
-            <Badge variant="secondary" className="text-[10px] px-2 py-0.5 rounded-full font-medium border-[#E5E7EB]">
+            <Badge variant="teal" className="text-[10px] px-2 py-0.5 rounded-full font-medium">
               {sessions.length}
             </Badge>
           </div>
 
           {isLoadingSessions && sessions.length === 0 ? (
-            <div className="flex items-center justify-center py-10 text-[#6B7280] text-xs gap-2">
-              <Loader2 className="w-4 h-4 animate-spin text-[#1A1A1A]" />
+            <div className="flex items-center justify-center py-10 text-[#64748B] text-xs gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-[#0D9488]" />
               Đang tải lịch sử...
             </div>
           ) : sessions.length === 0 ? (
-            <div className="text-center py-12 px-4 text-xs text-[#6B7280]">
-              <MessageSquare className="w-6 h-6 text-[#9CA3AF] mx-auto mb-2.5 opacity-60" />
-              <p className="font-medium text-[#4B5563]">Chưa có đoạn chat nào</p>
-              <p className="text-[11px] text-[#9CA3AF] mt-0.5">Các phiên hội thoại sẽ hiển thị tại đây</p>
+            <div className="text-center py-12 px-4 text-xs text-[#64748B]">
+              <MessageSquare className="w-6 h-6 text-[#94A3B8] mx-auto mb-2.5 opacity-60" />
+              <p className="font-medium text-[#0F172A]">Chưa có đoạn chat nào</p>
+              <p className="text-[11px] text-[#94A3B8] mt-0.5">Các phiên hội thoại sẽ hiển thị tại đây</p>
             </div>
           ) : (
             filteredSessions.map((session) => {
@@ -692,11 +700,11 @@ export default function QuestionAnswerPage() {
                   onClick={() => handleSelectSession(session.id)}
                   className={`group relative flex items-center justify-between gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-colors cursor-pointer border ${
                     isActive
-                      ? 'bg-[#F5F5F4] text-[#1A1A1A] border-[#E5E7EB] font-medium'
-                      : 'text-[#4B5563] hover:bg-[#FAFAF9] hover:text-[#1A1A1A] border-transparent'
+                      ? 'bg-[#F0FDFA] text-[#0F766E] border-[#99F6E4] font-medium'
+                      : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A] border-transparent'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5 shrink-0 text-[#6B7280]" />
+                  <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#0D9488]' : 'text-[#94A3B8]'}`} />
 
                   {isEditing ? (
                     <div className="flex-1 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -708,17 +716,21 @@ export default function QuestionAnswerPage() {
                           if (e.key === 'Escape') setEditingSessionId(null);
                         }}
                         autoFocus
-                        className="h-6 text-xs px-1.5 py-0 bg-white border-[#1A1A1A]"
+                        className="h-6 text-xs px-1.5 py-0 bg-white border-[#0D9488]"
                       />
                       <button
+                        type="button"
                         onClick={() => handleSaveEditTitle(session.id)}
-                        className="p-1 hover:text-emerald-700 text-emerald-600"
+                        aria-label="Lưu tên đoạn chat"
+                        className="p-1 hover:bg-[#F0FDFA] rounded text-[#0D9488] cursor-pointer"
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        type="button"
                         onClick={() => setEditingSessionId(null)}
-                        className="p-1 hover:text-rose-700 text-[#6B7280]"
+                        aria-label="Hủy đổi tên"
+                        className="p-1 hover:bg-[#F1F5F9] rounded text-[#64748B] cursor-pointer"
                       >
                         <X className="w-3.5 h-3.5" />
                       </button>
@@ -732,7 +744,8 @@ export default function QuestionAnswerPage() {
                       <button
                         type="button"
                         onClick={(e) => handleStartEditTitle(e, session)}
-                        className="p-1 rounded hover:bg-neutral-200 text-[#6B7280] hover:text-[#1A1A1A]"
+                        aria-label="Đổi tên đoạn chat"
+                        className="p-1 rounded hover:bg-[#F0FDFA] text-[#64748B] hover:text-[#0D9488] cursor-pointer"
                         title="Đổi tên"
                       >
                         <Edit3 className="w-3 h-3" />
@@ -740,7 +753,8 @@ export default function QuestionAnswerPage() {
                       <button
                         type="button"
                         onClick={(e) => handleDeleteSession(e, session.id)}
-                        className="p-1 rounded hover:bg-rose-100 text-[#6B7280] hover:text-rose-600"
+                        aria-label="Xóa đoạn chat"
+                        className="p-1 rounded hover:bg-[#FFF1F2] text-[#64748B] hover:text-[#EF4444] cursor-pointer"
                         title="Xóa"
                       >
                         <Trash2 className="w-3 h-3" />
@@ -754,33 +768,33 @@ export default function QuestionAnswerPage() {
         </div>
 
         {/* Footer Sidebar */}
-        <div className="p-3 border-t border-[#F0F0EF] text-[11px] text-[#6B7280] flex items-center justify-between bg-[#FAFAF9]">
+        <div className="p-3 border-t border-[#E2E8F0] text-[11px] text-[#64748B] flex items-center justify-between bg-[#F8FAFC]">
           <span className="truncate max-w-[170px]">{isAuthenticated ? user?.email : 'Chế độ khách'}</span>
-          <Badge variant="outline" className="text-[10px] bg-white border-[#E5E7EB] shrink-0">
+          <Badge variant="outline" className="text-[10px] bg-white border-[#E2E8F0] text-[#0F766E] shrink-0">
             {isAuthenticated ? 'Đã đồng bộ' : 'Lưu cục bộ'}
           </Badge>
         </div>
       </aside>
 
       {/* 2. MAIN CHAT AREA */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F9F9F8]">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#F8FAFC]">
         {/* Header Chat */}
-        <div className="h-14 border-b border-[#E5E7EB] bg-white px-4 flex items-center justify-between shrink-0 shadow-2xs">
+        <div className="h-14 border-b border-[#E2E8F0] bg-white px-4 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               aria-label={isSidebarOpen ? 'Thu gọn thanh bên' : 'Mở thanh bên'}
-              className="h-8 w-8 rounded-lg text-[#6B7280] hover:text-[#1A1A1A]"
+              className="h-8 w-8 rounded-lg text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
             >
               <PanelLeft className="w-4 h-4" />
             </Button>
 
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-[#1A1A1A]">Cố Vấn Du Lịch AI</h1>
-              <span className="text-neutral-300">•</span>
-              <span className="text-xs text-muted-foreground hidden sm:inline">Trợ lý du lịch thông minh</span>
+              <h1 className="text-sm font-bold text-[#0F172A]">Cố Vấn Du Lịch AI</h1>
+              <span className="text-[#CBD5E1]">•</span>
+              <span className="text-xs text-[#64748B] hidden sm:inline">Trợ lý du lịch thông minh</span>
             </div>
           </div>
 
@@ -790,7 +804,7 @@ export default function QuestionAnswerPage() {
                 variant="outline"
                 size="sm"
                 onClick={handleNewChat}
-                className="h-8 px-2.5 rounded-lg text-xs border-[#E5E7EB] text-[#6B7280] hover:text-[#1A1A1A] gap-1"
+                className="h-8 px-2.5 rounded-lg text-xs border-[#E2E8F0] text-[#64748B] hover:text-[#0D9488] hover:border-[#0D9488] gap-1"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Mới</span>
@@ -804,15 +818,15 @@ export default function QuestionAnswerPage() {
           {messages.length === 0 ? (
             /* EMPTY STATE: TINH GỌN, CHỈ 4 PROMPT GỢI Ý */
             <div className="max-w-2xl mx-auto py-12 sm:py-16 flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-2xl bg-[#1A1A1A] text-white flex items-center justify-center mb-5 shadow-sm">
-                <Sparkles className="w-6 h-6 text-[#D4F066]" />
+              <div className="w-12 h-12 rounded-2xl bg-[#0D9488] text-white flex items-center justify-center mb-5">
+                <Sparkles className="w-6 h-6 text-white" />
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1A1A] mb-2">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0F172A] mb-2">
                 Bạn muốn khám phá điều gì hôm nay?
               </h2>
 
-              <p className="text-muted-foreground text-xs sm:text-sm max-w-md mx-auto leading-relaxed mb-8">
+              <p className="text-[#64748B] text-xs sm:text-sm max-w-md mx-auto leading-relaxed mb-8">
                 Hỏi đáp về lịch trình, ẩm thực, chi phí hoặc kinh nghiệm khám phá mọi miền Việt Nam.
               </p>
 
@@ -822,15 +836,15 @@ export default function QuestionAnswerPage() {
                     key={idx}
                     type="button"
                     onClick={() => handleSendMessage(item.prompt)}
-                    className="group p-4 rounded-2xl bg-white hover:bg-[#FAFAF9] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 transition-all flex flex-col justify-between gap-3 shadow-2xs hover:shadow-xs cursor-pointer"
+                    className="group p-4 rounded-2xl bg-white hover:bg-[#F0FDFA]/50 border border-[#E2E8F0] hover:border-[#0D9488] transition-all flex flex-col justify-between gap-3 cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
-                      <Badge variant="lime" className="text-[10px] font-medium px-2 py-0.5">
+                      <Badge variant="teal" className="text-[10px] font-medium px-2 py-0.5">
                         {item.badge}
                       </Badge>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-[#1A1A1A] transition-colors" />
+                      <ArrowUpRight className="w-3.5 h-3.5 text-[#64748B] group-hover:text-[#0D9488] transition-colors" />
                     </div>
-                    <p className="text-xs sm:text-sm font-medium text-[#1A1A1A] leading-snug">
+                    <p className="text-xs sm:text-sm font-medium text-[#0F172A] leading-snug">
                       {item.prompt}
                     </p>
                   </button>
@@ -850,16 +864,16 @@ export default function QuestionAnswerPage() {
                   }`}
                 >
                   {msg.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center shrink-0 shadow-2xs mt-1">
-                      <Sparkles className="w-3.5 h-3.5 text-[#D4F066]" />
+                    <div className="w-7 h-7 rounded-full bg-[#0D9488] text-white flex items-center justify-center shrink-0 mt-1">
+                      <Sparkles className="w-3.5 h-3.5 text-white" />
                     </div>
                   )}
 
                   <div
                     className={`${
                       msg.role === 'user'
-                        ? 'max-w-xl sm:max-w-2xl bg-[#1A1A1A] text-white rounded-2xl sm:rounded-3xl px-5 py-3 shadow-xs'
-                        : 'w-full max-w-2xl sm:max-w-3xl text-[#1A1A1A] px-1 py-1'
+                        ? 'max-w-xl sm:max-w-2xl bg-[#0D9488] text-white rounded-2xl sm:rounded-3xl px-5 py-3'
+                        : 'w-full max-w-2xl sm:max-w-3xl text-[#0F172A] px-1 py-1'
                     }`}
                   >
                     {/* Header thông tin nguồn & nút báo cáo sai lệch */}
@@ -867,10 +881,10 @@ export default function QuestionAnswerPage() {
                       <div className="mb-3 flex items-center justify-between gap-2 flex-wrap">
                         {msg.mode === 'live_web' && (
                           <Badge
-                            variant="outline"
-                            className="text-[11px] font-medium bg-emerald-50 text-emerald-800 border-emerald-200 gap-1.5 py-0.5 px-2.5 rounded-full"
+                            variant="teal"
+                            className="text-[11px] font-medium gap-1.5 py-0.5 px-2.5 rounded-full"
                           >
-                            <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                            <Globe className="w-3.5 h-3.5 text-[#0D9488]" />
                             <span>Kiểm chứng trực tuyến</span>
                           </Badge>
                         )}
@@ -879,10 +893,10 @@ export default function QuestionAnswerPage() {
                           <button
                             type="button"
                             onClick={() => handleOpenFeedback(msg, idx)}
-                            className="inline-flex items-center gap-1.5 text-[11px] text-[#6B7280] hover:text-[#DC2626] transition-colors py-1 px-2 rounded-lg hover:bg-red-50 cursor-pointer ml-auto"
+                            className="inline-flex items-center gap-1.5 text-[11px] text-[#64748B] hover:text-[#EF4444] transition-colors py-1 px-2 rounded-lg hover:bg-red-50 cursor-pointer ml-auto"
                             title="Báo cáo thông tin chưa chính xác"
                           >
-                            <Flag className="w-3 h-3 text-[#6B7280]" />
+                            <Flag className="w-3 h-3" />
                             <span>Góp ý</span>
                           </button>
                         )}
@@ -892,7 +906,7 @@ export default function QuestionAnswerPage() {
                     {/* Nội dung markdown */}
                     <div
                       className={`text-sm leading-relaxed break-words [&>p]:mb-3 [&>p:last-child]:mb-0 [&_strong]:font-semibold [&_ul]:list-disc [&_ul]:ml-4 [&_ul]:space-y-1 [&_ol]:list-decimal [&_ol]:ml-4 [&_ol]:space-y-1 ${
-                        msg.role === 'user' ? 'text-white' : 'text-[#1A1A1A]'
+                        msg.role === 'user' ? 'text-white' : 'text-[#0F172A]'
                       }`}
                     >
                       {msg.content ? (
@@ -900,34 +914,34 @@ export default function QuestionAnswerPage() {
                           remarkPlugins={[remarkGfm]}
                           components={{
                             table: ({ children }) => (
-                              <div className="overflow-x-auto my-3 rounded-xl border border-[#E5E7EB] bg-white shadow-xs">
+                              <div className="overflow-x-auto my-3 rounded-xl border border-[#E2E8F0] bg-white shadow-xs">
                                 <table className="w-full text-left text-xs border-collapse">
                                   {children}
                                 </table>
                               </div>
                             ),
                             thead: ({ children }) => (
-                              <thead className="bg-[#F9F9F8] border-b border-[#E5E7EB] text-[#1A1A1A] font-semibold">
+                              <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0] text-[#0F172A] font-semibold">
                                 {children}
                               </thead>
                             ),
                             th: ({ children }) => (
-                              <th className="py-2.5 px-3 font-semibold text-[#1A1A1A] text-xs">
+                              <th className="py-2.5 px-3 font-semibold text-[#0F172A] text-xs">
                                 {children}
                               </th>
                             ),
                             tbody: ({ children }) => (
-                              <tbody className="divide-y divide-[#F0F0EF]">
+                              <tbody className="divide-y divide-[#E2E8F0]">
                                 {children}
                               </tbody>
                             ),
                             tr: ({ children }) => (
-                              <tr className="hover:bg-[#F9F9F8]/60 transition-colors">
+                              <tr className="hover:bg-[#F8FAFC]/80 transition-colors">
                                 {children}
                               </tr>
                             ),
                             td: ({ children }) => (
-                              <td className="py-2.5 px-3 text-[#374151] text-xs align-top">
+                              <td className="py-2.5 px-3 text-[#334155] text-xs align-top">
                                 {children}
                               </td>
                             ),
@@ -939,8 +953,8 @@ export default function QuestionAnswerPage() {
                           {normalizeMarkdownContent(msg.content)}
                         </ReactMarkdown>
                       ) : (
-                        <span className="inline-flex items-center gap-2 text-[#6B7280] italic text-xs">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#1A1A1A]" />
+                        <span className="inline-flex items-center gap-2 text-[#64748B] italic text-xs">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0D9488]" />
                           Đang tìm kiếm tri thức và viết câu trả lời...
                         </span>
                       )}
@@ -951,9 +965,9 @@ export default function QuestionAnswerPage() {
                       !/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/.test(msg.content || '') &&
                       msg.webSources &&
                       msg.webSources.length > 0 && (
-                      <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
-                        <div className="text-xs font-semibold text-[#1A1A1A] mb-2 flex items-center gap-1.5">
-                          <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                      <div className="mt-4 pt-3 border-t border-[#E2E8F0]">
+                        <div className="text-xs font-semibold text-[#0F172A] mb-2 flex items-center gap-1.5">
+                          <Globe className="w-3.5 h-3.5 text-[#0D9488]" />
                           <span>Nguồn kiểm chứng trực tuyến</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -963,20 +977,20 @@ export default function QuestionAnswerPage() {
                               href={webSrc.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center justify-between p-2.5 rounded-xl bg-[#F9F9F8] hover:bg-emerald-50/40 border border-[#E5E7EB] hover:border-emerald-300 text-xs text-[#1A1A1A] group transition-all"
+                              className="flex items-center justify-between p-2.5 rounded-xl bg-white hover:bg-[#F0FDFA] border border-[#E2E8F0] hover:border-[#99F6E4] text-xs text-[#0F172A] group transition-all"
                             >
                               <div className="flex items-center gap-2 min-w-0 pr-2">
-                                <Globe className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                <Globe className="w-3.5 h-3.5 text-[#64748B] group-hover:text-[#0D9488] shrink-0" />
                                 <div className="min-w-0">
-                                  <p className="font-medium truncate group-hover:text-emerald-700">
+                                  <p className="font-medium truncate">
                                     {webSrc.title || webSrc.domain || 'Trang web tham khảo'}
                                   </p>
                                   {webSrc.domain && (
-                                    <p className="text-[10px] text-[#6B7280] truncate">{webSrc.domain}</p>
+                                    <p className="text-[10px] text-[#64748B] truncate">{webSrc.domain}</p>
                                   )}
                                 </div>
                               </div>
-                              <ExternalLink className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-emerald-600 shrink-0" />
+                              <ExternalLink className="w-3.5 h-3.5 text-[#64748B] group-hover:text-[#0D9488] shrink-0" />
                             </a>
                           ))}
                         </div>
@@ -985,12 +999,12 @@ export default function QuestionAnswerPage() {
 
                     {/* Nguồn tham chiếu CSDL */}
                     {msg.role === 'assistant' && msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-4 pt-3 border-t border-[#F0F0EF]">
+                      <div className="mt-4 pt-3 border-t border-[#E2E8F0]">
                         <Accordion type="single" collapsible className="w-full">
                           <AccordionItem value="sources" className="border-0">
-                            <AccordionTrigger className="py-1 text-xs font-medium text-[#1A1A1A] hover:no-underline">
+                            <AccordionTrigger className="py-1 text-xs font-medium text-[#0F172A] hover:no-underline">
                               <span className="flex items-center gap-1.5">
-                                <BookOpen className="w-3.5 h-3.5 text-[#6B7280]" />
+                                <BookOpen className="w-3.5 h-3.5 text-[#0D9488]" />
                                 <span>Tài liệu tham chiếu ({msg.sources.length})</span>
                               </span>
                             </AccordionTrigger>
@@ -998,15 +1012,15 @@ export default function QuestionAnswerPage() {
                               {msg.sources.map((src, sIdx) => (
                                 <Card
                                   key={sIdx}
-                                  className="p-3 rounded-xl bg-[#F9F9F8] border-[#E5E7EB] text-xs space-y-1.5 shadow-none"
+                                  className="p-3 rounded-xl bg-[#F8FAFC] border-[#E2E8F0] text-xs space-y-1.5 shadow-none"
                                 >
                                   <div className="flex items-center justify-between gap-2">
-                                    <span className="font-semibold text-[#1A1A1A] truncate flex items-center gap-1.5">
-                                      <MapPin className="w-3.5 h-3.5 text-[#6B7280]" />
+                                    <span className="font-semibold text-[#0F172A] truncate flex items-center gap-1.5">
+                                      <MapPin className="w-3.5 h-3.5 text-[#0D9488]" />
                                       {src.title}
                                     </span>
                                   </div>
-                                  <p className="text-[#4B5563] text-xs leading-relaxed bg-white p-2.5 rounded-lg border border-[#E5E7EB] line-clamp-2">
+                                  <p className="text-[#475569] text-xs leading-relaxed bg-white p-2.5 rounded-lg border border-[#E2E8F0] line-clamp-2">
                                     &ldquo;{src.content}&rdquo;
                                   </p>
                                 </Card>
@@ -1019,8 +1033,8 @@ export default function QuestionAnswerPage() {
 
                     {/* Disclaimer */}
                     {msg.role === 'assistant' && msg.disclaimer && (
-                      <div className="mt-3.5 p-3 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 flex items-start gap-2">
-                        <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="mt-3.5 p-3 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-[11px] text-[#92400E] flex items-start gap-2">
+                        <ShieldAlert className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
                         <span className="leading-relaxed">{msg.disclaimer}</span>
                       </div>
                     )}
@@ -1041,13 +1055,13 @@ export default function QuestionAnswerPage() {
         </div>
 
         {/* 3. INPUT FORM */}
-        <div className="p-3.5 sm:p-4 bg-white border-t border-[#E5E7EB] shrink-0">
+        <div className="p-3.5 sm:p-4 bg-white border-t border-[#E2E8F0] shrink-0">
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="max-w-3xl mx-auto relative flex items-end gap-2 p-2 rounded-2xl bg-white border border-[#E5E7EB] shadow-2xs focus-within:border-[#1A1A1A] focus-within:ring-2 focus-within:ring-[#1A1A1A]/10 transition-all"
+            className="max-w-3xl mx-auto relative flex items-end gap-2 p-2 rounded-2xl bg-white border border-[#E2E8F0] focus-within:border-[#0D9488] focus-within:ring-2 focus-within:ring-[#0D9488]/15 transition-all"
           >
             <Textarea
               ref={textareaRef}
@@ -1056,7 +1070,7 @@ export default function QuestionAnswerPage() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Hỏi bất cứ điều gì về du lịch Việt Nam..."
-              className="flex-1 bg-transparent px-3 py-2 text-sm text-[#1A1A1A] placeholder-[#9CA3AF] focus-visible:ring-0 focus-visible:ring-offset-0 border-0 shadow-none resize-none max-h-32 min-h-[42px] leading-relaxed"
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-[#0F172A] placeholder-[#94A3B8] focus-visible:ring-0 focus-visible:ring-offset-0 border-0 shadow-none resize-none max-h-32 min-h-[42px] leading-relaxed"
             />
 
             <Button
@@ -1064,7 +1078,7 @@ export default function QuestionAnswerPage() {
               size="icon"
               disabled={isLoading || !input.trim()}
               aria-label="Gửi câu hỏi"
-              className="h-9 w-9 rounded-xl bg-[#1A1A1A] hover:bg-[#2C2C2C] disabled:opacity-30 disabled:cursor-not-allowed text-white shadow-2xs transition-colors shrink-0"
+              className="h-9 w-9 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] disabled:opacity-30 disabled:cursor-not-allowed text-white transition-colors shrink-0"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
@@ -1074,42 +1088,42 @@ export default function QuestionAnswerPage() {
             </Button>
           </form>
 
-          <p className="text-[11px] text-[#9CA3AF] text-center mt-2">
-            Nhấn <kbd className="px-1.5 py-0.5 rounded bg-[#F5F5F4] border border-[#E5E7EB] text-[#6B7280] text-[10px]">Enter</kbd> để gửi • <kbd className="px-1.5 py-0.5 rounded bg-[#F5F5F4] border border-[#E5E7EB] text-[#6B7280] text-[10px]">Shift + Enter</kbd> xuống dòng
+          <p className="text-[11px] text-[#94A3B8] text-center mt-2">
+            Nhấn <kbd className="px-1.5 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] text-[#64748B] text-[10px]">Enter</kbd> để gửi • <kbd className="px-1.5 py-0.5 rounded bg-[#F8FAFC] border border-[#E2E8F0] text-[#64748B] text-[10px]">Shift + Enter</kbd> xuống dòng
           </p>
         </div>
       </div>
 
       {/* 4. MODAL: BÁO CÁO SAI LỆCH THÔNG TIN */}
       <Dialog open={feedbackDialogOpen} onOpenChange={setFeedbackDialogOpen}>
-        <DialogContent className="max-w-md bg-white border-[#E5E7EB] p-5 rounded-2xl shadow-xl">
+        <DialogContent className="max-w-md bg-white border-[#E2E8F0] p-5 rounded-2xl shadow-xl">
           <DialogHeader className="space-y-1.5">
-            <DialogTitle className="text-sm sm:text-base font-bold text-[#1A1A1A] flex items-center gap-2">
-              <Flag className="w-4 h-4 text-[#DC2626]" />
+            <DialogTitle className="text-sm sm:text-base font-bold text-[#0F172A] flex items-center gap-2">
+              <Flag className="w-4 h-4 text-[#0D9488]" />
               Góp Ý Thông Tin Du Lịch
             </DialogTitle>
-            <DialogDescription className="text-xs text-[#6B7280]">
+            <DialogDescription className="text-xs text-[#64748B]">
               Đóng góp của bạn giúp hệ thống cập nhật thông tin du lịch chính xác hơn.
             </DialogDescription>
           </DialogHeader>
 
           {feedbackSuccess ? (
             <div className="py-6 flex flex-col items-center justify-center text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-600 animate-in zoom-in-50" />
-              <p className="text-sm font-semibold text-[#1A1A1A]">Đã gửi góp ý thành công!</p>
-              <p className="text-xs text-[#6B7280]">Cảm ơn bạn đã phản hồi cho hệ thống.</p>
+              <CheckCircle2 className="w-10 h-10 text-[#10B981] animate-in zoom-in-50" />
+              <p className="text-sm font-semibold text-[#0F172A]">Đã gửi góp ý thành công!</p>
+              <p className="text-xs text-[#64748B]">Cảm ơn bạn đã phản hồi cho hệ thống.</p>
             </div>
           ) : (
             <div className="space-y-4 pt-2">
               {feedbackTargetMessage && (
-                <div className="p-3 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB] text-xs space-y-1">
-                  <p className="text-[#6B7280] font-medium text-[11px]">Câu hỏi:</p>
-                  <p className="text-[#1A1A1A] font-semibold truncate">&ldquo;{feedbackTargetMessage.userQuestion}&rdquo;</p>
+                <div className="p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs space-y-1">
+                  <p className="text-[#64748B] font-medium text-[11px]">Câu hỏi:</p>
+                  <p className="text-[#0F172A] font-semibold truncate">&ldquo;{feedbackTargetMessage.userQuestion}&rdquo;</p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-[#1A1A1A]">Lý do báo cáo:</label>
+                <label className="text-xs font-semibold text-[#0F172A]">Lý do báo cáo:</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { id: 'OUTDATED_PRICE', label: 'Giá vé đã đổi' },
@@ -1123,8 +1137,8 @@ export default function QuestionAnswerPage() {
                       onClick={() => setFeedbackReason(r.id)}
                       className={`p-2 rounded-xl text-xs font-medium border text-left transition-all cursor-pointer ${
                         feedbackReason === r.id
-                          ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white'
-                          : 'border-[#E5E7EB] bg-white text-[#4B5563] hover:bg-[#F9F9F8]'
+                          ? 'border-[#0D9488] bg-[#0D9488] text-white'
+                          : 'border-[#E2E8F0] bg-white text-[#64748B] hover:bg-[#F0FDFA] hover:text-[#0F766E]'
                       }`}
                     >
                       {r.label}
@@ -1134,14 +1148,14 @@ export default function QuestionAnswerPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold text-[#1A1A1A]">
+                <label className="text-xs font-semibold text-[#0F172A]">
                   Ghi chú chi tiết:
                 </label>
                 <Textarea
                   value={feedbackNote}
                   onChange={(e) => setFeedbackNote(e.target.value)}
                   placeholder="Ví dụ: Giá vé hiện nay đã thay đổi thành..."
-                  className="text-xs min-h-[80px] rounded-xl border-[#E5E7EB] focus:ring-1 focus:ring-[#1A1A1A]"
+                  className="text-xs min-h-[80px] rounded-xl border-[#E2E8F0] focus:ring-1 focus:ring-[#0D9488]"
                 />
               </div>
 
@@ -1151,7 +1165,7 @@ export default function QuestionAnswerPage() {
                   variant="outline"
                   onClick={() => setFeedbackDialogOpen(false)}
                   disabled={isSubmittingFeedback}
-                  className="rounded-xl text-xs border-[#E5E7EB] cursor-pointer"
+                  className="rounded-xl text-xs border-[#E2E8F0] cursor-pointer"
                 >
                   Hủy
                 </Button>
@@ -1159,7 +1173,7 @@ export default function QuestionAnswerPage() {
                   type="button"
                   onClick={handleSubmitFeedback}
                   disabled={isSubmittingFeedback}
-                  className="rounded-xl bg-[#1A1A1A] text-white text-xs hover:bg-[#2C2C2C] gap-1.5 cursor-pointer"
+                  className="rounded-xl bg-[#0D9488] text-white text-xs hover:bg-[#0F766E] gap-1.5 cursor-pointer"
                 >
                   {isSubmittingFeedback ? (
                     <>

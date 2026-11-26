@@ -21,12 +21,20 @@ import {
   Share2,
 } from 'lucide-react';
 import { Place, Trip, UserProfileData } from '@/types';
+import {
+  formatBudgetLabel,
+  formatStyleLabel,
+  isCompanionTag,
+  normalizeBudgetKey,
+  splitStylesAndCompanion,
+} from '@/lib/labels';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useToast } from '@/components/ui/toast';
 
 const AVAILABLE_STYLES = [
   'Thiên nhiên',
@@ -49,6 +57,7 @@ const BUDGET_LEVELS = [
 
 export default function ProfilePage() {
   const { user: authUser, isAuthenticated, isLoading: authLoading, refreshProfile } = useAuth();
+  const { showToast } = useToast();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<'wishlist' | 'liked' | 'rated' | 'shared' | 'trips' | 'preferences'>('wishlist');
@@ -60,12 +69,6 @@ export default function ProfilePage() {
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedBudget, setSelectedBudget] = useState('MODERATE');
   const [isSavingPref, setIsSavingPref] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const loadProfile = async (userId: string) => {
     setIsLoading(true);
@@ -73,8 +76,8 @@ export default function ProfilePage() {
       const data = await api.get<UserProfileData>(`/users/${userId}/profile`);
       setProfileData(data);
       setEditName(data.user.name || '');
-      setSelectedStyles(data.user.preferredStyles || []);
-      setSelectedBudget(data.user.budgetLevel || 'MODERATE');
+      setSelectedStyles(splitStylesAndCompanion(data.user.preferredStyles).styles);
+      setSelectedBudget(normalizeBudgetKey(data.user.budgetLevel));
     } catch (err) {
       console.error('Failed to load profile:', err);
     } finally {
@@ -208,16 +211,18 @@ export default function ProfilePage() {
     if (!authUser) return;
     setIsSavingPref(true);
     try {
+      const existingCompanion = (profileData?.user?.preferredStyles || []).find(isCompanionTag);
+      const nextStyles = existingCompanion ? [...selectedStyles, existingCompanion] : selectedStyles;
       await api.patch(`/users/${authUser.id}/profile`, {
         name: editName,
-        preferredStyles: selectedStyles,
+        preferredStyles: nextStyles,
         budgetLevel: selectedBudget,
       });
       await refreshProfile();
       await loadProfile(authUser.id);
-      showToast('Đã cập nhật thông tin và sở thích thành công!');
+      showToast('Đã cập nhật thông tin và sở thích thành công!', 'success');
     } catch {
-      showToast('Có lỗi khi lưu thông tin');
+      showToast('Có lỗi khi lưu thông tin', 'error');
     } finally {
       setIsSavingPref(false);
     }
@@ -231,8 +236,8 @@ export default function ProfilePage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-neutral-400" />
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
       </div>
     );
   }
@@ -245,28 +250,24 @@ export default function ProfilePage() {
     ratedCount: 0,
   };
 
-  return (
-    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#333333] flex items-center gap-2.5 text-xs font-medium animate-in fade-in duration-200">
-          <Sparkles className="w-4 h-4 text-[#D4F066]" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
+  const { styles: userDisplayStyles, companion: userCompanion } = splitStylesAndCompanion(
+    u?.preferredStyles,
+  );
 
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
       {/* Profile Header Hero */}
-      <section className="border-b border-[#E5E7EB] bg-white pt-10 pb-8">
+      <section className="border-b border-[#E2E8F0] bg-white pt-10 pb-8">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-5">
             {/* Avatar */}
             <div className="relative">
-              <Avatar className="w-20 h-20 border-2 border-[#E5E7EB] shadow-xs">
-                <AvatarFallback className="bg-[#1A1A1A] text-white text-2xl font-bold">
+              <Avatar className="w-20 h-20 border-2 border-[#99F6E4]">
+                <AvatarFallback className="bg-[#0D9488] text-white text-2xl font-bold">
                   {u?.name ? u.name.charAt(0) : u?.email ? u.email.charAt(0) : 'U'}
                 </AvatarFallback>
               </Avatar>
-              <Badge variant="lime" className="absolute -bottom-2 -right-1 text-[10px] uppercase font-semibold h-5">
+              <Badge variant="teal" className="absolute -bottom-2 -right-1 text-[10px] uppercase font-semibold h-5">
                 {u?.role}
               </Badge>
             </div>
@@ -274,46 +275,51 @@ export default function ProfilePage() {
             {/* User Info */}
             <div className="flex-1 text-center md:text-left space-y-2">
               <div className="flex flex-col md:flex-row md:items-center gap-2">
-                <h1 className="text-2xl font-bold tracking-tight text-[#1A1A1A]">
+                <h1 className="text-2xl font-bold tracking-tight text-[#0F172A]">
                   {u?.name || u?.email.split('@')[0]}
                 </h1>
-                <span className="text-xs text-muted-foreground md:ml-1">({u?.email})</span>
+                <span className="text-xs text-[#64748B] md:ml-1">({u?.email})</span>
               </div>
 
               {/* Personality Badges */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-1.5 pt-0.5">
-                {u?.preferredStyles && u.preferredStyles.length > 0 ? (
-                  u.preferredStyles.map((style) => (
+                {userDisplayStyles.length > 0 ? (
+                  userDisplayStyles.map((style) => (
                     <Badge
                       key={style}
                       variant="outline"
-                      className="text-xs font-normal text-muted-foreground border-[#E5E7EB]"
+                      className="text-xs font-normal text-[#0F172A] border-[#E2E8F0]"
                     >
-                      {style}
+                      {formatStyleLabel(style)}
                     </Badge>
                   ))
                 ) : (
-                  <span className="text-xs text-muted-foreground italic">
+                  <span className="text-xs text-[#64748B] italic">
                     Chưa thiết lập gu du lịch. Vào tab &ldquo;Cài đặt sở thích&rdquo; để cập nhật.
                   </span>
                 )}
+                {userCompanion && (
+                  <Badge variant="teal" className="text-xs font-medium">
+                    Đồng hành: {userCompanion}
+                  </Badge>
+                )}
                 {u?.budgetLevel && (
-                  <Badge variant="lime" className="text-xs font-medium">
-                    Ngân sách: {u.budgetLevel}
+                  <Badge variant="amber" className="text-xs font-medium">
+                    Ngân sách: {formatBudgetLabel(u.budgetLevel)}
                   </Badge>
                 )}
               </div>
 
-              <div className="text-[11px] text-muted-foreground">
+              <div className="text-[11px] text-[#64748B]">
                 Thành viên từ:{' '}
                 {u?.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : '2026'}
               </div>
             </div>
 
             {/* Quick Action Button */}
-            <Button asChild size="sm" className="gap-2 font-medium">
+            <Button asChild size="sm" className="gap-2 font-medium bg-[#0D9488] hover:bg-[#0F766E] text-white rounded-xl">
               <Link href="/trips/new">
-                <Sparkles className="w-4 h-4 text-[#D4F066]" />
+                <Sparkles className="w-4 h-4 text-white" />
                 <span>Tạo chuyến đi mới</span>
               </Link>
             </Button>
@@ -321,45 +327,45 @@ export default function ProfilePage() {
 
           {/* Metric Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mt-8">
-            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+            <Card className="bg-[#F8FAFC] border-[#E2E8F0] p-3.5 text-center shadow-none">
               <CardContent className="p-0">
-                <Calendar className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
-                <div className="text-xl font-bold text-[#1A1A1A]">{stats.tripsCount}</div>
-                <div className="text-[11px] text-muted-foreground">Chuyến đi đã tạo</div>
+                <Calendar className="w-4 h-4 text-[#0D9488] mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#0F172A] tabular-nums">{stats.tripsCount}</div>
+                <div className="text-[11px] text-[#64748B]">Chuyến đi đã tạo</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+            <Card className="bg-[#F8FAFC] border-[#E2E8F0] p-3.5 text-center shadow-none">
               <CardContent className="p-0">
-                <Bookmark className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
-                <div className="text-xl font-bold text-[#1A1A1A]">{stats.savedCount}</div>
-                <div className="text-[11px] text-muted-foreground">Địa điểm đã lưu</div>
+                <Bookmark className="w-4 h-4 text-[#F59E0B] mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#0F172A] tabular-nums">{stats.savedCount}</div>
+                <div className="text-[11px] text-[#64748B]">Địa điểm đã lưu</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+            <Card className="bg-[#F8FAFC] border-[#E2E8F0] p-3.5 text-center shadow-none">
               <CardContent className="p-0">
-                <Heart className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
-                <div className="text-xl font-bold text-[#1A1A1A]">{stats.likedCount}</div>
-                <div className="text-[11px] text-muted-foreground">Địa điểm đã thích</div>
+                <Heart className="w-4 h-4 text-[#FF6B6B] mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#0F172A] tabular-nums">{stats.likedCount}</div>
+                <div className="text-[11px] text-[#64748B]">Địa điểm đã thích</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs">
+            <Card className="bg-[#F8FAFC] border-[#E2E8F0] p-3.5 text-center shadow-none">
               <CardContent className="p-0">
-                <Star className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
-                <div className="text-xl font-bold text-[#1A1A1A]">{stats.ratedCount}</div>
-                <div className="text-[11px] text-muted-foreground">Lượt đánh giá sao</div>
+                <Star className="w-4 h-4 text-[#F59E0B] mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#0F172A] tabular-nums">{stats.ratedCount}</div>
+                <div className="text-[11px] text-[#64748B]">Lượt đánh giá sao</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-[#FAFAFA] border-[#E5E7EB] p-3.5 text-center shadow-2xs col-span-2 sm:col-span-1">
+            <Card className="bg-[#F8FAFC] border-[#E2E8F0] p-3.5 text-center shadow-none col-span-2 sm:col-span-1">
               <CardContent className="p-0">
-                <Share2 className="w-4 h-4 text-muted-foreground mx-auto mb-1" />
-                <div className="text-xl font-bold text-[#1A1A1A]">
+                <Share2 className="w-4 h-4 text-[#14B8A6] mx-auto mb-1" />
+                <div className="text-xl font-bold text-[#0F172A] tabular-nums">
                   {stats.sharedCount ?? profileData?.sharedPlaces?.length ?? 0}
                 </div>
-                <div className="text-[11px] text-muted-foreground">Đã chia sẻ</div>
+                <div className="text-[11px] text-[#64748B]">Đã chia sẻ</div>
               </CardContent>
             </Card>
           </div>
@@ -369,13 +375,13 @@ export default function ProfilePage() {
       {/* Main Content with Tabs */}
       <section className="container mx-auto px-4 max-w-5xl py-8">
         {/* Tab Pills */}
-        <div className="flex border-b border-[#E5E7EB] mb-8 overflow-x-auto space-x-1 pb-1">
+        <div className="flex border-b border-[#E2E8F0] mb-8 overflow-x-auto space-x-1 pb-1">
           <button
             onClick={() => setActiveTab('wishlist')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'wishlist'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
@@ -386,8 +392,8 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('liked')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'liked'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Heart className="w-3.5 h-3.5" />
@@ -398,8 +404,8 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('rated')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'rated'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Star className="w-3.5 h-3.5" />
@@ -410,8 +416,8 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('shared')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'shared'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Share2 className="w-3.5 h-3.5" />
@@ -422,8 +428,8 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('trips')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'trips'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Calendar className="w-3.5 h-3.5" />
@@ -434,8 +440,8 @@ export default function ProfilePage() {
             onClick={() => setActiveTab('preferences')}
             className={`flex items-center gap-1.5 px-3.5 py-2 font-medium text-xs rounded-xl transition cursor-pointer whitespace-nowrap ${
               activeTab === 'preferences'
-                ? 'bg-[#1A1A1A] text-white shadow-xs'
-                : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                ? 'bg-[#0D9488] text-white'
+                : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
             }`}
           >
             <Settings className="w-3.5 h-3.5" />
@@ -447,25 +453,25 @@ export default function ProfilePage() {
         {activeTab === 'wishlist' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Bookmark className="w-3.5 h-3.5" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
+                <Bookmark className="w-3.5 h-3.5 text-[#F59E0B]" />
                 Địa điểm đã lưu vào danh sách mong muốn
               </h2>
               {profileData?.savedPlaces && profileData.savedPlaces.length > 0 && (
-                <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs">
+                <Button asChild variant="outline" size="sm" className="gap-1.5 text-xs border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488]">
                   <Link href="/trips/new">
-                    <Sparkles className="w-3.5 h-3.5 text-[#365314]" /> Tạo lịch trình từ Wishlist
+                    <Sparkles className="w-3.5 h-3.5 text-[#0D9488]" /> Tạo lịch trình từ Wishlist
                   </Link>
                 </Button>
               )}
             </div>
 
             {profileData?.savedPlaces.length === 0 ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <Bookmark className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có địa điểm nào được lưu</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
+                  <Bookmark className="w-9 h-9 text-[#F59E0B]/50 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa có địa điểm nào được lưu</h3>
+                  <p className="text-xs text-[#64748B] mb-4">
                     Khám phá địa điểm và bấm lưu lại các điểm đến bạn quan tâm!
                   </p>
                   <Button asChild size="sm">
@@ -478,40 +484,40 @@ export default function ProfilePage() {
                 {profileData?.savedPlaces.map((place) => (
                   <Card
                     key={place.id}
-                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
+                    className="bg-white border-[#E2E8F0] hover:border-[#0D9488]/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                        <Badge variant="teal" className="text-[10px] font-medium">
                           {place.province || 'Việt Nam'}
                         </Badge>
-                        <span className="text-xs font-mono font-medium text-[#1A1A1A]">
+                        <span className="text-xs font-mono font-semibold text-[#0F766E]">
                           {place.priceEstimate > 0
                             ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
                             : 'Miễn phí'}
                         </span>
                       </div>
-                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
+                      <h4 className="font-semibold text-[#0F172A] text-sm mb-1 line-clamp-1">
                         {place.name}
                       </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                      <p className="text-xs text-[#64748B] line-clamp-2 mb-3">
                         {place.description}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="pt-2.5 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveSaved(place.id)}
-                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
+                        className="h-6 px-1.5 text-[11px] text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] gap-1"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Bỏ lưu</span>
                       </Button>
                       <Link
                         href={`/places#${place.id}`}
-                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
+                        className="text-xs font-medium text-[#0D9488] hover:text-[#0F766E] hover:underline flex items-center gap-0.5"
                       >
                         Chi tiết <ChevronRight className="w-3 h-3" />
                       </Link>
@@ -526,17 +532,17 @@ export default function ProfilePage() {
         {/* Tab 2: Liked Places */}
         {activeTab === 'liked' && (
           <div className="space-y-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
-              <Heart className="w-3.5 h-3.5 text-rose-500" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5 mb-3">
+              <Heart className="w-3.5 h-3.5 text-[#FF6B6B]" />
               Địa điểm bạn đã thích
             </h2>
 
             {profileData?.likedPlaces.length === 0 ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <Heart className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa thích địa điểm nào</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
+                  <Heart className="w-9 h-9 text-[#FF6B6B]/40 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa thích địa điểm nào</h3>
+                  <p className="text-xs text-[#64748B] mb-4">
                     Thả tim các địa điểm để AI hiểu gu du lịch của bạn tốt hơn!
                   </p>
                   <Button asChild size="sm">
@@ -549,36 +555,36 @@ export default function ProfilePage() {
                 {profileData?.likedPlaces.map((place) => (
                   <Card
                     key={place.id}
-                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
+                    className="bg-white border-[#E2E8F0] hover:border-[#0D9488]/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                        <Badge variant="teal" className="text-[10px] font-medium">
                           {place.province || 'Việt Nam'}
                         </Badge>
-                        <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+                        <Heart className="w-3.5 h-3.5 text-[#FF6B6B] fill-[#FF6B6B]" />
                       </div>
-                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
+                      <h4 className="font-semibold text-[#0F172A] text-sm mb-1 line-clamp-1">
                         {place.name}
                       </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                      <p className="text-xs text-[#64748B] line-clamp-2 mb-3">
                         {place.description}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="pt-2.5 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveLiked(place.id)}
-                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
+                        className="h-6 px-1.5 text-[11px] text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] gap-1"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Bỏ thích</span>
                       </Button>
                       <Link
                         href={`/places#${place.id}`}
-                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
+                        className="text-xs font-medium text-[#0D9488] hover:text-[#0F766E] hover:underline flex items-center gap-0.5"
                       >
                         Xem <ChevronRight className="w-3 h-3" />
                       </Link>
@@ -593,17 +599,17 @@ export default function ProfilePage() {
         {/* Tab 3: Rated Places */}
         {activeTab === 'rated' && (
           <div className="space-y-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
-              <Star className="w-3.5 h-3.5" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5 mb-3">
+              <Star className="w-3.5 h-3.5 text-[#F59E0B]" />
               Địa điểm bạn đã chấm điểm & đánh giá
             </h2>
 
             {(!profileData?.ratedPlaces || profileData.ratedPlaces.length === 0) ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <Star className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa đánh giá địa điểm nào</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
+                  <Star className="w-9 h-9 text-[#F59E0B]/40 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa đánh giá địa điểm nào</h3>
+                  <p className="text-xs text-[#64748B] mb-4">
                     Đánh giá các địa điểm bạn đã trải nghiệm để chia sẻ cùng cộng đồng.
                   </p>
                   <Button asChild size="sm">
@@ -616,39 +622,39 @@ export default function ProfilePage() {
                 {profileData.ratedPlaces.map((item) => (
                   <Card
                     key={item.place.id}
-                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
+                    className="bg-white border-[#E2E8F0] hover:border-[#0D9488]/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                        <Badge variant="teal" className="text-[10px] font-medium">
                           {item.place.province || 'Việt Nam'}
                         </Badge>
-                        <Badge variant="secondary" className="gap-1 text-[11px] font-medium">
-                          <Star className="w-3 h-3 fill-neutral-700" />
+                        <Badge variant="amber" className="gap-1 text-[11px] font-medium">
+                          <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
                           <span>{item.rating}/5</span>
                         </Badge>
                       </div>
-                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
+                      <h4 className="font-semibold text-[#0F172A] text-sm mb-1 line-clamp-1">
                         {item.place.name}
                       </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                      <p className="text-xs text-[#64748B] line-clamp-2 mb-3">
                         {item.place.description}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="pt-2.5 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveRating(item.place.id)}
-                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
+                        className="h-6 px-1.5 text-[11px] text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] gap-1"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Xóa đánh giá</span>
                       </Button>
                       <Link
                         href={`/places#${item.place.id}`}
-                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
+                        className="text-xs font-medium text-[#0D9488] hover:text-[#0F766E] hover:underline flex items-center gap-0.5"
                       >
                         Chi tiết <ChevronRight className="w-3 h-3" />
                       </Link>
@@ -663,17 +669,17 @@ export default function ProfilePage() {
         {/* Tab 4: Shared Places */}
         {activeTab === 'shared' && (
           <div className="space-y-4">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 mb-3">
-              <Share2 className="w-3.5 h-3.5" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5 mb-3">
+              <Share2 className="w-3.5 h-3.5 text-[#0D9488]" />
               Địa điểm bạn đã chia sẻ
             </h2>
 
             {(!profileData?.sharedPlaces || profileData.sharedPlaces.length === 0) ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <Share2 className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có bài chia sẻ nào</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
+                  <Share2 className="w-9 h-9 text-[#0D9488]/40 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa có bài chia sẻ nào</h3>
+                  <p className="text-xs text-[#64748B] mb-4">
                     Tại trang Khám phá, bấm nút Chia sẻ để giới thiệu các địa điểm yêu thích lên hồ sơ của bạn.
                   </p>
                   <Button asChild size="sm">
@@ -686,45 +692,45 @@ export default function ProfilePage() {
                 {profileData.sharedPlaces.map((item) => (
                   <Card
                     key={item.id}
-                    className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
+                    className="bg-white border-[#E2E8F0] hover:border-[#0D9488]/40 rounded-2xl p-4 flex flex-col justify-between transition shadow-2xs"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-2">
-                        <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                        <Badge variant="teal" className="text-[10px] font-medium">
                           {item.place.province || 'Việt Nam'}
                         </Badge>
-                        <span className="text-[10px] text-muted-foreground">
+                        <span className="text-[10px] text-[#64748B]">
                           {new Date(item.sharedAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
 
                       {item.note && (
-                        <div className="p-2 rounded-lg bg-[#FAFAFA] border border-[#E5E7EB] mb-2.5 text-xs text-muted-foreground italic">
+                        <div className="p-2 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] mb-2.5 text-xs text-[#64748B] italic">
                           &ldquo;{item.note}&rdquo;
                         </div>
                       )}
 
-                      <h4 className="font-semibold text-[#1A1A1A] text-sm mb-1 line-clamp-1">
+                      <h4 className="font-semibold text-[#0F172A] text-sm mb-1 line-clamp-1">
                         {item.place.name}
                       </h4>
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
+                      <p className="text-xs text-[#64748B] line-clamp-2 mb-3">
                         {item.place.description}
                       </p>
                     </div>
 
-                    <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                    <div className="pt-2.5 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleRemoveShared(item.place.id)}
-                        className="h-6 px-1.5 text-[11px] text-muted-foreground hover:text-rose-600 gap-1"
+                        className="h-6 px-1.5 text-[11px] text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] gap-1"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Xóa chia sẻ</span>
                       </Button>
                       <Link
                         href={`/places#${item.place.id}`}
-                        className="text-xs font-medium text-[#1A1A1A] hover:underline flex items-center gap-0.5"
+                        className="text-xs font-medium text-[#0D9488] hover:text-[#0F766E] hover:underline flex items-center gap-0.5"
                       >
                         Xem <ChevronRight className="w-3 h-3" />
                       </Link>
@@ -740,8 +746,8 @@ export default function ProfilePage() {
         {activeTab === 'trips' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
+              <h2 className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-[#0D9488]" />
                 Lịch sử các chuyến đi đã tạo
               </h2>
               <Button asChild size="sm" className="gap-1.5 text-xs">
@@ -750,11 +756,11 @@ export default function ProfilePage() {
             </div>
 
             {profileData?.trips.length === 0 ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <Calendar className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có chuyến đi nào</h3>
-                  <p className="text-xs text-muted-foreground mb-4">
+                  <Calendar className="w-9 h-9 text-[#0D9488]/40 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa có chuyến đi nào</h3>
+                  <p className="text-xs text-[#64748B] mb-4">
                     Tạo chuyến đi đầu tiên để AI tối ưu hóa lịch trình cho bạn.
                   </p>
                   <Button asChild size="sm">
@@ -767,35 +773,35 @@ export default function ProfilePage() {
                 {profileData?.trips.map((trip) => (
                   <Card
                     key={trip.id}
-                    className="bg-white border-[#E5E7EB] rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#1A1A1A]/30 transition shadow-2xs"
+                    className="bg-white border-[#E2E8F0] rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-[#0D9488]/40 transition shadow-2xs"
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge variant="lime" className="text-[10px]">
+                        <Badge variant="teal" className="text-[10px]">
                           {trip.status}
                         </Badge>
-                        <span className="text-[11px] text-muted-foreground">
+                        <span className="text-[11px] text-[#64748B]">
                           Tạo ngày {new Date(trip.createdAt).toLocaleDateString('vi-VN')}
                         </span>
                       </div>
-                      <h4 className="text-base font-bold text-[#1A1A1A] flex items-center gap-1.5">
-                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <h4 className="text-base font-bold text-[#0F172A] flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4 text-[#0D9488]" />
                         Chuyến đi {trip.destination}
                       </h4>
-                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground pt-0.5">
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-[#64748B] pt-0.5">
                         <span>
                           {new Date(trip.startDate).toLocaleDateString('vi-VN')} -{' '}
                           {new Date(trip.endDate).toLocaleDateString('vi-VN')}
                         </span>
                         <span>{trip.groupSize} người</span>
-                        <span className="font-medium text-[#1A1A1A]">
+                        <span className="font-semibold text-[#0F766E]">
                           {trip.budgetPerPerson ? trip.budgetPerPerson.toLocaleString('vi-VN') : 0} đ / người
                         </span>
                       </div>
                     </div>
 
                     <div>
-                      <Button asChild variant="outline" size="sm" className="gap-1 text-xs">
+                      <Button asChild variant="outline" size="sm" className="gap-1 text-xs border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488]">
                         <Link href={`/trips/${trip.id}`}>
                           <span>Xem chi tiết</span>
                           <ChevronRight className="w-3.5 h-3.5" />
@@ -811,21 +817,21 @@ export default function ProfilePage() {
 
         {/* Tab 6: Preferences & Settings */}
         {activeTab === 'preferences' && (
-          <Card className="bg-white border-[#E5E7EB] rounded-2xl p-6 space-y-6 shadow-2xs">
+          <Card className="bg-white border-[#E2E8F0] rounded-2xl p-6 space-y-6 shadow-2xs">
             <CardContent className="p-0 space-y-6">
               <div>
-                <h2 className="text-base font-bold text-[#1A1A1A] mb-1 flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-muted-foreground" />
+                <h2 className="text-base font-bold text-[#0F172A] mb-1 flex items-center gap-2">
+                  <Settings className="w-4 h-4 text-[#0D9488]" />
                   Cài đặt hồ sơ & huấn luyện AI gợi ý
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-[#64748B]">
                   Gu du lịch và ngân sách dưới đây sẽ đóng vai trò là đặc trưng người dùng (User Features) truyền vào mô hình học máy để cá nhân hóa kết quả gợi ý.
                 </p>
               </div>
 
               {/* Display Name */}
               <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-1.5">
                   Tên hiển thị của bạn
                 </label>
                 <Input
@@ -833,7 +839,7 @@ export default function ProfilePage() {
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   placeholder="Nhập tên của bạn..."
-                  className="max-w-md bg-[#FAFAFA]"
+                  className="max-w-md bg-[#F8FAFC]"
                 />
               </div>
 
@@ -852,12 +858,12 @@ export default function ProfilePage() {
                         onClick={() => toggleStyle(style)}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition cursor-pointer ${
                           isSelected
-                            ? 'bg-[#1A1A1A] text-white shadow-xs'
-                            : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                            ? 'bg-[#0D9488] text-white'
+                            : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]'
                         }`}
                       >
-                        {isSelected && <Check className="w-3 h-3 text-[#D4F066]" />}
-                        <span>{style}</span>
+                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                        <span>{formatStyleLabel(style)}</span>
                       </button>
                     );
                   })}
@@ -866,7 +872,7 @@ export default function ProfilePage() {
 
               {/* Budget Level */}
               <div>
-                <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-[#64748B] uppercase tracking-wider mb-2">
                   Mức ngân sách thông thường
                 </label>
                 <div className="grid md:grid-cols-3 gap-3 max-w-3xl">
@@ -879,12 +885,16 @@ export default function ProfilePage() {
                         onClick={() => setSelectedBudget(b.key)}
                         className={`text-left p-3.5 rounded-xl border transition cursor-pointer ${
                           isSelected
-                            ? 'bg-[#F4FCE3] border-[#D9F99D] text-[#365314] shadow-xs'
-                            : 'bg-white border-[#E5E7EB] text-muted-foreground hover:border-[#1A1A1A]/30'
+                            ? 'bg-[#F0FDFA] border-[#0D9488] text-[#0F766E]'
+                            : 'bg-white border-[#E2E8F0] text-[#64748B] hover:border-[#0D9488]/50'
                         }`}
                       >
-                        <div className="font-semibold text-xs text-[#1A1A1A] mb-1">{b.label}</div>
-                        <div className="text-[11px] text-muted-foreground leading-relaxed">{b.desc}</div>
+                        <div className={`font-semibold text-xs mb-1 ${isSelected ? 'text-[#0F766E]' : 'text-[#0F172A]'}`}>
+                          {b.label}
+                        </div>
+                        <div className={`text-[11px] leading-relaxed ${isSelected ? 'text-[#0D9488]' : 'text-[#64748B]'}`}>
+                          {b.desc}
+                        </div>
                       </button>
                     );
                   })}
@@ -892,7 +902,7 @@ export default function ProfilePage() {
               </div>
 
               {/* Submit Button */}
-              <div className="pt-4 border-t border-[#E5E7EB] flex justify-end">
+              <div className="pt-4 border-t border-[#E2E8F0] flex justify-end">
                 <Button
                   onClick={handleSavePreferences}
                   disabled={isSavingPref}

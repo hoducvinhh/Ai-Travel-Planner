@@ -2,87 +2,85 @@ export interface ProvinceInfo {
   key: string;
   label: string;
   shortLabel: string;
+  tagline: string;
+  image: string;
   icon: string;
   bg: string;
 }
 
+export interface FeaturedDestinationBanner {
+  provinceKey: string;
+  regionLabel: string;
+  title: string;
+  subtitle: string;
+  query: string;
+  image: string;
+}
+
+const MONOCHROME_BADGE_CLASS = 'bg-[#F0FDFA] text-[#0F766E] border-[#99F6E4]';
+
 export const VIETNAM_PROVINCES: ProvinceInfo[] = [
+  { key: 'Lam Dong', label: 'Đà Lạt (Lâm Đồng)', shortLabel: 'Đà Lạt', tagline: 'Đồi thông & sương sớm', image: '/images/provinces/dalat.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Lao Cai', label: 'Sa Pa (Lào Cai)', shortLabel: 'Sa Pa', tagline: 'Mây núi & ruộng bậc thang', image: '/images/provinces/sapa.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Quang Ninh', label: 'Hạ Long (Quảng Ninh)', shortLabel: 'Hạ Long', tagline: 'Kỳ quan vịnh đá vôi', image: '/images/provinces/halong.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Quang Nam', label: 'Hội An (Quảng Nam)', shortLabel: 'Hội An', tagline: 'Phố cổ đèn lồng', image: '/images/provinces/hoian.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Ninh Binh', label: 'Ninh Bình', shortLabel: 'Ninh Bình', tagline: 'Tràng An non nước', image: '/images/provinces/ninhbinh.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Kien Giang', label: 'Phú Quốc (Kiên Giang)', shortLabel: 'Phú Quốc', tagline: 'Đảo ngọc & hoàng hôn', image: '/images/provinces/phuquoc.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Da Nang', label: 'Đà Nẵng', shortLabel: 'Đà Nẵng', tagline: 'Thành phố biển & Cầu Vàng', image: '/images/provinces/danang.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Hanoi', label: 'Hà Nội', shortLabel: 'Hà Nội', tagline: 'Nghìn năm văn hiến', image: '/images/provinces/hanoi.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Thua Thien Hue', label: 'Huế (Thừa Thiên Huế)', shortLabel: 'Huế', tagline: 'Cố đô bên dòng Hương', image: '/images/provinces/hue.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Khanh Hoa', label: 'Nha Trang (Khánh Hòa)', shortLabel: 'Nha Trang', tagline: 'Vịnh biển xanh ngắt', image: '/images/provinces/nhatrang.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+  { key: 'Ho Chi Minh', label: 'TP. Hồ Chí Minh', shortLabel: 'TP.HCM', tagline: 'Đô thị năng động', image: '/images/provinces/danang.jpg', icon: '', bg: MONOCHROME_BADGE_CLASS },
+];
+
+export const FEATURED_DESTINATION_BANNERS: FeaturedDestinationBanner[] = [
   {
-    key: 'Hanoi',
-    label: 'Hà Nội',
-    shortLabel: 'Hà Nội',
-    icon: '🏛️',
-    bg: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    provinceKey: 'Quang Ninh',
+    regionLabel: 'Hạ Long • Quảng Ninh',
+    title: 'Hạ Long kỳ quan xanh ngọc',
+    subtitle: 'Vịnh đá vôi hùng vĩ và hải trình bình minh giữa di sản thiên nhiên thế giới.',
+    query: 'Hạ Long',
+    image: '/images/provinces/halong.jpg',
   },
   {
-    key: 'Ho Chi Minh',
-    label: 'TP. Hồ Chí Minh',
-    shortLabel: 'TP.HCM',
-    icon: '🏙️',
-    bg: 'bg-fuchsia-500/15 text-fuchsia-400 border-fuchsia-500/30',
+    provinceKey: 'Lam Dong',
+    regionLabel: 'Đà Lạt • Lâm Đồng',
+    title: 'Đà Lạt sương sớm cao nguyên',
+    subtitle: 'Đồi thông lặng gió, hồ Xuân Hương và những quán cà phê ôm trọn thung lũng mây.',
+    query: 'Đà Lạt',
+    image: '/images/provinces/dalat.jpg',
   },
   {
-    key: 'Da Nang',
-    label: 'Đà Nẵng',
-    shortLabel: 'Đà Nẵng',
-    icon: '🌉',
-    bg: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+    provinceKey: 'Lao Cai',
+    regionLabel: 'Sa Pa • Lào Cai',
+    title: 'Sa Pa chạm đỉnh mây trời',
+    subtitle: 'Ruộng bậc thang Mường Hoa uốn lượn và cung đèo hùng vĩ vùng Tây Bắc.',
+    query: 'Sa Pa',
+    image: '/images/provinces/sapa.jpg',
   },
   {
-    key: 'Quang Nam',
-    label: 'Hội An (Quảng Nam)',
-    shortLabel: 'Hội An',
-    icon: '🏮',
-    bg: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
+    provinceKey: 'Quang Nam',
+    regionLabel: 'Hội An • Quảng Nam',
+    title: 'Hội An phố cổ bên sông Hoài',
+    subtitle: 'Dãy nhà tường vàng rực rỡ nắng chiều và đêm thả hoa đăng lung linh.',
+    query: 'Hội An',
+    image: '/images/provinces/hoian.jpg',
   },
   {
-    key: 'Thua Thien Hue',
-    label: 'Huế (Thừa Thiên Huế)',
-    shortLabel: 'Huế',
-    icon: '🏯',
-    bg: 'bg-purple-500/15 text-purple-400 border-purple-500/30',
+    provinceKey: 'Ninh Binh',
+    regionLabel: 'Ninh Bình • Tràng An',
+    title: 'Ninh Bình non nước hữu tình',
+    subtitle: 'Xuôi mái chèo xuyên hang động Tràng An giữa trùng điệp núi đá vôi.',
+    query: 'Ninh Bình',
+    image: '/images/provinces/ninhbinh.jpg',
   },
   {
-    key: 'Lam Dong',
-    label: 'Đà Lạt (Lâm Đồng)',
-    shortLabel: 'Đà Lạt',
-    icon: '🌲',
-    bg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-  },
-  {
-    key: 'Khanh Hoa',
-    label: 'Nha Trang (Khánh Hòa)',
-    shortLabel: 'Nha Trang',
-    icon: '🏖️',
-    bg: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-  },
-  {
-    key: 'Kien Giang',
-    label: 'Phú Quốc (Kiên Giang)',
-    shortLabel: 'Phú Quốc',
-    icon: '🏝️',
-    bg: 'bg-teal-500/15 text-teal-400 border-teal-500/30',
-  },
-  {
-    key: 'Quang Ninh',
-    label: 'Hạ Long (Quảng Ninh)',
-    shortLabel: 'Hạ Long',
-    icon: '⛵',
-    bg: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-  },
-  {
-    key: 'Lao Cai',
-    label: 'Sa Pa (Lào Cai)',
-    shortLabel: 'Sa Pa',
-    icon: '🏔️',
-    bg: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
-  },
-  {
-    key: 'Ninh Binh',
-    label: 'Ninh Bình',
-    shortLabel: 'Ninh Bình',
-    icon: '🚣',
-    bg: 'bg-lime-500/15 text-lime-400 border-lime-500/30',
+    provinceKey: 'Kien Giang',
+    regionLabel: 'Phú Quốc • Kiên Giang',
+    title: 'Phú Quốc biển ngọc phương Nam',
+    subtitle: 'Bãi cát mịn, làn nước trong vắt và ráng chiều vàng rực phía Tây đảo.',
+    query: 'Phú Quốc',
+    image: '/images/provinces/phuquoc.jpg',
   },
 ];
 
@@ -102,19 +100,19 @@ export function getProvinceMeta(province?: string | null): ProvinceInfo {
       key: 'VN',
       label: 'Việt Nam',
       shortLabel: 'Việt Nam',
-      icon: '📍',
-      bg: 'bg-slate-500/15 text-slate-300 border-slate-500/30',
+      tagline: 'Khám phá khắp Việt Nam',
+      image: '/images/provinces/halong.jpg',
+      icon: '',
+      bg: MONOCHROME_BADGE_CLASS,
     };
   }
 
   const pLower = province.trim().toLowerCase();
 
-  // Exact or partial match in map
   if (PROVINCE_MAP[pLower]) {
     return PROVINCE_MAP[pLower];
   }
 
-  // Substring checks
   if (pLower.includes('ha noi') || pLower.includes('hà nội')) return PROVINCE_MAP['hanoi'];
   if (pLower.includes('ho chi minh') || pLower.includes('hồ chí minh') || pLower.includes('sài gòn'))
     return PROVINCE_MAP['ho chi minh'];
@@ -137,7 +135,9 @@ export function getProvinceMeta(province?: string | null): ProvinceInfo {
     key: province,
     label: province,
     shortLabel: province,
-    icon: '📍',
-    bg: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    tagline: 'Điểm đến Việt Nam',
+    image: '/images/provinces/halong.jpg',
+    icon: '',
+    bg: MONOCHROME_BADGE_CLASS,
   };
 }

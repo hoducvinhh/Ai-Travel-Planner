@@ -65,7 +65,7 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
         html: `
           <div class="custom-photo-pin" style="position: relative; width: 44px; height: 50px; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
             <!-- Number badge on top-right -->
-            <div style="position: absolute; top: -4px; right: -2px; z-index: 10; background: #10b981; color: #ffffff; font-size: 11px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.35);">
+            <div style="position: absolute; top: -4px; right: -2px; z-index: 10; background: #0D9488; color: #ffffff; font-size: 11px; font-weight: 700; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);">
               ${index + 1}
             </div>
             <!-- Circular Photo Avatar -->
@@ -102,10 +102,10 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
             </div>
 
             <!-- Bottom-right pill: Price / Free -->
-            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.25);">
+            <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(15,23,42,0.82); backdrop-filter: blur(4px); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.25);">
               ${place.priceEstimate > 0 
-                ? `<span style="color: #D4F066; font-family: monospace;">${place.priceEstimate.toLocaleString('vi-VN')} đ</span>`
-                : `<span style="color: #34d399;">Miễn phí</span>`
+                ? `<span style="color: #FDE68A; font-family: monospace;">${place.priceEstimate.toLocaleString('vi-VN')} đ</span>`
+                : `<span style="color: #5EEAD4;">Miễn phí</span>`
               }
             </div>
           </div>
@@ -113,20 +113,20 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
           <!-- Body Content -->
           <div style="padding: 10px 12px 12px;">
             <!-- Place Title -->
-            <div style="font-weight: 700; font-size: 13px; color: #1a1a1a; line-height: 1.35; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${place.name}">
+            <div style="font-weight: 700; font-size: 13px; color: #0F172A; line-height: 1.35; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${place.name}">
               ${index + 1}. ${place.name}
             </div>
 
             <!-- Categories / Time metadata -->
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-bottom: 10px;">
               ${(place.categories || []).slice(0, 2).map((cat) => `
-                <span style="font-size: 10px; background: #f5f5f4; color: #525252; border: 1px solid #e5e7eb; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
+                <span style="font-size: 10px; background: #F1F5F9; color: #64748B; border: 1px solid #E2E8F0; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
                   ${cat}
                 </span>
               `).join('')}
               ${place.estimatedTime ? `
-                <span style="font-size: 10px; background: #f4fce3; color: #365314; border: 1px solid #d9f99d; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
-                  ⏱️ ${place.estimatedTime}
+                <span style="font-size: 10px; background: #F0FDFA; color: #0F766E; border: 1px solid #99F6E4; padding: 1px 6px; border-radius: 4px; font-weight: 500;">
+                  ${place.estimatedTime}
                 </span>
               ` : ''}
             </div>
@@ -139,16 +139,16 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
               gap: 6px;
               width: 100%;
               padding: 7px 12px;
-              background: #1A1A1A;
+              background: #0D9488;
               color: #ffffff;
               border-radius: 8px;
               border: none;
               font-size: 11px;
               font-weight: 600;
               cursor: pointer;
-              box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+              box-shadow: 0 2px 4px rgba(13,148,136,0.2);
               transition: all 0.15s ease;
-            " onmouseover="this.style.background='#2e2e2e'" onmouseout="this.style.background='#1A1A1A'">
+            " onmouseover="this.style.background='#0F766E'" onmouseout="this.style.background='#0D9488'">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
               <span>Chỉ đường & Thời tiết</span>
             </button>
@@ -180,9 +180,9 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
       ]);
 
       L.polyline(routeCoordinates, {
-        color: '#10b981',
+        color: '#0D9488',
         weight: 4,
-        opacity: 0.75,
+        opacity: 0.85,
         dashArray: '8, 8',
       }).addTo(map);
     }
@@ -214,7 +214,7 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
   }, [selectedPlaceId]);
 
   return (
-    <div className="relative w-full h-[400px] md:h-[500px] bg-slate-900 overflow-hidden">
+    <div className="relative w-full h-[400px] md:h-[500px] bg-[#F1F5F9] overflow-hidden">
       <div
         ref={mapContainerRef}
         className="w-full h-full"
@@ -237,7 +237,7 @@ export default function MapComponent({ places, onSelectPlace, selectedPlaceId }:
           border-radius: 14px !important;
           overflow: hidden !important;
           box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.25), 0 4px 10px -2px rgba(0, 0, 0, 0.1) !important;
-          border: 1px solid #E5E7EB !important;
+          border: 1px solid #E2E8F0 !important;
         }
         .custom-map-popup .leaflet-popup-content {
           margin: 0 !important;

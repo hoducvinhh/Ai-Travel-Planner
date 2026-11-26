@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
 import {
@@ -27,11 +28,13 @@ import {
 } from 'lucide-react';
 import { Place, CommentItem } from '@/types';
 import { VIETNAM_PROVINCES, getProvinceMeta } from '@/lib/provinces';
+import { formatIndoorOutdoor } from '@/lib/labels';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
+import { useToast } from '@/components/ui/toast';
 import {
   Select,
   SelectContent,
@@ -71,19 +74,22 @@ const CATEGORIES = [
   'Nghỉ dưỡng',
 ];
 
-export default function PlacesSocialFeedPage() {
+function PlacesSocialFeedContent() {
   const { user, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
+  const searchParams = useSearchParams();
 
-  // Filter & Search states
+  // Filter & Search states (initialized from URL query params if navigated from Landing Page)
   const [places, setPlaces] = useState<Place[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [selectedProvince, setSelectedProvince] = useState('ALL');
+  const [search, setSearch] = useState(() => searchParams.get('search') || '');
+  const [selectedProvince, setSelectedProvince] = useState(() => searchParams.get('province') || 'ALL');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [sortBy, setSortBy] = useState<string>('popularity');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   // In-feed comment expansion & input state
   const [activeCommentsPlaceId, setActiveCommentsPlaceId] = useState<string | null>(null);
@@ -91,9 +97,6 @@ export default function PlacesSocialFeedPage() {
   const [commentsLoading, setCommentsLoading] = useState<Record<string, boolean>>({});
   const [newCommentText, setNewCommentText] = useState<Record<string, string>>({});
   const [isSubmittingComment, setIsSubmittingComment] = useState<Record<string, boolean>>({});
-
-  // UI Toasts
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Directions & Weather Modal state
   const [directionsPlace, setDirectionsPlace] = useState<Place | null>(null);
@@ -103,11 +106,6 @@ export default function PlacesSocialFeedPage() {
 
   // Star hover preview state
   const [hoverRating, setHoverRating] = useState<Record<string, number>>({});
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const fetchPlaces = useCallback(async () => {
     setIsLoading(true);
@@ -365,23 +363,15 @@ export default function PlacesSocialFeedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#333333] flex items-center gap-2.5 text-xs font-medium animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <Sparkles className="w-4 h-4 text-[#D4F066]" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
       {/* Header Section */}
-      <section className="border-b border-[#E5E7EB] bg-white py-8 md:py-10">
+      <section className="border-b border-[#E2E8F0] bg-white py-8 md:py-10">
         <div className="container mx-auto px-4 text-center max-w-4xl">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-[#1A1A1A] mb-2.5">
-            Khám phá & trải nghiệm điểm đến
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-[#0F172A] mb-2.5">
+            Khám phá &amp; trải nghiệm điểm đến
           </h1>
 
-          <p className="text-muted-foreground text-sm max-w-xl mx-auto leading-relaxed">
+          <p className="text-[#64748B] text-sm max-w-xl mx-auto leading-relaxed">
             Tìm kiếm địa điểm du lịch thực tế, lưu lại mục yêu thích và chia sẻ đánh giá trải nghiệm của bạn.
           </p>
         </div>
@@ -389,12 +379,12 @@ export default function PlacesSocialFeedPage() {
 
       {/* Search & Filter Controls */}
       <section className="container mx-auto px-4 py-8 max-w-6xl">
-        <Card className="p-5 bg-white border-[#E5E7EB] shadow-2xs mb-8 space-y-5">
+        <Card className="p-5 bg-white border-[#E2E8F0] shadow-none mb-8 space-y-5 rounded-2xl">
           <CardContent className="p-0 space-y-5">
             {/* Search and Sort row */}
             <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
               <div className="relative w-full md:w-96">
-                <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
                 <Input
                   type="text"
                   value={search}
@@ -402,93 +392,111 @@ export default function PlacesSocialFeedPage() {
                     setSearch(e.target.value);
                     setPage(1);
                   }}
+                  aria-label="Tìm theo tên địa điểm"
                   placeholder="Tìm theo tên địa điểm, quận, mô tả..."
-                  className="pl-9 bg-[#FAFAFA] border-[#E5E7EB] text-sm"
+                  className="pl-9 bg-[#F8FAFC] border-[#E2E8F0] text-sm"
                 />
               </div>
 
-              <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
-                <span className="text-xs text-muted-foreground flex items-center gap-1.5 whitespace-nowrap">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" /> Sắp xếp:
-                </span>
-                <div className="w-[200px]">
-                  <Select
-                    value={sortBy}
-                    onValueChange={(val) => {
-                      setSortBy(val);
-                      setPage(1);
-                    }}
-                  >
-                    <SelectTrigger className="h-9 text-xs bg-[#FAFAFA] border-[#E5E7EB]">
-                      <SelectValue placeholder="Sắp xếp theo..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="popularity">Độ nổi tiếng (Mặc định)</SelectItem>
-                      <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
-                      <SelectItem value="price_asc">Giá vé: Thấp đến cao</SelectItem>
-                      <SelectItem value="price_desc">Giá vé: Cao đến thấp</SelectItem>
-                      <SelectItem value="newest">Mới cập nhật</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <div className="flex items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowMobileFilters((v) => !v)}
+                  className="md:hidden h-9 text-xs gap-1.5 border-[#E2E8F0]"
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
+                  <span>{showMobileFilters ? 'Ẩn bộ lọc' : 'Bộ lọc'}</span>
+                </Button>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[#64748B] hidden sm:flex items-center gap-1.5 whitespace-nowrap">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-[#64748B]" /> Sắp xếp:
+                  </span>
+                  <div className="w-[190px] sm:w-[200px]">
+                    <Select
+                      value={sortBy}
+                      onValueChange={(val) => {
+                        setSortBy(val);
+                        setPage(1);
+                      }}
+                    >
+                      <SelectTrigger className="h-9 text-xs bg-[#F8FAFC] border-[#E2E8F0]">
+                        <SelectValue placeholder="Sắp xếp theo..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="popularity">Độ nổi tiếng (Mặc định)</SelectItem>
+                        <SelectItem value="rating">Đánh giá cao nhất</SelectItem>
+                        <SelectItem value="price_asc">Giá vé: Thấp đến cao</SelectItem>
+                        <SelectItem value="price_desc">Giá vé: Cao đến thấp</SelectItem>
+                        <SelectItem value="newest">Mới cập nhật</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Province Filter Pills */}
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                <span>Tỉnh / Thành phố trọng điểm</span>
+            <div className={`${showMobileFilters ? 'block' : 'hidden'} md:block space-y-5`}>
+              {/* Province Filter Pills */}
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] mb-2.5 flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-[#0D9488]" />
+                  <span>Tỉnh / Thành phố trọng điểm</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {PROVINCES.map((prov) => {
+                    const isActive = selectedProvince === prov.key;
+                    return (
+                      <button
+                        key={prov.key}
+                        type="button"
+                        onClick={() => {
+                          setSelectedProvince(prov.key);
+                          setPage(1);
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium ${
+                          isActive
+                            ? 'bg-[#0D9488] text-white'
+                            : 'bg-[#F1F5F9] text-[#0F172A] hover:bg-[#E2E8F0]'
+                        }`}
+                      >
+                        {prov.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {PROVINCES.map((prov) => {
-                  const isActive = selectedProvince === prov.key;
-                  return (
-                    <button
-                      key={prov.key}
-                      onClick={() => {
-                        setSelectedProvince(prov.key);
-                        setPage(1);
-                      }}
-                      className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium ${
-                        isActive
-                          ? 'bg-[#1A1A1A] text-white shadow-xs'
-                          : 'bg-[#F5F5F4] text-[#1A1A1A] hover:bg-[#E5E7EB]'
-                      }`}
-                    >
-                      {prov.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
-            {/* Category Filter Pills */}
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-muted-foreground" />
-                <span>Thể loại trải nghiệm</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {CATEGORIES.map((cat) => {
-                  const isActive = selectedCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        setSelectedCategory(cat);
-                        setPage(1);
-                      }}
-                      className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium ${
-                        isActive
-                          ? 'bg-[#F4FCE3] text-[#365314] font-semibold border border-[#D9F99D] shadow-2xs'
-                          : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#F5F5F4]'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  );
-                })}
+              {/* Category Filter Pills */}
+              <div>
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-[#64748B] mb-2.5 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[#0D9488]" />
+                  <span>Thể loại trải nghiệm</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {CATEGORIES.map((cat) => {
+                    const isActive = selectedCategory === cat;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategory(cat);
+                          setPage(1);
+                        }}
+                        className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer font-medium border ${
+                          isActive
+                            ? 'bg-[#F0FDFA] text-[#0F766E] border-[#99F6E4] font-semibold'
+                            : 'bg-white border-[#E2E8F0] text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -496,15 +504,15 @@ export default function PlacesSocialFeedPage() {
 
         {/* Results Counter & Wishlist Link */}
         <div className="flex items-center justify-between mb-6 px-1">
-          <div className="text-xs text-muted-foreground">
-            Hiển thị <span className="font-semibold text-[#1A1A1A]">{places.length}</span> / {totalCount} địa điểm
+          <div className="text-xs text-[#64748B]">
+            Hiển thị <span className="font-semibold text-[#0F172A]">{places.length}</span> / {totalCount} địa điểm
           </div>
           {isAuthenticated && (
             <Link
               href="/profile"
-              className="text-xs text-[#1A1A1A] hover:underline flex items-center gap-1 font-medium transition"
+              className="text-xs text-[#0D9488] hover:underline flex items-center gap-1 font-medium transition"
             >
-              <Bookmark className="w-3.5 h-3.5" /> Xem Wishlist đã lưu →
+              <Bookmark className="w-3.5 h-3.5 text-[#F59E0B]" /> Xem Wishlist đã lưu →
             </Link>
           )}
         </div>
@@ -512,15 +520,15 @@ export default function PlacesSocialFeedPage() {
         {/* Loading State */}
         {isLoading ? (
           <div className="py-24 text-center">
-            <Loader2 className="w-8 h-8 text-neutral-400 animate-spin mx-auto mb-3" />
-            <p className="text-muted-foreground text-xs">Đang tải danh sách địa điểm...</p>
+            <Loader2 className="w-8 h-8 text-[#0D9488] animate-spin mx-auto mb-3" />
+            <p className="text-[#64748B] text-xs">Đang tải danh sách địa điểm...</p>
           </div>
         ) : places.length === 0 ? (
-          <Card className="py-16 text-center bg-white border-[#E5E7EB] p-8">
+          <Card className="py-16 text-center bg-white border-[#E2E8F0] p-8 rounded-2xl shadow-none">
             <CardContent className="p-0">
-              <Compass className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-semibold text-[#1A1A1A] mb-1">Không tìm thấy địa điểm phù hợp</h3>
-              <p className="text-muted-foreground text-xs mb-4">
+              <Compass className="w-10 h-10 text-[#94A3B8] mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-[#0F172A] mb-1">Không tìm thấy địa điểm phù hợp</h3>
+              <p className="text-[#64748B] text-xs mb-4">
                 Hãy thử đổi từ khóa tìm kiếm hoặc bỏ chọn các tiêu chí lọc tỉnh thành/thể loại.
               </p>
               <Button
@@ -532,6 +540,7 @@ export default function PlacesSocialFeedPage() {
                   setSearch('');
                   setPage(1);
                 }}
+                className="border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488]"
               >
                 Đặt lại bộ lọc
               </Button>
@@ -549,11 +558,11 @@ export default function PlacesSocialFeedPage() {
                 <Card
                   key={place.id}
                   id={place.id}
-                  className="group bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-2xl overflow-hidden shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between"
+                  className="group bg-white border-[#E2E8F0] hover:border-[#0D9488]/50 rounded-2xl overflow-hidden shadow-none transition-colors flex flex-col justify-between"
                 >
                   <div>
                     {/* Visual Banner Area */}
-                    <div className="relative h-48 w-full overflow-hidden bg-[#F0F0EF]">
+                    <div className="relative h-48 w-full overflow-hidden bg-[#F1F5F9]">
                       {place.imageUrl ? (
                         <img
                           src={place.imageUrl}
@@ -566,10 +575,10 @@ export default function PlacesSocialFeedPage() {
                           className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#F5F5F4]">
+                        <div className="w-full h-full flex items-center justify-center bg-[#F1F5F9]">
                           <div className="text-center p-4">
-                            <MapPin className="w-8 h-8 text-neutral-400 mx-auto mb-1 opacity-70" />
-                            <span className="text-xs text-muted-foreground font-medium">
+                            <MapPin className="w-8 h-8 text-[#94A3B8] mx-auto mb-1" />
+                            <span className="text-xs text-[#64748B] font-medium">
                               {place.district || provMeta.label}
                             </span>
                           </div>
@@ -578,12 +587,12 @@ export default function PlacesSocialFeedPage() {
 
                       {/* Top Badges */}
                       <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-                        <Badge variant="secondary" className="backdrop-blur-md bg-white/90 text-[#1A1A1A] border-[#E5E7EB] text-[11px] shadow-2xs">
+                        <Badge variant="secondary" className="backdrop-blur-md bg-white/92 text-[#0F172A] border-[#E2E8F0] text-[11px]">
                           {provMeta.label}
                         </Badge>
 
-                        <Badge variant="secondary" className="backdrop-blur-md bg-white/90 text-[#1A1A1A] border-[#E5E7EB] text-[11px] shadow-2xs flex items-center gap-1 font-mono font-medium">
-                          <Ticket className="w-3 h-3 text-muted-foreground" />
+                        <Badge variant="secondary" className="backdrop-blur-md bg-white/92 text-[#0F172A] border-[#E2E8F0] text-[11px] flex items-center gap-1 font-mono font-medium">
+                          <Ticket className="w-3 h-3 text-[#0D9488]" />
                           {place.priceEstimate > 0
                             ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
                             : 'Miễn phí'}
@@ -594,16 +603,19 @@ export default function PlacesSocialFeedPage() {
                     {/* Content Section */}
                     <CardContent className="p-4 pb-2">
                       {/* Name */}
-                      <h3
-                        onClick={() => setDirectionsPlace(place)}
-                        className="text-base font-semibold text-[#1A1A1A] mb-1.5 line-clamp-1 hover:underline cursor-pointer"
-                        title="Bấm để xem chỉ đường & thời tiết"
-                      >
-                        {place.name}
+                      <h3 className="mb-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setDirectionsPlace(place)}
+                          className="text-left text-base font-semibold text-[#0F172A] line-clamp-1 hover:text-[#0D9488] hover:underline cursor-pointer transition-colors"
+                          title="Bấm để xem chỉ đường & thời tiết"
+                        >
+                          {place.name}
+                        </button>
                       </h3>
 
                       {/* Description */}
-                      <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">
+                      <p className="text-xs text-[#64748B] line-clamp-2 mb-3 leading-relaxed">
                         {place.description || 'Địa điểm du lịch nổi tiếng với nhiều hoạt động hấp dẫn.'}
                       </p>
 
@@ -613,45 +625,85 @@ export default function PlacesSocialFeedPage() {
                           <Badge
                             key={cat}
                             variant="outline"
-                            className="text-[10px] px-1.5 py-0 h-5 font-normal text-muted-foreground border-[#E5E7EB]"
+                            className="text-[10px] px-1.5 py-0 h-5 font-normal text-[#64748B] border-[#E2E8F0]"
                           >
                             #{cat}
                           </Badge>
                         ))}
                         {place.indoorOutdoor && (
                           <Badge
-                            variant="lime"
+                            variant="teal"
                             className="text-[10px] px-1.5 py-0 h-5 font-normal"
                           >
-                            {place.indoorOutdoor}
+                            {formatIndoorOutdoor(place.indoorOutdoor)}
                           </Badge>
                         )}
                       </div>
 
-                      {/* Rating Summary */}
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-3 px-0.5">
+                      {/* Rating Summary & Interactive Star Picker */}
+                      <div className="flex items-center justify-between gap-2 text-xs text-[#64748B] mb-3 px-0.5">
                         <div className="flex items-center gap-1.5">
-                          <Star className="w-3.5 h-3.5 text-[#1A1A1A] fill-[#1A1A1A] flex-shrink-0" />
-                          <span className="text-xs font-semibold text-[#1A1A1A]">
+                          <Star className="w-3.5 h-3.5 text-[#F59E0B] fill-[#F59E0B] flex-shrink-0" />
+                          <span className="text-xs font-semibold text-[#0F172A] tabular-nums">
                             {place.ratingAvg > 0 ? place.ratingAvg.toFixed(1) : '—'}
                           </span>
-                          <span className="text-[11px] text-muted-foreground">
-                            ({place.ratingCount} đánh giá)
+                          <span className="text-[11px] text-[#64748B] tabular-nums">
+                            ({place.ratingCount})
                           </span>
                         </div>
 
-                        {place.userRating && (
-                          <span className="text-[11px] font-medium text-[#365314] flex items-center gap-1 bg-[#F4FCE3] border border-[#D9F99D] px-2 py-0.5 rounded-full">
-                            <Check className="w-3 h-3" /> Đã chấm {place.userRating}★
-                          </span>
-                        )}
+                        <div className="flex items-center gap-1">
+                          <div
+                            className="flex items-center gap-0.5"
+                            onMouseLeave={() =>
+                              setHoverRating((prev) => ({ ...prev, [place.id]: 0 }))
+                            }
+                          >
+                            {[1, 2, 3, 4, 5].map((starVal) => {
+                              const activeStars =
+                                hoverRating[place.id] || place.userRating || 0;
+                              const isFilled = starVal <= activeStars;
+                              return (
+                                <button
+                                  key={starVal}
+                                  type="button"
+                                  onMouseEnter={() =>
+                                    setHoverRating((prev) => ({ ...prev, [place.id]: starVal }))
+                                  }
+                                  onClick={() => handleRate(place.id, starVal)}
+                                  aria-label={`Đánh giá ${starVal} sao cho ${place.name}`}
+                                  title={`Chấm ${starVal} sao`}
+                                  className="p-0.5 cursor-pointer transition-transform hover:scale-110"
+                                >
+                                  <Star
+                                    className={`w-3.5 h-3.5 ${
+                                      isFilled
+                                        ? 'text-[#F59E0B] fill-[#F59E0B]'
+                                        : 'text-[#CBD5E1]'
+                                    }`}
+                                  />
+                                </button>
+                              );
+                            })}
+                          </div>
+                          {place.userRating && (
+                            <button
+                              type="button"
+                              onClick={() => handleUnrate(place.id)}
+                              title="Bấm để hủy đánh giá"
+                              className="text-[10px] font-medium text-[#B45309] bg-[#FFFBEB] border border-[#FDE68A] hover:bg-[#FEF3C7] px-1.5 py-0.5 rounded-full ml-1 cursor-pointer"
+                            >
+                              {place.userRating}★ ✕
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </CardContent>
                   </div>
 
                   {/* Actions Footer */}
                   <div>
-                    <div className="border-t border-[#E5E7EB] px-3 py-2 bg-[#FAFAFA] flex items-center justify-between text-xs">
+                    <div className="border-t border-[#E2E8F0] px-3 py-2 bg-[#F8FAFC] flex items-center justify-between text-xs">
                       {/* Left: Like & Save & Comment */}
                       <div className="flex items-center gap-1">
                         <Button
@@ -659,14 +711,16 @@ export default function PlacesSocialFeedPage() {
                           size="sm"
                           onClick={() => handleToggleLike(place)}
                           className={`h-7 px-2 text-xs gap-1 font-medium ${
-                            place.isLiked ? 'text-rose-600 hover:text-rose-700 bg-rose-50' : 'text-muted-foreground'
+                            place.isLiked
+                              ? 'text-[#FF6B6B] bg-[#FFF1F2] hover:bg-[#FFE4E6] hover:text-[#FF6B6B]'
+                              : 'text-[#64748B] hover:text-[#0F172A]'
                           }`}
                           title={place.isLiked ? 'Bỏ thích' : 'Thích địa điểm'}
                         >
                           <Heart
-                            className={`w-3.5 h-3.5 ${place.isLiked ? 'fill-rose-600 text-rose-600' : ''}`}
+                            className={`w-3.5 h-3.5 ${place.isLiked ? 'fill-[#FF6B6B] text-[#FF6B6B]' : ''}`}
                           />
-                          <span>{place.likesCount}</span>
+                          <span className="tabular-nums">{place.likesCount}</span>
                         </Button>
 
                         <Button
@@ -674,14 +728,16 @@ export default function PlacesSocialFeedPage() {
                           size="sm"
                           onClick={() => handleToggleSave(place)}
                           className={`h-7 px-2 text-xs gap-1 font-medium ${
-                            place.isSaved ? 'text-amber-700 hover:text-amber-800 bg-amber-50' : 'text-muted-foreground'
+                            place.isSaved
+                              ? 'text-[#B45309] bg-[#FFFBEB] hover:bg-[#FEF3C7] hover:text-[#B45309]'
+                              : 'text-[#64748B] hover:text-[#0F172A]'
                           }`}
                           title={place.isSaved ? 'Đã lưu trong Wishlist' : 'Lưu vào Wishlist'}
                         >
                           <Bookmark
-                            className={`w-3.5 h-3.5 ${place.isSaved ? 'fill-amber-600 text-amber-600' : ''}`}
+                            className={`w-3.5 h-3.5 ${place.isSaved ? 'fill-[#F59E0B] text-[#F59E0B]' : ''}`}
                           />
-                          <span>{place.savesCount}</span>
+                          <span className="tabular-nums">{place.savesCount}</span>
                         </Button>
 
                         <Button
@@ -689,7 +745,7 @@ export default function PlacesSocialFeedPage() {
                           size="sm"
                           onClick={() => toggleComments(place.id)}
                           className={`h-7 px-2 text-xs gap-1 font-medium ${
-                            isCommentsOpen ? 'bg-[#E5E7EB] text-[#1A1A1A]' : 'text-muted-foreground'
+                            isCommentsOpen ? 'bg-[#F0FDFA] text-[#0D9488]' : 'text-[#64748B] hover:text-[#0F172A]'
                           }`}
                           title="Bình luận"
                         >
@@ -708,7 +764,7 @@ export default function PlacesSocialFeedPage() {
                             e.stopPropagation();
                             setDirectionsPlace(place);
                           }}
-                          className="h-7 px-2.5 text-xs gap-1 font-medium"
+                          className="h-7 px-2.5 text-xs gap-1 font-medium border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                           title="Xem chỉ đường & thời tiết"
                         >
                           <Navigation className="w-3.5 h-3.5" />
@@ -719,7 +775,8 @@ export default function PlacesSocialFeedPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleShare(place)}
-                          className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
+                          aria-label="Chia sẻ địa điểm"
+                          className="h-7 w-7 p-0 text-[#64748B] hover:text-[#0D9488]"
                           title="Chia sẻ địa điểm"
                         >
                           <Share2 className="w-3.5 h-3.5" />
@@ -729,7 +786,7 @@ export default function PlacesSocialFeedPage() {
 
                     {/* Expandable Comments Drawer */}
                     {isCommentsOpen && (
-                      <div className="border-t border-[#E5E7EB] bg-white p-3 space-y-2.5">
+                      <div className="border-t border-[#E2E8F0] bg-white p-3 space-y-2.5">
                         <div className="flex gap-1.5 items-center">
                           <Input
                             type="text"
@@ -749,7 +806,7 @@ export default function PlacesSocialFeedPage() {
                                 : 'Đăng nhập để để lại bình luận...'
                             }
                             disabled={!isAuthenticated}
-                            className="h-8 text-xs bg-[#FAFAFA]"
+                            className="h-8 text-xs bg-[#F8FAFC]"
                           />
                           <Button
                             size="sm"
@@ -759,7 +816,8 @@ export default function PlacesSocialFeedPage() {
                               isSubmittingComment[place.id] ||
                               !(newCommentText[place.id] || '').trim()
                             }
-                            className="h-8 w-8 p-0 flex-shrink-0"
+                            aria-label="Gửi bình luận"
+                            className="h-8 w-8 p-0 flex-shrink-0 bg-[#0D9488] hover:bg-[#0F766E] text-white"
                           >
                             {isSubmittingComment[place.id] ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -770,12 +828,12 @@ export default function PlacesSocialFeedPage() {
                         </div>
 
                         {commentsLoading[place.id] ? (
-                          <div className="text-center py-2 text-xs text-muted-foreground">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto mb-1 text-neutral-400" />
+                          <div className="text-center py-2 text-xs text-[#64748B]">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto mb-1 text-[#0D9488]" />
                             Đang tải bình luận...
                           </div>
                         ) : placeComments.length === 0 ? (
-                          <div className="text-center py-2 text-[11px] text-muted-foreground">
+                          <div className="text-center py-2 text-[11px] text-[#64748B]">
                             Chưa có bình luận nào. Hãy là người đầu tiên!
                           </div>
                         ) : (
@@ -783,17 +841,17 @@ export default function PlacesSocialFeedPage() {
                             {placeComments.map((c) => (
                               <div
                                 key={c.id}
-                                className="bg-[#FAFAFA] border border-[#E5E7EB] rounded-lg p-2 text-xs"
+                                className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg p-2 text-xs"
                               >
                                 <div className="flex items-center justify-between mb-0.5">
-                                  <span className="font-medium text-[#1A1A1A] text-[11px]">
+                                  <span className="font-medium text-[#0F172A] text-[11px]">
                                     {c.user.name || c.user.email.split('@')[0]}
                                   </span>
-                                  <span className="text-[10px] text-muted-foreground">
+                                  <span className="text-[10px] text-[#64748B]">
                                     {new Date(c.createdAt).toLocaleDateString('vi-VN')}
                                   </span>
                                 </div>
-                                <p className="text-muted-foreground text-[11px] leading-relaxed">
+                                <p className="text-[#64748B] text-[11px] leading-relaxed">
                                   {c.content}
                                 </p>
                               </div>
@@ -817,13 +875,13 @@ export default function PlacesSocialFeedPage() {
               size="sm"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="gap-1 text-xs"
+              className="gap-1 text-xs border-[#E2E8F0]"
             >
               <ChevronLeft className="w-3.5 h-3.5" /> Trang trước
             </Button>
 
-            <span className="text-xs text-muted-foreground px-2">
-              Trang <strong className="text-[#1A1A1A]">{page}</strong> / {totalPages}
+            <span className="text-xs text-[#64748B] px-2">
+              Trang <strong className="text-[#0F172A]">{page}</strong> / {totalPages}
             </span>
 
             <Button
@@ -831,7 +889,7 @@ export default function PlacesSocialFeedPage() {
               size="sm"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="gap-1 text-xs"
+              className="gap-1 text-xs border-[#E2E8F0]"
             >
               Trang sau <ChevronRight className="w-3.5 h-3.5" />
             </Button>
@@ -857,5 +915,19 @@ export default function PlacesSocialFeedPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function PlacesSocialFeedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <Loader2 className="w-7 h-7 animate-spin text-[#0D9488]" />
+        </div>
+      }
+    >
+      <PlacesSocialFeedContent />
+    </Suspense>
   );
 }

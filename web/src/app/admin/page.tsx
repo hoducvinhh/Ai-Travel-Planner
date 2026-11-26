@@ -47,8 +47,8 @@ const LocationPickerMap = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[320px] bg-[#F5F5F4] animate-pulse rounded-xl flex flex-col items-center justify-center text-muted-foreground gap-2 border border-[#E5E7EB]">
-        <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+      <div className="w-full h-[320px] bg-[#F8FAFC] animate-pulse rounded-xl flex flex-col items-center justify-center text-[#64748B] gap-2 border border-[#E2E8F0]">
+        <Loader2 className="w-6 h-6 animate-spin text-[#0D9488]" />
         <span className="text-xs">Đang tải bản đồ OpenStreetMap...</span>
       </div>
     ),
@@ -549,42 +549,42 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminRoute>
-      <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
+      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
         {/* Floating Toast Alert */}
         {toast && (
           <div
             className={`fixed bottom-6 right-6 z-[9999] px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 border ${
               toast.type === 'success'
-                ? 'bg-[#1A1A1A] border-[#333333] text-white'
-                : 'bg-destructive/10 border-destructive/20 text-destructive'
+                ? 'bg-[#0F172A] border-slate-800 text-white'
+                : 'bg-[#FFF1F2] border-[#FECDD3] text-[#EF4444]'
             }`}
           >
             {toast.type === 'success' ? (
-              <CheckCircle2 className="w-4 h-4 text-[#D4F066]" />
+              <CheckCircle2 className="w-4 h-4 text-[#14B8A6]" />
             ) : (
-              <AlertCircle className="w-4 h-4 text-destructive" />
+              <AlertCircle className="w-4 h-4 text-[#EF4444]" />
             )}
             <span>{toast.message}</span>
           </div>
         )}
 
         {/* Top Header Banner */}
-        <div className="border-b border-[#E5E7EB] bg-white pt-8 pb-6 px-4 md:px-8">
+        <div className="border-b border-[#E2E8F0] bg-white pt-8 pb-6 px-4 md:px-8">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center shadow-xs">
+              <div className="w-11 h-11 rounded-xl bg-[#0D9488] text-white flex items-center justify-center shadow-xs">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl md:text-2xl font-bold text-[#1A1A1A]">
+                  <h1 className="text-xl md:text-2xl font-bold text-[#0F172A]">
                     Bảng điều khiển quản trị
                   </h1>
-                  <Badge variant="lime" className="text-[10px] uppercase font-semibold h-5">
+                  <Badge variant="teal" className="text-[10px] uppercase font-semibold h-5">
                     Admin
                   </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <p className="text-xs text-[#64748B] mt-0.5">
                   Quản lý toàn diện dữ liệu Địa điểm (OpenStreetMap), Người dùng và Hậu kiểm bài đăng cộng đồng
                 </p>
               </div>
@@ -592,22 +592,22 @@ export default function AdminDashboardPage() {
 
             {/* Quick stats snapshot */}
             <div className="flex items-center gap-2.5">
-              <Card className="bg-[#FAFAFA] border-[#E5E7EB] px-3.5 py-2 text-center shadow-2xs">
+              <Card className="bg-[#F8FAFC] border-[#E2E8F0] px-3.5 py-2 text-center shadow-2xs">
                 <CardContent className="p-0">
-                  <div className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Địa điểm</div>
-                  <div className="text-sm font-bold text-[#1A1A1A]">{placesTotal}</div>
+                  <div className="text-[10px] text-[#64748B] uppercase font-semibold tracking-wider">Địa điểm</div>
+                  <div className="text-sm font-bold text-[#0D9488]">{placesTotal}</div>
                 </CardContent>
               </Card>
-              <Card className="bg-[#FAFAFA] border-[#E5E7EB] px-3.5 py-2 text-center shadow-2xs">
+              <Card className="bg-[#F8FAFC] border-[#E2E8F0] px-3.5 py-2 text-center shadow-2xs">
                 <CardContent className="p-0">
-                  <div className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Thành viên</div>
-                  <div className="text-sm font-bold text-[#1A1A1A]">{usersTotal}</div>
+                  <div className="text-[10px] text-[#64748B] uppercase font-semibold tracking-wider">Thành viên</div>
+                  <div className="text-sm font-bold text-[#0F172A]">{usersTotal}</div>
                 </CardContent>
               </Card>
-              <Card className="bg-[#FAFAFA] border-[#E5E7EB] px-3.5 py-2 text-center shadow-2xs">
+              <Card className="bg-[#F8FAFC] border-[#E2E8F0] px-3.5 py-2 text-center shadow-2xs">
                 <CardContent className="p-0">
-                  <div className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">Bài viết</div>
-                  <div className="text-sm font-bold text-[#1A1A1A]">{postsTotal}</div>
+                  <div className="text-[10px] text-[#64748B] uppercase font-semibold tracking-wider">Bài viết</div>
+                  <div className="text-sm font-bold text-[#0F172A]">{postsTotal}</div>
                 </CardContent>
               </Card>
             </div>
@@ -616,13 +616,13 @@ export default function AdminDashboardPage() {
 
         {/* Tab Navigation */}
         <div className="max-w-7xl mx-auto px-4 md:px-8 mt-6">
-          <div className="flex items-center gap-1.5 border-b border-[#E5E7EB] pb-3">
+          <div className="flex items-center gap-1.5 border-b border-[#E2E8F0] pb-3">
             <button
               onClick={() => setActiveTab('places')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'places'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
               }`}
             >
               <MapPin className="w-3.5 h-3.5" />
@@ -633,8 +633,8 @@ export default function AdminDashboardPage() {
               onClick={() => setActiveTab('users')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'users'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
               }`}
             >
               <Users className="w-3.5 h-3.5" />
@@ -645,8 +645,8 @@ export default function AdminDashboardPage() {
               onClick={() => setActiveTab('posts')}
               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition cursor-pointer ${
                 activeTab === 'posts'
-                  ? 'bg-[#1A1A1A] text-white shadow-xs'
-                  : 'text-muted-foreground hover:text-[#1A1A1A] hover:bg-white'
+                  ? 'bg-[#0D9488] text-white shadow-xs'
+                  : 'text-[#64748B] hover:text-[#0D9488] hover:bg-white'
               }`}
             >
               <MessageSquare className="w-3.5 h-3.5" />
@@ -663,18 +663,18 @@ export default function AdminDashboardPage() {
           {activeTab === 'places' && (
             <div className="space-y-4">
               {/* Action Toolbar */}
-              <Card className="bg-white p-3.5 rounded-2xl border-[#E5E7EB] shadow-2xs">
+              <Card className="bg-white p-3.5 rounded-2xl border-[#E2E8F0] shadow-2xs">
                 <CardContent className="p-0 flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2 flex-1">
                     {/* Search */}
                     <div className="relative flex-1 min-w-[200px]">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
                       <Input
                         type="text"
                         value={searchPlace}
                         onChange={(e) => setSearchPlace(e.target.value)}
                         placeholder="Tìm kiếm địa điểm theo tên, quận huyện..."
-                        className="pl-8 text-xs h-9 bg-[#FAFAFA]"
+                        className="pl-8 text-xs h-9 bg-[#F8FAFC]"
                       />
                     </div>
 
@@ -685,7 +685,7 @@ export default function AdminDashboardPage() {
                         setFilterProvince(e.target.value);
                         setPlacesPage(1);
                       }}
-                      className="px-3 py-1.5 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="px-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       {PROVINCE_PRESETS.map((p) => (
                         <option key={p} value={p}>
@@ -701,7 +701,7 @@ export default function AdminDashboardPage() {
                         setFilterCategory(e.target.value);
                         setPlacesPage(1);
                       }}
-                      className="px-3 py-1.5 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="px-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="Tất cả">Tất cả thể loại</option>
                       {CATEGORY_OPTIONS.map((c) => (
@@ -718,7 +718,7 @@ export default function AdminDashboardPage() {
                       size="sm"
                       onClick={fetchPlaces}
                       title="Làm mới"
-                      className="h-9 px-2.5 text-muted-foreground hover:text-[#1A1A1A]"
+                      className="h-9 px-2.5 text-[#64748B] hover:text-[#0D9488] hover:border-[#0D9488]"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                     </Button>
@@ -736,21 +736,21 @@ export default function AdminDashboardPage() {
               </Card>
 
               {/* Places Table */}
-              <Card className="bg-white rounded-2xl border-[#E5E7EB] overflow-hidden shadow-2xs">
+              <Card className="bg-white rounded-2xl border-[#E2E8F0] overflow-hidden shadow-2xs">
                 {placesLoading ? (
-                  <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
-                    <Loader2 className="w-7 h-7 animate-spin text-neutral-400 mb-2" />
+                  <div className="py-20 flex flex-col items-center justify-center text-[#64748B]">
+                    <Loader2 className="w-7 h-7 animate-spin text-[#0D9488] mb-2" />
                     <p className="text-xs">Đang tải danh sách địa điểm...</p>
                   </div>
                 ) : places.length === 0 ? (
-                  <div className="py-16 text-center text-muted-foreground">
-                    <MapPin className="w-9 h-9 mx-auto text-neutral-300 mb-2" />
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Không tìm thấy địa điểm nào</p>
-                    <p className="text-xs text-muted-foreground mt-1">Hãy thử đổi từ khóa tìm kiếm</p>
+                  <div className="py-16 text-center text-[#64748B]">
+                    <MapPin className="w-9 h-9 mx-auto text-[#0D9488]/40 mb-2" />
+                    <p className="text-sm font-semibold text-[#0F172A]">Không tìm thấy địa điểm nào</p>
+                    <p className="text-xs text-[#64748B] mt-1">Hãy thử đổi từ khóa tìm kiếm</p>
                   </div>
                 ) : (
                   <Table>
-                    <TableHeader className="bg-[#FAFAFA]">
+                    <TableHeader className="bg-[#F8FAFC]">
                       <TableRow>
                         <TableHead className="px-4 py-3">Địa điểm</TableHead>
                         <TableHead className="px-4 py-3">Tỉnh / Thành</TableHead>
@@ -769,24 +769,24 @@ export default function AdminDashboardPage() {
                                 <img
                                   src={place.imageUrl}
                                   alt={place.name}
-                                  className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB] flex-shrink-0"
+                                  className="w-10 h-10 rounded-lg object-cover border border-[#E2E8F0] flex-shrink-0"
                                 />
                               ) : (
-                                <div className="w-10 h-10 rounded-lg bg-[#F0F0EF] flex items-center justify-center text-neutral-400 flex-shrink-0">
+                                <div className="w-10 h-10 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] flex items-center justify-center text-[#0D9488] flex-shrink-0">
                                   <MapPin className="w-4 h-4" />
                                 </div>
                               )}
                               <div>
-                                <div className="font-semibold text-[#1A1A1A] text-xs line-clamp-1">{place.name}</div>
-                                <div className="text-[11px] text-muted-foreground line-clamp-1">{place.description}</div>
+                                <div className="font-semibold text-[#0F172A] text-xs line-clamp-1">{place.name}</div>
+                                <div className="text-[11px] text-[#64748B] line-clamp-1">{place.description}</div>
                               </div>
                             </div>
                           </TableCell>
                           <TableCell className="px-4 py-3">
-                            <span className="text-[#1A1A1A] font-medium text-xs">{place.province || '—'}</span>
-                            {place.district && <span className="text-[10px] text-muted-foreground block">{place.district}</span>}
+                            <span className="text-[#0F172A] font-medium text-xs">{place.province || '—'}</span>
+                            {place.district && <span className="text-[10px] text-[#64748B] block">{place.district}</span>}
                           </TableCell>
-                          <TableCell className="px-4 py-3 font-mono text-[11px] text-muted-foreground">
+                          <TableCell className="px-4 py-3 font-mono text-[11px] text-[#64748B]">
                             {place.latitude.toFixed(4)}, {place.longitude.toFixed(4)}
                           </TableCell>
                           <TableCell className="px-4 py-3">
@@ -794,25 +794,25 @@ export default function AdminDashboardPage() {
                               {(place.categories || []).slice(0, 2).map((c) => (
                                 <Badge
                                   key={c}
-                                  variant="outline"
-                                  className="px-1.5 py-0 h-4 text-[10px] font-normal text-muted-foreground"
+                                  variant="teal"
+                                  className="px-1.5 py-0 h-4 text-[10px] font-normal"
                                 >
                                   {c}
                                 </Badge>
                               ))}
                               {(place.categories || []).length > 2 && (
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-[#64748B]">
                                   +{place.categories.length - 2}
                                 </span>
                               )}
                             </div>
                           </TableCell>
                           <TableCell className="px-4 py-3">
-                            <div className="text-[#1A1A1A] text-xs font-mono">
+                            <div className="text-[#0F766E] text-xs font-mono font-semibold">
                               {place.priceEstimate ? `${place.priceEstimate.toLocaleString('vi-VN')} đ` : 'Miễn phí'}
                             </div>
-                            <div className="text-[10px] text-muted-foreground flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-neutral-700" />
+                            <div className="text-[10px] text-[#64748B] flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
                               <span>{place.popularityScore || 0} điểm</span>
                             </div>
                           </TableCell>
@@ -822,7 +822,7 @@ export default function AdminDashboardPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => openEditPlaceModal(place)}
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
+                                className="h-7 w-7 p-0 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                                 title="Chỉnh sửa"
                               >
                                 <Edit className="w-3.5 h-3.5" />
@@ -831,7 +831,7 @@ export default function AdminDashboardPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setDeletingPlace(place)}
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600"
+                                className="h-7 w-7 p-0 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2]"
                                 title="Xóa"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -846,7 +846,7 @@ export default function AdminDashboardPage() {
 
                 {/* Pagination */}
                 {placesTotalPages > 1 && (
-                  <div className="px-4 py-3 border-t border-[#E5E7EB] flex items-center justify-between text-xs bg-[#FAFAFA]">
+                  <div className="px-4 py-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs bg-[#F8FAFC]">
                     <span className="text-muted-foreground">
                       Trang {placesPage} / {placesTotalPages} (Tổng {placesTotal} địa điểm)
                     </span>
@@ -882,17 +882,17 @@ export default function AdminDashboardPage() {
           {activeTab === 'users' && (
             <div className="space-y-4">
               {/* Action Toolbar */}
-              <Card className="bg-white p-3.5 rounded-2xl border-[#E5E7EB] shadow-2xs">
+              <Card className="bg-white p-3.5 rounded-2xl border-[#E2E8F0] shadow-2xs">
                 <CardContent className="p-0 flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2 flex-1">
                     <div className="relative flex-1 min-w-[200px]">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
                       <Input
                         type="text"
                         value={searchUser}
                         onChange={(e) => setSearchUser(e.target.value)}
                         placeholder="Tìm kiếm người dùng theo tên, email..."
-                        className="pl-8 text-xs h-9 bg-[#FAFAFA]"
+                        className="pl-8 text-xs h-9 bg-[#F8FAFC]"
                       />
                     </div>
 
@@ -902,7 +902,7 @@ export default function AdminDashboardPage() {
                         setFilterUserRole(e.target.value);
                         setUsersPage(1);
                       }}
-                      className="px-3 py-1.5 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="px-3 py-1.5 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="ALL">Tất cả vai trò</option>
                       <option value="USER">Người dùng (USER)</option>
@@ -916,7 +916,7 @@ export default function AdminDashboardPage() {
                       size="sm"
                       onClick={fetchUsers}
                       title="Làm mới"
-                      className="h-9 px-2.5 text-muted-foreground hover:text-[#1A1A1A]"
+                      className="h-9 px-2.5 text-[#64748B] hover:text-[#0D9488] hover:border-[#0D9488]"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                     </Button>
@@ -934,20 +934,20 @@ export default function AdminDashboardPage() {
               </Card>
 
               {/* Users Table */}
-              <Card className="bg-white rounded-2xl border-[#E5E7EB] overflow-hidden shadow-2xs">
+              <Card className="bg-white rounded-2xl border-[#E2E8F0] overflow-hidden shadow-2xs">
                 {usersLoading ? (
-                  <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
-                    <Loader2 className="w-7 h-7 animate-spin text-neutral-400 mb-2" />
+                  <div className="py-20 flex flex-col items-center justify-center text-[#64748B]">
+                    <Loader2 className="w-7 h-7 animate-spin text-[#0D9488] mb-2" />
                     <p className="text-xs">Đang tải danh sách người dùng...</p>
                   </div>
                 ) : usersList.length === 0 ? (
-                  <div className="py-16 text-center text-muted-foreground">
-                    <Users className="w-9 h-9 mx-auto text-neutral-300 mb-2" />
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Không tìm thấy người dùng nào</p>
+                  <div className="py-16 text-center text-[#64748B]">
+                    <Users className="w-9 h-9 mx-auto text-[#0D9488]/40 mb-2" />
+                    <p className="text-sm font-semibold text-[#0F172A]">Không tìm thấy người dùng nào</p>
                   </div>
                 ) : (
                   <Table>
-                    <TableHeader className="bg-[#FAFAFA]">
+                    <TableHeader className="bg-[#F8FAFC]">
                       <TableRow>
                         <TableHead className="px-4 py-3">Người dùng</TableHead>
                         <TableHead className="px-4 py-3">Vai trò</TableHead>
@@ -964,25 +964,25 @@ export default function AdminDashboardPage() {
                           <TableRow key={u.id}>
                             <TableCell className="px-4 py-3">
                               <div className="flex items-center gap-2.5">
-                                <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] font-semibold flex items-center justify-center text-xs uppercase flex-shrink-0">
+                                <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] text-[#0F766E] font-semibold flex items-center justify-center text-xs uppercase flex-shrink-0">
                                   {u.name ? u.name.charAt(0) : u.email.charAt(0)}
                                 </div>
                                 <div>
-                                  <div className="font-semibold text-[#1A1A1A] text-xs flex items-center gap-1.5">
+                                  <div className="font-semibold text-[#0F172A] text-xs flex items-center gap-1.5">
                                     <span>{u.name || 'Chưa đặt tên'}</span>
                                     {isSelf && (
-                                      <Badge variant="lime" className="text-[9px] px-1 py-0 h-4">
+                                      <Badge variant="teal" className="text-[9px] px-1 py-0 h-4">
                                         Bạn
                                       </Badge>
                                     )}
                                   </div>
-                                  <div className="text-[11px] text-muted-foreground">{u.email}</div>
+                                  <div className="text-[11px] text-[#64748B]">{u.email}</div>
                                 </div>
                               </div>
                             </TableCell>
                             <TableCell className="px-4 py-3">
                               <Badge
-                                variant={u.role === 'ADMIN' ? 'lime' : 'secondary'}
+                                variant={u.role === 'ADMIN' ? 'teal' : 'secondary'}
                                 className="text-[10px] uppercase font-semibold"
                               >
                                 {u.role}
@@ -994,21 +994,21 @@ export default function AdminDashboardPage() {
                                   <Badge
                                     key={s}
                                     variant="outline"
-                                    className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground"
+                                    className="text-[10px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]"
                                   >
                                     {s}
                                   </Badge>
                                 ))}
                                 {(!u.preferredStyles || u.preferredStyles.length === 0) && (
-                                  <span className="text-muted-foreground text-[11px]">—</span>
+                                  <span className="text-[#94A3B8] text-[11px]">—</span>
                                 )}
                               </div>
                             </TableCell>
-                            <TableCell className="px-4 py-3 text-muted-foreground text-xs">
-                              <div>Chuyến đi: <strong className="text-[#1A1A1A]">{u._count?.trips || 0}</strong></div>
-                              <div>Bài viết: <strong className="text-[#1A1A1A]">{u._count?.communityPosts || 0}</strong></div>
+                            <TableCell className="px-4 py-3 text-[#64748B] text-xs">
+                              <div>Chuyến đi: <strong className="text-[#0F172A]">{u._count?.trips || 0}</strong></div>
+                              <div>Bài viết: <strong className="text-[#0F172A]">{u._count?.communityPosts || 0}</strong></div>
                             </TableCell>
-                            <TableCell className="px-4 py-3 text-muted-foreground text-xs">
+                            <TableCell className="px-4 py-3 text-[#64748B] text-xs">
                               {new Date(u.createdAt).toLocaleDateString('vi-VN')}
                             </TableCell>
                             <TableCell className="px-4 py-3 text-right">
@@ -1017,7 +1017,7 @@ export default function AdminDashboardPage() {
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => openEditUserModal(u)}
-                                  className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
+                                  className="h-7 w-7 p-0 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                                   title="Sửa quyền / Thông tin"
                                 >
                                   <Edit className="w-3.5 h-3.5" />
@@ -1027,7 +1027,7 @@ export default function AdminDashboardPage() {
                                   size="sm"
                                   disabled={isSelf}
                                   onClick={() => setDeletingUser(u)}
-                                  className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600 disabled:opacity-30"
+                                  className="h-7 w-7 p-0 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] disabled:opacity-30"
                                   title={isSelf ? 'Không thể tự xóa chính mình' : 'Xóa người dùng'}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1043,7 +1043,7 @@ export default function AdminDashboardPage() {
 
                 {/* Users Pagination */}
                 {usersTotalPages > 1 && (
-                  <div className="px-4 py-3 border-t border-[#E5E7EB] flex items-center justify-between text-xs bg-[#FAFAFA]">
+                  <div className="px-4 py-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs bg-[#F8FAFC]">
                     <span className="text-muted-foreground">
                       Trang {usersPage} / {usersTotalPages} (Tổng {usersTotal} thành viên)
                     </span>
@@ -1079,17 +1079,17 @@ export default function AdminDashboardPage() {
           {activeTab === 'posts' && (
             <div className="space-y-4">
               {/* Action Toolbar */}
-              <Card className="bg-white p-3.5 rounded-2xl border-[#E5E7EB] shadow-2xs">
+              <Card className="bg-white p-3.5 rounded-2xl border-[#E2E8F0] shadow-2xs">
                 <CardContent className="p-0 flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <div className="flex flex-wrap items-center gap-2 flex-1">
                     <div className="relative flex-1 min-w-[200px]">
-                      <Search className="w-3.5 h-3.5 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+                      <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
                       <Input
                         type="text"
                         value={searchPost}
                         onChange={(e) => setSearchPost(e.target.value)}
                         placeholder="Tìm bài đăng theo tiêu đề, nội dung..."
-                        className="pl-8 text-xs h-9 bg-[#FAFAFA]"
+                        className="pl-8 text-xs h-9 bg-[#F8FAFC]"
                       />
                     </div>
 
@@ -1098,7 +1098,7 @@ export default function AdminDashboardPage() {
                       value={filterPostTag}
                       onChange={(e) => setFilterPostTag(e.target.value)}
                       placeholder="Lọc theo tag..."
-                      className="text-xs h-9 w-40 bg-[#FAFAFA]"
+                      className="text-xs h-9 w-40 bg-[#F8FAFC]"
                     />
                   </div>
 
@@ -1108,7 +1108,7 @@ export default function AdminDashboardPage() {
                       size="sm"
                       onClick={fetchPosts}
                       title="Làm mới"
-                      className="h-9 px-2.5 text-muted-foreground hover:text-[#1A1A1A]"
+                      className="h-9 px-2.5 text-[#64748B] hover:text-[#0D9488] hover:border-[#0D9488]"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                     </Button>
@@ -1126,28 +1126,28 @@ export default function AdminDashboardPage() {
               </Card>
 
               {/* Note on Post-moderation */}
-              <div className="p-3 bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-xs text-muted-foreground flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#1A1A1A]" />
+              <div className="p-3 bg-[#F0FDFA] border border-[#99F6E4] rounded-xl text-xs text-[#0F766E] flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#0D9488]" />
                 <span>
                   <strong>Cơ chế hậu kiểm:</strong> Người dùng được đăng bài trực tiếp lên diễn đàn. Tại đây bạn có thể kiểm duyệt, chỉnh sửa hoặc xóa bài viết vi phạm, spam.
                 </span>
               </div>
 
               {/* Posts Table */}
-              <Card className="bg-white rounded-2xl border-[#E5E7EB] overflow-hidden shadow-2xs">
+              <Card className="bg-white rounded-2xl border-[#E2E8F0] overflow-hidden shadow-2xs">
                 {postsLoading ? (
-                  <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
-                    <Loader2 className="w-7 h-7 animate-spin text-neutral-400 mb-2" />
+                  <div className="py-20 flex flex-col items-center justify-center text-[#64748B]">
+                    <Loader2 className="w-7 h-7 animate-spin text-[#0D9488] mb-2" />
                     <p className="text-xs">Đang tải danh sách bài viết...</p>
                   </div>
                 ) : postsList.length === 0 ? (
-                  <div className="py-16 text-center text-muted-foreground">
-                    <MessageSquare className="w-9 h-9 mx-auto text-neutral-300 mb-2" />
-                    <p className="text-sm font-semibold text-[#1A1A1A]">Không tìm thấy bài viết nào</p>
+                  <div className="py-16 text-center text-[#64748B]">
+                    <MessageSquare className="w-9 h-9 mx-auto text-[#0D9488]/40 mb-2" />
+                    <p className="text-sm font-semibold text-[#0F172A]">Không tìm thấy bài viết nào</p>
                   </div>
                 ) : (
                   <Table>
-                    <TableHeader className="bg-[#FAFAFA]">
+                    <TableHeader className="bg-[#F8FAFC]">
                       <TableRow>
                         <TableHead className="px-4 py-3">Bài viết</TableHead>
                         <TableHead className="px-4 py-3">Tác giả</TableHead>
@@ -1161,12 +1161,12 @@ export default function AdminDashboardPage() {
                       {postsList.map((post) => (
                         <TableRow key={post.id}>
                           <TableCell className="px-4 py-3 max-w-[280px]">
-                            <div className="font-semibold text-[#1A1A1A] text-xs line-clamp-1">{post.title}</div>
-                            <div className="text-[11px] text-muted-foreground line-clamp-1">{post.content}</div>
+                            <div className="font-semibold text-[#0F172A] text-xs line-clamp-1">{post.title}</div>
+                            <div className="text-[11px] text-[#64748B] line-clamp-1">{post.content}</div>
                           </TableCell>
                           <TableCell className="px-4 py-3">
-                            <span className="font-medium text-[#1A1A1A] text-xs">{post.user?.name || 'Ẩn danh'}</span>
-                            <span className="text-[10px] text-muted-foreground block">{post.user?.email}</span>
+                            <span className="font-medium text-[#0F172A] text-xs">{post.user?.name || 'Ẩn danh'}</span>
+                            <span className="text-[10px] text-[#64748B] block">{post.user?.email}</span>
                           </TableCell>
                           <TableCell className="px-4 py-3">
                             <div className="flex flex-wrap gap-1 max-w-[150px]">
@@ -1174,24 +1174,24 @@ export default function AdminDashboardPage() {
                                 <Badge
                                   key={t}
                                   variant="outline"
-                                  className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground"
+                                  className="text-[10px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]"
                                 >
                                   #{t}
                                 </Badge>
                               ))}
                             </div>
                           </TableCell>
-                          <TableCell className="px-4 py-3 text-xs text-muted-foreground">
-                            <div>Thích: <strong className="text-[#1A1A1A]">{post.likesCount || 0}</strong></div>
+                          <TableCell className="px-4 py-3 text-xs text-[#64748B]">
+                            <div>Thích: <strong className="text-[#0F172A]">{post.likesCount || 0}</strong></div>
                             <button
                               type="button"
                               onClick={() => openViewComments(post)}
-                              className="text-xs text-[#1A1A1A] hover:underline cursor-pointer"
+                              className="text-xs text-[#0D9488] hover:text-[#0F766E] hover:underline cursor-pointer"
                             >
                               Bình luận: <strong>{post.commentsCount || 0}</strong>
                             </button>
                           </TableCell>
-                          <TableCell className="px-4 py-3 text-xs text-muted-foreground">
+                          <TableCell className="px-4 py-3 text-xs text-[#64748B]">
                             {new Date(post.createdAt).toLocaleDateString('vi-VN')}
                           </TableCell>
                           <TableCell className="px-4 py-3 text-right">
@@ -1200,7 +1200,7 @@ export default function AdminDashboardPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => openViewComments(post)}
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
+                                className="h-7 w-7 p-0 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                                 title="Xem bình luận"
                               >
                                 <MessageCircle className="w-3.5 h-3.5" />
@@ -1209,7 +1209,7 @@ export default function AdminDashboardPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => openEditPostModal(post)}
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-[#1A1A1A]"
+                                className="h-7 w-7 p-0 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                                 title="Chỉnh sửa"
                               >
                                 <Edit className="w-3.5 h-3.5" />
@@ -1218,7 +1218,7 @@ export default function AdminDashboardPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => setDeletingPost(post)}
-                                className="h-7 w-7 p-0 text-muted-foreground hover:text-rose-600"
+                                className="h-7 w-7 p-0 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2]"
                                 title="Xóa"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -1233,7 +1233,7 @@ export default function AdminDashboardPage() {
 
                 {/* Posts Pagination */}
                 {postsTotalPages > 1 && (
-                  <div className="px-4 py-3 border-t border-[#E5E7EB] flex items-center justify-between text-xs bg-[#FAFAFA]">
+                  <div className="px-4 py-3 border-t border-[#E2E8F0] flex items-center justify-between text-xs bg-[#F8FAFC]">
                     <span className="text-muted-foreground">
                       Trang {postsPage} / {postsTotalPages} (Tổng {postsTotal} bài đăng)
                     </span>
@@ -1269,24 +1269,24 @@ export default function AdminDashboardPage() {
         {/* ========================================================= */}
         {isPlaceModalOpen && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 shadow-xl relative text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-6 shadow-xl relative text-[#0F172A]">
               <button
                 type="button"
                 onClick={() => setIsPlaceModalOpen(false)}
-                className="absolute top-5 right-5 p-1.5 rounded-lg text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA] transition cursor-pointer"
+                className="absolute top-5 right-5 p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center font-bold">
                   <MapPin className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#1A1A1A]">
+                  <h2 className="text-base font-bold text-[#0F172A]">
                     {editingPlace ? 'Chỉnh sửa địa điểm' : 'Thêm địa điểm mới'}
                   </h2>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-[#64748B]">
                     Sử dụng bản đồ OpenStreetMap bên dưới để tìm kiếm hoặc chấm ghim tọa độ
                   </p>
                 </div>
@@ -1295,7 +1295,7 @@ export default function AdminDashboardPage() {
               <form onSubmit={handleSavePlace} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="md:col-span-1">
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                       Tên địa điểm <span className="text-destructive">*</span>
                     </label>
                     <Input
@@ -1304,12 +1304,12 @@ export default function AdminDashboardPage() {
                       value={placeForm.name}
                       onChange={(e) => setPlaceForm({ ...placeForm, name: e.target.value })}
                       placeholder="VD: Cà phê Giảng..."
-                      className="bg-[#FAFAFA]"
+                      className="bg-[#F8FAFC]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                       Tỉnh / Thành phố
                     </label>
                     <Input
@@ -1317,12 +1317,12 @@ export default function AdminDashboardPage() {
                       value={placeForm.province}
                       onChange={(e) => setPlaceForm({ ...placeForm, province: e.target.value })}
                       placeholder="VD: Hà Nội..."
-                      className="bg-[#FAFAFA]"
+                      className="bg-[#F8FAFC]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                       Quận / Huyện
                     </label>
                     <Input
@@ -1330,13 +1330,13 @@ export default function AdminDashboardPage() {
                       value={placeForm.district}
                       onChange={(e) => setPlaceForm({ ...placeForm, district: e.target.value })}
                       placeholder="VD: Hoàn Kiếm..."
-                      className="bg-[#FAFAFA]"
+                      className="bg-[#F8FAFC]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Mô tả chi tiết <span className="text-destructive">*</span>
                   </label>
                   <Textarea
@@ -1345,15 +1345,15 @@ export default function AdminDashboardPage() {
                     value={placeForm.description}
                     onChange={(e) => setPlaceForm({ ...placeForm, description: e.target.value })}
                     placeholder="Mô tả đặc điểm nổi bật của địa điểm này..."
-                    className="bg-[#FAFAFA] resize-none"
+                    className="bg-[#F8FAFC] resize-none"
                   />
                 </div>
 
                 {/* Map Picker */}
-                <div className="p-3.5 bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl space-y-2">
+                <div className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-[#1A1A1A] flex items-center gap-1.5">
-                      <Compass className="w-3.5 h-3.5" />
+                    <label className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5 text-[#0D9488]" />
                       Bản đồ tọa độ (OpenStreetMap)
                     </label>
                     <div className="text-[11px] text-muted-foreground font-mono">
@@ -1419,8 +1419,8 @@ export default function AdminDashboardPage() {
                           onClick={() => toggleCategorySelection(cat)}
                           className={`px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
                             isSelected
-                              ? 'bg-[#1A1A1A] text-white shadow-xs'
-                              : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A]'
+                              ? 'bg-[#0D9488] text-white shadow-xs'
+                              : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#0D9488] hover:border-[#0D9488]'
                           }`}
                         >
                           {cat}
@@ -1432,7 +1432,7 @@ export default function AdminDashboardPage() {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                    <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
                       Ước tính chi phí (VNĐ)
                     </label>
                     <Input
@@ -1441,12 +1441,12 @@ export default function AdminDashboardPage() {
                       onChange={(e) =>
                         setPlaceForm({ ...placeForm, priceEstimate: parseInt(e.target.value) || 0 })
                       }
-                      className="bg-[#FAFAFA]"
+                      className="bg-[#F8FAFC]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                    <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
                       Điểm nổi tiếng (0 - 100)
                     </label>
                     <Input
@@ -1457,18 +1457,18 @@ export default function AdminDashboardPage() {
                       onChange={(e) =>
                         setPlaceForm({ ...placeForm, popularityScore: parseFloat(e.target.value) || 0 })
                       }
-                      className="bg-[#FAFAFA]"
+                      className="bg-[#F8FAFC]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                    <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
                       Không gian
                     </label>
                     <select
                       value={placeForm.indoorOutdoor}
                       onChange={(e) => setPlaceForm({ ...placeForm, indoorOutdoor: e.target.value })}
-                      className="w-full px-3 py-2 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="Ngoài trời">Ngoài trời</option>
                       <option value="Trong nhà">Trong nhà</option>
@@ -1477,13 +1477,13 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted-foreground mb-1">
+                    <label className="block text-[11px] font-semibold text-[#64748B] mb-1">
                       Mức độ vận động
                     </label>
                     <select
                       value={placeForm.activityLevel}
                       onChange={(e) => setPlaceForm({ ...placeForm, activityLevel: e.target.value })}
-                      className="w-full px-3 py-2 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="Nhẹ nhàng">Nhẹ nhàng</option>
                       <option value="Trung bình">Trung bình</option>
@@ -1493,7 +1493,7 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     URL Hình ảnh
                   </label>
                   <Input
@@ -1501,22 +1501,22 @@ export default function AdminDashboardPage() {
                     value={placeForm.imageUrl}
                     onChange={(e) => setPlaceForm({ ...placeForm, imageUrl: e.target.value })}
                     placeholder="https://images.unsplash.com/..."
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                   {placeForm.imageUrl && (
                     <div className="mt-2 flex items-center gap-3">
                       <img
                         src={placeForm.imageUrl}
                         alt="Preview"
-                        className="w-14 h-14 rounded-xl object-cover border border-[#E5E7EB]"
+                        className="w-14 h-14 rounded-xl object-cover border border-[#E2E8F0]"
                         onError={(e) => (e.currentTarget.style.display = 'none')}
                       />
-                      <span className="text-[11px] text-muted-foreground">Xem trước ảnh đại diện</span>
+                      <span className="text-[11px] text-[#64748B]">Xem trước ảnh đại diện</span>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
                   <Button
                     type="button"
                     variant="outline"
@@ -1545,24 +1545,24 @@ export default function AdminDashboardPage() {
         {/* ========================================================= */}
         {isUserModalOpen && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-lg p-6 shadow-xl relative text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-lg p-6 shadow-xl relative text-[#0F172A]">
               <button
                 type="button"
                 onClick={() => setIsUserModalOpen(false)}
-                className="absolute top-5 right-5 p-1.5 rounded-lg text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA] transition cursor-pointer"
+                className="absolute top-5 right-5 p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center font-bold">
                   <Users className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#1A1A1A]">
+                  <h2 className="text-base font-bold text-[#0F172A]">
                     {editingUser ? 'Cập nhật người dùng' : 'Tạo người dùng mới'}
                   </h2>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-[#64748B]">
                     {editingUser ? `Chỉnh sửa tài khoản ${editingUser.email}` : 'Thêm thành viên hoặc quản trị viên'}
                   </p>
                 </div>
@@ -1570,7 +1570,7 @@ export default function AdminDashboardPage() {
 
               <form onSubmit={handleSaveUser} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Email <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -1579,12 +1579,12 @@ export default function AdminDashboardPage() {
                     value={userForm.email}
                     onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                     placeholder="email@example.com"
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Họ và tên
                   </label>
                   <Input
@@ -1592,12 +1592,12 @@ export default function AdminDashboardPage() {
                     value={userForm.name}
                     onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
                     placeholder="Nguyễn Văn A"
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     {editingUser ? 'Mật khẩu mới (để trống nếu không đổi)' : 'Mật khẩu khởi tạo *'}
                   </label>
                   <Input
@@ -1606,19 +1606,19 @@ export default function AdminDashboardPage() {
                     value={userForm.password}
                     onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                     placeholder={editingUser ? '••••••••' : 'Nhập mật khẩu ít nhất 6 ký tự'}
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                       Vai trò
                     </label>
                     <select
                       value={userForm.role}
                       onChange={(e: any) => setUserForm({ ...userForm, role: e.target.value })}
-                      className="w-full px-3 py-2 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="USER">USER (Người dùng)</option>
                       <option value="ADMIN">ADMIN (Quản trị viên)</option>
@@ -1626,13 +1626,13 @@ export default function AdminDashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                       Mức ngân sách
                     </label>
                     <select
                       value={userForm.budgetLevel}
                       onChange={(e) => setUserForm({ ...userForm, budgetLevel: e.target.value })}
-                      className="w-full px-3 py-2 text-xs bg-[#FAFAFA] border border-[#E5E7EB] rounded-xl text-[#1A1A1A] h-9"
+                      className="w-full px-3 py-2 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-[#0F172A] h-9"
                     >
                       <option value="BUDGET">Tiết kiệm</option>
                       <option value="MODERATE">Tiêu chuẩn</option>
@@ -1641,7 +1641,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
                   <Button
                     type="button"
                     variant="outline"
@@ -1670,24 +1670,24 @@ export default function AdminDashboardPage() {
         {/* ========================================================= */}
         {isPostModalOpen && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-xl p-6 shadow-xl relative text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-xl p-6 shadow-xl relative text-[#0F172A]">
               <button
                 type="button"
                 onClick={() => setIsPostModalOpen(false)}
-                className="absolute top-5 right-5 p-1.5 rounded-lg text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA] transition cursor-pointer"
+                className="absolute top-5 right-5 p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2.5 mb-5">
-                <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center font-bold">
                   <MessageSquare className="w-4 h-4" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#1A1A1A]">
+                  <h2 className="text-base font-bold text-[#0F172A]">
                     {editingPost ? 'Chỉnh sửa bài viết' : 'Tạo bài viết thông báo (Admin)'}
                   </h2>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-[11px] text-[#64748B]">
                     Bài viết sẽ xuất hiện trực tiếp trên trang Cộng đồng du lịch
                   </p>
                 </div>
@@ -1695,7 +1695,7 @@ export default function AdminDashboardPage() {
 
               <form onSubmit={handleSavePost} className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Tiêu đề bài viết <span className="text-destructive">*</span>
                   </label>
                   <Input
@@ -1704,12 +1704,12 @@ export default function AdminDashboardPage() {
                     value={postForm.title}
                     onChange={(e) => setPostForm({ ...postForm, title: e.target.value })}
                     placeholder="VD: Thông báo cập nhật tính năng mới..."
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Nội dung bài viết <span className="text-destructive">*</span>
                   </label>
                   <Textarea
@@ -1718,12 +1718,12 @@ export default function AdminDashboardPage() {
                     value={postForm.content}
                     onChange={(e) => setPostForm({ ...postForm, content: e.target.value })}
                     placeholder="Nhập nội dung chia sẻ hoặc thông báo quản trị..."
-                    className="bg-[#FAFAFA] resize-none"
+                    className="bg-[#F8FAFC] resize-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Tags (ngăn cách bằng dấu phẩy)
                   </label>
                   <Input
@@ -1731,12 +1731,12 @@ export default function AdminDashboardPage() {
                     value={postForm.tagsString}
                     onChange={(e) => setPostForm({ ...postForm, tagsString: e.target.value })}
                     placeholder="Thông báo, Hướng dẫn..."
-                    className="bg-[#FAFAFA]"
+                    className="bg-[#F8FAFC]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#64748B] mb-1 uppercase tracking-wider">
                     Link hình ảnh (mỗi dòng một link)
                   </label>
                   <Textarea
@@ -1744,11 +1744,11 @@ export default function AdminDashboardPage() {
                     value={postForm.imagesString}
                     onChange={(e) => setPostForm({ ...postForm, imagesString: e.target.value })}
                     placeholder="https://images.unsplash.com/photo-..."
-                    className="bg-[#FAFAFA] font-mono text-[11px] resize-none"
+                    className="bg-[#F8FAFC] font-mono text-[11px] resize-none"
                   />
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
                   <Button
                     type="button"
                     variant="outline"
@@ -1777,55 +1777,55 @@ export default function AdminDashboardPage() {
         {/* ========================================================= */}
         {viewingCommentsPost && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-lg p-5 shadow-xl relative max-h-[85vh] flex flex-col text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-lg p-5 shadow-xl relative max-h-[85vh] flex flex-col text-[#0F172A]">
               <button
                 type="button"
                 onClick={() => setViewingCommentsPost(null)}
-                className="absolute top-4 right-4 p-1.5 rounded-lg text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#FAFAFA] transition cursor-pointer"
+                className="absolute top-4 right-4 p-1.5 rounded-lg text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="flex items-center gap-2 mb-3">
-                <MessageCircle className="w-4 h-4 text-muted-foreground" />
+                <MessageCircle className="w-4 h-4 text-[#0D9488]" />
                 <div>
-                  <h2 className="text-sm font-bold text-[#1A1A1A] line-clamp-1">
+                  <h2 className="text-sm font-bold text-[#0F172A] line-clamp-1">
                     Bình luận bài viết: {viewingCommentsPost.title}
                   </h2>
-                  <p className="text-[11px] text-muted-foreground">Kiểm duyệt và xóa bình luận vi phạm</p>
+                  <p className="text-[11px] text-[#64748B]">Kiểm duyệt và xóa bình luận vi phạm</p>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto space-y-2 pr-1">
                 {commentsLoading ? (
-                  <div className="py-12 flex justify-center text-muted-foreground">
-                    <Loader2 className="w-6 h-6 animate-spin text-neutral-400" />
+                  <div className="py-12 flex justify-center text-[#64748B]">
+                    <Loader2 className="w-6 h-6 animate-spin text-[#0D9488]" />
                   </div>
                 ) : postComments.length === 0 ? (
-                  <div className="py-12 text-center text-muted-foreground text-xs">Chưa có bình luận nào</div>
+                  <div className="py-12 text-center text-[#64748B] text-xs">Chưa có bình luận nào</div>
                 ) : (
                   postComments.map((c) => (
                     <div
                       key={c.id}
-                      className="p-3 bg-[#FAFAFA] rounded-xl border border-[#E5E7EB] flex items-start justify-between gap-3 text-xs"
+                      className="p-3 bg-[#F8FAFC] rounded-xl border border-[#E2E8F0] flex items-start justify-between gap-3 text-xs"
                     >
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-[#1A1A1A]">
+                          <span className="font-semibold text-[#0F172A]">
                             {c.user?.name || c.user?.email}
                           </span>
-                          <span className="text-[10px] text-muted-foreground">
+                          <span className="text-[10px] text-[#64748B]">
                             {new Date(c.createdAt).toLocaleDateString('vi-VN')}
                           </span>
                         </div>
-                        <p className="text-muted-foreground mt-1 text-[11px] leading-relaxed">{c.content}</p>
+                        <p className="text-[#64748B] mt-1 text-[11px] leading-relaxed">{c.content}</p>
                       </div>
 
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteComment(c.id)}
-                        className="h-6 w-6 p-0 text-muted-foreground hover:text-rose-600 flex-shrink-0"
+                        className="h-6 w-6 p-0 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2] flex-shrink-0"
                         title="Xóa bình luận này"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1843,12 +1843,12 @@ export default function AdminDashboardPage() {
         {/* ========================================================= */}
         {deletingPlace && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#0F172A]">
               <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-3">
                 <Trash2 className="w-5 h-5" />
               </div>
               <h3 className="text-sm font-bold mb-1">Xác nhận xóa địa điểm</h3>
-              <p className="text-xs text-muted-foreground mb-4">
+              <p className="text-xs text-[#64748B] mb-4">
                 Bạn có chắc chắn muốn xóa địa điểm <strong>&quot;{deletingPlace.name}&quot;</strong>? Thao tác này không thể hoàn tác.
               </p>
               <div className="flex gap-2 justify-center">
@@ -1873,12 +1873,12 @@ export default function AdminDashboardPage() {
 
         {deletingUser && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#0F172A]">
               <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-3">
                 <Trash2 className="w-5 h-5" />
               </div>
               <h3 className="text-sm font-bold mb-1">Xác nhận xóa tài khoản</h3>
-              <p className="text-xs text-muted-foreground mb-4">
+              <p className="text-xs text-[#64748B] mb-4">
                 Bạn có chắc chắn muốn xóa người dùng <strong>&quot;{deletingUser.email}&quot;</strong>?
               </p>
               <div className="flex gap-2 justify-center">
@@ -1903,7 +1903,7 @@ export default function AdminDashboardPage() {
 
         {deletingPost && (
           <div className="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
-            <div className="bg-white border border-[#E5E7EB] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#1A1A1A]">
+            <div className="bg-white border border-[#E2E8F0] rounded-2xl w-full max-w-sm p-5 text-center shadow-xl text-[#0F172A]">
               <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mx-auto mb-3">
                 <Trash2 className="w-5 h-5" />
               </div>

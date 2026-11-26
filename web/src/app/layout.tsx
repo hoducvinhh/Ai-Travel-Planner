@@ -4,6 +4,7 @@ import './globals.css';
 import 'leaflet/dist/leaflet.css';
 import { AuthProvider } from '@/context/AuthContext';
 import { SocketProvider } from '@/context/SocketContext';
+import { ToastProvider } from '@/components/ui/toast';
 import Navbar from '@/components/Navbar';
 import OnboardingModal from '@/components/onboarding/OnboardingModal';
 
@@ -33,14 +34,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <SocketProvider>
-            <Navbar />
-            <OnboardingModal />
-            {children}
-          </SocketProvider>
-        </AuthProvider>
+      <body className="min-h-full flex flex-col bg-[#F8FAFC] text-[#0F172A]">
+        <ToastProvider>
+          <AuthProvider>
+            <SocketProvider>
+              <Navbar />
+              <OnboardingModal />
+              {children}
+            </SocketProvider>
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

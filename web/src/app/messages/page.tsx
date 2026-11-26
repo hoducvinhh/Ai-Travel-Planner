@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useSocket } from '@/context/SocketContext';
 import { api } from '@/lib/api';
+import { formatStyleLabel, splitStylesAndCompanion } from '@/lib/labels';
 import { ConversationItem, DirectMessageItem, ChatUser } from '@/types';
 import {
   MessageCircle,
@@ -270,21 +271,21 @@ function MessagesContent() {
 
   if (isAuthLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center py-24 bg-[#F9F9F8]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#1A1A1A]" />
+      <div className="flex-1 flex items-center justify-center py-24 bg-[#F8FAFC]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 text-center bg-white border-[#E5E7EB] rounded-2xl shadow-sm">
-          <div className="w-12 h-12 rounded-2xl bg-[#F0F0EF] flex items-center justify-center mx-auto mb-4 text-[#1A1A1A]">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center bg-white border-[#E2E8F0] rounded-2xl shadow-sm">
+          <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] flex items-center justify-center mx-auto mb-4 text-[#0D9488]">
             <MessageCircle className="w-6 h-6" />
           </div>
-          <h2 className="text-lg font-bold text-[#1A1A1A] mb-2">Đăng nhập để xem tin nhắn</h2>
-          <p className="text-xs text-[#6B7280] mb-6">
+          <h2 className="text-lg font-bold text-[#0F172A] mb-2">Đăng nhập để xem tin nhắn</h2>
+          <p className="text-xs text-[#64748B] mb-6">
             Bạn cần đăng nhập tài khoản để trao đổi trực tiếp với bạn đồng hành và các thành viên cộng đồng.
           </p>
           <Button onClick={() => router.push('/login')} className="w-full text-xs font-semibold">
@@ -296,51 +297,51 @@ function MessagesContent() {
   }
 
   return (
-    <div className="flex-1 bg-[#F9F9F8] text-[#1A1A1A] py-6 px-4 sm:px-6">
+    <div className="flex-1 bg-[#F8FAFC] text-[#0F172A] py-4 sm:py-6 px-4 sm:px-6">
       <div className="container mx-auto max-w-6xl">
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-2xs overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[680px] max-h-[820px]">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl overflow-hidden grid grid-cols-1 md:grid-cols-12 h-[calc(100vh-104px)] min-h-[520px] max-h-[820px]">
           {/* CỘT TRÁI: DANH SÁCH CUỘC HỘI THOẠI (4 cols) */}
           <div
-            className={`md:col-span-4 border-r border-[#E5E7EB] flex flex-col bg-white ${
+            className={`md:col-span-4 border-r border-[#E2E8F0] flex flex-col bg-white min-h-0 ${
               activeConversationId ? 'hidden md:flex' : 'flex'
             }`}
           >
             {/* Header Cột Trái */}
-            <div className="p-4 border-b border-[#E5E7EB]">
+            <div className="p-4 border-b border-[#E2E8F0]">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-[#1A1A1A] text-white flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-[#0D9488] text-white flex items-center justify-center">
                     <MessageCircle className="w-4 h-4" />
                   </div>
-                  <h1 className="text-sm font-bold text-[#1A1A1A]">Hộp thư trực tiếp</h1>
+                  <h1 className="text-sm font-bold text-[#0F172A]">Hộp thư trực tiếp</h1>
                 </div>
               </div>
 
               {/* Ô tìm kiếm đối thoại */}
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280]" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B]" />
                 <Input
                   type="text"
                   placeholder="Tìm theo tên bạn bè..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-8 h-8 text-xs bg-[#F9F9F8] border-[#E5E7EB] rounded-xl focus:border-[#1A1A1A]"
+                  className="pl-8 h-8 text-xs bg-[#F8FAFC] border-[#E2E8F0] rounded-xl focus:border-[#0D9488]"
                 />
               </div>
             </div>
 
             {/* Danh sách các cuộc trò chuyện */}
-            <div className="flex-1 overflow-y-auto divide-y divide-[#F0F0EF]">
+            <div className="flex-1 overflow-y-auto divide-y divide-[#F1F5F9]">
               {isLoadingConversations ? (
-                <div className="py-12 text-center text-xs text-[#6B7280]">
-                  <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-[#1A1A1A]" />
+                <div className="py-12 text-center text-xs text-[#64748B]">
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2 text-[#0D9488]" />
                   Đang tải danh sách hội thoại...
                 </div>
               ) : filteredConversations.length === 0 ? (
                 <div className="py-16 text-center px-4">
-                  <MessageCircle className="w-8 h-8 mx-auto text-[#D1D5DB] mb-2" />
-                  <p className="text-xs font-semibold text-[#1A1A1A]">Chưa có cuộc trò chuyện nào</p>
-                  <p className="text-[11px] text-[#6B7280] mt-1">
+                  <MessageCircle className="w-8 h-8 mx-auto text-[#CBD5E1] mb-2" />
+                  <p className="text-xs font-semibold text-[#0F172A]">Chưa có cuộc trò chuyện nào</p>
+                  <p className="text-[11px] text-[#64748B] mt-1">
                     Hãy bấm &quot;Nhắn tin tham gia&quot; từ bài viết cộng đồng để bắt đầu!
                   </p>
                 </div>
@@ -358,18 +359,18 @@ function MessagesContent() {
                       onClick={() => loadConversation(conv.id, partner)}
                       className={`w-full p-3.5 flex items-start gap-3 text-left transition rounded-xl cursor-pointer ${
                         isActive
-                          ? 'bg-[#F4FCE3] text-[#1A1A1A] font-medium border border-[#D9F99D]'
-                          : 'hover:bg-[#F9F9F8]'
+                          ? 'bg-[#F0FDFA] text-[#0F172A] font-medium border border-[#99F6E4]'
+                          : 'hover:bg-[#F8FAFC]'
                       }`}
                     >
                       <div className="relative flex-shrink-0">
-                        <Avatar className="w-10 h-10 rounded-xl border border-[#E5E7EB]">
-                          <AvatarFallback className="font-bold text-xs bg-[#F0F0EF] text-[#1A1A1A]">
+                        <Avatar className="w-10 h-10 rounded-xl border border-[#E2E8F0]">
+                          <AvatarFallback className="font-bold text-xs bg-[#F0FDFA] text-[#0F766E]">
                             {initial}
                           </AvatarFallback>
                         </Avatar>
                         {conv.unreadCount > 0 && (
-                          <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white shadow-xs">
+                          <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full text-[9px] font-bold bg-[#FF6B6B] text-white border border-white">
                             {conv.unreadCount}
                           </span>
                         )}
@@ -377,8 +378,8 @@ function MessagesContent() {
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-0.5">
-                          <h4 className="text-xs font-bold text-[#1A1A1A] truncate">{displayName}</h4>
-                          <span className="text-[10px] text-[#6B7280] whitespace-nowrap">
+                          <h4 className="text-xs font-bold truncate text-[#0F172A]">{displayName}</h4>
+                          <span className="text-[10px] whitespace-nowrap text-[#64748B]">
                             {conv.lastMessageAt
                               ? new Date(conv.lastMessageAt).toLocaleDateString('vi-VN', {
                                   hour: '2-digit',
@@ -391,8 +392,8 @@ function MessagesContent() {
                         <p
                           className={`text-[11px] truncate ${
                             conv.unreadCount > 0
-                              ? 'font-bold text-[#1A1A1A]'
-                              : 'text-[#6B7280]'
+                              ? 'font-bold text-[#0F172A]'
+                              : 'text-[#64748B]'
                           }`}
                         >
                           {conv.lastMessage ? conv.lastMessage.content : 'Bắt đầu cuộc trò chuyện...'}
@@ -400,13 +401,13 @@ function MessagesContent() {
 
                         {partner?.preferredStyles && partner.preferredStyles.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1.5">
-                            {partner.preferredStyles.slice(0, 2).map((s) => (
+                            {splitStylesAndCompanion(partner.preferredStyles).styles.slice(0, 2).map((s) => (
                               <Badge
                                 key={s}
                                 variant="outline"
-                                className="text-[9px] px-1.5 py-0 h-3.5 border-[#E5E7EB] text-[#6B7280]"
+                                className="text-[9px] px-1.5 py-0 h-3.5 border-[#E2E8F0] text-[#64748B]"
                               >
-                                {s}
+                                {formatStyleLabel(s)}
                               </Badge>
                             ))}
                           </div>
@@ -421,49 +422,50 @@ function MessagesContent() {
 
           {/* CỘT PHẢI: KHUNG TRÒ CHUYỆN (8 cols) */}
           <div
-            className={`md:col-span-8 flex flex-col bg-[#FAFAFA] ${
+            className={`md:col-span-8 flex flex-col bg-[#F8FAFC] ${
               !activeConversationId ? 'hidden md:flex' : 'flex'
             }`}
           >
             {activeConversationId && activePartner ? (
               <>
                 {/* Header Khung Chat */}
-                <div className="p-3.5 border-b border-[#E5E7EB] bg-white flex items-center justify-between">
+                <div className="p-3.5 border-b border-[#E2E8F0] bg-white flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => setActiveConversationId(null)}
-                      className="md:hidden h-8 w-8 text-[#6B7280]"
+                      aria-label="Quay lại danh sách hội thoại"
+                      className="md:hidden h-8 w-8 text-[#64748B]"
                     >
                       <ArrowLeft className="w-4 h-4" />
                     </Button>
 
-                    <Avatar className="w-9 h-9 rounded-xl border border-[#E5E7EB]">
-                      <AvatarFallback className="font-bold text-xs bg-[#F0F0EF] text-[#1A1A1A]">
+                    <Avatar className="w-9 h-9 rounded-xl border border-[#E2E8F0]">
+                      <AvatarFallback className="font-bold text-xs bg-[#F0FDFA] text-[#0F766E]">
                         {(activePartner.name || activePartner.email || 'U').charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xs font-bold text-[#1A1A1A]">
+                        <h3 className="text-xs font-bold text-[#0F172A]">
                           {activePartner.name || activePartner.email.split('@')[0]}
                         </h3>
-                        <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="flex items-center gap-1 text-[10px] text-[#10B981] font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
                           Trực tuyến
                         </span>
                       </div>
-                      <p className="text-[10px] text-[#6B7280]">{activePartner.email}</p>
+                      <p className="text-[10px] text-[#64748B]">{activePartner.email}</p>
                     </div>
                   </div>
 
                   {activePartner.preferredStyles && activePartner.preferredStyles.length > 0 && (
                     <div className="hidden sm:flex items-center gap-1">
-                      {activePartner.preferredStyles.slice(0, 3).map((st) => (
-                        <Badge key={st} variant="lime" className="text-[9px] px-2 py-0.5">
-                          {st}
+                      {splitStylesAndCompanion(activePartner.preferredStyles).styles.slice(0, 3).map((st) => (
+                        <Badge key={st} variant="teal" className="text-[9px] px-2 py-0.5">
+                          {formatStyleLabel(st)}
                         </Badge>
                       ))}
                     </div>
@@ -471,19 +473,19 @@ function MessagesContent() {
                 </div>
 
                 {/* Vùng Tin Nhắn */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F9F9F8]">
+                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F8FAFC]">
                   {isLoadingMessages ? (
-                    <div className="py-20 text-center text-xs text-[#6B7280]">
-                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#1A1A1A]" />
+                    <div className="py-20 text-center text-xs text-[#64748B]">
+                      <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-[#0D9488]" />
                       Đang tải tin nhắn...
                     </div>
                   ) : messages.length === 0 ? (
                     <div className="py-20 text-center px-4 max-w-sm mx-auto">
-                      <div className="w-10 h-10 rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center mx-auto mb-3 text-[#1A1A1A]">
-                        <Sparkles className="w-5 h-5 text-[#365314]" />
+                      <div className="w-10 h-10 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] flex items-center justify-center mx-auto mb-3 text-[#0D9488]">
+                        <Sparkles className="w-5 h-5" />
                       </div>
-                      <h4 className="text-xs font-bold text-[#1A1A1A]">Bắt đầu cuộc trò chuyện</h4>
-                      <p className="text-[11px] text-[#6B7280] mt-1">
+                      <h4 className="text-xs font-bold text-[#0F172A]">Bắt đầu cuộc trò chuyện</h4>
+                      <p className="text-[11px] text-[#64748B] mt-1">
                         Hãy gửi lời chào đầu tiên để làm quen hoặc bàn về chuyến đi đồng hành!
                       </p>
                     </div>
@@ -496,17 +498,17 @@ function MessagesContent() {
                           className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                         >
                           <div
-                            className={`max-w-[78%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed break-words shadow-2xs ${
+                            className={`max-w-[78%] px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed break-words ${
                               isMe
-                                ? 'bg-[#1A1A1A] text-white rounded-br-xs'
-                                : 'bg-white border border-[#E5E7EB] text-[#1A1A1A] rounded-bl-xs'
+                                ? 'bg-[#0D9488] text-white rounded-br-xs'
+                                : 'bg-white border border-[#E2E8F0] text-[#0F172A] rounded-bl-xs'
                             }`}
                           >
                             <p className="whitespace-pre-line">{m.content}</p>
                           </div>
 
                           <div className="flex items-center gap-1 mt-1 px-1">
-                            <span className="text-[9px] text-[#9CA3AF]">
+                            <span className="text-[9px] text-[#94A3B8]">
                               {new Date(m.createdAt).toLocaleTimeString('vi-VN', {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -515,9 +517,9 @@ function MessagesContent() {
                             {isMe && (
                               <span>
                                 {m.isRead ? (
-                                  <CheckCheck className="w-3 h-3 text-[#D9F99D]" />
+                                  <CheckCheck className="w-3 h-3 text-[#0D9488]" />
                                 ) : (
-                                  <Check className="w-3 h-3 text-[#9CA3AF]" />
+                                  <Check className="w-3 h-3 text-[#94A3B8]" />
                                 )}
                               </span>
                             )}
@@ -529,11 +531,11 @@ function MessagesContent() {
 
                   {/* Typing Indicator */}
                   {partnerTyping && (
-                    <div className="flex items-center gap-2 text-xs text-[#6B7280] bg-white border border-[#E5E7EB] px-3 py-1.5 rounded-full w-fit animate-in fade-in">
+                    <div className="flex items-center gap-2 text-xs text-[#64748B] bg-white border border-[#E2E8F0] px-3 py-1.5 rounded-full w-fit animate-in fade-in">
                       <div className="flex gap-1">
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse [animation-delay:-0.3s]" />
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse [animation-delay:-0.15s]" />
-                        <span className="w-1.5 h-1.5 bg-[#6B7280] rounded-full animate-pulse" />
+                        <span className="w-1.5 h-1.5 bg-[#0D9488] rounded-full animate-pulse [animation-delay:-0.3s]" />
+                        <span className="w-1.5 h-1.5 bg-[#0D9488] rounded-full animate-pulse [animation-delay:-0.15s]" />
+                        <span className="w-1.5 h-1.5 bg-[#0D9488] rounded-full animate-pulse" />
                       </div>
                       <span className="text-[10px]">Đang soạn tin nhắn...</span>
                     </div>
@@ -545,20 +547,20 @@ function MessagesContent() {
                 {/* Thanh Nhập Tin Nhắn */}
                 <form
                   onSubmit={handleSendMessage}
-                  className="p-3 border-t border-[#E5E7EB] bg-white flex items-center gap-2"
+                  className="p-3 border-t border-[#E2E8F0] bg-white flex items-center gap-2"
                 >
                   <Input
                     type="text"
                     placeholder="Nhập tin nhắn... (Enter để gửi)"
                     value={inputText}
                     onChange={handleInputChange}
-                    className="flex-1 h-9 text-xs bg-[#F9F9F8] border-[#E5E7EB] rounded-xl focus:border-[#1A1A1A]"
+                    className="flex-1 h-9 text-xs bg-[#F8FAFC] border-[#E2E8F0] rounded-xl focus:border-[#0D9488]"
                   />
                   <Button
                     type="submit"
                     size="sm"
                     disabled={!inputText.trim()}
-                    className="h-9 px-3.5 rounded-xl text-xs gap-1.5 bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white"
+                    className="h-9 px-3.5 rounded-xl text-xs gap-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white"
                   >
                     <span>Gửi</span>
                     <Send className="w-3.5 h-3.5" />
@@ -568,13 +570,13 @@ function MessagesContent() {
             ) : (
               /* Trạng thái chưa chọn cuộc hội thoại nào */
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-white border border-[#E5E7EB] flex items-center justify-center mb-4 text-[#1A1A1A] shadow-xs">
-                  <MessageCircle className="w-7 h-7 text-[#1A1A1A]" />
+                <div className="w-14 h-14 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] flex items-center justify-center mb-4 text-[#0D9488]">
+                  <MessageCircle className="w-7 h-7" />
                 </div>
-                <h3 className="text-sm font-bold text-[#1A1A1A] mb-1">
+                <h3 className="text-sm font-bold text-[#0F172A] mb-1">
                   Chọn một cuộc trò chuyện
                 </h3>
-                <p className="text-xs text-[#6B7280] max-w-sm">
+                <p className="text-xs text-[#64748B] max-w-sm">
                   Kết nối với bạn bè du lịch, hẹn giờ gặp mặt hoặc hỏi kinh nghiệm lịch trình qua kênh chat bảo mật tức thì.
                 </p>
               </div>
@@ -590,8 +592,8 @@ export default function MessagesPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex-1 flex items-center justify-center py-24 bg-[#F9F9F8]">
-          <Loader2 className="w-8 h-8 animate-spin text-[#1A1A1A]" />
+        <div className="flex-1 flex items-center justify-center py-24 bg-[#F8FAFC]">
+          <Loader2 className="w-8 h-8 animate-spin text-[#0D9488]" />
         </div>
       }
     >

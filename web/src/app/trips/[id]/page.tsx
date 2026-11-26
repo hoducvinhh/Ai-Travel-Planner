@@ -31,6 +31,7 @@ import TripFeasibilityCard from '@/components/trips/TripFeasibilityCard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/toast';
 
 // Dynamically import Leaflet map
 const MapComponent = dynamic(() => import('./MapComponent'), {
@@ -113,9 +114,9 @@ const SESSION_DEFINITIONS: SessionConfig[] = [
     icon: Sunrise,
     timeRange: '08:00 - 11:30',
     theme: 'Tham quan văn hoá, di tích & Khởi đầu ngày mới',
-    accentBg: 'bg-amber-50/70',
-    accentText: 'text-amber-800',
-    accentBorder: 'border-amber-200/80',
+    accentBg: 'bg-[#FFFBEB]',
+    accentText: 'text-[#B45309]',
+    accentBorder: 'border-[#FDE68A]',
     emptyNote: 'Buổi sáng tự do: Thưởng thức bữa sáng, cà phê hoặc nghỉ ngơi chuẩn bị cho chuyến đi.',
   },
   {
@@ -124,9 +125,9 @@ const SESSION_DEFINITIONS: SessionConfig[] = [
     icon: Sun,
     timeRange: '13:30 - 17:30',
     theme: 'Vui chơi, trải nghiệm khám phá & Ẩm thực địa phương',
-    accentBg: 'bg-sky-50/70',
-    accentText: 'text-sky-800',
-    accentBorder: 'border-sky-200/80',
+    accentBg: 'bg-[#F0FDFA]',
+    accentText: 'text-[#0F766E]',
+    accentBorder: 'border-[#99F6E4]',
     emptyNote: 'Buổi chiều tự do: Tự do tham quan các điểm lân cận hoặc mua sắm.',
   },
   {
@@ -135,9 +136,9 @@ const SESSION_DEFINITIONS: SessionConfig[] = [
     icon: Moon,
     timeRange: '18:30 - 21:30',
     theme: 'Ẩm thực đêm, phố đi bộ, chợ đêm & Ngắm cảnh',
-    accentBg: 'bg-indigo-50/70',
-    accentText: 'text-indigo-800',
-    accentBorder: 'border-indigo-200/80',
+    accentBg: 'bg-[#F1F5F9]',
+    accentText: 'text-[#0F172A]',
+    accentBorder: 'border-[#CBD5E1]',
     emptyNote: 'Buổi tối tự do: Dạo mát, thưởng thức ẩm thực đường phố hoặc nghỉ ngơi tại khách sạn.',
   },
 ];
@@ -145,6 +146,7 @@ const SESSION_DEFINITIONS: SessionConfig[] = [
 function TripDetailContent() {
   const params = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const tripId = params.id as string;
 
   const [trip, setTrip] = useState<Trip | null>(null);
@@ -187,7 +189,7 @@ function TripDetailContent() {
       }
     } catch (err: any) {
       console.error('Error optimizing trip route:', err);
-      alert(err.message || 'Không thể tối ưu hóa lộ trình');
+      showToast(err.message || 'Không thể tối ưu hóa lộ trình', 'error');
     } finally {
       setIsOptimizing(false);
     }
@@ -270,10 +272,10 @@ function TripDetailContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-neutral-400 mx-auto mb-3" />
-          <p className="text-muted-foreground text-xs">Đang tải chi tiết lịch trình...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-[#0D9488] mx-auto mb-3" />
+          <p className="text-[#64748B] text-xs">Đang tải chi tiết lịch trình...</p>
         </div>
       </div>
     );
@@ -281,8 +283,8 @@ function TripDetailContent() {
 
   if (error || !trip) {
     return (
-      <div className="min-h-screen bg-[#F9F9F8] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full text-center p-6 bg-white border-[#E5E7EB]">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center p-6 bg-white border-[#E2E8F0]">
           <CardContent className="p-0">
             <p className="text-destructive text-sm font-medium mb-4">{error || 'Không tìm thấy lịch trình'}</p>
             <Button
@@ -299,28 +301,28 @@ function TripDetailContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
       {/* Top Header */}
-      <header className="border-b border-[#E5E7EB] bg-white/95 backdrop-blur-md sticky top-[57px] z-30 shadow-2xs">
+      <header className="border-b border-[#E2E8F0] bg-white/95 backdrop-blur-md sticky top-[61px] z-30">
         <div className="container mx-auto px-4 py-3 max-w-6xl">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => router.push('/trips')}
-              className="gap-1.5 text-xs text-muted-foreground hover:text-[#1A1A1A]"
+              className="gap-1.5 text-xs text-[#64748B] hover:text-[#0D9488]"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Quay lại</span>
             </Button>
 
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#F0F0EF] text-[#1A1A1A] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center flex-shrink-0">
                 <MapPin className="w-4 h-4" />
               </div>
               <div className="text-left">
-                <h1 className="text-sm font-bold text-[#1A1A1A] line-clamp-1">{trip.destination}</h1>
-                <p className="text-[11px] text-muted-foreground">
+                <h1 className="text-sm font-bold text-[#0F172A] line-clamp-1">{trip.destination}</h1>
+                <p className="text-[11px] text-[#64748B]">
                   {new Date(trip.startDate).toLocaleDateString('vi-VN')} -{' '}
                   {new Date(trip.endDate).toLocaleDateString('vi-VN')}
                 </p>
@@ -328,12 +330,12 @@ function TripDetailContent() {
             </div>
 
             <div className="hidden sm:flex items-center gap-3 text-xs">
-              <Badge variant="secondary" className="gap-1 font-normal bg-[#F5F5F4] text-[#1A1A1A]">
-                <Users className="w-3 h-3 text-muted-foreground" />
+              <Badge variant="secondary" className="gap-1 font-normal bg-[#F1F5F9] text-[#0F172A]">
+                <Users className="w-3 h-3 text-[#0D9488]" />
                 <span>{trip.groupSize} người</span>
               </Badge>
-              <Badge variant="secondary" className="gap-1 font-mono font-medium bg-[#F5F5F4] text-[#1A1A1A]">
-                <DollarSign className="w-3 h-3 text-muted-foreground" />
+              <Badge variant="secondary" className="gap-1 font-mono font-medium bg-[#F1F5F9] text-[#0F172A] tabular-nums">
+                <DollarSign className="w-3 h-3 text-[#0D9488]" />
                 <span>{trip.budgetPerPerson.toLocaleString('vi-VN')} đ / người</span>
               </Badge>
             </div>
@@ -343,28 +345,28 @@ function TripDetailContent() {
 
       <main className="container mx-auto px-4 py-6 max-w-6xl">
         {/* Summary Card */}
-        <Card className="mb-6 bg-white border-[#E5E7EB] shadow-2xs">
+        <Card className="mb-6 bg-white border-[#E2E8F0] shadow-none rounded-2xl">
           <CardContent className="p-5">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-[11px] font-medium">
-                    <Sparkles className="w-3 h-3" />
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F0FDFA] border border-[#99F6E4] text-[#0F766E] text-[11px] font-medium">
+                    <Sparkles className="w-3 h-3 text-[#0D9488]" />
                     Lịch trình tạo bởi AI ({trip.itinerary.days.length} ngày • 3 buổi mỗi ngày)
                   </div>
                   {trip.itinerary?.optimizationStats && (
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#1A1A1A] text-white text-[11px] font-medium">
-                      <Zap className="w-3 h-3 text-[#D4F066]" />
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0D9488] text-white text-[11px] font-medium tabular-nums">
+                      <Zap className="w-3 h-3 text-white" />
                       Đã tối ưu cung đường (-{trip.itinerary.optimizationStats.totalSavedPercentage}%)
                     </div>
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-[#1A1A1A] mb-1">{trip.itinerary.summary}</h2>
+                <h2 className="text-xl font-bold text-[#0F172A] mb-1">{trip.itinerary.summary}</h2>
               </div>
               <div className="flex flex-col sm:items-end gap-2">
                 <div className="text-left sm:text-right">
-                  <div className="text-[11px] text-muted-foreground">Tổng chi phí dự kiến</div>
-                  <div className="text-xl font-bold font-mono text-[#1A1A1A]">
+                  <div className="text-[11px] text-[#64748B]">Tổng chi phí dự kiến</div>
+                  <div className="text-xl font-bold font-mono text-[#0D9488] tabular-nums">
                     {trip.itinerary.totalEstimatedCost.toLocaleString('vi-VN')} đ
                   </div>
                 </div>
@@ -372,12 +374,12 @@ function TripDetailContent() {
                   onClick={handleOptimizeRoute}
                   disabled={isOptimizing}
                   size="sm"
-                  className="bg-[#1A1A1A] hover:bg-neutral-800 text-white font-medium text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-xs cursor-pointer self-start sm:self-auto"
+                  className="bg-[#0D9488] hover:bg-[#0F766E] text-white font-medium text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer self-start sm:self-auto"
                 >
                   {isOptimizing ? (
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <Zap className="w-3.5 h-3.5 text-[#D4F066]" />
+                    <Zap className="w-3.5 h-3.5 text-white" />
                   )}
                   <span>{isOptimizing ? 'Đang tối ưu lộ trình...' : 'Tối ưu hóa lộ trình'}</span>
                 </Button>
@@ -386,28 +388,28 @@ function TripDetailContent() {
 
             {/* Optimization Success Notice */}
             {optimizationNotice && (
-              <div className="mb-4 p-3 rounded-xl bg-[#F4FCE3] border border-[#D9F99D] text-xs text-[#365314] flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#365314]" />
+              <div className="mb-4 p-3 rounded-xl bg-[#F0FDFA] border border-[#99F6E4] text-xs text-[#0F766E] flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#10B981]" />
                 <span className="font-medium">{optimizationNotice}</span>
               </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-muted-foreground pt-3 border-t border-[#E5E7EB]">
+            <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs text-[#64748B] pt-3 border-t border-[#E2E8F0]">
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#365314] flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#0D9488] flex-shrink-0" />
                 <span>
                   Bao gồm {allPlaces.length} địa điểm tối ưu theo các buổi Sáng, Chiều, Tối
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-[11px] text-neutral-500 ml-auto">
+              <div className="flex items-center gap-3 text-[11px] text-[#64748B] ml-auto">
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-500"></span> Sáng
+                  <Sunrise className="w-3 h-3 text-[#F59E0B]" /> Sáng
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-sky-500"></span> Chiều
+                  <Sun className="w-3 h-3 text-[#0D9488]" /> Chiều
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500"></span> Tối
+                  <Moon className="w-3 h-3 text-[#0F172A]" /> Tối
                 </span>
               </div>
             </div>
@@ -422,9 +424,9 @@ function TripDetailContent() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Day Selector Sidebar */}
           <div className="lg:col-span-1 space-y-3">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between px-1">
+            <div className="text-xs font-semibold uppercase tracking-wider text-[#64748B] flex items-center justify-between px-1">
               <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                <Calendar className="w-3.5 h-3.5 text-[#0D9488]" />
                 <span>Lịch trình theo ngày</span>
               </div>
               <span className="text-[11px] font-normal lowercase">
@@ -448,33 +450,34 @@ function TripDetailContent() {
                     onClick={() => handleSelectDay(day.dayNumber)}
                     className={`w-full p-3.5 rounded-xl border text-left transition cursor-pointer flex flex-col gap-2 ${
                       isSelected
-                        ? 'bg-[#1A1A1A] border-[#1A1A1A] text-white shadow-xs'
-                        : 'bg-white border-[#E5E7EB] text-[#1A1A1A] hover:bg-[#FAFAFA]'
+                        ? 'bg-[#0D9488] border-[#0D9488] text-white'
+                        : 'bg-white border-[#E2E8F0] text-[#0F172A] hover:border-[#0D9488]/50'
                     }`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <div>
                         <div className="font-semibold text-sm">Ngày {day.dayNumber}</div>
-                        <div className={`text-xs mt-0.5 capitalize ${isSelected ? 'text-neutral-300' : 'text-muted-foreground'}`}>
+                        <div className={`text-xs mt-0.5 capitalize ${isSelected ? 'text-teal-50' : 'text-[#64748B]'}`}>
                           {formatDayDate(trip.startDate, day.dayNumber, day.date)}
                         </div>
                       </div>
                       <div className="flex items-center gap-1.5">
                         {day.optimizationStats && day.optimizationStats.savedDistanceKm > 0 && (
                           <span
-                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full font-medium ${
+                            className={`inline-flex items-center gap-0.5 text-[10px] font-mono px-1.5 py-0.5 rounded-full font-medium tabular-nums ${
                               isSelected
-                                ? 'bg-[#D4F066] text-[#1A1A1A]'
-                                : 'bg-[#F4FCE3] text-[#365314] border border-[#D9F99D]'
+                                ? 'bg-white text-[#0D9488]'
+                                : 'bg-[#F0FDFA] text-[#0F766E] border border-[#99F6E4]'
                             }`}
                             title={`Tiết kiệm ${day.optimizationStats.savedDistanceKm} km (${day.optimizationStats.savedPercentage}%)`}
                           >
-                            ⚡ -{day.optimizationStats.savedPercentage}%
+                            <Zap className="w-2.5 h-2.5" />
+                            -{day.optimizationStats.savedPercentage}%
                           </span>
                         )}
                         <Badge
-                          variant={isSelected ? 'lime' : 'secondary'}
-                          className="text-[10px] h-5"
+                          variant={isSelected ? 'outline' : 'secondary'}
+                          className={`text-[10px] h-5 ${isSelected ? 'bg-white/15 text-white border-white/25' : ''}`}
                         >
                           {totalInThisDay} điểm
                         </Badge>
@@ -482,34 +485,39 @@ function TripDetailContent() {
                     </div>
 
                     {/* Session rhythm indicator chips */}
-                    <div className="flex items-center gap-1.5 text-[10px] pt-1 border-t border-white/10 dark:border-neutral-800">
+                    <div className={`flex items-center gap-1.5 text-[10px] pt-1 border-t ${isSelected ? 'border-white/20' : 'border-[#E2E8F0]'}`}>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] tabular-nums ${
                           isSelected
-                            ? 'bg-white/15 text-neutral-200'
-                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                            ? 'bg-white/15 text-white'
+                            : 'bg-[#F1F5F9] text-[#64748B]'
                         }`}
                         title="Buổi sáng"
-                      ><Sunrise className="w-2.5 h-2.5 inline mr-1" />{mCount}
+                      >
+                        <Sunrise className="w-2.5 h-2.5" />
+                        {mCount}
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] tabular-nums ${
                           isSelected
-                            ? 'bg-white/15 text-neutral-200'
-                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                            ? 'bg-white/15 text-white'
+                            : 'bg-[#F1F5F9] text-[#64748B]'
                         }`}
                         title="Buổi chiều"
                       >
-                        ☀️ {aCount}
+                        <Sun className="w-2.5 h-2.5" />
+                        {aCount}
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 rounded text-[10px] ${
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] tabular-nums ${
                           isSelected
-                            ? 'bg-white/15 text-neutral-200'
-                            : 'bg-[#F5F5F4] text-[#6B7280]'
+                            ? 'bg-white/15 text-white'
+                            : 'bg-[#F1F5F9] text-[#64748B]'
                         }`}
                         title="Buổi tối"
-                      ><Moon className="w-2.5 h-2.5 inline mr-1" />{eCount}
+                      >
+                        <Moon className="w-2.5 h-2.5" />
+                        {eCount}
                       </span>
                     </div>
                   </button>
@@ -521,21 +529,21 @@ function TripDetailContent() {
           {/* Main Content: Map & Itinerary Sessions */}
           <div className="lg:col-span-2 space-y-6">
             {/* Interactive Map Canvas */}
-            <Card id="map-container-card" className="rounded-2xl overflow-hidden border-[#E5E7EB] bg-white shadow-2xs">
-              <div className="px-4 py-2.5 bg-[#FAFAFA] border-b border-[#E5E7EB] flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#1A1A1A]">
-                  <MapIcon className="w-3.5 h-3.5 text-muted-foreground" />
+            <Card id="map-container-card" className="rounded-2xl overflow-hidden border-[#E2E8F0] bg-white shadow-none">
+              <div className="px-4 py-2.5 bg-[#F8FAFC] border-b border-[#E2E8F0] flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#0F172A]">
+                  <MapIcon className="w-3.5 h-3.5 text-[#0D9488]" />
                   <span>
                     Bản đồ hành trình Ngày {selectedDay}
                     {selectedSession !== 'all' && (
-                      <span className="font-normal text-muted-foreground">
+                      <span className="font-normal text-[#64748B]">
                         {' '}• {SESSION_DEFINITIONS.find((s) => s.slot === selectedSession)?.label}
                       </span>
                     )}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                  <Compass className="w-3 h-3" />
+                <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                  <Compass className="w-3 h-3 text-[#0D9488]" />
                   <span>{displayedPlaces.length} điểm hiển thị</span>
                 </div>
               </div>
@@ -552,26 +560,26 @@ function TripDetailContent() {
                 {/* Day Header Info */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
                   <div>
-                    <h3 className="text-lg font-bold text-[#1A1A1A] flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-bold text-[#0F172A] flex flex-wrap items-center gap-2">
                       <span>Ngày {currentDay.dayNumber}</span>
-                      <span className="text-muted-foreground font-normal text-sm capitalize">
+                      <span className="text-[#64748B] font-normal text-sm capitalize">
                         • {formatDayDate(trip.startDate, currentDay.dayNumber, currentDay.date)}
                       </span>
                     </h3>
                     {currentDay.notes && (
-                      <p className="text-xs text-muted-foreground mt-0.5">{currentDay.notes}</p>
+                      <p className="text-xs text-[#64748B] mt-0.5">{currentDay.notes}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Session Filter / Tabs */}
-                <div className="flex items-center gap-1.5 p-1 bg-[#F0F0EF] rounded-xl border border-[#E5E7EB] overflow-x-auto">
+                <div className="flex items-center gap-1.5 p-1 bg-[#F1F5F9] rounded-xl border border-[#E2E8F0] overflow-x-auto">
                   <button
                     onClick={() => setSelectedSession('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                       selectedSession === 'all'
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'text-[#6B7280] hover:text-[#1A1A1A] hover:bg-white/60'
+                        ? 'bg-[#0D9488] text-white'
+                        : 'text-[#64748B] hover:text-[#0F172A] hover:bg-white/70'
                     }`}
                   >
                     <span>Tất cả các buổi</span>
@@ -587,8 +595,8 @@ function TripDetailContent() {
                         onClick={() => setSelectedSession(session.slot)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                           isActive
-                            ? 'bg-[#1A1A1A] text-white shadow-xs'
-                            : 'text-[#6B7280] hover:text-[#1A1A1A] hover:bg-white/60'
+                            ? 'bg-[#0D9488] text-white'
+                            : 'text-[#64748B] hover:text-[#0F172A] hover:bg-white/70'
                         }`}
                       >
                         <Icon className="w-3.5 h-3.5" />
@@ -612,22 +620,22 @@ function TripDetailContent() {
                           {/* Session Header Card */}
                           <div className={`flex items-center justify-between p-3 rounded-xl border ${session.accentBg} ${session.accentBorder}`}>
                             <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg bg-white border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center flex-shrink-0 shadow-2xs">
-                                <Icon className="w-4 h-4" />
+                              <div className="w-7 h-7 rounded-lg bg-white border border-[#E2E8F0] text-[#0F172A] flex items-center justify-center flex-shrink-0">
+                                <Icon className={`w-4 h-4 ${session.accentText}`} />
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide">
+                                  <span className="text-xs font-bold text-[#0F172A] uppercase tracking-wide">
                                     {session.label}
                                   </span>
                                   <Badge
                                     variant="outline"
-                                    className="text-[10px] px-1.5 py-0 h-4 bg-white border-[#E5E7EB] text-[#1A1A1A]"
+                                    className="text-[10px] px-1.5 py-0 h-4 bg-white border-[#E2E8F0] text-[#0F172A]"
                                   >
                                     {session.timeRange}
                                   </Badge>
                                 </div>
-                                <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
+                                <p className="text-[11px] text-[#64748B] line-clamp-1 mt-0.5">
                                   {session.theme}
                                 </p>
                               </div>
@@ -635,7 +643,7 @@ function TripDetailContent() {
 
                             <Badge
                               variant="secondary"
-                              className="text-[11px] font-semibold bg-white border border-[#E5E7EB] text-[#1A1A1A] h-6 px-2"
+                              className="text-[11px] font-semibold bg-white border border-[#E2E8F0] text-[#0F172A] h-6 px-2"
                             >
                               {session.places.length} địa điểm
                             </Badge>
@@ -645,22 +653,22 @@ function TripDetailContent() {
                           {hasPlaces ? (
                             <div className="space-y-3 relative pl-2 sm:pl-3">
                               {/* Vertical connector line */}
-                              <div className="absolute left-5 sm:left-6 top-3 bottom-3 w-0.5 bg-[#E5E7EB] -z-0" />
+                              <div className="absolute left-5 sm:left-6 top-3 bottom-3 w-0.5 bg-[#E2E8F0] -z-0" />
 
                               {session.places.map((place) => (
                                 <Card
                                   key={place.placeId}
-                                  className="relative z-10 bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-xl p-4 shadow-2xs transition group"
+                                  className="relative z-10 bg-white border-[#E2E8F0] hover:border-[#0D9488]/50 rounded-xl p-4 shadow-none transition group"
                                 >
                                   <div className="flex items-start gap-3">
                                     {/* Order Pill */}
-                                    <div className="w-6 h-6 rounded-full bg-[#1A1A1A] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                                    <div className="w-6 h-6 rounded-full bg-[#0D9488] text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
                                       {place.orderInDay}
                                     </div>
 
                                     {/* Thumbnail ảnh địa điểm */}
                                     {place.imageUrl && (
-                                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border border-[#E5E7EB] flex-shrink-0 bg-neutral-100 hidden xs:block">
+                                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden border border-[#E2E8F0] flex-shrink-0 bg-[#F1F5F9] hidden xs:block">
                                         <img
                                           src={place.imageUrl}
                                           alt={place.name}
@@ -676,12 +684,15 @@ function TripDetailContent() {
                                     <div className="flex-1 min-w-0">
                                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-1.5">
                                         <div>
-                                          <h4
-                                            onClick={() => setDirectionsPlace(place)}
-                                            className="text-sm font-bold text-[#1A1A1A] hover:underline cursor-pointer flex items-center gap-1.5"
-                                            title="Bấm để xem chỉ đường và thời tiết"
-                                          >
-                                            <span>{place.name}</span>
+                                          <h4 className="text-sm font-bold text-[#0F172A]">
+                                            <button
+                                              type="button"
+                                              onClick={() => setDirectionsPlace(place)}
+                                              className="text-left hover:text-[#0D9488] hover:underline cursor-pointer"
+                                              title="Bấm để xem chỉ đường và thời tiết"
+                                            >
+                                              {place.name}
+                                            </button>
                                           </h4>
 
                                           <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -695,7 +706,7 @@ function TripDetailContent() {
                                               <Badge
                                                 key={cat}
                                                 variant="outline"
-                                                className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                                                className="text-[10px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]"
                                               >
                                                 {cat}
                                               </Badge>
@@ -709,8 +720,8 @@ function TripDetailContent() {
                                         </div>
 
                                         <div className="text-left sm:text-right flex-shrink-0">
-                                          <div className="text-[10px] text-muted-foreground">Chi phí ước tính</div>
-                                          <div className="font-semibold text-xs font-mono text-[#1A1A1A]">
+                                          <div className="text-[10px] text-[#64748B]">Chi phí ước tính</div>
+                                          <div className="font-semibold text-xs font-mono text-[#0D9488] tabular-nums">
                                             {place.priceEstimate > 0
                                               ? `${place.priceEstimate.toLocaleString('vi-VN')} đ`
                                               : 'Miễn phí'}
@@ -718,12 +729,12 @@ function TripDetailContent() {
                                         </div>
                                       </div>
 
-                                      <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                                      <p className="text-xs text-[#64748B] mb-3 leading-relaxed">
                                         {place.description}
                                       </p>
 
-                                      <div className="flex items-center justify-between pt-2 border-t border-[#E5E7EB] text-xs">
-                                        <div className="flex items-center gap-3 text-muted-foreground text-[11px]">
+                                      <div className="flex items-center justify-between pt-2 border-t border-[#E2E8F0] text-xs">
+                                        <div className="flex items-center gap-3 text-[#64748B] text-[11px]">
                                           <span className="flex items-center gap-1">
                                             <Clock className="w-3 h-3" />
                                             {place.estimatedTime}
@@ -738,7 +749,7 @@ function TripDetailContent() {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => handleFocusOnMap(place)}
-                                            className="h-6 px-2 text-[11px] gap-1 text-muted-foreground hover:text-[#1A1A1A]"
+                                            className="h-6 px-2 text-[11px] gap-1 text-[#64748B] hover:text-[#0D9488]"
                                             title="Xem vị trí trên bản đồ"
                                           >
                                             <MapPin className="w-3 h-3" />
@@ -749,7 +760,7 @@ function TripDetailContent() {
                                             variant="outline"
                                             size="sm"
                                             onClick={() => setDirectionsPlace(place)}
-                                            className="h-6 px-2.5 text-[11px] gap-1 font-medium bg-white hover:bg-[#F5F5F4] border-[#E5E7EB]"
+                                            className="h-6 px-2.5 text-[11px] gap-1 font-medium bg-white hover:bg-[#F0FDFA] hover:text-[#0D9488] hover:border-[#0D9488] border-[#E2E8F0]"
                                           >
                                             <Navigation className="w-3 h-3" />
                                             <span>Chỉ đường</span>
@@ -762,7 +773,7 @@ function TripDetailContent() {
                               ))}
                             </div>
                           ) : (
-                            <div className="p-4 rounded-xl border border-dashed border-[#E5E7EB] bg-[#FAFAFA] text-center text-xs text-muted-foreground">
+                            <div className="p-4 rounded-xl border border-dashed border-[#E2E8F0] bg-[#F8FAFC] text-center text-xs text-[#64748B]">
                               {session.emptyNote}
                             </div>
                           )}

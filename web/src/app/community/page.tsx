@@ -4,6 +4,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { api, formatImageUrl, uploadImageApi } from '@/lib/api';
+import { formatStyleLabel, splitStylesAndCompanion } from '@/lib/labels';
+import { useToast } from '@/components/ui/toast';
 import {
   Users,
   MessageSquare,
@@ -54,6 +56,7 @@ const POPULAR_TAGS = [
 
 export default function CommunityPage() {
   const { user, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
   const router = useRouter();
 
   // Feed states
@@ -89,14 +92,6 @@ export default function CommunityPage() {
 
   // Delete confirmation
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
-
-  // Toast
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
 
   const fetchPosts = useCallback(async () => {
     setIsLoading(true);
@@ -238,10 +233,10 @@ export default function CommunityPage() {
       prev.map((p) =>
         p.id === post.id
           ? {
-              ...p,
-              isLiked: nextLiked,
-              likesCount: nextLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1),
-            }
+            ...p,
+            isLiked: nextLiked,
+            likesCount: nextLiked ? p.likesCount + 1 : Math.max(0, p.likesCount - 1),
+          }
           : p,
       ),
     );
@@ -416,10 +411,10 @@ export default function CommunityPage() {
         prev.map((p) =>
           p.id === postId
             ? {
-                ...p,
-                commentsCount: p.commentsCount + 1,
-                recentComments: [...p.recentComments, added],
-              }
+              ...p,
+              commentsCount: p.commentsCount + 1,
+              recentComments: [...p.recentComments, added],
+            }
             : p,
         ),
       );
@@ -434,26 +429,18 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A] pb-24">
-      {/* Toast Alert */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#1A1A1A] text-white px-4 py-2.5 rounded-xl shadow-lg border border-[#333333] flex items-center gap-2.5 text-xs font-medium animate-in fade-in duration-200">
-          <Sparkles className="w-4 h-4 text-[#D4F066]" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] pb-24">
       {/* Hero Header */}
-      <section className="border-b border-[#E5E7EB] bg-white py-10">
+      <section className="border-b border-[#E2E8F0] bg-white py-10">
         <div className="container mx-auto px-4 max-w-6xl text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F4FCE3] border border-[#D9F99D] text-[#365314] text-xs font-medium mb-3">
-            <Users className="w-3.5 h-3.5" />
-            <span>Cộng đồng du lịch & Kết nối bạn đồng hành</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F0FDFA] border border-[#99F6E4] text-[#0F766E] text-xs font-medium mb-3">
+            <Users className="w-3.5 h-3.5 text-[#0D9488]" />
+            <span>Cộng đồng du lịch &amp; Kết nối bạn đồng hành</span>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1A1A1A] mb-2">
-            Diễn đàn chia sẻ & kết nối du lịch
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#0F172A] mb-2">
+            Diễn đàn chia sẻ &amp; kết nối du lịch
           </h1>
-          <p className="text-muted-foreground text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#64748B] text-xs md:text-sm max-w-2xl mx-auto leading-relaxed">
             Chia sẻ trải nghiệm khám phá, tìm bạn đồng hành cùng gu, lưu lại lịch trình hữu ích và trao đổi kinh nghiệm du lịch thực tế khắp Việt Nam.
           </p>
         </div>
@@ -465,10 +452,10 @@ export default function CommunityPage() {
           {/* Left: Feed (2 cols) */}
           <div className="lg:col-span-2 space-y-5">
             {/* Create Post Prompt Card */}
-            <Card className="bg-white border-[#E5E7EB] shadow-2xs p-4 rounded-2xl">
+            <Card className="bg-white border-[#E2E8F0] shadow-2xs p-4 rounded-2xl">
               <CardContent className="p-0 flex items-center gap-3">
-                <Avatar className="w-9 h-9 border border-[#E5E7EB]">
-                  <AvatarFallback className="bg-[#F0F0EF] text-[#1A1A1A] text-xs font-semibold">
+                <Avatar className="w-9 h-9 border border-[#E2E8F0]">
+                  <AvatarFallback className="bg-[#F0FDFA] text-[#0F766E] text-xs font-semibold">
                     {user?.name ? user.name.charAt(0) : user?.email ? user.email.charAt(0) : 'U'}
                   </AvatarFallback>
                 </Avatar>
@@ -476,7 +463,7 @@ export default function CommunityPage() {
                 <button
                   type="button"
                   onClick={handleOpenCreateModal}
-                  className="flex-1 text-left px-3.5 py-2.5 rounded-xl bg-[#FAFAFA] border border-[#E5E7EB] text-muted-foreground text-xs hover:border-[#1A1A1A]/30 hover:text-[#1A1A1A] transition cursor-pointer"
+                  className="flex-1 text-left px-3.5 py-2.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-[#64748B] text-xs hover:border-[#0D9488]/40 hover:text-[#0F172A] transition cursor-pointer"
                 >
                   Bạn có chuyến đi sắp tới hay kinh nghiệm muốn chia sẻ?
                 </button>
@@ -484,7 +471,7 @@ export default function CommunityPage() {
                 <Button
                   size="sm"
                   onClick={handleOpenCreateModal}
-                  className="gap-1.5 text-xs font-medium bg-[#1A1A1A] text-white hover:bg-[#2C2C2C]"
+                  className="gap-1.5 text-xs font-medium bg-[#0D9488] text-white hover:bg-[#0F766E]"
                 >
                   <PlusCircle className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Đăng bài</span>
@@ -501,11 +488,10 @@ export default function CommunityPage() {
                     key={tag}
                     type="button"
                     onClick={() => setSelectedTag(tag)}
-                    className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer whitespace-nowrap font-medium ${
-                      isActive
-                        ? 'bg-[#1A1A1A] text-white shadow-xs'
-                        : 'bg-white border border-[#E5E7EB] text-muted-foreground hover:text-[#1A1A1A] hover:bg-[#F5F5F4]'
-                    }`}
+                    className={`px-3 py-1.5 rounded-full text-xs transition cursor-pointer whitespace-nowrap font-medium ${isActive
+                        ? 'bg-[#0D9488] text-white shadow-xs'
+                        : 'bg-white border border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC]'
+                      }`}
                   >
                     #{tag}
                   </button>
@@ -516,15 +502,15 @@ export default function CommunityPage() {
             {/* Posts List */}
             {isLoading ? (
               <div className="py-20 text-center">
-                <Loader2 className="w-7 h-7 text-neutral-400 animate-spin mx-auto mb-2" />
-                <p className="text-xs text-muted-foreground">Đang tải bài viết...</p>
+                <Loader2 className="w-7 h-7 text-[#0D9488] animate-spin mx-auto mb-2" />
+                <p className="text-xs text-[#64748B]">Đang tải bài viết...</p>
               </div>
             ) : posts.length === 0 ? (
-              <Card className="p-10 text-center bg-white border-[#E5E7EB] rounded-2xl">
+              <Card className="p-10 text-center bg-white border-[#E2E8F0] rounded-2xl">
                 <CardContent className="p-0">
-                  <MessageSquare className="w-9 h-9 text-neutral-300 mx-auto mb-2" />
-                  <h3 className="text-sm font-semibold text-[#1A1A1A] mb-1">Chưa có bài viết nào</h3>
-                  <p className="text-xs text-muted-foreground">
+                  <MessageSquare className="w-9 h-9 text-slate-300 mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-[#0F172A] mb-1">Chưa có bài viết nào</h3>
+                  <p className="text-xs text-[#64748B]">
                     Hãy là người đầu tiên chia sẻ cảm nhận hoặc kêu gọi bạn đồng hành!
                   </p>
                 </CardContent>
@@ -546,28 +532,28 @@ export default function CommunityPage() {
                   return (
                     <Card
                       key={post.id}
-                      className="bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-2xl p-5 shadow-2xs transition space-y-4"
+                      className="bg-white border-[#E2E8F0] hover:border-[#0D9488]/40 rounded-2xl p-5 shadow-2xs transition space-y-4"
                     >
                       {/* Author Header */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
-                          <Avatar className="w-9 h-9 border border-[#E5E7EB]">
-                            <AvatarFallback className="bg-[#F0F0EF] text-[#1A1A1A] text-xs font-semibold">
+                          <Avatar className="w-9 h-9 border border-[#E2E8F0]">
+                            <AvatarFallback className="bg-[#F0FDFA] text-[#0F766E] text-xs font-semibold">
                               {post.user.name ? post.user.name.charAt(0) : post.user.email.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-semibold text-xs text-[#1A1A1A]">
+                              <span className="font-semibold text-xs text-[#0F172A]">
                                 {post.user.name || post.user.email.split('@')[0]}
                               </span>
                               {isAuthor && (
-                                <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5 border-[#E5E7EB]">
+                                <Badge variant="teal" className="text-[9px] px-1.5 py-0 h-3.5">
                                   Tác giả
                                 </Badge>
                               )}
                             </div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[10px] text-[#64748B]">
                               {new Date(post.createdAt).toLocaleDateString('vi-VN', {
                                 hour: '2-digit',
                                 minute: '2-digit',
@@ -585,7 +571,7 @@ export default function CommunityPage() {
                               <Badge
                                 key={t}
                                 variant="outline"
-                                className="text-[10px] px-1.5 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                                className="text-[10px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]"
                               >
                                 #{t}
                               </Badge>
@@ -593,12 +579,12 @@ export default function CommunityPage() {
                           </div>
 
                           {canManage && (
-                            <div className="flex items-center gap-1 pl-2 border-l border-[#E5E7EB]">
+                            <div className="flex items-center gap-1 pl-2 border-l border-[#E2E8F0]">
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => handleOpenEditModal(post)}
-                                className="h-7 w-7 text-[#6B7280] hover:text-[#1A1A1A]"
+                                className="h-7 w-7 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                                 title="Sửa bài viết"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -607,7 +593,8 @@ export default function CommunityPage() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={() => setDeletingPostId(post.id)}
-                                className="h-7 w-7 text-[#6B7280] hover:text-rose-600"
+                                aria-label="Xóa bài viết"
+                                className="h-7 w-7 text-[#64748B] hover:text-[#EF4444] hover:bg-[#FFF1F2]"
                                 title="Xóa bài viết"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
@@ -619,10 +606,10 @@ export default function CommunityPage() {
 
                       {/* Title & Text Content */}
                       <div>
-                        <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">
+                        <h3 className="text-sm font-bold text-[#0F172A] mb-1.5">
                           {post.title}
                         </h3>
-                        <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                        <p className="text-xs text-[#64748B] leading-relaxed whitespace-pre-line">
                           {post.content}
                         </p>
                       </div>
@@ -630,19 +617,20 @@ export default function CommunityPage() {
                       {/* Image Gallery Grid */}
                       {post.images && post.images.length > 0 && (
                         <div
-                          className={`grid gap-2 rounded-xl overflow-hidden ${
-                            post.images.length === 1
+                          className={`grid gap-2 rounded-xl overflow-hidden ${post.images.length === 1
                               ? 'grid-cols-1'
                               : post.images.length === 2
-                              ? 'grid-cols-2'
-                              : 'grid-cols-3'
-                          }`}
+                                ? 'grid-cols-2'
+                                : 'grid-cols-3'
+                            }`}
                         >
                           {post.images.map((imgUrl, idx) => (
-                            <div
+                            <button
                               key={idx}
+                              type="button"
                               onClick={() => setPreviewImage(formatImageUrl(imgUrl))}
-                              className="relative cursor-pointer group bg-[#F0F0EF] overflow-hidden rounded-xl border border-[#E5E7EB]"
+                              aria-label={`Xem ảnh ${idx + 1} của bài viết ${post.title}`}
+                              className="relative cursor-pointer group bg-[#F1F5F9] overflow-hidden rounded-xl border border-[#E2E8F0] block w-full"
                             >
                               <img
                                 src={formatImageUrl(imgUrl)}
@@ -650,31 +638,31 @@ export default function CommunityPage() {
                                 className="w-full h-44 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
                                 loading="lazy"
                               />
-                            </div>
+                            </button>
                           ))}
                         </div>
                       )}
 
                       {/* CARD LỊCH TRÌNH ĐÍNH KÈM THÔNG MINH (2 KỊCH BẢN) */}
                       {isAttachedTrip && post.trip && (
-                        <div className="p-3.5 rounded-xl border border-[#E5E7EB] bg-[#FDFDFD] space-y-3">
+                        <div className="p-3.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] space-y-3">
                           {isUpcomingOrLookingBuddy ? (
                             /* KỊCH BẢN A: SẮP ĐI - TÌM BẠN ĐỒNG HÀNH */
                             <div>
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5">
                                   <Badge
-                                    variant="lime"
-                                    className="text-[10px] font-medium px-2 py-0.5 gap-1"
+                                    variant="teal"
+                                    className="text-[10px] font-medium px-2 py-0.5 gap-1.5"
                                   >
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
                                     <span>
-                                      🟢 Sắp khởi hành:{' '}
+                                      Sắp khởi hành:{' '}
                                       {new Date(post.trip.startDate).toLocaleDateString('vi-VN')}
                                     </span>
                                   </Badge>
                                 </div>
-                                <span className="text-[10px] text-muted-foreground font-medium">
+                                <span className="text-[10px] text-[#64748B] font-medium">
                                   {post.trip.groupSize} người •{' '}
                                   {post.trip.budgetPerPerson?.toLocaleString()} VND / người
                                 </span>
@@ -682,14 +670,14 @@ export default function CommunityPage() {
 
                               <div className="flex items-center justify-between flex-wrap gap-2">
                                 <div className="flex items-center gap-2">
-                                  <div className="w-7 h-7 rounded-lg bg-[#F0F0EF] flex items-center justify-center text-[#1A1A1A]">
+                                  <div className="w-7 h-7 rounded-lg bg-[#F0FDFA] border border-[#99F6E4] flex items-center justify-center text-[#0D9488]">
                                     <MapPin className="w-3.5 h-3.5" />
                                   </div>
                                   <div>
-                                    <h4 className="text-xs font-bold text-[#1A1A1A]">
+                                    <h4 className="text-xs font-bold text-[#0F172A]">
                                       {post.trip.destination}
                                     </h4>
-                                    <p className="text-[10px] text-muted-foreground">
+                                    <p className="text-[10px] text-[#64748B]">
                                       {new Date(post.trip.startDate).toLocaleDateString('vi-VN')} -{' '}
                                       {new Date(post.trip.endDate).toLocaleDateString('vi-VN')}
                                     </p>
@@ -707,16 +695,16 @@ export default function CommunityPage() {
                                         post.trip?.startDate,
                                       )
                                     }
-                                    className="h-7 px-3 text-xs gap-1.5 bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white rounded-lg shadow-xs"
+                                    className="h-7 px-3 text-xs gap-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white rounded-lg"
                                   >
-                                    <MessageCircle className="w-3.5 h-3.5 text-[#D4F066]" />
+                                    <MessageCircle className="w-3.5 h-3.5 text-white" />
                                     <span>Nhắn tin tham gia</span>
                                   </Button>
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={() => router.push(`/trips/${post.trip?.id}`)}
-                                    className="h-7 px-2.5 text-xs text-[#1A1A1A] border-[#E5E7EB]"
+                                    className="h-7 px-2.5 text-xs text-[#0F172A] border-[#E2E8F0] hover:border-[#0D9488] hover:text-[#0D9488]"
                                   >
                                     Chi tiết
                                   </Button>
@@ -729,14 +717,14 @@ export default function CommunityPage() {
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-1.5">
                                   <Badge
-                                    variant="outline"
-                                    className="text-[10px] font-medium px-2 py-0.5 border-[#E5E7EB] text-[#1A1A1A] gap-1"
+                                    variant="teal"
+                                    className="text-[10px] font-medium px-2 py-0.5 gap-1"
                                   >
-                                    <MapPin className="w-3 h-3 text-muted-foreground" />
+                                    <MapPin className="w-3 h-3 text-[#0D9488]" />
                                     <span>Lịch trình tham quan</span>
                                   </Badge>
                                 </div>
-                                <span className="text-[10px] text-muted-foreground">
+                                <span className="text-[10px] text-[#64748B]">
                                   {post.trip.destination}
                                 </span>
                               </div>
@@ -746,21 +734,21 @@ export default function CommunityPage() {
                                   {post.trip.places.map((tp, pIdx) => (
                                     <div
                                       key={pIdx}
-                                      className="flex items-center gap-1.5 bg-white border border-[#E5E7EB] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap text-[#1A1A1A]"
+                                      className="flex items-center gap-1.5 bg-white border border-[#E2E8F0] px-2 py-1 rounded-lg text-[10px] whitespace-nowrap text-[#0F172A]"
                                     >
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#1A1A1A]" />
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#0D9488]" />
                                       <span>{tp.place.name}</span>
                                     </div>
                                   ))}
                                 </div>
                               )}
 
-                              <div className="flex items-center justify-end gap-2 pt-1 border-t border-[#F0F0EF]">
+                              <div className="flex items-center justify-end gap-2 pt-1 border-t border-[#E2E8F0]">
                                 <Button
                                   size="sm"
                                   variant="outline"
                                   onClick={() => router.push(`/trips/${post.trip?.id}`)}
-                                  className="h-7 px-2.5 text-xs gap-1 border-[#E5E7EB] text-[#1A1A1A]"
+                                  className="h-7 px-2.5 text-xs gap-1 border-[#E2E8F0] text-[#0F172A] hover:border-[#0D9488] hover:text-[#0D9488]"
                                 >
                                   <ExternalLink className="w-3 h-3" />
                                   <span>Xem chi tiết</span>
@@ -771,12 +759,12 @@ export default function CommunityPage() {
                                   variant="default"
                                   disabled={cloningTripId === post.trip.id}
                                   onClick={() => handleCloneTrip(post.trip!.id)}
-                                  className="h-7 px-3 text-xs gap-1.5 bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white"
+                                  className="h-7 px-3 text-xs gap-1.5 bg-[#0D9488] hover:bg-[#0F766E] text-white"
                                 >
                                   {cloningTripId === post.trip.id ? (
                                     <Loader2 className="w-3 h-3 animate-spin" />
                                   ) : (
-                                    <Copy className="w-3 h-3 text-[#D4F066]" />
+                                    <Copy className="w-3 h-3 text-white" />
                                   )}
                                   <span>Nhân bản chuyến đi (1-Click)</span>
                                 </Button>
@@ -787,20 +775,21 @@ export default function CommunityPage() {
                       )}
 
                       {/* Post Actions: Like & Comment Counter */}
-                      <div className="pt-2.5 border-t border-[#E5E7EB] flex items-center justify-between text-xs">
+                      <div className="pt-2.5 border-t border-[#E2E8F0] flex items-center justify-between text-xs">
                         <div className="flex items-center gap-3">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleToggleLike(post)}
-                            className={`h-7 px-2 text-xs gap-1 font-medium ${
-                              post.isLiked ? 'text-rose-600 bg-rose-50' : 'text-muted-foreground'
-                            }`}
+                            className={`h-7 px-2 text-xs gap-1 font-medium ${post.isLiked
+                                ? 'text-[#FF6B6B] bg-[#FFF1F2] hover:bg-[#FFE4E6] hover:text-[#FF6B6B]'
+                                : 'text-[#64748B] hover:text-[#FF6B6B] hover:bg-[#FFF1F2]'
+                              }`}
                           >
                             <Heart
-                              className={`w-3.5 h-3.5 ${post.isLiked ? 'fill-rose-600 text-rose-600' : ''}`}
+                              className={`w-3.5 h-3.5 ${post.isLiked ? 'fill-[#FF6B6B] text-[#FF6B6B]' : ''}`}
                             />
-                            <span>{post.likesCount} Thích</span>
+                            <span className="tabular-nums">{post.likesCount} Thích</span>
                           </Button>
 
                           <Button
@@ -812,7 +801,7 @@ export default function CommunityPage() {
                                 [post.id]: !prev[post.id],
                               }))
                             }
-                            className="h-7 px-2 text-xs gap-1 font-medium text-muted-foreground hover:text-[#1A1A1A]"
+                            className="h-7 px-2 text-xs gap-1 font-medium text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
                             <span>{post.commentsCount} Bình luận</span>
@@ -825,7 +814,7 @@ export default function CommunityPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleStartChatWithAuthor(post.userId)}
-                            className="h-7 px-2 text-xs gap-1 text-[#6B7280] hover:text-[#1A1A1A]"
+                            className="h-7 px-2 text-xs gap-1 text-[#64748B] hover:text-[#0D9488] hover:bg-[#F0FDFA]"
                             title="Nhắn tin với tác giả"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -836,7 +825,7 @@ export default function CommunityPage() {
 
                       {/* Comments Drawer */}
                       {isCommentsOpen && (
-                        <div className="pt-3 border-t border-[#E5E7EB] space-y-2.5">
+                        <div className="pt-3 border-t border-[#E2E8F0] space-y-2.5">
                           <div className="flex gap-1.5">
                             <Input
                               type="text"
@@ -856,7 +845,7 @@ export default function CommunityPage() {
                                   : 'Đăng nhập để bình luận...'
                               }
                               disabled={!isAuthenticated}
-                              className="h-8 text-xs bg-[#FAFAFA]"
+                              className="h-8 text-xs bg-[#F8FAFC]"
                             />
                             <Button
                               size="sm"
@@ -866,7 +855,7 @@ export default function CommunityPage() {
                                 isSubmittingComment[post.id] ||
                                 !(newCommentText[post.id] || '').trim()
                               }
-                              className="h-8 w-8 p-0 flex-shrink-0 bg-[#1A1A1A] text-white"
+                              className="h-8 w-8 p-0 flex-shrink-0 bg-[#0D9488] hover:bg-[#0F766E] text-white"
                             >
                               <Send className="w-3.5 h-3.5" />
                             </Button>
@@ -874,24 +863,24 @@ export default function CommunityPage() {
 
                           <div className="space-y-1.5">
                             {post.recentComments?.length === 0 ? (
-                              <div className="text-[11px] text-muted-foreground text-center py-1">
+                              <div className="text-[11px] text-[#64748B] text-center py-1">
                                 Chưa có bình luận nào.
                               </div>
                             ) : (
                               post.recentComments.map((rc) => (
                                 <div
                                   key={rc.id}
-                                  className="bg-[#FAFAFA] rounded-xl p-2.5 text-xs border border-[#E5E7EB]"
+                                  className="bg-[#F8FAFC] rounded-xl p-2.5 text-xs border border-[#E2E8F0]"
                                 >
                                   <div className="flex items-center justify-between mb-0.5">
-                                    <span className="font-semibold text-[#1A1A1A] text-[11px]">
+                                    <span className="font-semibold text-[#0F172A] text-[11px]">
                                       {rc.user.name || rc.user.email.split('@')[0]}
                                     </span>
-                                    <span className="text-[10px] text-muted-foreground">
+                                    <span className="text-[10px] text-[#64748B]">
                                       {new Date(rc.createdAt).toLocaleDateString('vi-VN')}
                                     </span>
                                   </div>
-                                  <p className="text-muted-foreground text-[11px] leading-relaxed">
+                                  <p className="text-[#64748B] text-[11px] leading-relaxed">
                                     {rc.content}
                                   </p>
                                 </div>
@@ -909,19 +898,19 @@ export default function CommunityPage() {
 
           {/* Right: Travel Buddy Finder */}
           <div className="space-y-6">
-            <Card className="bg-white border-[#E5E7EB] shadow-2xs rounded-2xl p-5 sticky top-20 space-y-4">
+            <Card className="bg-white border-[#E2E8F0] shadow-2xs rounded-2xl p-5 sticky top-20 space-y-4">
               <CardContent className="p-0 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#F0F0EF] text-[#1A1A1A]">
+                    <div className="p-1.5 rounded-lg bg-[#F0FDFA] text-[#0D9488]">
                       <Users className="w-4 h-4" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-xs text-[#1A1A1A]">Bạn đồng hành hợp gu</h3>
-                      <p className="text-[10px] text-muted-foreground">Gợi ý AI & Chat 1-1</p>
+                      <h3 className="font-semibold text-xs text-[#0F172A]">Bạn đồng hành hợp gu</h3>
+                      <p className="text-[10px] text-[#64748B]">Gợi ý AI &amp; Chat 1-1</p>
                     </div>
                   </div>
-                  <Badge variant="lime" className="text-[10px] h-5">
+                  <Badge variant="teal" className="text-[10px] h-5">
                     {buddies.length} Gợi ý
                   </Badge>
                 </div>
@@ -944,20 +933,20 @@ export default function CommunityPage() {
                     {buddies.slice(0, 8).map((buddy) => (
                       <div
                         key={buddy.id}
-                        className="bg-[#FAFAFA] border border-[#E5E7EB] hover:border-[#1A1A1A]/30 rounded-xl p-3 transition"
+                        className="bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#99F6E4] rounded-xl p-3 transition"
                       >
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2">
-                            <Avatar className="w-7 h-7 border border-[#E5E7EB]">
-                              <AvatarFallback className="bg-white text-[#1A1A1A] text-[11px] font-semibold">
+                            <Avatar className="w-7 h-7 border border-[#E2E8F0]">
+                              <AvatarFallback className="bg-[#F0FDFA] text-[#0F766E] text-[11px] font-semibold">
                                 {buddy.name ? buddy.name.charAt(0) : buddy.email.charAt(0)}
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-semibold text-xs text-[#1A1A1A]">
+                              <div className="font-semibold text-xs text-[#0F172A]">
                                 {buddy.name}
                               </div>
-                              <div className="text-[10px] text-muted-foreground">
+                              <div className="text-[10px] text-[#64748B]">
                                 {buddy.tripsCount} chuyến đi
                               </div>
                             </div>
@@ -966,13 +955,13 @@ export default function CommunityPage() {
 
                         {/* Styles */}
                         <div className="flex flex-wrap gap-1 mb-2">
-                          {buddy.preferredStyles?.slice(0, 3).map((st) => (
+                          {splitStylesAndCompanion(buddy.preferredStyles).styles.slice(0, 3).map((st) => (
                             <Badge
                               key={st}
                               variant="outline"
-                              className="text-[9px] px-1 py-0 h-4 font-normal text-muted-foreground border-[#E5E7EB]"
+                              className="text-[9px] px-1.5 py-0 h-4 font-normal text-[#64748B] border-[#E2E8F0]"
                             >
-                              {st}
+                              {formatStyleLabel(st)}
                             </Badge>
                           ))}
                         </div>
@@ -981,7 +970,7 @@ export default function CommunityPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => handleStartChatWithAuthor(buddy.id)}
-                          className="w-full h-7 text-[11px] font-medium gap-1.5 border-[#E5E7EB] hover:bg-[#1A1A1A] hover:text-white transition"
+                          className="w-full h-7 text-[11px] font-medium gap-1.5 border-[#E2E8F0] hover:bg-[#0D9488] hover:border-[#0D9488] hover:text-white transition"
                         >
                           <MessageCircle className="w-3 h-3" />
                           <span>Giao lưu kết nối</span>
@@ -998,10 +987,10 @@ export default function CommunityPage() {
 
       {/* CREATE & EDIT POST MODAL */}
       <Dialog open={showCreateModal} onOpenChange={setShowCreateModal}>
-        <DialogContent className="max-w-lg bg-white border-[#E5E7EB] p-5 rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg bg-white border-[#E2E8F0] p-5 rounded-2xl shadow-xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-base font-semibold text-[#1A1A1A] flex items-center gap-2">
-              <PlusCircle className="w-4 h-4" />
+            <DialogTitle className="text-base font-semibold text-[#0F172A] flex items-center gap-2">
+              <PlusCircle className="w-4 h-4 text-[#0D9488]" />
               {editingPostId ? 'Chỉnh sửa bài viết' : 'Đăng bài viết lên diễn đàn'}
             </DialogTitle>
           </DialogHeader>
@@ -1009,7 +998,7 @@ export default function CommunityPage() {
           <form onSubmit={handleSubmitPost} className="space-y-4 mt-2">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Tiêu đề bài viết <span className="text-rose-500">*</span>
+                Tiêu đề bài viết <span className="text-foreground">*</span>
               </label>
               <Input
                 type="text"
@@ -1017,13 +1006,13 @@ export default function CommunityPage() {
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Ví dụ: Tìm 2 bạn phượt săn mây Đà Lạt 3N2Đ cuối tuần này..."
                 required
-                className="bg-[#FAFAFA]"
+                className="bg-[#F8FAFC]"
               />
             </div>
 
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-                Nội dung chia sẻ <span className="text-rose-500">*</span>
+                Nội dung chia sẻ <span className="text-foreground">*</span>
               </label>
               <Textarea
                 rows={4}
@@ -1031,20 +1020,20 @@ export default function CommunityPage() {
                 onChange={(e) => setNewContent(e.target.value)}
                 placeholder="Chia sẻ kinh nghiệm, lịch trình dự kiến hoặc điều kiện tuyển bạn đồng hành..."
                 required
-                className="bg-[#FAFAFA] resize-none text-xs"
+                className="bg-[#F8FAFC] resize-none text-xs"
               />
             </div>
 
             {/* ĐÍNH KÈM CHUYẾN ĐI (TRIP SELECTOR) */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
+                <Calendar className="w-3.5 h-3.5 text-[#0D9488]" />
                 <span>Đính kèm lịch trình của bạn (Tùy chọn)</span>
               </label>
               <select
                 value={selectedTripId}
                 onChange={(e) => setSelectedTripId(e.target.value)}
-                className="w-full h-9 px-3 rounded-xl bg-[#FAFAFA] border border-[#E5E7EB] text-xs text-[#1A1A1A] focus:outline-none focus:border-[#1A1A1A]"
+                className="w-full h-9 px-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] text-xs text-[#0F172A] focus:outline-none focus:border-[#0D9488]"
               >
                 <option value="">-- Không đính kèm lịch trình --</option>
                 {userTrips.map((trip) => (
@@ -1062,7 +1051,7 @@ export default function CommunityPage() {
             {/* UPLOAD & DÁN LINK ẢNH */}
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5" />
+                <ImageIcon className="w-3.5 h-3.5 text-[#0D9488]" />
                 <span>Hình ảnh bài viết (Lưu URL máy chủ & Link ngoài)</span>
               </label>
 
@@ -1083,7 +1072,7 @@ export default function CommunityPage() {
                     size="sm"
                     disabled={isUploadingImage}
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full text-xs gap-1.5 border-[#E5E7EB] bg-[#FAFAFA] hover:bg-[#F0F0EF]"
+                    className="w-full text-xs gap-1.5 border-[#E2E8F0] bg-[#F8FAFC] hover:bg-[#F0FDFA] hover:border-[#0D9488] hover:text-[#0D9488]"
                   >
                     {isUploadingImage ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -1100,14 +1089,14 @@ export default function CommunityPage() {
                     value={customImageUrl}
                     onChange={(e) => setCustomImageUrl(e.target.value)}
                     placeholder="Dán link ảnh URL..."
-                    className="h-8 text-xs bg-[#FAFAFA]"
+                    className="h-8 text-xs bg-[#F8FAFC]"
                   />
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
                     onClick={handleAddImageUrl}
-                    className="h-8 px-2.5 text-xs border-[#E5E7EB]"
+                    className="h-8 px-2.5 text-xs border-[#E2E8F0]"
                   >
                     Thêm
                   </Button>
@@ -1118,7 +1107,7 @@ export default function CommunityPage() {
               {newImages.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {newImages.map((img, i) => (
-                    <div key={i} className="relative group w-16 h-16 rounded-lg overflow-hidden border border-[#E5E7EB]">
+                    <div key={i} className="relative group w-16 h-16 rounded-lg overflow-hidden border border-[#E2E8F0]">
                       <img
                         src={formatImageUrl(img)}
                         alt={`Ảnh ${i + 1}`}
@@ -1147,11 +1136,11 @@ export default function CommunityPage() {
                 value={newTagsInput}
                 onChange={(e) => setNewTagsInput(e.target.value)}
                 placeholder="Đà Lạt, Săn mây, Tìm bạn đồng hành"
-                className="bg-[#FAFAFA] text-xs"
+                className="bg-[#F8FAFC] text-xs"
               />
             </div>
 
-            <div className="flex justify-end gap-2 pt-3 border-t border-[#E5E7EB]">
+            <div className="flex justify-end gap-2 pt-3 border-t border-[#E2E8F0]">
               <Button
                 type="button"
                 variant="outline"
@@ -1164,7 +1153,7 @@ export default function CommunityPage() {
                 type="submit"
                 size="sm"
                 disabled={isSubmittingPost || isUploadingImage}
-                className="gap-1.5 bg-[#1A1A1A] text-white hover:bg-[#2C2C2C]"
+                className="gap-1.5 bg-[#0D9488] text-white hover:bg-[#0F766E]"
               >
                 {isSubmittingPost && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{editingPostId ? 'Lưu thay đổi' : 'Đăng bài'}</span>
@@ -1176,9 +1165,9 @@ export default function CommunityPage() {
 
       {/* CONFIRM DELETE MODAL */}
       <Dialog open={!!deletingPostId} onOpenChange={() => setDeletingPostId(null)}>
-        <DialogContent className="max-w-sm bg-white border-[#E5E7EB] p-5 rounded-2xl shadow-xl">
+        <DialogContent className="max-w-sm bg-white border-[#E2E8F0] p-5 rounded-2xl shadow-xl">
           <DialogHeader>
-            <DialogTitle className="text-sm font-bold text-[#1A1A1A]">
+            <DialogTitle className="text-sm font-bold text-[#0F172A]">
               Xác nhận xóa bài viết?
             </DialogTitle>
           </DialogHeader>
@@ -1198,7 +1187,7 @@ export default function CommunityPage() {
               variant="default"
               size="sm"
               onClick={() => deletingPostId && handleDeletePost(deletingPostId)}
-              className="bg-rose-600 hover:bg-rose-700 text-white text-xs"
+              className="bg-[#EF4444] hover:bg-red-600 text-white text-xs"
             >
               Xác nhận xóa
             </Button>

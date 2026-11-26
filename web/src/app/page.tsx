@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   Sparkles,
@@ -15,27 +16,67 @@ import {
   Bookmark,
   Heart,
   MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  Route,
   ShieldCheck,
-  Plane,
 } from 'lucide-react';
 
+import { FEATURED_DESTINATION_BANNERS, VIETNAM_PROVINCES } from '@/lib/provinces';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 
-const POPULAR_DESTINATIONS = [
-  { name: 'Đà Lạt', query: 'Đà Lạt' },
-  { name: 'Sa Pa', query: 'Sa Pa' },
-  { name: 'Đà Nẵng', query: 'Đà Nẵng' },
-  { name: 'Hội An', query: 'Hội An' },
-  { name: 'Ninh Bình', query: 'Ninh Bình' },
-  { name: 'Phú Quốc', query: 'Phú Quốc' },
+const QUICK_CHIPS = [
+  { label: 'Đà Lạt', province: 'Lam Dong' },
+  { label: 'Sa Pa', province: 'Lao Cai' },
+  { label: 'Hạ Long', province: 'Quang Ninh' },
+  { label: 'Hội An', province: 'Quang Nam' },
+  { label: 'Ninh Bình', province: 'Ninh Binh' },
+  { label: 'Phú Quốc', province: 'Kien Giang' },
+];
+
+// Keep the 10 distinct Vietnam province photos in the visual discovery grid (no duplicate imagery)
+const DISCOVERY_PROVINCES = VIETNAM_PROVINCES.filter((p) => p.key !== 'Ho Chi Minh');
+
+const WORKFLOW_STEPS = [
+  {
+    step: '01',
+    icon: Compass,
+    title: 'Chia sẻ gu & ngân sách',
+    desc: 'Chọn tỉnh thành muốn đến, số ngày dự kiến, ngân sách và sở thích du lịch cá nhân.',
+  },
+  {
+    step: '02',
+    icon: Route,
+    title: 'AI sắp lịch 3 buổi & chấm OFS',
+    desc: 'Mô hình gợi ý sắp xếp lộ trình Sáng / Chiều / Tối tối ưu vị trí GPS và đánh giá tính khả thi 5 chiều.',
+  },
+  {
+    step: '03',
+    icon: Users,
+    title: 'Khám phá bản đồ & rủ bạn đi',
+    desc: 'Theo dõi đường đi OSRM, thời tiết trực tiếp và chia sẻ lên cộng đồng để tìm Travel Buddy 1-1.',
+  },
 ];
 
 export default function Home() {
   const router = useRouter();
   const [quickSearch, setQuickSearch] = useState('');
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isHoveringHero, setIsHoveringHero] = useState(false);
+
+  const bannerCount = FEATURED_DESTINATION_BANNERS.length;
+  const currentBanner = FEATURED_DESTINATION_BANNERS[activeSlide] || FEATURED_DESTINATION_BANNERS[0];
+
+  useEffect(() => {
+    if (isHoveringHero) return;
+    const timer = setInterval(() => {
+      setActiveSlide((prev) => (prev + 1) % bannerCount);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [bannerCount, isHoveringHero]);
 
   const handleQuickSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,289 +87,415 @@ export default function Home() {
     }
   };
 
+  const handlePrevSlide = () => {
+    setActiveSlide((prev) => (prev - 1 + bannerCount) % bannerCount);
+  };
+
+  const handleNextSlide = () => {
+    setActiveSlide((prev) => (prev + 1) % bannerCount);
+  };
+
   return (
-    <div className="min-h-screen bg-[#F9F9F8] text-[#1A1A1A]">
-      {/* Hero Section */}
-      <main className="container mx-auto px-4 pt-16 pb-20 max-w-6xl">
-        <div className="text-center mb-16 max-w-4xl mx-auto">
-          <Badge
-            variant="lime"
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium mb-6 shadow-2xs border-[#D9F99D]"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-[#365314]" />
-            <span>Nền tảng du lịch thông minh & gợi ý cá nhân hóa</span>
-          </Badge>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#1A1A1A] mb-5 leading-tight">
-            Nền tảng du lịch thông minh
-            <br />
-            <span className="text-neutral-500 font-semibold">cá nhân hoá cho riêng bạn</span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-            Khám phá các điểm đến thực tế, kết nối bạn đồng hành cùng gu, và để AI kiến tạo lịch trình tối ưu từng buổi cho chuyến đi của bạn.
-          </p>
-
-          {/* Quick Search & Actions Box */}
-          <div className="max-w-2xl mx-auto mb-8 bg-white p-2.5 sm:p-3 rounded-2xl sm:rounded-full border border-[#E5E7EB] shadow-xs flex flex-col sm:flex-row items-center gap-2.5">
-            <div className="relative flex-1 w-full pl-2">
-              <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <Input
-                type="text"
-                value={quickSearch}
-                onChange={(e) => setQuickSearch(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleQuickSearch(e)}
-                placeholder="Bạn muốn đi đâu? (Đà Lạt, Sa Pa, Hội An...)"
-                className="pl-10 h-10 border-none bg-transparent text-sm focus-visible:ring-0 shadow-none"
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col">
+      <main className="flex-1 container mx-auto px-4 pt-6 sm:pt-8 pb-20 max-w-7xl">
+        {/* 1. Editorial Hero Showcase */}
+        <section
+          aria-label="Điểm đến nổi bật tại Việt Nam"
+          onMouseEnter={() => setIsHoveringHero(true)}
+          onMouseLeave={() => setIsHoveringHero(false)}
+          className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] bg-[#0F172A] min-h-[470px] lg:min-h-[530px] flex items-center shadow-sm"
+        >
+          {/* Crisp rotating 1376x768 editorial destination photos */}
+          {FEATURED_DESTINATION_BANNERS.map((banner, idx) => (
+            <div
+              key={banner.provinceKey}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                idx === activeSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+              }`}
+            >
+              <Image
+                src={banner.image}
+                alt={banner.title}
+                fill
+                priority={idx === 0}
+                quality={95}
+                sizes="(max-width: 768px) 100vw, 1280px"
+                className="object-cover object-center"
               />
             </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <Button
-                onClick={handleQuickSearch}
-                className="h-10 px-5 rounded-full bg-[#1A1A1A] hover:bg-[#2C2C2C] text-white text-xs font-semibold gap-1.5 shadow-xs w-full sm:w-auto"
+          ))}
+
+          {/* High-contrast directional slate/teal scrim */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-r from-[#0F172A]/92 via-[#0F172A]/68 to-[#0F172A]/25"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/75 via-transparent to-transparent"
+          />
+
+          {/* Hero Content */}
+          <div className="relative z-10 w-full px-6 py-10 sm:px-10 md:px-14 lg:py-14 flex flex-col justify-between gap-8">
+            <div className="max-w-2xl">
+              {/* Active Location Pill */}
+              <Link
+                href={`/places?province=${encodeURIComponent(currentBanner.provinceKey)}`}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/14 hover:bg-white/22 backdrop-blur-md border border-white/25 text-white text-xs font-medium mb-5 transition"
               >
-                <span>Tìm kiếm</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Button>
+                <MapPin className="w-3.5 h-3.5 text-[#14B8A6]" />
+                <span>{currentBanner.regionLabel}</span>
+                <span className="text-white/50">•</span>
+                <span className="text-teal-200">{currentBanner.title}</span>
+              </Link>
+
+              <h1 className="text-3xl sm:text-4xl lg:text-[3.1rem] font-bold tracking-[-0.025em] text-white mb-4 leading-[1.14] text-balance">
+                Khám phá Việt Nam &amp; lập lịch trình thông minh cùng AI
+              </h1>
+
+              <p className="text-sm sm:text-base text-slate-200 max-w-xl mb-7 leading-relaxed">
+                {currentBanner.subtitle} Tìm kiếm hơn 500 điểm đến thực tế, tối ưu cung đường từng buổi và kết nối bạn đồng hành hợp gu.
+              </p>
+
+              {/* Quick Search Bar integrated in Hero */}
+              <form
+                onSubmit={handleQuickSearch}
+                className="bg-white p-1.5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4 border border-white/40"
+              >
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Input
+                    type="text"
+                    value={quickSearch}
+                    onChange={(e) => setQuickSearch(e.target.value)}
+                    aria-label="Tìm kiếm điểm đến"
+                    placeholder="Bạn muốn đi đâu? (Đà Lạt, Sa Pa, Hội An...)"
+                    className="pl-10 h-10 border-none bg-transparent text-sm text-[#0F172A] placeholder-[#94A3B8] focus-visible:ring-0 shadow-none"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="h-10 px-5 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-semibold gap-1.5 cursor-pointer shrink-0"
+                >
+                  <span>Tìm điểm đến</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              </form>
+
+              {/* Quick Province Chips + Hero Primary CTA */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-[11px] text-slate-300 font-medium mr-1">Gợi ý:</span>
+                  {QUICK_CHIPS.map((chip) => (
+                    <Link
+                      key={chip.province}
+                      href={`/places?province=${encodeURIComponent(chip.province)}`}
+                      className="px-2.5 py-1 rounded-full bg-white/12 hover:bg-[#0D9488] border border-white/20 hover:border-[#0D9488] text-white text-[11px] font-medium transition-colors backdrop-blur-xs"
+                    >
+                      {chip.label}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2.5">
+                  <Button
+                    asChild
+                    size="sm"
+                    className="h-9 px-4 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] text-white text-xs font-semibold gap-1.5 shadow-md"
+                  >
+                    <Link href="/trips/new">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>Tạo lịch trình AI</span>
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Carousel Controls */}
+            <div className="flex items-center justify-between pt-2 border-t border-white/15">
+              <div className="flex items-center gap-1.5">
+                {FEATURED_DESTINATION_BANNERS.map((banner, idx) => (
+                  <button
+                    key={banner.provinceKey}
+                    type="button"
+                    onClick={() => setActiveSlide(idx)}
+                    aria-label={`Xem ảnh ${banner.title}`}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      idx === activeSlide
+                        ? 'w-7 bg-[#14B8A6]'
+                        : 'w-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrevSlide}
+                  aria-label="Ảnh điểm đến trước"
+                  className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center transition cursor-pointer backdrop-blur-xs"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextSlide}
+                  aria-label="Ảnh điểm đến tiếp theo"
+                  className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 border border-white/25 text-white flex items-center justify-center transition cursor-pointer backdrop-blur-xs"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Popular Destination Quick Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span className="text-neutral-400 font-medium mr-1">Điểm đến gợi ý:</span>
-            {POPULAR_DESTINATIONS.map((dest) => (
+        {/* 2. Visual Province Discovery Grid */}
+        <section className="mt-12 sm:mt-14">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
+                Điểm đến nổi bật khắp Việt Nam
+              </h2>
+              <p className="text-xs sm:text-sm text-[#64748B] mt-1">
+                Chọn điểm đến để xem tọa độ thực tế, đánh giá cộng đồng, giá vé &amp; dự báo thời tiết
+              </p>
+            </div>
+            <Link
+              href="/places"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-[#0D9488] hover:text-[#0F766E] transition shrink-0"
+            >
+              <span>Xem tất cả địa điểm</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            {DISCOVERY_PROVINCES.map((province) => (
               <Link
-                key={dest.name}
-                href={`/places?search=${encodeURIComponent(dest.query)}`}
-                className="px-3 py-1 rounded-full bg-white hover:bg-neutral-100 border border-[#E5E7EB] text-[#1A1A1A] text-xs font-medium transition-colors shadow-2xs"
+                key={province.key}
+                href={`/places?province=${encodeURIComponent(province.key)}`}
+                className="group relative aspect-[16/10] rounded-2xl overflow-hidden border border-[#E2E8F0] bg-[#0F172A] block shadow-2xs"
               >
-                {dest.name}
+                <Image
+                  src={province.image}
+                  alt={province.label}
+                  fill
+                  quality={95}
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 240px"
+                  className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-gradient-to-t from-[#0F172A]/85 via-[#0F172A]/25 to-transparent"
+                />
+                <div className="absolute inset-x-0 bottom-0 p-3.5">
+                  <div className="text-sm font-bold text-white leading-tight group-hover:text-[#5EEAD4] transition-colors">
+                    {province.shortLabel}
+                  </div>
+                  <div className="text-[11px] text-slate-200/90 mt-0.5 line-clamp-1">
+                    {province.tagline}
+                  </div>
+                </div>
               </Link>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* 4 Feature Cards (2x2 Grid) */}
-        <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {/* Card 1: Khám Phá Điểm Đến */}
-          <Link href="/places" className="group block">
-            <Card className="h-full bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-3xl p-8 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-200">
-                  <Compass className="w-6 h-6" />
-                </div>
+        {/* 3. Action Hub Bento (Mobile-inspired hierarchy) */}
+        <section className="mt-12 sm:mt-14">
+          <div className="mb-5">
+            <h2 className="text-xl sm:text-2xl font-bold text-[#0F172A] tracking-tight">
+              Lên kế hoạch &amp; Trợ lý du lịch
+            </h2>
+            <p className="text-xs sm:text-sm text-[#64748B] mt-1">
+              Mọi công cụ cần thiết cho một chuyến đi tự túc chỉn chu từ lúc lên ý tưởng tới khi khởi hành
+            </p>
+          </div>
 
-                <h2 className="text-xl font-bold text-[#1A1A1A] mb-2 group-hover:underline flex items-center justify-between">
-                  <span>Khám phá điểm đến</span>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-[#1A1A1A] group-hover:translate-x-1 transition-all" />
-                </h2>
+          <div className="grid lg:grid-cols-12 gap-5 items-stretch">
+            {/* Left Primary AI Planner Card (7 cols) */}
+            <Link href="/trips/new" className="lg:col-span-7 group block">
+              <Card className="h-full bg-[#0D9488] text-white border-[#0D9488] rounded-3xl p-6 sm:p-8 flex flex-col justify-between transition-transform duration-200 group-hover:-translate-y-0.5 shadow-sm overflow-hidden">
+                <div className="grid md:grid-cols-12 gap-6 items-center">
+                  <div className="md:col-span-7">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/25 text-white flex items-center justify-center">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                      <Badge variant="outline" className="bg-white text-[#0D9488] border-white text-[10px] font-semibold">
+                        AI Planner
+                      </Badge>
+                    </div>
 
-                <p className="text-muted-foreground text-xs leading-relaxed mb-6">
-                  Bảng tin mạng xã hội chia sẻ địa điểm thực tế tại Việt Nam. Thích, lưu wishlist, đánh giá và bình luận trao đổi.
-                </p>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2.5 leading-snug">
+                      Tạo lịch trình AI thông minh
+                    </h3>
 
-                <div className="space-y-2.5 mb-6">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Heart className="w-3.5 h-3.5 text-rose-500" />
-                    <span>Tương tác Thích, Lưu Wishlist, Đánh giá sao</span>
+                    <p className="text-teal-50 text-xs sm:text-sm leading-relaxed mb-5">
+                      Chọn tour một tỉnh hoặc liên tỉnh, ngân sách và gu cá nhân. Hệ thống chia 3 buổi Sáng / Chiều / Tối hợp lý và tối ưu quãng đường di chuyển.
+                    </p>
+
+                    <div className="space-y-2 text-xs text-teal-50 mb-5">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
+                        <span>Tối ưu lộ trình theo tọa độ địa lý (OSRM)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-3.5 h-3.5 text-white shrink-0" />
+                        <span>Chấm điểm tính khả thi 5 chiều (OFS)</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Bookmark className="w-3.5 h-3.5 text-neutral-600" />
-                    <span>Bộ lọc đa dạng theo 11 tỉnh thành & thể loại</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Sparkles className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Dữ liệu tương tác giúp gợi ý chuẩn xác theo gu bạn</span>
-                  </div>
-                </div>
-              </div>
 
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A1A1A] pt-4 border-t border-[#F0F0EF]">
-                <span>Khám phá ngay</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Card>
-          </Link>
-
-          {/* Card 2: Lập Kế Hoạch Du Lịch */}
-          <Link href="/trips/new" className="group block">
-            <Card className="h-full bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-3xl p-8 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-200">
-                  <Calendar className="w-6 h-6" />
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-xl font-bold text-[#1A1A1A] group-hover:underline">Lập lịch trình thông minh</h2>
-                  <Badge variant="lime" className="text-[10px] h-5">AI</Badge>
-                </div>
-
-                <p className="text-muted-foreground text-xs leading-relaxed mb-6">
-                  Lập kế hoạch du lịch chi tiết theo từng ngày. Chọn điểm đến, ngân sách và sở thích; AI sẽ tự động tối ưu cung đường và thời gian.
-                </p>
-
-                <div className="space-y-2.5 mb-6">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Gợi ý cá nhân hóa theo sở thích của bạn</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Sắp xếp lịch trình theo cung đường di chuyển tối ưu</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Bản đồ trực quan & tích hợp dự báo thời tiết</span>
+                  {/* Crisp visual route-planning illustration framed cleanly */}
+                  <div className="md:col-span-5">
+                    <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden border border-white/25 bg-white shadow-md">
+                      <Image
+                        src="/images/illustrations/empty_trips.jpg"
+                        alt="Minh họa lập kế hoạch lịch trình AI"
+                        fill
+                        quality={95}
+                        sizes="(max-width: 768px) 100vw, 280px"
+                        className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A1A1A] pt-4 border-t border-[#F0F0EF]">
-                <span>Tạo lịch trình ngay</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Card>
-          </Link>
-
-          {/* Card 3: Cộng Đồng & Bạn Đồng Hành */}
-          <Link href="/community" className="group block">
-            <Card className="h-full bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-3xl p-8 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-200">
-                  <Users className="w-6 h-6" />
+                <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-white pt-4 mt-4 border-t border-white/20">
+                  <span>Bắt đầu tạo lịch trình ngay</span>
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                 </div>
+              </Card>
+            </Link>
 
-                <h2 className="text-xl font-bold text-[#1A1A1A] mb-2 group-hover:underline">
-                  Cộng đồng & tìm bạn du lịch
-                </h2>
-
-                <p className="text-muted-foreground text-xs leading-relaxed mb-6">
-                  Diễn đàn giao lưu kinh nghiệm, review điểm đến thực tế. Tính năng Travel Buddy tự động gợi ý bạn đồng hành có chung gu xê dịch.
-                </p>
-
-                <div className="space-y-2.5 mb-6">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Đăng bài chia sẻ & thảo luận mở với cộng đồng</span>
+            {/* Right Stack of 3 Concise Tool Cards (5 cols) */}
+            <div className="lg:col-span-5 flex flex-col justify-between gap-3.5">
+              <Link href="/places" className="group block flex-1">
+                <Card className="h-full bg-white border-[#E2E8F0] hover:border-[#0D9488] rounded-2xl p-5 flex items-center gap-4 transition-colors shadow-2xs">
+                  <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center shrink-0 group-hover:bg-[#0D9488] group-hover:text-white group-hover:border-[#0D9488] transition-colors">
+                    <Compass className="w-5 h-5" />
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Gợi ý bạn đồng hành cùng gu và lịch trình</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className="text-sm sm:text-base font-bold text-[#0F172A] group-hover:text-[#0D9488] transition-colors truncate">
+                        Khám phá 500+ điểm đến
+                      </h3>
+                      <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+                      Lọc theo tỉnh thành &amp; thể loại, chấm sao, lưu Wishlist và xem chỉ đường kèm thời tiết.
+                    </p>
+                    <div className="flex items-center gap-3 mt-2 text-[11px] text-[#64748B]">
+                      <span className="inline-flex items-center gap-1">
+                        <Heart className="w-3 h-3 text-[#FF6B6B]" /> Thích &amp; Đánh giá
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <Bookmark className="w-3 h-3 text-[#F59E0B]" /> Wishlist nhanh
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Kết nối những người cùng đam mê xê dịch</span>
+                </Card>
+              </Link>
+
+              <Link href="/community" className="group block flex-1">
+                <Card className="h-full bg-white border-[#E2E8F0] hover:border-[#0D9488] rounded-2xl p-5 flex items-center gap-4 transition-colors shadow-2xs">
+                  <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center shrink-0 group-hover:bg-[#0D9488] group-hover:text-white group-hover:border-[#0D9488] transition-colors">
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className="text-sm sm:text-base font-bold text-[#0F172A] group-hover:text-[#0D9488] transition-colors truncate">
+                        Cộng đồng &amp; Travel Buddy 1-1
+                      </h3>
+                      <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+                      Đọc review thực tế, nhân bản lịch trình cộng đồng chỉ với 1 chạm và chat tìm bạn đồng hành.
+                    </p>
+                  </div>
+                </Card>
+              </Link>
+
+              <Link href="/question-answer" className="group block flex-1">
+                <Card className="h-full bg-white border-[#E2E8F0] hover:border-[#0D9488] rounded-2xl p-5 flex items-center gap-4 transition-colors shadow-2xs">
+                  <div className="w-12 h-12 rounded-2xl bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center shrink-0 group-hover:bg-[#0D9488] group-hover:text-white group-hover:border-[#0D9488] transition-colors">
+                    <MessageSquare className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h3 className="text-sm sm:text-base font-bold text-[#0F172A] group-hover:text-[#0D9488] transition-colors truncate">
+                          Hỏi đáp du lịch AI (RAG)
+                        </h3>
+                        <Badge variant="amber" className="text-[10px] shrink-0">Trợ lý AI</Badge>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#94A3B8] group-hover:text-[#0D9488] group-hover:translate-x-0.5 transition-all shrink-0" />
+                    </div>
+                    <p className="text-xs text-[#64748B] line-clamp-2 leading-relaxed">
+                      Hỏi đáp về giá vé, giờ mở cửa, kinh nghiệm bản địa có trích dẫn nguồn tài liệu tin cậy.
+                    </p>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. 3-Step Flow Strip */}
+        <section className="mt-12 sm:mt-14 bg-white border border-[#E2E8F0] rounded-3xl p-6 sm:p-8 shadow-2xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 pb-4 border-b border-[#E2E8F0]">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#F59E0B]" />
+              <h2 className="text-base sm:text-lg font-bold text-[#0F172A]">
+                Quy trình tạo chuyến đi cá nhân hóa trong 3 bước
+              </h2>
+            </div>
+            <span className="text-xs text-[#64748B]">Kết hợp LightFM + tối ưu lộ trình</span>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-6">
+            {WORKFLOW_STEPS.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.step} className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-[#F0FDFA] border border-[#99F6E4] text-[#0D9488] flex items-center justify-center shrink-0">
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-mono font-bold text-[#0D9488] mb-0.5">
+                      BƯỚC {item.step}
+                    </div>
+                    <h3 className="text-sm font-bold text-[#0F172A] mb-1">{item.title}</h3>
+                    <p className="text-xs text-[#64748B] leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
-              </div>
-
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A1A1A] pt-4 border-t border-[#F0F0EF]">
-                <span>Tham gia cộng đồng</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Card>
-          </Link>
-
-          {/* Card 4: Hỏi Đáp Thông Minh */}
-          <Link href="/question-answer" className="group block">
-            <Card className="h-full bg-white border-[#E5E7EB] hover:border-[#1A1A1A]/40 rounded-3xl p-8 shadow-2xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-6 group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-200">
-                  <MessageSquare className="w-6 h-6" />
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <h2 className="text-xl font-bold text-[#1A1A1A] group-hover:underline">
-                    Hỏi đáp du lịch thông minh
-                  </h2>
-                  <Badge variant="lime" className="text-[10px] h-5">Trợ lý AI</Badge>
-                </div>
-
-                <p className="text-muted-foreground text-xs leading-relaxed mb-6">
-                  Trợ lý thông minh giải đáp mọi thắc mắc du lịch Việt Nam với dữ liệu tin cậy và trích dẫn nguồn uy tín.
-                </p>
-
-                <div className="space-y-2.5 mb-6">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Tra cứu nhanh lộ trình, thời tiết và đặc sản địa phương</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Trích dẫn cẩm nang du lịch và nguồn tham khảo rõ ràng</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#365314]" />
-                    <span>Khám phá các chủ đề du lịch đặc sắc nhanh chóng</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A1A1A] pt-4 border-t border-[#F0F0EF]">
-                <span>Bắt đầu trò chuyện</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Card>
-          </Link>
-        </div>
-
-        {/* Value Highlights Section */}
-        <div className="mt-16 grid md:grid-cols-3 gap-5 max-w-5xl mx-auto">
-          <Card className="p-6 bg-white border-[#E5E7EB] rounded-2xl shadow-2xs">
-            <CardContent className="p-0">
-              <div className="w-10 h-10 rounded-xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-3.5">
-                <Compass className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">Cộng đồng thực tế</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Tương tác và chia sẻ kinh nghiệm thực tế từ các chuyến đi của cộng đồng du lịch khắp Việt Nam.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="p-6 bg-white border-[#E5E7EB] rounded-2xl shadow-2xs">
-            <CardContent className="p-0">
-              <div className="w-10 h-10 rounded-xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-3.5">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">Gợi ý cá nhân hóa</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Hệ thống AI phân tích sở thích và thói quen du lịch để gợi ý điểm đến phù hợp nhất với bạn.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="p-6 bg-white border-[#E5E7EB] rounded-2xl shadow-2xs">
-            <CardContent className="p-0">
-              <div className="w-10 h-10 rounded-xl bg-[#F5F5F4] border border-[#E5E7EB] text-[#1A1A1A] flex items-center justify-center mb-3.5">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-[#1A1A1A] mb-1.5">Tìm bạn đồng hành</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Kết nối với những người bạn có cùng gu du lịch, thời gian rảnh và ngân sách chuyến đi.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              );
+            })}
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#E5E7EB] bg-white py-10">
-        <div className="container mx-auto px-4 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
+      <footer className="border-t border-[#E2E8F0] bg-white py-8">
+        <div className="container mx-auto px-4 max-w-7xl flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748B]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#1A1A1A] text-white flex items-center justify-center">
+            <div className="w-7 h-7 rounded-lg bg-[#0D9488] text-white flex items-center justify-center">
               <MapPin className="w-3.5 h-3.5" />
             </div>
-            <span className="font-semibold text-[#1A1A1A]">AI Travel Planner</span>
-            <span className="text-neutral-300">|</span>
+            <span className="font-semibold text-[#0F172A]">AI Travel Planner</span>
+            <span className="text-[#CBD5E1]">|</span>
             <span>Nền tảng lập kế hoạch du lịch thông minh</span>
           </div>
 
-          <div className="flex items-center gap-5 text-xs text-neutral-600">
-            <Link href="/places" className="hover:text-[#1A1A1A] transition">Khám phá</Link>
-            <Link href="/trips/new" className="hover:text-[#1A1A1A] transition">Tạo lịch trình</Link>
-            <Link href="/community" className="hover:text-[#1A1A1A] transition">Cộng đồng</Link>
-            <Link href="/question-answer" className="hover:text-[#1A1A1A] transition">Hỏi đáp AI</Link>
+          <div className="flex items-center gap-5 text-xs text-[#64748B]">
+            <Link href="/places" className="hover:text-[#0D9488] transition">Khám phá</Link>
+            <Link href="/trips/new" className="hover:text-[#0D9488] transition">Tạo lịch trình</Link>
+            <Link href="/community" className="hover:text-[#0D9488] transition">Cộng đồng</Link>
+            <Link href="/question-answer" className="hover:text-[#0D9488] transition">Hỏi đáp AI</Link>
           </div>
         </div>
       </footer>

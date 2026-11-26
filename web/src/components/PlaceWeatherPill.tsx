@@ -89,8 +89,8 @@ export default function PlaceWeatherPill({ latitude, longitude }: PlaceWeatherPi
 
   if (loading) {
     return (
-      <Badge variant="secondary" className="gap-1 text-[11px] font-normal border-[#E5E7EB]">
-        <Loader2 className="w-3 h-3 animate-spin text-[#6B7280]" />
+      <Badge variant="secondary" className="gap-1 text-[11px] font-normal border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]">
+        <Loader2 className="w-3 h-3 animate-spin text-[#0D9488]" />
         <span>Thời tiết...</span>
       </Badge>
     );
@@ -103,12 +103,12 @@ export default function PlaceWeatherPill({ latitude, longitude }: PlaceWeatherPi
   return (
     <Badge
       variant="secondary"
-      className="gap-1.5 text-[11px] font-medium border-[#E5E7EB] bg-[#F5F5F4] text-[#1A1A1A] hover:bg-[#E5E7EB] transition-colors"
+      className="gap-1.5 text-[11px] font-medium border-[#E2E8F0] bg-[#F8FAFC] text-[#0F172A] hover:bg-[#F0FDFA] hover:border-[#99F6E4] transition-colors"
       title={`Thời tiết hiện tại: ${weather.temp}°C, ${weather.text}, độ ẩm ${weather.humidity}%`}
     >
-      <WeatherIcon className="w-3.5 h-3.5 text-[#6B7280]" />
+      <WeatherIcon className="w-3.5 h-3.5 text-[#0D9488]" />
       <span className="font-semibold">{weather.temp}°C</span>
-      <span className="text-[#6B7280]">({weather.text})</span>
+      <span className="text-[#64748B]">({weather.text})</span>
     </Badge>
   );
 }

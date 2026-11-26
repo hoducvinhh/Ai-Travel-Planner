@@ -1,3 +1,4 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:travel_planner/config/env.dart';
 import 'package:travel_planner/config/provinces.dart';
@@ -49,6 +50,20 @@ void main() {
       expect(vietnamProvinces.length, 11);
       expect(placeCategories.length, 10);
       expect(getProvinceMeta('Hanoi').label, 'Hà Nội');
+    });
+
+    test('Env reads API_URL and ENV from dotenv with default fallback', () {
+      dotenv.testLoad(
+        fileInput: 'API_URL=http://192.168.1.50:3002\nENV=production',
+      );
+      expect(Env.apiUrl, 'http://192.168.1.50:3002');
+      expect(Env.environment, 'production');
+      expect(Env.isProduction, isTrue);
+
+      dotenv.clean();
+      expect(Env.apiUrl, 'http://localhost:3002');
+      expect(Env.environment, 'dev');
+      expect(Env.isDevelopment, isTrue);
     });
   });
 }

@@ -96,17 +96,17 @@ export default function SharePlaceModal({
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md rounded-2xl border-[#E5E7EB] bg-white p-6 shadow-xl">
-        <DialogHeader className="pb-3 border-b border-[#F0F0EF]">
+      <DialogContent className="sm:max-w-md rounded-2xl border-[#E2E8F0] bg-white p-6 shadow-xl">
+        <DialogHeader className="pb-3 border-b border-[#E2E8F0]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#1A1A1A] text-white flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-[#0D9488] text-white flex items-center justify-center shrink-0">
               <Share2 className="w-4 h-4 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-base font-semibold text-[#1A1A1A]">
+              <DialogTitle className="text-base font-semibold text-[#0F172A]">
                 Chia sẻ địa điểm
               </DialogTitle>
-              <DialogDescription className="text-xs text-[#6B7280]">
+              <DialogDescription className="text-xs text-[#64748B]">
                 Đăng lên trang cá nhân để bạn bè cùng khám phá
               </DialogDescription>
             </div>
@@ -114,8 +114,8 @@ export default function SharePlaceModal({
         </DialogHeader>
 
         {/* Place Card Preview */}
-        <div className="flex gap-3.5 p-3.5 rounded-xl bg-[#F9F9F8] border border-[#E5E7EB]">
-          <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#F5F5F4] border border-[#E5E7EB] flex-shrink-0 relative">
+        <div className="flex gap-3.5 p-3.5 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
+          <div className="w-20 h-20 rounded-lg overflow-hidden bg-[#F1F5F9] border border-[#E2E8F0] flex-shrink-0 relative">
             {place.imageUrl ? (
               <img
                 src={place.imageUrl}
@@ -123,26 +123,26 @@ export default function SharePlaceModal({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#9CA3AF]">
+              <div className="w-full h-full flex items-center justify-center text-[#94A3B8]">
                 <MapPin className="w-6 h-6" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
             <div>
-              <h4 className="text-sm font-semibold text-[#1A1A1A] truncate">
+              <h4 className="text-sm font-semibold text-[#0F172A] truncate">
                 {place.name}
               </h4>
-              <div className="flex items-center gap-1.5 text-xs text-[#6B7280] mt-1">
-                <MapPin className="w-3.5 h-3.5 text-[#6B7280] flex-shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs text-[#64748B] mt-1">
+                <MapPin className="w-3.5 h-3.5 text-[#0D9488] flex-shrink-0" />
                 <span className="truncate">
                   {place.district ? `${place.district}, ` : ''}
                   {place.province || 'Việt Nam'}
                 </span>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-medium text-[#1A1A1A]">
-              <Ticket className="w-3.5 h-3.5 text-[#6B7280]" />
+            <div className="flex items-center gap-1.5 text-xs font-medium text-[#0F766E]">
+              <Ticket className="w-3.5 h-3.5 text-[#0D9488]" />
               <span>
                 {place.priceEstimate > 0
                   ? `${place.priceEstimate.toLocaleString('vi-VN')}đ`
@@ -154,8 +154,8 @@ export default function SharePlaceModal({
 
         {/* Note / Caption Input */}
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-[#1A1A1A] flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-[#6B7280]" />
+          <label className="text-xs font-semibold text-[#0F172A] flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-[#0D9488]" />
             Cảm nghĩ của bạn về địa điểm này (tùy chọn)
           </label>
           <Textarea
@@ -164,7 +164,7 @@ export default function SharePlaceModal({
             placeholder="Bạn thấy địa điểm này thế nào? Có mẹo gì hay muốn nhắn nhủ không?..."
             rows={3}
             maxLength={300}
-            className="rounded-xl border-[#E5E7EB] text-xs text-[#1A1A1A] placeholder-[#9CA3AF] resize-none focus-visible:ring-1 focus-visible:ring-[#1A1A1A]"
+            className="rounded-xl border-[#E2E8F0] text-xs text-[#0F172A] placeholder-[#94A3B8] resize-none focus-visible:ring-1 focus-visible:ring-[#0D9488]"
           />
 
           {/* Quick Tags Suggestions */}
@@ -174,7 +174,7 @@ export default function SharePlaceModal({
                 key={tag}
                 type="button"
                 onClick={() => addTagToNote(tag)}
-                className="px-2.5 py-1 rounded-full bg-[#F5F5F4] hover:bg-[#E5E7EB] border border-[#E5E7EB] text-[11px] text-[#4B5563] transition-colors"
+                className="px-2.5 py-1 rounded-full bg-[#F8FAFC] hover:bg-[#F0FDFA] hover:border-[#0D9488] hover:text-[#0D9488] border border-[#E2E8F0] text-[11px] text-[#64748B] transition-colors cursor-pointer"
               >
                 + {tag}
               </button>
@@ -183,16 +183,16 @@ export default function SharePlaceModal({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#F0F0EF]">
+        <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#E2E8F0]">
           <Button
             type="button"
             variant="outline"
             onClick={handleCopyLink}
-            className="rounded-xl text-xs gap-1.5 border-[#E5E7EB]"
+            className="rounded-xl text-xs gap-1.5 border-[#E2E8F0] text-[#0F172A] hover:border-[#0D9488] hover:text-[#0D9488]"
           >
             {copied ? (
               <>
-                <Check className="w-3.5 h-3.5 text-[#1A1A1A]" />
+                <Check className="w-3.5 h-3.5 text-[#10B981]" />
                 <span>Đã sao chép</span>
               </>
             ) : (
@@ -208,7 +208,7 @@ export default function SharePlaceModal({
             variant="default"
             onClick={handleShareToProfile}
             disabled={isSubmitting}
-            className="flex-1 rounded-xl text-xs gap-1.5 bg-[#1A1A1A] text-white hover:bg-[#2C2C2C]"
+            className="flex-1 rounded-xl text-xs gap-1.5 bg-[#0D9488] text-white hover:bg-[#0F766E]"
           >
             {isSubmitting ? (
               <>

@@ -23,9 +23,9 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 flex flex-col items-center justify-center text-white">
-        <Loader2 className="w-10 h-10 animate-spin text-emerald-400 mb-3" />
-        <p className="text-sm text-slate-400">Đang kiểm tra quyền truy cập...</p>
+      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center text-[#0F172A]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0D9488] mb-3" />
+        <p className="text-xs font-medium text-[#64748B]">Đang kiểm tra quyền truy cập...</p>
       </div>
     );
   }
